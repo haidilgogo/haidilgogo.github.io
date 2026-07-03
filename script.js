@@ -28,7 +28,7 @@
       steps: [],
       tip: '' },
     { id: 's4', cat: '소스', emoji: '🧅', tint: 'linear-gradient(160deg,#F5E1C8,#E8C79A)', name: '화령소스', desc: '\'화령\'이라는 하이디라오 직원이 한 네이버 블로거에게 쪽지로 전달해준 소스. 그 포스팅을 \'이예지\'가 우연히 발견하면서 알려지게 됨.',
-      ings: [['땅콩참깨소스', '0.25', '스푼'], ['스위트칠리소스(땅콩보다 많이)', '3.5~4', '스푼'], ['튀긴대두', '2~3', '스푼'], ['참기름(고추기름만큼)', '0.5', '스푼'], ['고추기름', '0.5', '스푼'], ['양파(많이)', '3', '스푼'], ['다진파(많이)', '3', '집게'], ['다진마늘(산더미처럼 쌓아서)', '1', '스푼']],
+      ings: [['땅콩참깨소스', '0.25', '스푼'], ['스위트칠리소스', '3.5~4', '스푼'], ['튀긴대두', '2~3', '스푼'], ['참기름', '0.5', '스푼'], ['고추기름', '0.5', '스푼'], ['양파', '3', '스푼'], ['다진파', '3', '집게'], ['다진마늘', '1', '스푼']],
       steps: [],
       tip: '튀긴대두, 양파, 다진파, 다진마늘은 많으면 많을수록 맛있음' },
     { id: 'r1', cat: '밥', emoji: '🍚', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', desc: '홍탕에 익힌 메기살을 소스에 비빈 공기밥에 얹어 먹는 든든한 한 그릇.',
@@ -124,6 +124,7 @@
     document.getElementById('modalEmoji').textContent = r.emoji;
     document.getElementById('modalName').textContent = r.name;
     document.getElementById('modalCat').textContent = r.cat;
+    document.getElementById('modalDesc').textContent = r.desc;
 
     const orderWrap = document.getElementById('modalOrderWrap');
     if (r.order && r.order.length > 0) {

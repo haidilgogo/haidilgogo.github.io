@@ -231,6 +231,14 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
+
+  .recipe-desc {
+    display: none;
+  }
+
+  .recipe-name {
+    font-size: 18px;
+  }
 }
 
 .recipe-card {
@@ -415,6 +423,14 @@ body {
   color: #E0301E;
   border-radius: 999px;
   font-weight: 600;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.modal-desc {
+  margin: 14px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #8B6F68;
   font-family: 'Noto Sans KR', sans-serif;
 }
 
