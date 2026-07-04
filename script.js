@@ -189,14 +189,18 @@
   renderGrid();
 
   const ptrIndicator = document.getElementById('ptrIndicator');
+  const ptrText = document.getElementById('ptrText');
+  const ptrPage = document.querySelector('.page');
   const PTR_THRESHOLD = 65;
   const PTR_MAX = 100;
+  const PTR_SHOW_AT = 8;
   let ptrStartY = 0;
   let ptrPulling = false;
   let ptrDistance = 0;
 
   function setPtrTransform(dist) {
-    ptrIndicator.style.transform = `translate(-50%, ${-60 + dist}px)`;
+    ptrPage.style.transform = dist ? `translateY(${dist}px)` : '';
+    ptrIndicator.classList.toggle('visible', dist >= PTR_SHOW_AT);
   }
 
   document.addEventListener('touchstart', (e) => {
@@ -208,6 +212,8 @@
     ptrPulling = true;
     ptrIndicator.classList.remove('settling');
     ptrIndicator.classList.add('dragging');
+    ptrPage.classList.remove('ptr-settling');
+    ptrPage.classList.add('ptr-dragging');
   }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
@@ -220,9 +226,11 @@
       return;
     }
     e.preventDefault();
-    ptrDistance = Math.min(delta * 0.45, PTR_MAX);
+    ptrDistance = Math.min(delta * 0.5, PTR_MAX);
     setPtrTransform(ptrDistance);
-    ptrIndicator.classList.toggle('ready', ptrDistance >= PTR_THRESHOLD);
+    const isReady = ptrDistance >= PTR_THRESHOLD;
+    ptrIndicator.classList.toggle('ready', isReady);
+    ptrText.textContent = isReady ? '놓으면 새로고침' : '당겨서 새로고침';
   }, { passive: false });
 
   document.addEventListener('touchend', () => {
@@ -230,10 +238,13 @@
     ptrPulling = false;
     ptrIndicator.classList.remove('dragging');
     ptrIndicator.classList.add('settling');
+    ptrPage.classList.remove('ptr-dragging');
+    ptrPage.classList.add('ptr-settling');
     if (ptrDistance >= PTR_THRESHOLD) {
       ptrIndicator.classList.add('loading');
       ptrIndicator.classList.remove('ready');
-      setPtrTransform(40);
+      ptrText.textContent = '새로고침 중...';
+      setPtrTransform(56);
       location.href = location.pathname + '?_r=' + Date.now();
     } else {
       setPtrTransform(0);
