@@ -27,11 +27,11 @@
       ings: [['매운소고기 - 건더기만', '0.5', '스푼'], ['청유훠궈소스 - 건더기만', '0.5', '스푼'], ['땅콩가루', '', '넉넉하게'], ['다진파', '', '넉넉하게'], ['다진마늘', '0.5', '스푼'], ['스위트칠리소스', '0.5', '스푼'], ['굴소스', '0.5', '스푼'], ['땅콩참깨소스', '0.25', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's3', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디소스(2024ver.).jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE0C2,#F8B888)', name: '쑨디소스(2024ver.)', desc: '쑨디2호소스의 개발자이자 유튜버 \'쑨디\'가, 쑨디2호소스 레시피에 일부 틀린 부분이 있어서 유튜브를 통해 공식적으로 정정해 공개한 소스.',
+    { id: 's3', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디소스(2024ver.).jpg', imgFit: 'cover', imgPosition: 'left 45%', tint: 'linear-gradient(160deg,#FFE0C2,#F8B888)', name: '쑨디소스(2024ver.)', desc: '쑨디2호소스의 개발자이자 유튜버 \'쑨디\'가, 쑨디2호소스 레시피에 일부 틀린 부분이 있어서 유튜브를 통해 공식적으로 정정해 공개한 소스.',
       ings: [['땅콩참깨소스', '0.5', '스푼'], ['다진파', '', '넉넉하게'], ['스위트칠리소스', '0.5', '스푼'], ['다진마늘', '3', '스푼'], ['굴소스', '1', '스푼'], ['매운소고기 - 건더기만', '1', '스푼'], ['청유훠궈소스 - 건더기만', '2', '스푼'], ['땅콩가루', '2', '스푼'], ['만구향', '1', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's5', cat: '소스', emoji: '🥣', img: 'assets/recipe card_영지소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5E6D3,#E8C9A0)', name: '영지소스', desc: '유튜브 채널 \'채널십오야\'의 나영석의 보글보글 촬영 중 \'이영지\'가 공개한 소스.',
+    { id: 's5', cat: '소스', emoji: '🥣', img: 'assets/recipe card_영지소스.jpg', imgFit: 'cover', imgPosition: 'right 12%', tint: 'linear-gradient(160deg,#F5E6D3,#E8C9A0)', name: '영지소스', desc: '유튜브 채널 \'채널십오야\'의 나영석의 보글보글 촬영 중 \'이영지\'가 공개한 소스.',
       ings: [['땅콩참깨소스', '2', '스푼'], ['스위트칠리소스', '1.5', '스푼'], ['태국고추', '2', '스푼'], ['마라시즈닝(고춧가루)', '1.5', '스푼'], ['다진파', '1.5', '집게'], ['다진마늘', '1', '스푼'], ['참기름', '2', '바퀴'], ['간장소스', '1', '바퀴'], ['오향우육(다진고기)', '1.5', '스푼'], ['깨', '', '적당히'], ['설탕', '', '한 꼬집'], ['땅콩가루', '', '한 꼬집']],
       steps: [],
       tip: '' },
@@ -93,7 +93,7 @@
       const card = document.createElement('div');
       card.className = 'recipe-card';
       card.innerHTML = `
-        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}">` : `<span>${r.emoji}</span>`}</div>
+        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}>` : `<span>${r.emoji}</span>`}</div>
         <div class="recipe-body">
           <div class="recipe-cat-row">
             <span class="recipe-cat-label">${r.cat}</span>
@@ -200,6 +200,7 @@
 
   function setPtrTransform(dist) {
     ptrPage.style.transform = dist ? `translateY(${dist}px)` : '';
+    ptrIndicator.style.setProperty('--ptr-y', `${dist}px`);
     ptrIndicator.classList.toggle('visible', dist >= PTR_SHOW_AT);
   }
 
@@ -212,6 +213,7 @@
     ptrPulling = true;
     ptrIndicator.classList.remove('settling');
     ptrIndicator.classList.add('dragging');
+    ptrText.textContent = '땡겨요';
     ptrPage.classList.remove('ptr-settling');
     ptrPage.classList.add('ptr-dragging');
   }, { passive: true });
@@ -230,7 +232,7 @@
     setPtrTransform(ptrDistance);
     const isReady = ptrDistance >= PTR_THRESHOLD;
     ptrIndicator.classList.toggle('ready', isReady);
-    ptrText.textContent = isReady ? '놓으면 새로고침' : '당겨서 새로고침';
+    ptrText.textContent = isReady ? '땡겨요 하딜' : '땡겨요';
   }, { passive: false });
 
   document.addEventListener('touchend', () => {
