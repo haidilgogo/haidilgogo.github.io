@@ -27,7 +27,7 @@
       ings: [['매운소고기 - 건더기만', '0.5', '스푼'], ['청유훠궈소스 - 건더기만', '0.5', '스푼'], ['땅콩가루', '', '넉넉하게'], ['다진파', '', '넉넉하게'], ['다진마늘', '0.5', '스푼'], ['스위트칠리소스', '0.5', '스푼'], ['굴소스', '0.5', '스푼'], ['땅콩참깨소스', '0.25', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's3', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디소스(2024ver.).jpg', imgFit: 'cover', imgPosition: 'left 45%', tint: 'linear-gradient(160deg,#FFE0C2,#F8B888)', name: '쑨디소스(2024ver.)', desc: '쑨디2호소스의 개발자이자 유튜버 \'쑨디\'가, 쑨디2호소스 레시피에 일부 틀린 부분이 있어서 유튜브를 통해 공식적으로 정정해 공개한 소스.',
+    { id: 's3', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디소스(2024ver.).jpg', imgFit: 'cover', imgPosition: 'left 45%', tint: 'linear-gradient(160deg,#FFE0C2,#F8B888)', name: '쑨디소스(2024ver.)', desc: '쑨디2호소스의 개발자인 \'쑨디\'가 레시피에 일부 오류가 있어서 본인의 유튜브를 통해 공식적으로 정정한 소스.',
       ings: [['땅콩참깨소스', '0.5', '스푼'], ['다진파', '', '넉넉하게'], ['스위트칠리소스', '0.5', '스푼'], ['다진마늘', '3', '스푼'], ['굴소스', '1', '스푼'], ['매운소고기 - 건더기만', '1', '스푼'], ['청유훠궈소스 - 건더기만', '2', '스푼'], ['땅콩가루', '2', '스푼'], ['만구향', '1', '스푼']],
       steps: [],
       tip: '' },
@@ -189,18 +189,30 @@
   renderGrid();
 
   const ptrIndicator = document.getElementById('ptrIndicator');
-  const ptrText = document.getElementById('ptrText');
+  const ptrLabel = document.getElementById('ptrLabel');
+  const ptrSuffix = document.getElementById('ptrSuffix');
+  const ptrDots = document.getElementById('ptrDots');
   const ptrPage = document.querySelector('.page');
   const PTR_THRESHOLD = 65;
   const PTR_MAX = 100;
   const PTR_SHOW_AT = 8;
+  const ptrSuffixWidth = ptrSuffix.scrollWidth;
   let ptrStartY = 0;
   let ptrPulling = false;
   let ptrDistance = 0;
 
   function setPtrTransform(dist) {
     ptrPage.style.transform = dist ? `translateY(${dist}px)` : '';
+    const growProgress = Math.min(Math.max((dist - PTR_SHOW_AT) / (PTR_MAX - PTR_SHOW_AT), 0), 1);
+    const scale = 0.7 + growProgress * 0.5;
+    ptrIndicator.style.setProperty('--ptr-scale', scale.toFixed(3));
+    ptrIndicator.style.setProperty('--ptr-y', `${dist * 0.3}px`);
     ptrIndicator.classList.toggle('visible', dist >= PTR_SHOW_AT);
+
+    const readyProgress = Math.min(Math.max(dist / PTR_THRESHOLD, 0), 1);
+    ptrLabel.style.opacity = (0.5 + readyProgress * 0.5).toFixed(3);
+    ptrSuffix.style.opacity = readyProgress.toFixed(3);
+    ptrSuffix.style.maxWidth = `${readyProgress * ptrSuffixWidth}px`;
   }
 
   document.addEventListener('touchstart', (e) => {
@@ -212,7 +224,7 @@
     ptrPulling = true;
     ptrIndicator.classList.remove('settling');
     ptrIndicator.classList.add('dragging');
-    ptrText.textContent = '땡겨요';
+    ptrDots.textContent = '';
     ptrPage.classList.remove('ptr-settling');
     ptrPage.classList.add('ptr-dragging');
   }, { passive: true });
@@ -229,9 +241,7 @@
     e.preventDefault();
     ptrDistance = Math.min(delta * 0.5, PTR_MAX);
     setPtrTransform(ptrDistance);
-    const isReady = ptrDistance >= PTR_THRESHOLD;
-    ptrIndicator.classList.toggle('ready', isReady);
-    ptrText.textContent = isReady ? '땡겨요 하딜' : '땡겨요';
+    ptrIndicator.classList.toggle('ready', ptrDistance >= PTR_THRESHOLD);
   }, { passive: false });
 
   document.addEventListener('touchend', () => {
@@ -245,6 +255,11 @@
       ptrIndicator.classList.add('loading');
       if (navigator.vibrate) navigator.vibrate(30);
       setPtrTransform(56);
+      let dotCount = 1;
+      setInterval(() => {
+        ptrDots.textContent = '.'.repeat(dotCount);
+        dotCount = dotCount >= 5 ? 1 : dotCount + 1;
+      }, 250);
       location.href = location.pathname + '?_r=' + Date.now();
     } else {
       setPtrTransform(0);

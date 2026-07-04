@@ -575,7 +575,7 @@ body {
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  transform: translate(-50%, var(--ptr-y, 0px)) scale(.85);
+  transform: translate(-50%, var(--ptr-y, 0px)) scale(var(--ptr-scale, .7));
   opacity: 0;
   z-index: 999;
   pointer-events: none;
@@ -583,7 +583,6 @@ body {
 
 .ptr-indicator.visible {
   opacity: 1;
-  transform: translate(-50%, var(--ptr-y, 0px)) scale(1);
 }
 
 .ptr-indicator.dragging {
@@ -607,4 +606,18 @@ body {
   font-weight: 700;
   color: #F0928A;
   font-family: 'Noto Sans KR', sans-serif;
+  white-space: nowrap;
+}
+
+.ptr-label {
+  opacity: .5;
+}
+
+.ptr-suffix {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 0;
+  margin-left: 6px;
+  vertical-align: bottom;
+  opacity: 0;
 }
