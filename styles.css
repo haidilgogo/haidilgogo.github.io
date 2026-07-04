@@ -269,6 +269,19 @@ body {
   line-height: 1;
 }
 
+.recipe-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.recipe-thumb-img--cover {
+  object-fit: cover;
+  padding: 0;
+}
+
 .recipe-body {
   padding: 19px 21px 21px;
   display: flex;
@@ -475,6 +488,7 @@ body {
   font-weight: 500;
   color: #3A241F;
   font-family: 'Noto Sans KR', sans-serif;
+  word-break: keep-all;
 }
 
 .ing-amt {
@@ -492,6 +506,20 @@ body {
   min-width: 40px;
   text-align: left;
   flex: none;
+}
+
+@media (max-width: 640px) {
+  .ing-name {
+    font-size: 13.5px;
+  }
+
+  .ing-amt {
+    font-size: 13.5px;
+  }
+
+  .ing-unit {
+    font-size: 12.5px;
+  }
 }
 
 .steps-list {
