@@ -189,17 +189,28 @@
   renderGrid();
 
   const ptrIndicator = document.getElementById('ptrIndicator');
-  const ptrLabel = document.getElementById('ptrLabel');
+  const ptrText = document.getElementById('ptrText');
   const ptrSuffix = document.getElementById('ptrSuffix');
   const ptrDots = document.getElementById('ptrDots');
   const ptrPage = document.querySelector('.page');
   const PTR_THRESHOLD = 65;
-  const PTR_MAX = 100;
+  const PTR_MAX = Math.round(window.innerHeight * 0.55);
   const PTR_SHOW_AT = 8;
-  const ptrSuffixWidth = ptrSuffix.scrollWidth;
+  const PTR_EMOJI_RAMP = PTR_MAX * 0.55;
+  const PTR_RELOAD_DELAY = 320;
+  ptrSuffix.style.setProperty('--ptr-suffix-w', `${ptrSuffix.scrollWidth}px`);
   let ptrStartY = 0;
   let ptrPulling = false;
   let ptrDistance = 0;
+  let emojiBurstTriggered = false;
+
+  function triggerEmojiBurst() {
+    emojiBurstTriggered = true;
+    ptrIndicator.classList.add('emoji-burst');
+    ptrIndicator.style.setProperty('--ptr-emoji-sp', '1.3');
+    ptrIndicator.style.setProperty('--ptr-emoji-op', '0');
+    ptrIndicator.style.setProperty('--ptr-emoji-rp', '1.3');
+  }
 
   function setPtrTransform(dist) {
     ptrPage.style.transform = dist ? `translateY(${dist}px)` : '';
@@ -207,12 +218,14 @@
     const scale = 0.7 + growProgress * 0.5;
     ptrIndicator.style.setProperty('--ptr-scale', scale.toFixed(3));
     ptrIndicator.style.setProperty('--ptr-y', `${dist * 0.3}px`);
+    if (!emojiBurstTriggered) {
+      const emojiProgress = Math.min(Math.max(dist / PTR_EMOJI_RAMP, 0), 1);
+      const emojiRotProgress = Math.min(Math.max((emojiProgress - 0.25) / 0.75, 0), 1);
+      ptrIndicator.style.setProperty('--ptr-emoji-sp', emojiProgress.toFixed(3));
+      ptrIndicator.style.setProperty('--ptr-emoji-op', emojiProgress.toFixed(3));
+      ptrIndicator.style.setProperty('--ptr-emoji-rp', emojiRotProgress.toFixed(3));
+    }
     ptrIndicator.classList.toggle('visible', dist >= PTR_SHOW_AT);
-
-    const readyProgress = Math.min(Math.max(dist / PTR_THRESHOLD, 0), 1);
-    ptrLabel.style.opacity = (0.5 + readyProgress * 0.5).toFixed(3);
-    ptrSuffix.style.opacity = readyProgress.toFixed(3);
-    ptrSuffix.style.maxWidth = `${readyProgress * ptrSuffixWidth}px`;
   }
 
   function ptrStart(clientY) {
@@ -222,7 +235,8 @@
     }
     ptrStartY = clientY;
     ptrPulling = true;
-    ptrIndicator.classList.remove('settling');
+    emojiBurstTriggered = false;
+    ptrIndicator.classList.remove('settling', 'emoji-burst');
     ptrIndicator.classList.add('dragging');
     ptrDots.textContent = '';
     ptrPage.classList.remove('ptr-settling');
@@ -238,9 +252,12 @@
       ptrIndicator.classList.remove('ready');
       return false;
     }
-    ptrDistance = Math.min(delta * 0.5, PTR_MAX);
+    ptrDistance = Math.min(delta * 0.7, PTR_MAX);
     setPtrTransform(ptrDistance);
     ptrIndicator.classList.toggle('ready', ptrDistance >= PTR_THRESHOLD);
+    if (!emojiBurstTriggered && ptrDistance >= PTR_EMOJI_RAMP) {
+      triggerEmojiBurst();
+    }
     return true;
   }
 
@@ -255,12 +272,16 @@
       ptrIndicator.classList.add('loading');
       if (navigator.vibrate) navigator.vibrate(30);
       setPtrTransform(56);
+      triggerEmojiBurst();
+      ptrText.style.opacity = '0';
       let dotCount = 1;
       setInterval(() => {
         ptrDots.textContent = '.'.repeat(dotCount);
         dotCount = dotCount >= 5 ? 1 : dotCount + 1;
       }, 250);
-      location.href = location.pathname + '?_r=' + Date.now();
+      setTimeout(() => {
+        location.href = location.pathname + '?_r=' + Date.now();
+      }, PTR_RELOAD_DELAY);
     } else {
       setPtrTransform(0);
     }
