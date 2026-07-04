@@ -621,3 +621,30 @@ body {
   vertical-align: bottom;
   opacity: 0;
 }
+
+.ptr-emoji {
+  position: absolute;
+  font-size: 17px;
+  opacity: 0;
+  transform: scale(0) rotate(0deg) translateY(0);
+  pointer-events: none;
+}
+
+.ptr-emoji--1 { top: -8px; left: -32px; }
+.ptr-emoji--2 { top: -16px; right: -28px; }
+.ptr-emoji--3 { top: 8px; right: -44px; }
+.ptr-emoji--4 { top: 14px; left: -44px; }
+
+.ptr-indicator.ready .ptr-emoji {
+  animation: ptrEmojiPop .7s ease forwards;
+}
+
+.ptr-indicator.ready .ptr-emoji--2 { animation-delay: .06s; }
+.ptr-indicator.ready .ptr-emoji--3 { animation-delay: .12s; }
+.ptr-indicator.ready .ptr-emoji--4 { animation-delay: .18s; }
+
+@keyframes ptrEmojiPop {
+  0% { opacity: 0; transform: scale(0) rotate(-12deg) translateY(0); }
+  35% { opacity: 1; transform: scale(1.25) rotate(8deg) translateY(-6px); }
+  100% { opacity: 0; transform: scale(.9) rotate(0deg) translateY(-24px); }
+}
