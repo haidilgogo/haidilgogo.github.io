@@ -323,7 +323,7 @@ body {
 /* FOOTER */
 .footer {
   color: #E3B3A6;
-  padding: 38px clamp(20px, 5vw, 40px);
+  padding: 18px clamp(20px, 5vw, 40px);
   display: flex;
   justify-content: center;
   align-items: center;
