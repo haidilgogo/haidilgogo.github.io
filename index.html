@@ -7,8 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=24">
+<link rel="stylesheet" href="styles.css?v=31">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E0301E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="하이디라오 꿀팁">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -103,10 +105,32 @@
   </div>
 </div>
 
-<!-- ADD TO HOME SCREEN -->
-<button class="a2hs-btn" id="a2hsBtn" type="button" style="display:none;">
-  <span class="a2hs-btn-icon">＋</span>홈 화면에 추가
-</button>
+<!-- IN-APP BROWSER GUIDE -->
+<div class="inapp-banner" id="inappBanner" style="display:none;">
+  <span class="inapp-banner-text" id="inappBannerText"></span>
+  <span class="inapp-banner-close" id="inappBannerClose">&times;</span>
+</div>
+
+<!-- FLOATING ACTIONS -->
+<div class="floating-actions" id="floatingActions">
+  <button class="a2hs-btn" id="androidInstallBtn" type="button" style="display:none;">
+    <span class="a2hs-btn-icon">＋</span>앱 설치하기
+  </button>
+  <button class="a2hs-btn" id="a2hsBtn" type="button" style="display:none;">
+    <span class="a2hs-btn-icon">＋</span>홈 화면에 추가
+  </button>
+  <button class="share-btn" id="shareBtn" type="button">
+    <span class="share-btn-icon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
+        <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+        <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.6 10.6l6.8-3.8M8.6 13.4l6.8 3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </span>친구에게 공유
+  </button>
+</div>
+<div class="share-toast" id="shareToast">링크가 복사되었어요!</div>
 
 <div class="a2hs-overlay" id="a2hsOverlay">
   <div class="a2hs-card">
@@ -116,20 +140,28 @@
     <ol class="a2hs-steps">
       <li>
         <span class="a2hs-step-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M7 8l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 6l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 8H7a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3h-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </span>
         <span class="a2hs-step-text">하단(또는 상단) 공유 버튼을 눌러요</span>
       </li>
-      <li><span class="a2hs-step-icon">＋</span><span class="a2hs-step-text">목록에서 <b>'홈 화면에 추가'</b>를 선택해요</span></li>
+      <li>
+        <span class="a2hs-step-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="a2hs-step-text">목록에서 <b>'홈 화면에 추가'</b>를 선택해요</span>
+      </li>
       <li><span class="a2hs-step-icon">✓</span><span class="a2hs-step-text">오른쪽 위 <b>'추가'</b>를 누르면 완료!</span></li>
     </ol>
   </div>
 </div>
 
-<script src="script.js?v=20"></script>
+<script src="script.js?v=21"></script>
 </body>
 </html>

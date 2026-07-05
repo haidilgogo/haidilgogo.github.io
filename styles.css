@@ -800,29 +800,109 @@ body {
     scale(calc(var(--ptr-emoji-sp, 0) * var(--ptr-emoji-max, 1)));
 }
 
-/* ADD TO HOME SCREEN */
-.a2hs-btn {
+/* FLOATING ACTIONS */
+.floating-actions {
   position: fixed;
   right: 18px;
   bottom: 18px;
   z-index: 150;
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* ADD TO HOME SCREEN / INSTALL */
+.a2hs-btn {
+  display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: rgba(224, 48, 30, .85);
   color: #fff;
   border: none;
   border-radius: 999px;
-  padding: 12px 18px;
+  padding: 9px 14px;
   font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .a2hs-btn-icon {
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1;
+}
+
+/* SHARE */
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, .85);
+  color: #E0301E;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(58, 12, 8, .12);
+}
+
+.share-btn-icon {
+  display: flex;
+  line-height: 1;
+}
+
+.share-toast {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 90px;
+  transform: translateX(-50%);
+  z-index: 250;
+  background: rgba(43, 18, 13, .9);
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.share-toast.show {
+  display: block;
+}
+
+/* IN-APP BROWSER GUIDE */
+.inapp-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #2B120D;
+  color: #fff;
+  padding: 12px 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.inapp-banner-close {
+  flex: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .7;
 }
 
 .a2hs-overlay {

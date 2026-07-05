@@ -12,6 +12,7 @@
     '땅콩참깨소스': '🥜', '스위트칠리소스': '🌶️', '다진파': '🌿', '깨': '⚪', '땅콩가루': '🥜',
     '마라시즈닝': '🌶️', '설탕': '🍬', '매운소고기': '🥩',
     '참기름': '🫗', '중국식초': '🧴', '팡가시우메기': '🐟',
+    '날계란': '🥚', '오향우육(다진고기)': '🥩', '생면': '🍜',
   };
 
   const RECIPES = [
@@ -44,6 +45,29 @@
         '충분히 익힌 메기살을 밥에 얹어 으깨 먹는다',
       ],
       tip: '느끼하면 마라훠궈 국물을 밥에 조금 섞어주기' },
+    { id: 'r2', cat: '밥', emoji: '🍚', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토계란국밥', desc: '녹진하게 끓인 토마토탕에 계란물을 풀어, 밥에 끼얹어 비벼 먹는 히든 메뉴.',
+      order: [['날계란', '1', '개'], ['공깃밥', '1', '공기']],
+      ings: [['참기름', '0.5', '스푼'], ['오향우육(다진고기)', '2', '스푼'], ['다진파', '2', '집게']],
+      steps: [
+        '토마토탕이 녹진(꾸덕)해질 때까지 충분히 끓여준다',
+        '소스바에서 소스를 만든다',
+        '날계란에 물을 조금 섞어 풀어준 뒤, 녹진해진 토마토탕 위에 구멍 뚫린 국자를 대고 계란물을 천천히 부어준다',
+        '계란이 잘 익도록 국자로 탕을 잘 저어준다',
+        '소스가 담긴 밥에 토마토계란탕을 끼얹어 비벼 먹는다',
+      ],
+      tip: '토마토탕 안에 토마토를 국자로 으깨주기' },
+    { id: 'n1', cat: '면', emoji: '🍜', tint: 'linear-gradient(160deg,#FFECDD,#FFC2A6)', name: '토마토에그누들', desc: '녹진하게 끓인 토마토탕에 계란물을 풀고 생면을 익혀 먹는 히든 메뉴.',
+      order: [['날계란', '1', '개'], ['생면', '1', '인분']],
+      ings: [['오향우육(다진고기)', '2', '스푼'], ['다진파', '2', '집게']],
+      steps: [
+        '토마토탕이 녹진(꾸덕)해질 때까지 충분히 끓여준다',
+        '소스바에서 소스를 만든다',
+        '날계란에 물을 조금 섞어 풀어준 뒤, 녹진해진 토마토탕 위에 구멍 뚫린 국자를 대고 계란물을 천천히 부어준다',
+        '계란이 잘 익도록 국자로 탕을 잘 저어준다',
+        '맑은탕에 생면을 넣고 살짝 익힌 뒤, 토마토탕으로 옮겨 타지 않게 저으면서 잘 익혀준다',
+        '면이 다 익으면 소스그릇에 토마토계란탕을 끼얹고 면을 건져 먹는다',
+      ],
+      tip: '토마토탕 안에 토마토를 국자로 으깨주기' },
   ];
 
   let activeCat = '전체';
@@ -309,15 +333,19 @@
   }, { passive: false });
   document.addEventListener('touchend', ptrEnd);
 
-  // ADD TO HOME SCREEN (iOS Safari only — no install API exists, so we guide manually)
+  // 기기/브라우저 판별
+  const ua = navigator.userAgent;
+  const isIos = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/.test(ua);
+  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const isInAppBrowser = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//.test(ua);
+
   function isIosSafariNotInstalled() {
-    const ua = navigator.userAgent;
-    const isIos = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-    return isIos && isSafari && !isStandalone;
+    return isIos && isSafari && !isStandalone && !isInAppBrowser;
   }
 
+  // ADD TO HOME SCREEN (iOS Safari — no install API exists, so we guide manually)
   const a2hsBtn = document.getElementById('a2hsBtn');
   const a2hsOverlay = document.getElementById('a2hsOverlay');
   const a2hsClose = document.getElementById('a2hsClose');
@@ -330,4 +358,76 @@
     });
     a2hsClose.addEventListener('click', () => a2hsOverlay.classList.remove('open'));
   }
+
+  // INSTALL APP (Android Chrome/삼성 인터넷 — 표준 설치 프롬프트 이용)
+  const androidInstallBtn = document.getElementById('androidInstallBtn');
+  let deferredInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    if (isInAppBrowser || isStandalone) return;
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    androidInstallBtn.style.display = 'flex';
+  });
+
+  androidInstallBtn.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    androidInstallBtn.style.display = 'none';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    androidInstallBtn.style.display = 'none';
+  });
+
+  // 카카오톡 등 인앱 브라우저 안내
+  const inappBanner = document.getElementById('inappBanner');
+  const inappBannerText = document.getElementById('inappBannerText');
+  const inappBannerClose = document.getElementById('inappBannerClose');
+  const INAPP_DISMISS_KEY = 'inappBannerDismissed';
+
+  if (isInAppBrowser && !isStandalone && !sessionStorage.getItem(INAPP_DISMISS_KEY)) {
+    inappBannerText.textContent = isIos
+      ? '카카오톡 등에서는 홈 화면 추가가 안 돼요. 오른쪽 위 \'⋯\'을 눌러 Safari로 열어주세요'
+      : '카카오톡 등에서는 앱 설치가 안 돼요. 오른쪽 위 \'⋯\'을 눌러 기본 브라우저로 열어주세요';
+    inappBanner.style.display = 'flex';
+    document.body.style.paddingTop = inappBanner.offsetHeight + 'px';
+    inappBannerClose.addEventListener('click', () => {
+      inappBanner.style.display = 'none';
+      document.body.style.paddingTop = '';
+      sessionStorage.setItem(INAPP_DISMISS_KEY, '1');
+    });
+  }
+
+  // 친구에게 공유
+  const shareBtn = document.getElementById('shareBtn');
+  const shareToast = document.getElementById('shareToast');
+  let shareToastTimer = null;
+
+  function showShareToast(text) {
+    shareToast.textContent = text;
+    shareToast.classList.add('show');
+    clearTimeout(shareToastTimer);
+    shareToastTimer = setTimeout(() => shareToast.classList.remove('show'), 2000);
+  }
+
+  shareBtn.addEventListener('click', async () => {
+    const shareData = { title: document.title, url: location.origin + location.pathname };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // 사용자가 공유를 취소한 경우 등은 무시
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      showShareToast('링크가 복사되었어요!');
+    } catch (err) {
+      showShareToast('링크 복사에 실패했어요');
+    }
+  });
 })();
