@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=40">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css">
+<link rel="stylesheet" href="styles.css?v=67">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,22 +16,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
-
-<div class="ptr-indicator" id="ptrIndicator">
-  <span class="ptr-emoji ptr-emoji--veg" style="--ptr-rot:-39deg; --ptr-dx:-85px; --ptr-dy:-15px">🌶️</span>
-  <span class="ptr-emoji ptr-emoji--big" style="--ptr-rot:25deg; --ptr-dx:-20px; --ptr-dy:-32px">🍲</span>
-  <span class="ptr-emoji ptr-emoji--veg" style="--ptr-rot:-14deg; --ptr-dx:20px; --ptr-dy:-32px">🧄</span>
-  <span class="ptr-emoji ptr-emoji--big" style="--ptr-rot:36deg; --ptr-dx:85px; --ptr-dy:-15px">🥟</span>
-  <span class="ptr-emoji ptr-emoji--veg" style="--ptr-rot:-34deg; --ptr-dx:100px; --ptr-dy:30px">🧅</span>
-  <span class="ptr-emoji ptr-emoji--big" style="--ptr-rot:20deg; --ptr-dx:25px; --ptr-dy:32px">🥢</span>
-  <span class="ptr-emoji ptr-emoji--veg" style="--ptr-rot:-22deg; --ptr-dx:-25px; --ptr-dy:32px">🥬</span>
-  <span class="ptr-emoji ptr-emoji--big" style="--ptr-rot:31deg; --ptr-dx:-100px; --ptr-dy:30px">🍜</span>
-  <span class="ptr-emoji ptr-emoji--spark" style="--ptr-rot:10deg; --ptr-dx:-35px; --ptr-dy:-48px; --ptr-dx-b:-70px; --ptr-dy-b:-95px">✨</span>
-  <span class="ptr-emoji ptr-emoji--spark" style="--ptr-rot:-15deg; --ptr-dx:100px; --ptr-dy:-35px; --ptr-dx-b:150px; --ptr-dy-b:-65px">✨</span>
-  <span class="ptr-emoji ptr-emoji--spark" style="--ptr-rot:20deg; --ptr-dx:45px; --ptr-dy:50px; --ptr-dx-b:85px; --ptr-dy-b:90px">✨</span>
-  <span class="ptr-emoji ptr-emoji--spark" style="--ptr-rot:-10deg; --ptr-dx:-115px; --ptr-dy:50px; --ptr-dx-b:-160px; --ptr-dy-b:85px">✨</span>
-  <span class="ptr-text" id="ptrText"><span class="ptr-label">땡겨요</span><span class="ptr-suffix" id="ptrSuffix">하딜</span><span class="ptr-dots" id="ptrDots"></span></span>
-</div>
 
 <div class="page">
 
@@ -44,10 +29,11 @@
         <div class="tabs" id="tabs">
           <span class="tabs-underline" id="tabsUnderline"></span>
         </div>
-        <button class="fav-toggle-btn" id="favToggleBtn" type="button">
-          <svg class="fav-toggle-icon" id="favToggleIcon" width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button class="fav-toggle-btn" id="favToggleBtn" type="button" aria-label="즐겨찾기">
+          <svg class="fav-toggle-icon" id="favToggleIcon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 3.5l2.72 5.66 6.13.85-4.43 4.36 1.03 6.13L12 17.5l-5.45 2.9 1.03-6.13-4.43-4.36 6.13-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-          </svg>즐겨찾기
+          </svg>
+          <span class="fav-toggle-label">즐겨찾기</span>
         </button>
       </div>
       <div class="topbar-spacer"></div>
@@ -87,7 +73,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <span class="footer-title">하딜갈사람은 하이디라오 소스바 앞에서 매번 건희소스를 검색하는 사람들(나 포함)을 위해 만들어졌습니다</span>
+    <span class="footer-title">하딜갈사람은 하이디라오 소스바 앞에서 <br class="footer-break-mobile">매번 건희소스를 검색하는 사람들(나 포함)을 <br class="footer-break-mobile">위해 만들어졌습니다</span>
   </footer>
 
 </div>
@@ -184,6 +170,6 @@
   </div>
 </div>
 
-<script src="script.js?v=24"></script>
+<script src="script.js?v=28"></script>
 </body>
 </html>

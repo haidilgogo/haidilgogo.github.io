@@ -134,11 +134,11 @@
       const card = document.createElement('div');
       card.className = 'recipe-card';
       card.innerHTML = `
-        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.72 5.66 6.13.85-4.43 4.36 1.03 6.13L12 17.5l-5.45 2.9 1.03-6.13-4.43-4.36 6.13-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
+        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}"><span class="recipe-cat-badge">${r.cat}</span>${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}${r.id === 's5' ? ' recipe-thumb-img--yeongji-mobile' : ''}" src="${r.img}" alt="${r.name}"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.72 5.66 6.13.85-4.43 4.36 1.03 6.13L12 17.5l-5.45 2.9 1.03-6.13-4.43-4.36 6.13-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
         <div class="recipe-body">
           <div class="recipe-cat-row">
             <span class="recipe-cat-label">${r.cat}</span>
-            <h3 class="recipe-name">${r.name}</h3>
+            <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}">${r.name}</h3>
           </div>
         </div>
       `;
@@ -254,15 +254,7 @@
     renderGrid();
   });
   homeBtn.addEventListener('click', () => {
-    activeCat = '전체';
-    query = '';
-    showFavoritesOnly = false;
-    searchInput.value = '';
-    searchBox.classList.remove('has-value');
-    favToggleBtn.classList.remove('active');
-    renderTabs();
-    renderGrid();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    location.href = location.pathname + '?_r=' + Date.now();
   });
   searchClear.addEventListener('click', () => {
     query = '';
@@ -275,111 +267,8 @@
   renderTabs();
   renderGrid();
 
-  const ptrIndicator = document.getElementById('ptrIndicator');
-  const ptrText = document.getElementById('ptrText');
-  const ptrSuffix = document.getElementById('ptrSuffix');
-  const ptrDots = document.getElementById('ptrDots');
-  const ptrPage = document.querySelector('.page');
-  const PTR_THRESHOLD = 65;
-  const PTR_MAX = Math.round(window.innerHeight * 0.55);
-  const PTR_SHOW_AT = 8;
-  const PTR_EMOJI_RAMP = PTR_MAX * 0.55;
-  const PTR_RELOAD_DELAY = 320;
-  ptrSuffix.style.setProperty('--ptr-suffix-w', `${ptrSuffix.scrollWidth}px`);
-  let ptrStartY = 0;
-  let ptrPulling = false;
-  let ptrDistance = 0;
-  let emojiBurstTriggered = false;
-
-  function triggerEmojiBurst() {
-    emojiBurstTriggered = true;
-    ptrIndicator.classList.add('emoji-burst');
-    ptrIndicator.style.setProperty('--ptr-emoji-sp', '1.3');
-    ptrIndicator.style.setProperty('--ptr-emoji-op', '0');
-    ptrIndicator.style.setProperty('--ptr-emoji-rp', '1.3');
-  }
-
-  function setPtrTransform(dist) {
-    ptrPage.style.transform = dist ? `translateY(${dist}px)` : '';
-    const growProgress = Math.min(Math.max((dist - PTR_SHOW_AT) / (PTR_MAX - PTR_SHOW_AT), 0), 1);
-    const scale = 0.7 + growProgress * 0.5;
-    ptrIndicator.style.setProperty('--ptr-scale', scale.toFixed(3));
-    ptrIndicator.style.setProperty('--ptr-y', `${dist * 0.3}px`);
-    if (!emojiBurstTriggered) {
-      const emojiProgress = Math.min(Math.max(dist / PTR_EMOJI_RAMP, 0), 1);
-      const emojiRotProgress = Math.min(Math.max((emojiProgress - 0.25) / 0.75, 0), 1);
-      ptrIndicator.style.setProperty('--ptr-emoji-sp', emojiProgress.toFixed(3));
-      ptrIndicator.style.setProperty('--ptr-emoji-op', emojiProgress.toFixed(3));
-      ptrIndicator.style.setProperty('--ptr-emoji-rp', emojiRotProgress.toFixed(3));
-    }
-    ptrIndicator.classList.toggle('visible', dist >= PTR_SHOW_AT);
-  }
-
-  function ptrStart(clientY, target) {
-    if (window.scrollY > 0 || modalOverlay.classList.contains('open') || (target && target.closest('.tabs'))) {
-      ptrPulling = false;
-      return;
-    }
-    ptrStartY = clientY;
-    ptrPulling = true;
-    emojiBurstTriggered = false;
-    ptrIndicator.classList.remove('settling', 'emoji-burst');
-    ptrIndicator.classList.add('dragging');
-    ptrDots.textContent = '';
-    ptrPage.classList.remove('ptr-settling');
-    ptrPage.classList.add('ptr-dragging');
-  }
-
-  function ptrMove(clientY) {
-    if (!ptrPulling) return false;
-    const delta = clientY - ptrStartY;
-    if (delta <= 0) {
-      ptrDistance = 0;
-      setPtrTransform(0);
-      ptrIndicator.classList.remove('ready');
-      return false;
-    }
-    ptrDistance = Math.min(delta * 0.7, PTR_MAX);
-    setPtrTransform(ptrDistance);
-    ptrIndicator.classList.toggle('ready', ptrDistance >= PTR_THRESHOLD);
-    if (!emojiBurstTriggered && ptrDistance >= PTR_EMOJI_RAMP) {
-      triggerEmojiBurst();
-    }
-    return true;
-  }
-
-  function ptrEnd() {
-    if (!ptrPulling) return;
-    ptrPulling = false;
-    ptrIndicator.classList.remove('dragging');
-    ptrIndicator.classList.add('settling');
-    ptrPage.classList.remove('ptr-dragging');
-    ptrPage.classList.add('ptr-settling');
-    if (ptrDistance >= PTR_THRESHOLD) {
-      ptrIndicator.classList.add('loading');
-      if (navigator.vibrate) navigator.vibrate(30);
-      setPtrTransform(56);
-      triggerEmojiBurst();
-      ptrText.style.opacity = '0';
-      let dotCount = 1;
-      setInterval(() => {
-        ptrDots.textContent = '.'.repeat(dotCount);
-        dotCount = dotCount >= 5 ? 1 : dotCount + 1;
-      }, 250);
-      setTimeout(() => {
-        location.href = location.pathname + '?_r=' + Date.now();
-      }, PTR_RELOAD_DELAY);
-    } else {
-      setPtrTransform(0);
-    }
-    ptrDistance = 0;
-  }
-
-  document.addEventListener('touchstart', (e) => ptrStart(e.touches[0].clientY, e.target), { passive: true });
-  document.addEventListener('touchmove', (e) => {
-    if (ptrMove(e.touches[0].clientY)) e.preventDefault();
-  }, { passive: false });
-  document.addEventListener('touchend', ptrEnd);
+  // iOS Safari에서 :active 스타일이 먹히려면 touchstart 리스너가 하나라도 있어야 함
+  document.addEventListener('touchstart', () => {}, { passive: true });
 
   // 기기/브라우저 판별
   const ua = navigator.userAgent;
@@ -455,11 +344,9 @@
     inappBanner.style.display = 'flex';
     const bannerHeight = inappBanner.offsetHeight;
     document.body.style.paddingTop = bannerHeight + 'px';
-    ptrIndicator.style.top = (20 + bannerHeight) + 'px';
     inappBannerClose.addEventListener('click', () => {
       inappBanner.style.display = 'none';
       document.body.style.paddingTop = '';
-      ptrIndicator.style.top = '';
       sessionStorage.setItem(INAPP_DISMISS_KEY, '1');
     });
   }
