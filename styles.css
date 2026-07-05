@@ -2,13 +2,26 @@
   box-sizing: border-box;
 }
 
+/* Overscroll bounce backdrop: cream at the very top (so the pull-to-refresh
+   reveal area behind the page still contrasts with the "하딜" text, which
+   turns brand-red), red everywhere else (so bouncing past the footer blends
+   into its red instead of showing cream). */
 html {
   scroll-behavior: smooth;
+  background-color: #E40111;
+  background-image: linear-gradient(#FFF7F4, #FFF7F4);
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: 100% 60vh;
 }
 
 body {
   margin: 0;
-  background: #FFF7F4;
+  background-color: #E40111;
+  background-image: linear-gradient(#FFF7F4, #FFF7F4);
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: 100% 60vh;
   font-family: 'Noto Sans KR', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -128,19 +141,57 @@ body {
   gap: 9px;
   flex-wrap: wrap;
   justify-content: center;
+  order: 1;
 }
 
-/* 6 tabs wrapping 5+1 in a flex row looks lopsided on narrow screens;
-   lock to a balanced 3x2 grid instead. */
+.search-box {
+  order: 2;
+}
+
+/* Mobile: the search box and tabs are unwrapped from `.tabs-bar` (which
+   becomes a non-box via `display: contents`) so each can scroll
+   independently as direct children of `.page`. The search box is then a
+   normal, non-sticky block that scrolls away with the page like any other
+   content, while only the tabs (now a single swipeable row) stay pinned to
+   the top - order is reset to the default so they fall back to DOM order
+   (search above tabs) instead of the desktop-only order above. */
 @media (max-width: 640px) {
+  .tabs-bar {
+    display: contents;
+  }
+
+  .search-box {
+    order: 0;
+    align-self: center;
+    width: calc(100% - 2 * clamp(20px, 5vw, 40px));
+    margin: 16px auto 0;
+  }
+
   .tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    width: 100%;
+    order: 0;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start;
+    max-width: 100%;
+    margin-top: 12px;
+    padding: 12px clamp(20px, 5vw, 40px);
+    background: rgba(255, 247, 244, .92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #F7DCD3;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .tab-btn {
-    text-align: center;
+    flex: none;
+    white-space: nowrap;
   }
 }
 
@@ -196,7 +247,35 @@ body {
   font-size: 13.5px;
   font-family: 'Noto Sans KR', sans-serif;
   color: #2B120D;
-  padding-right: 16px;
+  padding-right: 8px;
+}
+
+@media (max-width: 640px) {
+  .search-input {
+    font-size: 16px;
+  }
+}
+
+.search-clear {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-right: 9px;
+  border: none;
+  border-radius: 50%;
+  background: #F0D2C9;
+  color: #7A3B33;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-box.has-value .search-clear {
+  display: flex;
 }
 
 /* RECIPE GRID */

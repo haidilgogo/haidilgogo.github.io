@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=12">
+<link rel="stylesheet" href="styles.css?v=21">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
 <body>
@@ -41,11 +41,12 @@
 
   <!-- CATEGORY TABS + SEARCH -->
   <div class="tabs-bar">
-    <div class="tabs" id="tabs"></div>
     <div class="search-box">
       <span class="search-icon" id="searchIcon">🔍</span>
       <input class="search-input" id="searchInput" type="text" placeholder="레시피 검색(예: 건희소스, 메기살덮밥)">
+      <button class="search-clear" id="searchClear" type="button" aria-label="검색어 지우기">&times;</button>
     </div>
+    <div class="tabs" id="tabs"></div>
   </div>
 
   <!-- RECIPE GRID -->
@@ -93,6 +94,6 @@
   </div>
 </div>
 
-<script src="script.js?v=12"></script>
+<script src="script.js?v=18"></script>
 </body>
 </html>

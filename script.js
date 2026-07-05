@@ -54,6 +54,8 @@
   const countEl = document.getElementById('countNum');
   const searchInput = document.getElementById('searchInput');
   const searchIcon = document.getElementById('searchIcon');
+  const searchClear = document.getElementById('searchClear');
+  const searchBox = document.querySelector('.search-box');
   const modalOverlay = document.getElementById('modalOverlay');
   const modalScroll = document.getElementById('recipe-modal-scroll');
   const modalClose = document.getElementById('modalClose');
@@ -181,9 +183,17 @@
 
   searchInput.addEventListener('input', (e) => {
     query = e.target.value;
+    searchBox.classList.toggle('has-value', query.length > 0);
     renderGrid();
   });
   searchIcon.addEventListener('click', () => searchInput.focus());
+  searchClear.addEventListener('click', () => {
+    query = '';
+    searchInput.value = '';
+    searchBox.classList.remove('has-value');
+    renderGrid();
+    searchInput.focus();
+  });
 
   renderTabs();
   renderGrid();
@@ -228,8 +238,8 @@
     ptrIndicator.classList.toggle('visible', dist >= PTR_SHOW_AT);
   }
 
-  function ptrStart(clientY) {
-    if (window.scrollY > 0 || modalOverlay.classList.contains('open')) {
+  function ptrStart(clientY, target) {
+    if (window.scrollY > 0 || modalOverlay.classList.contains('open') || (target && target.closest('.tabs'))) {
       ptrPulling = false;
       return;
     }
@@ -288,7 +298,7 @@
     ptrDistance = 0;
   }
 
-  document.addEventListener('touchstart', (e) => ptrStart(e.touches[0].clientY), { passive: true });
+  document.addEventListener('touchstart', (e) => ptrStart(e.touches[0].clientY, e.target), { passive: true });
   document.addEventListener('touchmove', (e) => {
     if (ptrMove(e.touches[0].clientY)) e.preventDefault();
   }, { passive: false });
