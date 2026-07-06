@@ -24,7 +24,7 @@
       tip: '' },
     { id: 'r1', cat: '밥', emoji: '🍚', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', desc: '마라훠궈 국물에 익힌 메기살을 특제소스에 비빈 밥에 얹어 먹는 히든 메뉴.',
       order: [['팡가시우메기', '1', '접시'], ['공깃밥', '1', '공기']],
-      ings: [['참기름', '1', '스푼'], ['간장소스', '1', '스푼'], ['굴소스', '0.5', '스푼'], ['중국식초', '0.5', '스푼'], ['다진파', '1', '집게'], ['다진마늘', '0.5', '스푼']],
+      ings: [['참기름', '1', '스푼'], ['간장소스', '1', '스푼'], ['굴소스', '0.5', '스푼'], ['중국식초', '0.5', '스푼'], ['다진파', '1', '집게']],
       steps: [
         '소스바에서 소스를 만든다',
         '메기살은 마라훠궈 국물에 넣어 익히고, 공깃밥에는 소스를 부어 비빈다',
@@ -146,7 +146,7 @@
       const card = document.createElement('div');
       card.className = 'recipe-card';
       card.innerHTML = `
-        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}"><span class="recipe-cat-badge">${r.cat}</span>${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}${r.id === 's5' ? ' recipe-thumb-img--yeongji-mobile' : ''}" src="${r.img}" alt="${r.name}"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.72 5.66 6.13.85-4.43 4.36 1.03 6.13L12 17.5l-5.45 2.9 1.03-6.13-4.43-4.36 6.13-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
+        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}"><span class="recipe-cat-badge">${r.cat}</span>${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}${r.id === 's5' ? ' recipe-thumb-img--yeongji-mobile' : ''}" src="${r.img}" alt="${r.name}" draggable="false"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.72 5.66 6.13.85-4.43 4.36 1.03 6.13L12 17.5l-5.45 2.9 1.03-6.13-4.43-4.36 6.13-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
         <div class="recipe-body">
           <div class="recipe-cat-row">
             <span class="recipe-cat-label">${r.cat}</span>
@@ -281,6 +281,29 @@
 
   // iOS Safari에서 :active 스타일이 먹히려면 touchstart 리스너가 하나라도 있어야 함
   document.addEventListener('touchstart', () => {}, { passive: true });
+
+  // 썸네일 이미지 우클릭 저장/복사 방지
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target.closest('.recipe-thumb-img')) e.preventDefault();
+  });
+
+  // 플로팅 버튼(공유/설치)이 푸터를 가리지 않도록, 푸터가 보이면 그만큼 위로 밀어 올림
+  const floatingActions = document.getElementById('floatingActions');
+  const footerEl = document.querySelector('.footer');
+  const FLOATING_GAP = 18;
+
+  function updateFloatingActionsDock() {
+    if (window.innerWidth > 640) {
+      floatingActions.style.bottom = '';
+      return;
+    }
+    const footerVisible = window.innerHeight - footerEl.getBoundingClientRect().top;
+    floatingActions.style.bottom = footerVisible > 0 ? `${FLOATING_GAP + footerVisible}px` : '';
+  }
+
+  window.addEventListener('scroll', updateFloatingActionsDock, { passive: true });
+  window.addEventListener('resize', updateFloatingActionsDock);
+  updateFloatingActionsDock();
 
   // 기기/브라우저 판별
   const ua = navigator.userAgent;
