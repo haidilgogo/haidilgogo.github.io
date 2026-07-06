@@ -2,6 +2,40 @@
   box-sizing: border-box;
 }
 
+/* 로고("하딜갈사람")에 쓰이는 5글자만 자체 호스팅 — 외부 CDN(fonts-archive) 의존 제거 */
+@font-face {
+  font-family: 'Paperlogy';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('assets/fonts/Paperlogy-5Medium.subset.111.woff2') format('woff2');
+  unicode-range: U+B51C;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('assets/fonts/Paperlogy-5Medium.subset.115.woff2') format('woff2');
+  unicode-range: U+AC08;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('assets/fonts/Paperlogy-5Medium.subset.116.woff2') format('woff2');
+  unicode-range: U+B78C;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('assets/fonts/Paperlogy-5Medium.subset.119.woff2') format('woff2');
+  unicode-range: U+C0AC, U+D558;
+}
+
 /* iOS Safari fills the elastic overscroll/bounce area with the flat
    background-color, ignoring any background-image/gradient. Keep this
    cream so pull-to-refresh never flashes brand-red. */
@@ -395,6 +429,15 @@ body {
   display: flex;
   flex-direction: column;
   transition: transform .18s;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #A88F87;
+  font-size: 15px;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 @media (hover: hover) {
@@ -810,12 +853,6 @@ body {
   gap: 12px;
   padding: 11px 0;
   border-bottom: 1px solid rgba(0, 0, 0, .05);
-}
-
-.ing-emoji {
-  font-size: 20px;
-  width: 26px;
-  text-align: center;
 }
 
 .ing-name {

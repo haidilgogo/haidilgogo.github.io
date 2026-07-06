@@ -1,20 +1,6 @@
 (() => {
   const CATS = ['전체', '소스', '육수', '밥', '면', '기타'];
 
-  const EMOJI = {
-    '마장(참깨)': '🥜', '마장': '🥜', '굴소스': '🦪', '사테소스': '🥜', '고추기름': '🛢️',
-    '다진마늘': '🧄', '고수': '🌿', '부추': '🌿', '청양고추': '🌶️', '파': '🌿',
-    '식초': '🧴', '간장': '🍶', '땅콩분태': '🥜', '공깃밥': '🍚', '계란': '🥚',
-    '김가루': '🍙', '토마토육수': '🍅', '치즈': '🧀', '면': '🍜', '숙주': '🌱',
-    '마라육수': '🌶️', '토마토탕': '🍅', '완자': '🍡', '팽이버섯': '🍄', '청경채': '🥬',
-    '마라탕': '🌶️', '백탕': '🍲', '소고기': '🥩', '배추': '🥬', '버섯탕': '🍄',
-    '두부': '⬜', '아이스크림': '🍨', '과일': '🍓', '견과': '🥜', '우유(육수바)': '🥛',
-    '땅콩참깨소스': '🥜', '스위트칠리소스': '🌶️', '다진파': '🌿', '깨': '⚪', '땅콩가루': '🥜',
-    '마라시즈닝': '🌶️', '설탕': '🍬', '매운소고기': '🥩',
-    '참기름': '🫗', '중국식초': '🧴', '팡가시우메기': '🐟',
-    '날계란': '🥚', '오향우육(다진고기)': '🥩', '생면': '🍜',
-  };
-
   const RECIPES = [
     { id: 's1', cat: '소스', emoji: '🥣', img: 'assets/recipe card_건희소스.png', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', source: '버블 건희(ONEUS)', desc: '아이돌 그룹 \'ONEUS\'의 \'건희\'가 버블에 공개한 소스로, 현 시점 대한민국에서 가장 유명한 소스이다.',
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '2.5', '스푼'], ['다진마늘', '0.5', '스푼'], ['다진파', '0.5', '집게'], ['깨', '1', '티스푼'], ['땅콩가루', '1', '티스푼'], ['마라시즈닝(고춧가루)', '0.5', '티스푼'], ['고추기름', '1', '티스푼'], ['설탕', '0.3', '티스푼'], ['매운소고기', '0.5', '티스푼']],
@@ -73,7 +59,20 @@
   let activeCat = '전체';
   let query = '';
   let showFavoritesOnly = false;
-  const favorites = new Set();
+  const FAVORITES_KEY = 'haidilao_favorites';
+  let favorites;
+  try {
+    favorites = new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []);
+  } catch (err) {
+    favorites = new Set();
+  }
+  function saveFavorites() {
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
+    } catch (err) {
+      // 저장 공간이 없거나 접근이 막힌 경우는 무시
+    }
+  }
 
   const tabsEl = document.getElementById('tabs');
   const tabsUnderline = document.getElementById('tabsUnderline');
@@ -130,6 +129,19 @@
     const filtered = getFiltered();
     countEl.textContent = filtered.length;
     gridEl.innerHTML = '';
+    if (filtered.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'empty-state';
+      if (query.trim()) {
+        empty.textContent = '검색 결과가 없어요';
+      } else if (showFavoritesOnly) {
+        empty.textContent = '즐겨찾기한 레시피가 없어요';
+      } else {
+        empty.textContent = '아직 등록된 레시피가 없어요';
+      }
+      gridEl.appendChild(empty);
+      return;
+    }
     filtered.forEach((r) => {
       const card = document.createElement('div');
       card.className = 'recipe-card';
@@ -150,20 +162,19 @@
         } else {
           favorites.add(r.id);
         }
+        saveFavorites();
         renderGrid();
       });
       gridEl.appendChild(card);
     });
   }
 
-  function renderIngList(el, items, showEmoji = true) {
+  function renderIngList(el, items) {
     el.innerHTML = '';
     items.forEach((i) => {
       const row = document.createElement('div');
       row.className = 'ing-row';
-      const emojiHtml = showEmoji ? `<span class="ing-emoji">${EMOJI[i[0]] || '•'}</span>` : '';
       row.innerHTML = `
-        ${emojiHtml}
         <span class="ing-name">${i[0]}</span>
         <span class="ing-amt">${i[1]}</span>
         <span class="ing-unit">${i[2]}</span>
@@ -185,12 +196,12 @@
     const orderWrap = document.getElementById('modalOrderWrap');
     if (r.order && r.order.length > 0) {
       orderWrap.style.display = '';
-      renderIngList(document.getElementById('modalOrder'), r.order, false);
+      renderIngList(document.getElementById('modalOrder'), r.order);
     } else {
       orderWrap.style.display = 'none';
     }
 
-    renderIngList(document.getElementById('modalIngs'), r.ings, false);
+    renderIngList(document.getElementById('modalIngs'), r.ings);
 
     const stepsWrap = document.getElementById('modalStepsWrap');
     const stepsEl = document.getElementById('modalSteps');
@@ -238,6 +249,7 @@
     } else {
       favorites.add(id);
     }
+    saveFavorites();
     modalFavBtn.classList.toggle('active', favorites.has(id));
     renderGrid();
   });
