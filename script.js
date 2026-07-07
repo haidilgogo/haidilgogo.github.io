@@ -14,7 +14,7 @@
       ings: [['매운소고기 - 건더기만', '0.5', '스푼'], ['청유훠궈소스 - 건더기만', '0.5', '스푼'], ['땅콩가루', '', '넉넉하게'], ['다진파', '', '넉넉하게'], ['다진마늘', '0.5', '스푼'], ['스위트칠리소스', '0.5', '스푼'], ['굴소스', '0.5', '스푼'], ['땅콩참깨소스', '0.25', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's3', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디소스(2024ver.).jpg', imgFit: 'cover', imgPosition: 'left 45%', tint: 'linear-gradient(160deg,#FFE0C2,#F8B888)', name: '쑨디2호소스(2024ver.)', source: 'YouTube 쑨디', desc: '쑨디2호소스의 개발자인 \'쑨디\'가 트위터(현재: X)에 공개한 레시피에 일부 오류가 있어서 본인의 유튜브를 통해 공식적으로 정정한 소스이다.',
+    { id: 's3', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디소스(2024ver.).jpg', imgFit: 'cover', imgPosition: 'left 45%', tint: 'linear-gradient(160deg,#FFE0C2,#F8B888)', name: '쑨디2호소스', ver: '2024 ver.', source: 'YouTube 쑨디', desc: '쑨디2호소스의 개발자인 \'쑨디\'가 트위터(현재: X)에 공개한 레시피에 일부 오류가 있어서 본인의 유튜브를 통해 공식적으로 정정한 소스이다.',
       ings: [['땅콩참깨소스', '0.5', '스푼'], ['다진파', '', '넉넉하게'], ['스위트칠리소스', '0.5', '스푼'], ['다진마늘', '3', '스푼'], ['굴소스', '1', '스푼'], ['매운소고기 - 건더기만', '1', '스푼'], ['청유훠궈소스 - 건더기만', '2', '스푼'], ['땅콩가루', '2', '스푼'], ['만구향', '1', '스푼']],
       steps: [],
       tip: '' },
@@ -72,6 +72,44 @@
     } catch (err) {
       // 저장 공간이 없거나 접근이 막힌 경우는 무시
     }
+  }
+
+  // 좋아요: 내가 누른 것(likedByMe)은 기기별, 집계(likeCounts)는 지금은 로컬 임시 —
+  // 이후 Firebase를 붙이면 집계가 전체 방문자 공유로 바뀜
+  const LIKED_KEY = 'haidilao_liked';
+  const LIKE_COUNTS_KEY = 'haidilao_like_counts';
+  let likedByMe;
+  try {
+    likedByMe = new Set(JSON.parse(localStorage.getItem(LIKED_KEY)) || []);
+  } catch (err) {
+    likedByMe = new Set();
+  }
+  let likeCounts;
+  try {
+    likeCounts = JSON.parse(localStorage.getItem(LIKE_COUNTS_KEY)) || {};
+  } catch (err) {
+    likeCounts = {};
+  }
+  function saveLikes() {
+    try {
+      localStorage.setItem(LIKED_KEY, JSON.stringify([...likedByMe]));
+      localStorage.setItem(LIKE_COUNTS_KEY, JSON.stringify(likeCounts));
+    } catch (err) {
+      // 무시
+    }
+  }
+  function getLikeCount(id) {
+    return likeCounts[id] || 0;
+  }
+  function toggleLike(id) {
+    if (likedByMe.has(id)) {
+      likedByMe.delete(id);
+      likeCounts[id] = Math.max(0, getLikeCount(id) - 1);
+    } else {
+      likedByMe.add(id);
+      likeCounts[id] = getLikeCount(id) + 1;
+    }
+    saveLikes();
   }
 
   const tabsEl = document.getElementById('tabs');
@@ -146,12 +184,14 @@
       const card = document.createElement('div');
       card.className = 'recipe-card';
       card.innerHTML = `
-        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}"><span class="recipe-cat-badge">${r.cat}</span>${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}${r.id === 's5' ? ' recipe-thumb-img--yeongji-mobile' : ''}" src="${r.img}" alt="${r.name}" draggable="false"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.72 5.66 6.13.85-4.43 4.36 1.03 6.13L12 17.5l-5.45 2.9 1.03-6.13-4.43-4.36 6.13-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
+        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}${r.id === 's5' ? ' recipe-thumb-img--yeongji-mobile' : ''}" src="${r.img}" alt="${r.name}" draggable="false"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
         <div class="recipe-body">
           <div class="recipe-cat-row">
             <span class="recipe-cat-label">${r.cat}</span>
             <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}">${r.name}</h3>
+            <span class="recipe-ver">${r.ver || ''}</span>
           </div>
+          <button class="like-btn${likedByMe.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="좋아요"><svg width="17" height="17" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="like-count">${getLikeCount(r.id)}</span></button>
         </div>
       `;
       card.addEventListener('click', () => openModal(r));
@@ -164,6 +204,13 @@
         }
         saveFavorites();
         renderGrid();
+      });
+      card.querySelector('.like-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const btn = e.currentTarget;
+        toggleLike(r.id);
+        btn.classList.toggle('active', likedByMe.has(r.id));
+        btn.querySelector('.like-count').textContent = getLikeCount(r.id);
       });
       gridEl.appendChild(card);
     });
@@ -287,15 +334,24 @@
     if (e.target.closest('.recipe-thumb-img')) e.preventDefault();
   });
 
-  // 플로팅 버튼(공유/설치)이 푸터를 가리지 않도록, 푸터가 보이면 그만큼 위로 밀어 올림
+  // 플로팅 버튼(공유/설치)이 카드 하단과 푸터 사이 여백의 "중앙"에 오도록.
+  // 여백(.main 아래쪽)을 플로터 높이 + 위아래 간격만큼 확보한 뒤, 푸터가 보이면 그만큼 위로 밀어 올림
   const floatingActions = document.getElementById('floatingActions');
   const footerEl = document.querySelector('.footer');
-  const FLOATING_GAP = 18;
+  const mainEl = document.querySelector('.main');
+  const FLOATING_GAP = 20;
 
   function updateFloatingActionsDock() {
     if (window.innerWidth > 640) {
       floatingActions.style.bottom = '';
+      mainEl.style.paddingBottom = '';
       return;
+    }
+    const faHeight = floatingActions.getBoundingClientRect().height;
+    // 카드-푸터 사이 여백 = 플로터 높이 + 위아래 각 FLOATING_GAP → 플로터가 그 중앙에 위치
+    const pad = `${Math.round(faHeight + FLOATING_GAP * 2)}px`;
+    if (mainEl.style.paddingBottom !== pad) {
+      mainEl.style.paddingBottom = pad;
     }
     const footerVisible = window.innerHeight - footerEl.getBoundingClientRect().top;
     floatingActions.style.bottom = footerVisible > 0 ? `${FLOATING_GAP + footerVisible}px` : '';
