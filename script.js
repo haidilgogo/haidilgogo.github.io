@@ -74,8 +74,8 @@
     }
   }
 
-  // 좋아요: 내가 누른 것(likedByMe)은 기기별, 집계(likeCounts)는 지금은 로컬 임시 —
-  // 이후 Firebase를 붙이면 집계가 전체 방문자 공유로 바뀜
+  // 좋아요: "내가 누른 것"(likedByMe)은 이 기기(localStorage)에만, "집계"(likeCounts)는
+  // Firebase 실시간 DB로 전체 방문자 공유. likeCounts는 localStorage에도 캐시해서 즉시 표시.
   const LIKED_KEY = 'haidilao_liked';
   const LIKE_COUNTS_KEY = 'haidilao_like_counts';
   let likedByMe;
@@ -101,15 +101,55 @@
   function getLikeCount(id) {
     return likeCounts[id] || 0;
   }
+
+  // 화면에 그려진 하트 숫자들을 현재 likeCounts로 갱신 (active 상태는 기기별이라 건드리지 않음)
+  function refreshLikeCounts() {
+    document.querySelectorAll('.like-btn').forEach((btn) => {
+      const countEl = btn.querySelector('.like-count');
+      if (countEl) countEl.textContent = getLikeCount(btn.dataset.id);
+    });
+  }
+
+  // --- Firebase 실시간 DB 연결 ---
+  let likesRef = null;
+  try {
+    if (window.firebase && firebase.initializeApp) {
+      const firebaseConfig = {
+        apiKey: 'AIzaSyDy3sMlz4lqMLXkdnty7GKh5ZHhwpve4ns',
+        authDomain: 'haidilao-gogo.firebaseapp.com',
+        databaseURL: 'https://haidilao-gogo-default-rtdb.asia-southeast1.firebasedatabase.app',
+        projectId: 'haidilao-gogo',
+        storageBucket: 'haidilao-gogo.firebasestorage.app',
+        messagingSenderId: '648756978171',
+        appId: '1:648756978171:web:497d1b4c3dfa3a65d8eb5e'
+      };
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      likesRef = firebase.database().ref('likes');
+      // 집계가 바뀔 때마다(내가/남이 눌렀든) 실시간으로 화면 숫자 갱신
+      likesRef.on('value', (snapshot) => {
+        likeCounts = snapshot.val() || {};
+        saveLikes();
+        refreshLikeCounts();
+      });
+    }
+  } catch (err) {
+    likesRef = null; // 연결 실패(오프라인 등) 시 로컬 캐시로만 동작
+  }
+
   function toggleLike(id) {
-    if (likedByMe.has(id)) {
+    const liked = likedByMe.has(id);
+    if (liked) {
       likedByMe.delete(id);
-      likeCounts[id] = Math.max(0, getLikeCount(id) - 1);
     } else {
       likedByMe.add(id);
-      likeCounts[id] = getLikeCount(id) + 1;
     }
+    // 낙관적 반영(즉시 반응) — Firebase 응답이 오면 정확한 값으로 덮어씀
+    likeCounts[id] = Math.max(0, getLikeCount(id) + (liked ? -1 : 1));
     saveLikes();
+    // Firebase: 원자적 증감(동시 접속에도 숫자 안 꼬임)
+    if (likesRef) {
+      likesRef.child(id).transaction((current) => Math.max(0, (current || 0) + (liked ? -1 : 1)));
+    }
   }
 
   const tabsEl = document.getElementById('tabs');
