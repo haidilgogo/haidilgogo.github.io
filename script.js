@@ -208,6 +208,7 @@
   const searchBox = document.querySelector('.search-box');
   const favToggleBtn = document.getElementById('favToggleBtn');
   const favToggleIcon = document.getElementById('favToggleIcon');
+  const sortDefaultBtn = document.getElementById('sortDefaultBtn');
   const sortPopularBtn = document.getElementById('sortPopularBtn');
   const homeBtn = document.getElementById('homeBtn');
   const modalOverlay = document.getElementById('modalOverlay');
@@ -406,11 +407,14 @@
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
     renderGrid();
   });
-  sortPopularBtn.addEventListener('click', () => {
-    sortByPopular = !sortByPopular;
-    sortPopularBtn.classList.toggle('active', sortByPopular);
+  function setSort(popular) {
+    sortByPopular = popular;
+    sortPopularBtn.classList.toggle('active', popular);
+    sortDefaultBtn.classList.toggle('active', !popular);
     renderGrid();
-  });
+  }
+  sortDefaultBtn.addEventListener('click', () => setSort(false));
+  sortPopularBtn.addEventListener('click', () => setSort(true));
   homeBtn.addEventListener('click', () => {
     location.href = location.pathname + '?_r=' + Date.now();
   });
