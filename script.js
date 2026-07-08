@@ -1,6 +1,23 @@
 (() => {
   const CATS = ['전체', '소스', '육수', '밥', '면', '기타'];
 
+  // ── 정식 재료·단위 목록 (소스바에 실제로 있는 것만) ─────────────────
+  // 레시피의 ings/order/단위는 아래 목록 안에서만 써야 이름이 어긋나지 않아요.
+  // 진짜 새 재료라면 → 먼저 아래 목록에 추가한 뒤 레시피에 쓰세요.
+  // 목록에 없는 이름을 쓰면 사이트 로딩 시 브라우저 콘솔(F12)에 경고가 떠요.
+  const SAUCE_BAR = [                       // 소스바 재료 (레시피의 ings 에 쓰는 이름)
+    // 소스·장류
+    '땅콩참깨소스', '스위트칠리소스', '굴소스', '간장소스', '고추기름', '참기름', '중국식초',
+    // 고기·건더기  ('매운소고기'와 '매운소고기 - 건더기만'은 의도적으로 구분함)
+    '매운소고기', '매운소고기 - 건더기만', '청유훠궈소스 - 건더기만', '오향우육(다진고기)', '튀긴대두',
+    // 채소·향신
+    '다진마늘', '다진파', '양파', '태국고추',
+    // 가루·기타
+    '땅콩가루', '마라시즈닝(고춧가루)', '깨', '설탕', '만구향',
+  ];
+  const ORDER_ITEMS = ['공깃밥', '날계란', '생면', '팡가시우메기'];  // 직원에게 주문하는 항목 (order 에 쓰는 이름)
+  const UNITS = ['스푼', '티스푼', '집게', '바퀴', '개', '공기', '접시', '인분', '넉넉하게', '적당히', '한 꼬집'];  // 정식 단위
+
   const RECIPES = [
     { id: 's1', cat: '소스', emoji: '🥣', img: 'assets/recipe card_건희소스.png', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', source: '버블 건희(ONEUS)', desc: '아이돌 그룹 \'ONEUS\'의 \'건희\'가 버블에 공개한 소스로, 현 시점 대한민국에서 가장 유명한 소스이다.',
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '2.5', '스푼'], ['다진마늘', '0.5', '스푼'], ['다진파', '0.5', '집게'], ['깨', '1', '티스푼'], ['땅콩가루', '1', '티스푼'], ['마라시즈닝(고춧가루)', '0.5', '티스푼'], ['고추기름', '1', '티스푼'], ['설탕', '0.3', '티스푼'], ['매운소고기', '0.5', '티스푼']],
@@ -55,6 +72,31 @@
       ],
       tip: '토마토탕 안에 토마토를 국자로 으깨주기' },
   ];
+
+  // ── 레시피 데이터 검사: 정식 목록에 없는 재료/단위/주문항목을 콘솔에 경고 ──
+  // 새 레시피를 추가하다 오타를 내거나 다른 이름을 쓰면 여기서 바로 걸려요.
+  (function validateRecipes() {
+    const knownIng = new Set(SAUCE_BAR);
+    const knownOrder = new Set(ORDER_ITEMS);
+    const knownUnit = new Set(UNITS);
+    const issues = [];
+    RECIPES.forEach(r => {
+      (r.ings || []).forEach(([name, , unit]) => {
+        if (!knownIng.has(name)) issues.push(`재료 "${name}" — SAUCE_BAR 목록에 없음  ·  [${r.name}]`);
+        if (unit && !knownUnit.has(unit)) issues.push(`단위 "${unit}" — UNITS 목록에 없음  ·  [${r.name}] ${name}`);
+      });
+      (r.order || []).forEach(([name, , unit]) => {
+        if (!knownOrder.has(name)) issues.push(`주문항목 "${name}" — ORDER_ITEMS 목록에 없음  ·  [${r.name}]`);
+        if (unit && !knownUnit.has(unit)) issues.push(`단위 "${unit}" — UNITS 목록에 없음  ·  [${r.name}] ${name}`);
+      });
+    });
+    if (issues.length) {
+      console.warn(`⚠️ 하딜고고: 정식 목록에 없는 항목 ${issues.length}건 — 오타이거나, 진짜 새 항목이면 목록에 추가하세요:`);
+      issues.forEach(m => console.warn('   • ' + m));
+    } else {
+      console.info('✅ 하딜고고: 모든 재료·단위·주문항목이 정식 목록과 일치합니다.');
+    }
+  })();
 
   let activeCat = '전체';
   let query = '';
