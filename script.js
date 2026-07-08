@@ -104,6 +104,7 @@
   let activeCat = '전체';
   let query = '';
   let showFavoritesOnly = false;
+  let sortByPopular = false;
   const FAVORITES_KEY = 'haidilao_favorites';
   let favorites;
   try {
@@ -207,6 +208,7 @@
   const searchBox = document.querySelector('.search-box');
   const favToggleBtn = document.getElementById('favToggleBtn');
   const favToggleIcon = document.getElementById('favToggleIcon');
+  const sortPopularBtn = document.getElementById('sortPopularBtn');
   const homeBtn = document.getElementById('homeBtn');
   const modalOverlay = document.getElementById('modalOverlay');
   const modalScroll = document.getElementById('recipe-modal-scroll');
@@ -244,6 +246,13 @@
       filtered = filtered.filter((r) =>
         r.name.includes(q) || r.ings.some((i) => i[0].includes(q))
       );
+    }
+    if (sortByPopular) {
+      // 좋아요(하트) 많은 순. 동점이면 원래 순서 유지(정렬은 안정적)
+      filtered = filtered
+        .map((r, i) => [r, i])
+        .sort((a, b) => getLikeCount(b[0].id) - getLikeCount(a[0].id) || a[1] - b[1])
+        .map((pair) => pair[0]);
     }
     return filtered;
   }
@@ -395,6 +404,11 @@
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
+    renderGrid();
+  });
+  sortPopularBtn.addEventListener('click', () => {
+    sortByPopular = !sortByPopular;
+    sortPopularBtn.classList.toggle('active', sortByPopular);
     renderGrid();
   });
   homeBtn.addEventListener('click', () => {
