@@ -425,8 +425,12 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  /* 버튼 폭 고정: 이모지(♥️/🕐/🔤)·글자 수가 달라도 버튼 크기와 화살표 위치가 안 바뀜 → 옆 '오늘의 소스' 버튼 밀림 방지 */
+  /* 버튼 크기 완전 고정: 이모지(♥️/🕐/🔤)마다 글자 폭·줄높이가 달라도 버튼이 안 변하게 →
+     가로(width)로 옆 버튼 밀림 방지, 세로(height+line-height)로 줄 위아래 흔들림 방지.
+     line-height:normal이면 이모지 글자 높이에 따라 버튼이 커져서 인기순(❤️)일 때 줄이 위로 밀렸음. */
   width: 120px;
+  height: 36px;
+  line-height: 1;
   border: 1px solid #E7DED9;
   background: #fff;
   color: #6E5F58;
@@ -434,7 +438,7 @@ body {
   font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
-  padding: 8px 13px;
+  padding: 0 13px;
   border-radius: 10px;
   cursor: pointer;
   transition: border-color .15s, color .15s, background-color .15s, transform .09s ease;
@@ -954,6 +958,12 @@ body {
 }
 
 .gacha-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 정렬 버튼과 같은 고정 높이 → 줄 높이가 이모지에 흔들리지 않게 함 */
+  height: 36px;
+  line-height: 1;
   border: none;
   background: #E0301E;
   color: #fff;
@@ -961,7 +971,7 @@ body {
   font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
-  padding: 8px 14px;
+  padding: 0 14px;
   border-radius: 10px;
   cursor: pointer;
   transition: transform .09s ease, background-color .15s ease;
