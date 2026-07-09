@@ -1049,51 +1049,90 @@ body {
   justify-content: center;
 }
 
-.gacha-cap {
+/* 소스그릇: 블러/그림자 필터 없이 SVG 그라데이션만 사용(iOS 렌더링 문제 회피).
+   층 순서: 그림자(0) < 그릇 안쪽(1) < 소스(2) < 떨어지는 재료(3) < 그릇 앞면(4)
+   → 재료가 그릇 "안으로" 떨어져 앞면 뒤로 잠기는 것처럼 보임 */
+.gacha-bowl {
   position: relative;
-  width: 128px;
-  height: 128px;
+  width: 150px;
+  height: 96px;
+  transition: opacity .25s;
 }
 
-/* 캡슐 그림자: 바닥에 깔리는 SVG 타원(그라데이션). blur/drop-shadow 필터를 쓰지 않아
-   iOS에서도 동일하게 그려짐. 갈라질 때는 opacity 0으로 사라지게 함(JS). */
-.gacha-cap-shadow {
+.gacha-bowl-shadow {
   position: absolute;
   left: 0;
-  bottom: -14px;
-  width: 128px;
-  height: 32px;
+  bottom: -10px;
+  width: 150px;
+  height: 30px;
   transition: opacity .3s ease;
   z-index: 0;
   pointer-events: none;
 }
 
-.gacha-cap.shaking {
-  animation: gachaShake .5s ease-in-out 1;
-}
-
-@keyframes gachaShake {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  20% { transform: translateX(-7px) rotate(-7deg); }
-  40% { transform: translateX(7px) rotate(6deg); }
-  60% { transform: translateX(-6px) rotate(-5deg); }
-  80% { transform: translateX(6px) rotate(5deg); }
-}
-
-/* 캡슐 반쪽 = SVG 반구(위 빨강 / 아래 크림). 입체감은 SVG 그라데이션이 담당 */
-.gacha-cap-half {
+.gacha-bowl-back,
+.gacha-sauce,
+.gacha-bowl-front {
   position: absolute;
   left: 0;
-  width: 128px;
-  height: 66px;
-  z-index: 1;
-  transition: transform .5s cubic-bezier(.5, -.3, .4, 1.3), opacity .5s;
+  top: 0;
+  width: 150px;
+  height: 96px;
+  pointer-events: none;
 }
 
-.gacha-cap-half svg { display: block; width: 100%; height: 100%; }
+.gacha-bowl-back { z-index: 1; }
 
-.gacha-cap-top { top: 0; }
-.gacha-cap-bot { bottom: 0; }
+.gacha-sauce {
+  z-index: 2;
+  opacity: 0;
+  transform: scale(.5);
+  transform-origin: 50% 32%;
+  transition: opacity .25s, transform .3s cubic-bezier(.3, 1.4, .5, 1);
+}
+
+.gacha-ings {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 96px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.gacha-bowl-front { z-index: 4; }
+
+/* 떨어지는 재료 한 개 */
+.gacha-ing {
+  position: absolute;
+  top: 16px;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  animation: gachaDrop .43s ease-in both;
+}
+
+.gacha-ing svg { display: block; width: 100%; height: 100%; }
+
+.gacha-ing.sink { opacity: 0; transition: opacity .28s ease; }
+
+@keyframes gachaDrop {
+  0% { transform: translateY(-120px) rotate(-24deg); opacity: 0; }
+  12% { opacity: 1; }
+  70% { transform: translateY(0) rotate(8deg); }
+  85% { transform: translateY(-6px) rotate(3deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* 재료 착지 시 그릇 출렁 */
+.gacha-bowl.bump {
+  animation: gachaBump .24s ease-out 1;
+}
+
+@keyframes gachaBump {
+  45% { transform: translateY(3px) scale(1.02, .96); }
+}
 
 .gacha-result {
   position: absolute;

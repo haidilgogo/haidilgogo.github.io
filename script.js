@@ -456,10 +456,10 @@
   const gachaModal = document.getElementById('gachaModal');
   const gachaClose = document.getElementById('gachaClose');
   const gachaStage = document.getElementById('gachaStage');
-  const gachaCap = document.getElementById('gachaCap');
-  const gachaCapShadow = document.getElementById('gachaCapShadow');
-  const gachaCapTop = document.getElementById('gachaCapTop');
-  const gachaCapBot = document.getElementById('gachaCapBot');
+  const gachaBowl = document.getElementById('gachaBowl');
+  const gachaBowlShadow = document.getElementById('gachaBowlShadow');
+  const gachaSauce = document.getElementById('gachaSauce');
+  const gachaIngs = document.getElementById('gachaIngs');
   const gachaResult = document.getElementById('gachaResult');
   const gachaPull = document.getElementById('gachaPull');
   const gachaActions = document.getElementById('gachaActions');
@@ -467,6 +467,14 @@
   const gachaAgain = document.getElementById('gachaAgain');
   const GACHA_POOL = RECIPES.filter((r) => r.cat === '소스');
   const GACHA_CONFETTI = ['#E0301E', '#F8B888', '#FCE4AE', '#F5B8A8', '#E8C9A0', '#FFB07A', '#EF9F27'];
+  // 그릇에 떨어지는 재료들(SVG, 필터 금지). x = 그릇 중앙 기준 가로 위치(px)
+  const GACHA_DROPS = [
+    { x: -30, svg: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="giA" cx="38%" cy="32%" r="75%"><stop offset="0%" stop-color="#F6DCA9"/><stop offset="100%" stop-color="#C08B45"/></radialGradient></defs><circle cx="12" cy="12" r="9" fill="url(#giA)"/><ellipse cx="9" cy="9" rx="3" ry="2" fill="rgba(255,255,255,.5)" transform="rotate(-20 9 9)"/></svg>' },
+    { x: 20, svg: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="giB" cx="38%" cy="35%" r="75%"><stop offset="0%" stop-color="#FF8A66"/><stop offset="100%" stop-color="#B92A12"/></radialGradient></defs><path d="M12 2 C15 7 19 9.5 19 14 A7 7 0 0 1 5 14 C5 9.5 9 7 12 2 Z" fill="url(#giB)"/><ellipse cx="9.5" cy="13" rx="2.4" ry="1.6" fill="rgba(255,255,255,.5)" transform="rotate(-25 9.5 13)"/></svg>' },
+    { x: -12, svg: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="13" height="5" rx="2.5" fill="#5FA845" transform="rotate(-18 9 11)"/><rect x="10" y="14" width="10" height="4" rx="2" fill="#7CC25E" transform="rotate(14 15 16)"/></svg>' },
+    { x: 28, svg: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="8" cy="9" rx="3" ry="1.9" fill="#EFE0BE" stroke="#C9AE85" stroke-width=".8" transform="rotate(-30 8 9)"/><ellipse cx="16" cy="11" rx="3" ry="1.9" fill="#F4E7C8" stroke="#C9AE85" stroke-width=".8" transform="rotate(20 16 11)"/><ellipse cx="11" cy="16" rx="3" ry="1.9" fill="#EADBB6" stroke="#C9AE85" stroke-width=".8" transform="rotate(70 11 16)"/></svg>' },
+    { x: 0, svg: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="giC" cx="40%" cy="33%" r="75%"><stop offset="0%" stop-color="#FFB073"/><stop offset="100%" stop-color="#DE4E14"/></radialGradient></defs><circle cx="12" cy="13" r="8" fill="url(#giC)"/><circle cx="9.5" cy="10" r="2" fill="rgba(255,255,255,.55)"/></svg>' },
+  ];
   let gachaLast = -1;
   let gachaPicked = null;
 
@@ -486,19 +494,17 @@
     }
   }
 
-  function gachaResetCap() {
-    // 반쪽 복구는 전환 없이 즉시 — 다시 뽑기 때 재조립 움직임이 흔들림과 겹치지 않게
-    gachaCapTop.style.transition = 'none';
-    gachaCapBot.style.transition = 'none';
-    gachaCapTop.style.transform = 'none';
-    gachaCapTop.style.opacity = '1';
-    gachaCapBot.style.transform = 'none';
-    gachaCapBot.style.opacity = '1';
-    void gachaCapTop.offsetWidth;
-    gachaCapTop.style.transition = '';
-    gachaCapBot.style.transition = '';
-    gachaCap.style.opacity = '1';
-    gachaCapShadow.style.opacity = '1'; // 캡슐이 온전할 때(멈춤/흔들림) 그림자 보이기
+  function gachaResetBowl() {
+    // 그릇 복구는 전환 없이 즉시 — 다시 뽑기 때 잔상이 새 연출과 겹치지 않게
+    gachaIngs.innerHTML = '';
+    gachaSauce.style.transition = 'none';
+    gachaSauce.style.opacity = '0';
+    gachaSauce.style.transform = 'scale(.5)';
+    void gachaSauce.offsetWidth;
+    gachaSauce.style.transition = '';
+    gachaBowl.classList.remove('bump');
+    gachaBowl.style.opacity = '1';
+    gachaBowlShadow.style.opacity = '1';
     // 결과 카드는 애니메이션 없이 즉시 제거(다시 뽑기 때 흰 네모 잔상 방지)
     gachaResult.style.transition = 'none';
     gachaResult.style.opacity = '0';
@@ -509,19 +515,16 @@
   }
 
   function gachaToStart() {
-    gachaResetCap();
+    gachaResetBowl();
     gachaActions.style.display = 'none';
     gachaPull.style.display = 'inline-block';
     gachaPull.style.pointerEvents = 'auto';
   }
 
   function gachaPullOnce() {
-    gachaResetCap();
+    gachaResetBowl();
     gachaPull.style.pointerEvents = 'none';
     gachaAgain.style.pointerEvents = 'none';
-    gachaCap.classList.remove('shaking');
-    void gachaCap.offsetWidth;
-    gachaCap.classList.add('shaking');
     // 결과를 미리 뽑아 이미지를 먼저 로드해둔다(카드가 흰 네모로 잠깐 보이는 현상 방지)
     let i;
     do { i = Math.floor(Math.random() * GACHA_POOL.length); } while (i === gachaLast && GACHA_POOL.length > 1);
@@ -530,13 +533,25 @@
     gachaPicked = r;
     const preload = new Image();
     preload.src = r.img;
-    setTimeout(() => {
-      gachaCapTop.style.transform = 'translateY(-50px) rotate(-14deg)';
-      gachaCapTop.style.opacity = '0';
-      gachaCapBot.style.transform = 'translateY(50px)';
-      gachaCapBot.style.opacity = '0';
-      gachaCapShadow.style.opacity = '0'; // 캡슐이 갈라지면 그림자도 사라지게(원 잔상 방지)
-    }, 520);
+    // 재료를 하나씩 그릇에 떨어뜨린다: 착지마다 그릇 출렁 + 소스 차오름 + 재료 잠김
+    GACHA_DROPS.forEach((d, idx) => {
+      setTimeout(() => {
+        const s = document.createElement('span');
+        s.className = 'gacha-ing';
+        s.style.left = 'calc(50% + ' + d.x + 'px)';
+        s.innerHTML = d.svg;
+        gachaIngs.appendChild(s);
+        setTimeout(() => {
+          gachaBowl.classList.remove('bump');
+          void gachaBowl.offsetWidth;
+          gachaBowl.classList.add('bump');
+          const step = (idx + 1) / GACHA_DROPS.length;
+          gachaSauce.style.opacity = String(.25 + .75 * step);
+          gachaSauce.style.transform = 'scale(' + (.5 + .5 * step).toFixed(2) + ')';
+          s.classList.add('sink');
+        }, 430); // gachaDrop 애니메이션(.43s) 착지 시점
+      }, idx * 170);
+    });
     setTimeout(() => {
       const ver = r.ver ? '<div class="gacha-card-ver">' + r.ver + '</div>' : '';
       // 카드는 opacity 0(리셋 상태)로 먼저 그려두고, 이미지가 실제로 로드된 뒤에만 공개한다.
@@ -552,7 +567,8 @@
         revealed = true;
         gachaResult.style.opacity = '1';
         gachaResult.style.transform = 'scale(1)';
-        gachaCap.style.opacity = '0';
+        gachaBowl.style.opacity = '0';
+        gachaBowlShadow.style.opacity = '0';
         gachaConfetti();
         gachaPull.style.display = 'none';
         gachaActions.style.display = 'flex';
@@ -563,12 +579,12 @@
         reveal();
       } else if (cardImg) {
         cardImg.addEventListener('load', reveal);
-        cardImg.addEventListener('error', reveal); // 이미지 실패해도 캡슐에 갇히지 않게
+        cardImg.addEventListener('error', reveal); // 이미지 실패해도 그릇에 갇히지 않게
         setTimeout(reveal, 1500); // 안전장치: 아무리 느려도 1.5초 뒤엔 공개
       } else {
         reveal();
       }
-    }, 1060); // 갈라짐(520ms 시작 + 0.5s)이 끝난 뒤에 카드 공개 — 도중에 캡슐이 뚝 사라지지 않게
+    }, 1480); // 마지막 재료 착지(~1110ms)와 잠김 연출이 끝난 뒤 카드 공개
   }
 
   let gachaPreloaded = false;
