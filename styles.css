@@ -1062,7 +1062,7 @@ body {
 .gacha-bowl-shadow {
   position: absolute;
   left: 0;
-  bottom: -10px;
+  bottom: -8px;
   width: 150px;
   height: 30px;
   transition: opacity .3s ease;
