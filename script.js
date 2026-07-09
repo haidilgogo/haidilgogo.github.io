@@ -513,6 +513,14 @@
     gachaCap.classList.remove('shaking');
     void gachaCap.offsetWidth;
     gachaCap.classList.add('shaking');
+    // 결과를 미리 뽑아 이미지를 먼저 로드해둔다(카드가 흰 네모로 잠깐 보이는 현상 방지)
+    let i;
+    do { i = Math.floor(Math.random() * GACHA_POOL.length); } while (i === gachaLast && GACHA_POOL.length > 1);
+    gachaLast = i;
+    const r = GACHA_POOL[i];
+    gachaPicked = r;
+    const preload = new Image();
+    preload.src = r.img;
     setTimeout(() => {
       gachaCapTop.style.transform = 'translateY(-50px) rotate(-14deg)';
       gachaCapTop.style.opacity = '0';
@@ -520,11 +528,6 @@
       gachaCapBot.style.opacity = '0';
     }, 520);
     setTimeout(() => {
-      let i;
-      do { i = Math.floor(Math.random() * GACHA_POOL.length); } while (i === gachaLast && GACHA_POOL.length > 1);
-      gachaLast = i;
-      const r = GACHA_POOL[i];
-      gachaPicked = r;
       const ver = r.ver ? '<div class="gacha-card-ver">' + r.ver + '</div>' : '';
       gachaResult.innerHTML =
         '<div class="gacha-card">' +
@@ -541,8 +544,14 @@
     }, 840);
   }
 
+  let gachaPreloaded = false;
   function openGacha() {
     document.body.style.overflow = 'hidden';
+    // 첫 뽑기에서도 카드가 흰 네모로 안 뜨게, 소스 이미지를 미리 받아둔다(한 번만)
+    if (!gachaPreloaded) {
+      gachaPreloaded = true;
+      GACHA_POOL.forEach((r) => { const im = new Image(); im.src = r.img; });
+    }
     gachaToStart();
     gachaOverlay.classList.add('open');
   }
