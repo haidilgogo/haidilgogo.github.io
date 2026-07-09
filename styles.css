@@ -423,7 +423,10 @@ body {
 .sort-dd-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
+  /* 버튼 폭 고정: 이모지(♥️/🕐/🔤)·글자 수가 달라도 버튼 크기와 화살표 위치가 안 바뀜 → 옆 '오늘의 소스' 버튼 밀림 방지 */
+  width: 120px;
   border: 1px solid #E7DED9;
   background: #fff;
   color: #6E5F58;
@@ -449,9 +452,9 @@ body {
   transform: scale(.97);
 }
 
-/* 라벨 폭 고정(가나다순 등 글자 수 달라도 버튼 크기 안 변하게 → 옆 버튼 밀림 방지) */
+/* 라벨은 자연 폭 그대로. 버튼 자체를 고정 폭으로 잡아 이모지/글자 수가 달라도 버튼 크기·화살표 위치가 안 변함 → 옆 버튼 밀림 방지 (.sort-dd-btn width 참고) */
 .sort-dd-current {
-  min-width: 64px;
+  white-space: nowrap;
 }
 
 .sort-dd-chev {
