@@ -250,26 +250,27 @@
         r.name.includes(q) || r.ings.some((i) => i[0].includes(q))
       );
     }
-    // 정렬(안정적): 동점/미지정은 원래 배열 순서 유지
-    const withIdx = filtered.map((r, i) => [r, i]);
+    // 정렬: 동점은 가나다순
+    const byName = (a, b) => a.name.localeCompare(b.name, 'ko');
+    const sorted = filtered.slice();
     if (sortMode === 'popular') {
-      // 좋아요(하트) 많은 순
-      withIdx.sort((a, b) => getLikeCount(b[0].id) - getLikeCount(a[0].id) || a[1] - b[1]);
+      // 좋아요(하트) 많은 순, 동점은 가나다순
+      sorted.sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || byName(a, b));
     } else if (sortMode === 'recent') {
-      // 최신순: 날짜(YYYY-MM-DD 문자열) 내림차순. 날짜 없는 건 맨 아래에 배열 순서대로
-      withIdx.sort((a, b) => {
-        const da = a[0].date || '';
-        const db = b[0].date || '';
-        if (da && db) return db.localeCompare(da) || a[1] - b[1];
+      // 최신순: 날짜(YYYY-MM-DD 문자열) 내림차순, 동점은 가나다순. 날짜 없는 건 맨 아래에 가나다순
+      sorted.sort((a, b) => {
+        const da = a.date || '';
+        const db = b.date || '';
+        if (da && db) return db.localeCompare(da) || byName(a, b);
         if (da) return -1;
         if (db) return 1;
-        return a[1] - b[1];
+        return byName(a, b);
       });
     } else if (sortMode === 'name') {
       // 가나다순: 한글 정렬
-      withIdx.sort((a, b) => a[0].name.localeCompare(b[0].name, 'ko') || a[1] - b[1]);
+      sorted.sort(byName);
     }
-    return withIdx.map((pair) => pair[0]);
+    return sorted;
   }
 
   function renderGrid() {
