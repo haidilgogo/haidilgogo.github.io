@@ -456,6 +456,7 @@
   const gachaClose = document.getElementById('gachaClose');
   const gachaStage = document.getElementById('gachaStage');
   const gachaCap = document.getElementById('gachaCap');
+  const gachaCapShadow = document.getElementById('gachaCapShadow');
   const gachaCapTop = document.getElementById('gachaCapTop');
   const gachaCapBot = document.getElementById('gachaCapBot');
   const gachaResult = document.getElementById('gachaResult');
@@ -490,6 +491,7 @@
     gachaCapBot.style.transform = 'none';
     gachaCapBot.style.opacity = '1';
     gachaCap.style.opacity = '1';
+    gachaCapShadow.style.opacity = '1'; // 캡슐이 온전할 때(멈춤/흔들림) 그림자 보이기
     // 결과 카드는 애니메이션 없이 즉시 제거(다시 뽑기 때 흰 네모 잔상 방지)
     gachaResult.style.transition = 'none';
     gachaResult.style.opacity = '0';
@@ -526,6 +528,7 @@
       gachaCapTop.style.opacity = '0';
       gachaCapBot.style.transform = 'translateY(50px)';
       gachaCapBot.style.opacity = '0';
+      gachaCapShadow.style.opacity = '0'; // 캡슐이 갈라지면 그림자도 사라지게(원 잔상 방지)
     }, 520);
     setTimeout(() => {
       const ver = r.ver ? '<div class="gacha-card-ver">' + r.ver + '</div>' : '';

@@ -1053,11 +1053,26 @@ body {
   position: relative;
   width: 128px;
   height: 128px;
-  /* 원형 그림자: filter:drop-shadow는 자식(.gacha-cap-half)의 overflow:hidden 때문에
-     iOS 사파리에서 사각형으로 렌더링됨 → box-shadow+원형 border-radius로 대체 */
-  border-radius: 50%;
-  box-shadow: 0 7px 12px rgba(170, 70, 40, .24);
 }
+
+/* 캡슐 그림자: filter:drop-shadow는 반쪽(overflow:hidden) 때문에 iOS에서 사각형으로 그려지고,
+   box-shadow는 갈라질 때 원이 남음 → 전용 흐린 원 요소로 그림자를 그린다.
+   갈라질 때는 opacity 0으로 사라지게 함(JS). */
+.gacha-cap-shadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: rgba(170, 70, 40, .24);
+  filter: blur(7px);
+  transform: translateY(7px);
+  transition: opacity .3s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+.gacha-cap-half { z-index: 1; }
 
 .gacha-cap.shaking {
   animation: gachaShake .5s ease-in-out 1;
