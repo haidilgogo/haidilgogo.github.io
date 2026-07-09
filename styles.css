@@ -1055,24 +1055,18 @@ body {
   height: 128px;
 }
 
-/* 캡슐 그림자: filter:drop-shadow는 반쪽(overflow:hidden) 때문에 iOS에서 사각형으로 그려지고,
-   box-shadow는 갈라질 때 원이 남음 → 전용 흐린 원 요소로 그림자를 그린다.
-   갈라질 때는 opacity 0으로 사라지게 함(JS). */
+/* 캡슐 그림자: 바닥에 깔리는 SVG 타원(그라데이션). blur/drop-shadow 필터를 쓰지 않아
+   iOS에서도 동일하게 그려짐. 갈라질 때는 opacity 0으로 사라지게 함(JS). */
 .gacha-cap-shadow {
   position: absolute;
   left: 0;
-  top: 0;
+  bottom: -14px;
   width: 128px;
-  height: 128px;
-  border-radius: 50%;
-  background: rgba(170, 70, 40, .24);
-  filter: blur(7px);
-  transform: translateY(7px);
+  height: 32px;
   transition: opacity .3s ease;
   z-index: 0;
   pointer-events: none;
 }
-.gacha-cap-half { z-index: 1; }
 
 .gacha-cap.shaking {
   animation: gachaShake .5s ease-in-out 1;
@@ -1086,33 +1080,20 @@ body {
   80% { transform: translateX(6px) rotate(5deg); }
 }
 
-/* 반쪽 = 128px 원을 64px 창으로 잘라 만든 완벽한 반원 */
+/* 캡슐 반쪽 = SVG 반구(위 빨강 / 아래 크림). 입체감은 SVG 그라데이션이 담당 */
 .gacha-cap-half {
   position: absolute;
   left: 0;
   width: 128px;
-  height: 64px;
-  overflow: hidden;
+  height: 66px;
+  z-index: 1;
   transition: transform .5s cubic-bezier(.5, -.3, .4, 1.3), opacity .5s;
 }
 
+.gacha-cap-half svg { display: block; width: 100%; height: 100%; }
+
 .gacha-cap-top { top: 0; }
-.gacha-cap-bot { bottom: 0; box-shadow: inset 0 4px 6px -3px rgba(150, 90, 60, .3); }
-
-.gacha-ball {
-  position: absolute;
-  left: 0;
-  width: 128px;
-  height: 128px;
-  border-radius: 50%;
-}
-
-.gacha-ball-top { top: 0; background: #E23A22; }
-.gacha-ball-bot { bottom: 0; background: #EADBC8; }
-
-.gacha-gloss-a { position: absolute; top: 16px; left: 20px; width: 46px; height: 26px; background: rgba(255, 255, 255, .42); border-radius: 50%; transform: rotate(-22deg); filter: blur(3px); }
-.gacha-gloss-b { position: absolute; top: 24px; left: 56px; width: 11px; height: 11px; background: rgba(255, 255, 255, .55); border-radius: 50%; filter: blur(1px); }
-.gacha-bot-light { position: absolute; bottom: 16px; left: 41px; width: 46px; height: 20px; background: rgba(255, 255, 255, .5); border-radius: 50%; filter: blur(3px); }
+.gacha-cap-bot { bottom: 0; }
 
 .gacha-result {
   position: absolute;

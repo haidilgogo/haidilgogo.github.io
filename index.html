@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=100">
+<link rel="stylesheet" href="styles.css?v=101">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
@@ -206,17 +206,57 @@
     <div class="gacha-title">오늘의 소스</div>
     <div class="gacha-stage" id="gachaStage">
       <div class="gacha-cap" id="gachaCap">
-        <div class="gacha-cap-shadow" id="gachaCapShadow"></div>
+        <!-- 캡슐은 SVG로 그림: 블러/그림자 필터 없이 그라데이션만 사용(iOS 렌더링 문제 회피) -->
+        <svg class="gacha-cap-shadow" id="gachaCapShadow" viewBox="0 0 128 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <radialGradient id="gCapShadow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(150,75,45,.34)"/>
+              <stop offset="65%" stop-color="rgba(150,75,45,.17)"/>
+              <stop offset="100%" stop-color="rgba(150,75,45,0)"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="64" cy="16" rx="56" ry="13" fill="url(#gCapShadow)"/>
+        </svg>
         <div class="gacha-cap-half gacha-cap-top" id="gachaCapTop">
-          <div class="gacha-ball gacha-ball-top">
-            <div class="gacha-gloss-a"></div>
-            <div class="gacha-gloss-b"></div>
-          </div>
+          <svg viewBox="0 0 128 66" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="gCapTopBody" cx="38%" cy="28%" r="85%">
+                <stop offset="0%" stop-color="#FF8B6E"/>
+                <stop offset="45%" stop-color="#E8422A"/>
+                <stop offset="100%" stop-color="#AE2512"/>
+              </radialGradient>
+              <radialGradient id="gCapGloss" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(255,255,255,.8)"/>
+                <stop offset="60%" stop-color="rgba(255,255,255,.3)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </radialGradient>
+            </defs>
+            <path d="M0 64 A64 64 0 0 1 128 64 L128 66 L0 66 Z" fill="url(#gCapTopBody)"/>
+            <ellipse cx="42" cy="27" rx="24" ry="13" transform="rotate(-22 42 27)" fill="url(#gCapGloss)"/>
+            <circle cx="66" cy="18" r="6" fill="url(#gCapGloss)"/>
+          </svg>
         </div>
         <div class="gacha-cap-half gacha-cap-bot" id="gachaCapBot">
-          <div class="gacha-ball gacha-ball-bot">
-            <div class="gacha-bot-light"></div>
-          </div>
+          <svg viewBox="0 0 128 66" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="gCapBotBody" cx="42%" cy="30%" r="90%">
+                <stop offset="0%" stop-color="#FBF3E4"/>
+                <stop offset="55%" stop-color="#EDDCC2"/>
+                <stop offset="100%" stop-color="#C8AB86"/>
+              </radialGradient>
+              <linearGradient id="gCapBotRim" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(140,90,60,.3)"/>
+                <stop offset="100%" stop-color="rgba(140,90,60,0)"/>
+              </linearGradient>
+              <radialGradient id="gCapBotLight" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(255,255,255,.55)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </radialGradient>
+            </defs>
+            <path d="M0 2 A64 64 0 0 0 128 2 L128 0 L0 0 Z" fill="url(#gCapBotBody)"/>
+            <rect x="1" y="2" width="126" height="9" fill="url(#gCapBotRim)"/>
+            <ellipse cx="62" cy="44" rx="26" ry="10" fill="url(#gCapBotLight)"/>
+          </svg>
         </div>
       </div>
       <div class="gacha-result" id="gachaResult"></div>
@@ -229,6 +269,6 @@
   </div>
 </div>
 
-<script src="script.js?v=52"></script>
+<script src="script.js?v=53"></script>
 </body>
 </html>

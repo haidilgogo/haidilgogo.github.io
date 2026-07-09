@@ -487,10 +487,16 @@
   }
 
   function gachaResetCap() {
+    // 반쪽 복구는 전환 없이 즉시 — 다시 뽑기 때 재조립 움직임이 흔들림과 겹치지 않게
+    gachaCapTop.style.transition = 'none';
+    gachaCapBot.style.transition = 'none';
     gachaCapTop.style.transform = 'none';
     gachaCapTop.style.opacity = '1';
     gachaCapBot.style.transform = 'none';
     gachaCapBot.style.opacity = '1';
+    void gachaCapTop.offsetWidth;
+    gachaCapTop.style.transition = '';
+    gachaCapBot.style.transition = '';
     gachaCap.style.opacity = '1';
     gachaCapShadow.style.opacity = '1'; // 캡슐이 온전할 때(멈춤/흔들림) 그림자 보이기
     // 결과 카드는 애니메이션 없이 즉시 제거(다시 뽑기 때 흰 네모 잔상 방지)
@@ -562,7 +568,7 @@
       } else {
         reveal();
       }
-    }, 840);
+    }, 1060); // 갈라짐(520ms 시작 + 0.5s)이 끝난 뒤에 카드 공개 — 도중에 캡슐이 뚝 사라지지 않게
   }
 
   let gachaPreloaded = false;
