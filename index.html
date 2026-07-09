@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=89">
+<link rel="stylesheet" href="styles.css?v=96">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
@@ -80,9 +80,19 @@
   <main class="main">
     <div class="list-head">
       <p class="count-line">레시피 <span class="count-num" id="countNum">0</span>개</p>
-      <div class="sort-toggle" role="group" aria-label="정렬 방식">
-        <button class="sort-btn active" id="sortDefaultBtn" type="button">기본순</button>
-        <button class="sort-btn" id="sortPopularBtn" type="button">인기순</button>
+      <div class="head-actions">
+        <button class="gacha-btn" id="gachaBtn" type="button">🎲 오늘의 소스</button>
+        <div class="sort-dd" id="sortDd">
+          <button class="sort-dd-btn" id="sortDdBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="정렬 방식">
+            <span class="sort-dd-current" id="sortDdCurrent">♥️ 인기순</span>
+            <svg class="sort-dd-chev" width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="sort-dd-menu" id="sortDdMenu" role="listbox">
+            <button class="sort-dd-item active" type="button" role="option" data-sort="popular">♥️ 인기순</button>
+            <button class="sort-dd-item" type="button" role="option" data-sort="recent">🕐 최신순</button>
+            <button class="sort-dd-item" type="button" role="option" data-sort="name">🔤 가나다순</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="recipe-grid" id="recipeGrid"></div>
@@ -189,6 +199,35 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="script.js?v=43"></script>
+<!-- 오늘의 소스 가챠 -->
+<div class="gacha-overlay" id="gachaOverlay">
+  <div class="gacha-modal" id="gachaModal">
+    <button class="modal-close gacha-close" id="gachaClose" type="button" aria-label="닫기">&times;</button>
+    <div class="gacha-title">오늘의 소스</div>
+    <div class="gacha-stage" id="gachaStage">
+      <div class="gacha-cap" id="gachaCap">
+        <div class="gacha-cap-half gacha-cap-top" id="gachaCapTop">
+          <div class="gacha-ball gacha-ball-top">
+            <div class="gacha-gloss-a"></div>
+            <div class="gacha-gloss-b"></div>
+          </div>
+        </div>
+        <div class="gacha-cap-half gacha-cap-bot" id="gachaCapBot">
+          <div class="gacha-ball gacha-ball-bot">
+            <div class="gacha-bot-light"></div>
+          </div>
+        </div>
+      </div>
+      <div class="gacha-result" id="gachaResult"></div>
+    </div>
+    <button class="gacha-pull" id="gachaPull" type="button">뽑기</button>
+    <div class="gacha-actions" id="gachaActions">
+      <button class="gacha-view" id="gachaView" type="button">📖 레시피 보기</button>
+      <button class="gacha-again" id="gachaAgain" type="button">🎲 다시 뽑기</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js?v=47"></script>
 </body>
 </html>

@@ -104,7 +104,7 @@
   let activeCat = '전체';
   let query = '';
   let showFavoritesOnly = false;
-  let sortByPopular = false;
+  let sortMode = 'popular'; // 'popular'(좋아요) | 'recent'(날짜) | 'name'(가나다)
   const FAVORITES_KEY = 'haidilao_favorites';
   let favorites;
   try {
@@ -208,8 +208,10 @@
   const searchBox = document.querySelector('.search-box');
   const favToggleBtn = document.getElementById('favToggleBtn');
   const favToggleIcon = document.getElementById('favToggleIcon');
-  const sortDefaultBtn = document.getElementById('sortDefaultBtn');
-  const sortPopularBtn = document.getElementById('sortPopularBtn');
+  const sortDd = document.getElementById('sortDd');
+  const sortDdBtn = document.getElementById('sortDdBtn');
+  const sortDdMenu = document.getElementById('sortDdMenu');
+  const sortDdCurrent = document.getElementById('sortDdCurrent');
   const homeBtn = document.getElementById('homeBtn');
   const modalOverlay = document.getElementById('modalOverlay');
   const modalScroll = document.getElementById('recipe-modal-scroll');
@@ -248,14 +250,26 @@
         r.name.includes(q) || r.ings.some((i) => i[0].includes(q))
       );
     }
-    if (sortByPopular) {
-      // 좋아요(하트) 많은 순. 동점이면 원래 순서 유지(정렬은 안정적)
-      filtered = filtered
-        .map((r, i) => [r, i])
-        .sort((a, b) => getLikeCount(b[0].id) - getLikeCount(a[0].id) || a[1] - b[1])
-        .map((pair) => pair[0]);
+    // 정렬(안정적): 동점/미지정은 원래 배열 순서 유지
+    const withIdx = filtered.map((r, i) => [r, i]);
+    if (sortMode === 'popular') {
+      // 좋아요(하트) 많은 순
+      withIdx.sort((a, b) => getLikeCount(b[0].id) - getLikeCount(a[0].id) || a[1] - b[1]);
+    } else if (sortMode === 'recent') {
+      // 최신순: 날짜(YYYY-MM-DD 문자열) 내림차순. 날짜 없는 건 맨 아래에 배열 순서대로
+      withIdx.sort((a, b) => {
+        const da = a[0].date || '';
+        const db = b[0].date || '';
+        if (da && db) return db.localeCompare(da) || a[1] - b[1];
+        if (da) return -1;
+        if (db) return 1;
+        return a[1] - b[1];
+      });
+    } else if (sortMode === 'name') {
+      // 가나다순: 한글 정렬
+      withIdx.sort((a, b) => a[0].name.localeCompare(b[0].name, 'ko') || a[1] - b[1]);
     }
-    return filtered;
+    return withIdx.map((pair) => pair[0]);
   }
 
   function renderGrid() {
@@ -407,14 +421,149 @@
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
     renderGrid();
   });
-  function setSort(popular) {
-    sortByPopular = popular;
-    sortPopularBtn.classList.toggle('active', popular);
-    sortDefaultBtn.classList.toggle('active', !popular);
+  const SORT_LABELS = { popular: '♥️ 인기순', recent: '🕐 최신순', name: '🔤 가나다순' };
+  function openSortMenu(open) {
+    sortDd.classList.toggle('open', open);
+    sortDdBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function setSort(mode) {
+    sortMode = mode;
+    sortDdCurrent.textContent = SORT_LABELS[mode];
+    sortDdMenu.querySelectorAll('.sort-dd-item').forEach((it) => {
+      it.classList.toggle('active', it.dataset.sort === mode);
+    });
     renderGrid();
   }
-  sortDefaultBtn.addEventListener('click', () => setSort(false));
-  sortPopularBtn.addEventListener('click', () => setSort(true));
+  sortDdBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openSortMenu(!sortDd.classList.contains('open'));
+  });
+  sortDdMenu.querySelectorAll('.sort-dd-item').forEach((it) => {
+    it.addEventListener('click', () => {
+      setSort(it.dataset.sort);
+      openSortMenu(false);
+    });
+  });
+  // 바깥 클릭 시 닫기
+  document.addEventListener('click', (e) => {
+    if (!sortDd.contains(e.target)) openSortMenu(false);
+  });
+
+  // ===== 오늘의 소스 가챠 =====
+  const gachaBtn = document.getElementById('gachaBtn');
+  const gachaOverlay = document.getElementById('gachaOverlay');
+  const gachaModal = document.getElementById('gachaModal');
+  const gachaClose = document.getElementById('gachaClose');
+  const gachaStage = document.getElementById('gachaStage');
+  const gachaCap = document.getElementById('gachaCap');
+  const gachaCapTop = document.getElementById('gachaCapTop');
+  const gachaCapBot = document.getElementById('gachaCapBot');
+  const gachaResult = document.getElementById('gachaResult');
+  const gachaPull = document.getElementById('gachaPull');
+  const gachaActions = document.getElementById('gachaActions');
+  const gachaView = document.getElementById('gachaView');
+  const gachaAgain = document.getElementById('gachaAgain');
+  const GACHA_POOL = RECIPES.filter((r) => r.cat === '소스');
+  const GACHA_CONFETTI = ['#E0301E', '#F8B888', '#FCE4AE', '#F5B8A8', '#E8C9A0', '#FFB07A', '#EF9F27'];
+  let gachaLast = -1;
+  let gachaPicked = null;
+
+  function gachaConfetti() {
+    for (let i = 0; i < 26; i++) {
+      const s = document.createElement('span');
+      const z = 7 + Math.random() * 7;
+      s.style.cssText = 'position:absolute;left:104px;top:102px;width:' + z + 'px;height:' + (z * 0.6) + 'px;background:' + GACHA_CONFETTI[i % GACHA_CONFETTI.length] + ';border-radius:2px;pointer-events:none;z-index:9;';
+      gachaStage.appendChild(s);
+      const ang = Math.random() * 6.283;
+      const dist = 52 + Math.random() * 82;
+      const anim = s.animate([
+        { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+        { transform: 'translate(' + (Math.cos(ang) * dist).toFixed(1) + 'px,' + (Math.sin(ang) * dist).toFixed(1) + 'px) rotate(' + Math.round(Math.random() * 600) + 'deg)', opacity: 0 }
+      ], { duration: 900, easing: 'cubic-bezier(.15,.6,.4,1)', fill: 'forwards' });
+      anim.onfinish = () => s.remove();
+    }
+  }
+
+  function gachaResetCap() {
+    gachaCapTop.style.transform = 'none';
+    gachaCapTop.style.opacity = '1';
+    gachaCapBot.style.transform = 'none';
+    gachaCapBot.style.opacity = '1';
+    gachaCap.style.opacity = '1';
+    // 결과 카드는 애니메이션 없이 즉시 제거(다시 뽑기 때 흰 네모 잔상 방지)
+    gachaResult.style.transition = 'none';
+    gachaResult.style.opacity = '0';
+    gachaResult.style.transform = 'scale(.35)';
+    gachaResult.innerHTML = '';
+    void gachaResult.offsetWidth;
+    gachaResult.style.transition = '';
+  }
+
+  function gachaToStart() {
+    gachaResetCap();
+    gachaActions.style.display = 'none';
+    gachaPull.style.display = 'inline-block';
+    gachaPull.style.pointerEvents = 'auto';
+  }
+
+  function gachaPullOnce() {
+    gachaResetCap();
+    gachaPull.style.pointerEvents = 'none';
+    gachaAgain.style.pointerEvents = 'none';
+    gachaCap.classList.remove('shaking');
+    void gachaCap.offsetWidth;
+    gachaCap.classList.add('shaking');
+    setTimeout(() => {
+      gachaCapTop.style.transform = 'translateY(-50px) rotate(-14deg)';
+      gachaCapTop.style.opacity = '0';
+      gachaCapBot.style.transform = 'translateY(50px)';
+      gachaCapBot.style.opacity = '0';
+    }, 520);
+    setTimeout(() => {
+      let i;
+      do { i = Math.floor(Math.random() * GACHA_POOL.length); } while (i === gachaLast && GACHA_POOL.length > 1);
+      gachaLast = i;
+      const r = GACHA_POOL[i];
+      gachaPicked = r;
+      const ver = r.ver ? '<div class="gacha-card-ver">' + r.ver + '</div>' : '';
+      gachaResult.innerHTML =
+        '<div class="gacha-card">' +
+        '<div class="gacha-card-thumb" style="background:' + (r.imgBg || '#fff') + '"><img src="' + r.img + '" alt="' + r.name + '" style="object-position:' + (r.imgPosition || 'center') + '" draggable="false"></div>' +
+        '<div class="gacha-card-body"><span class="gacha-card-cat">소스</span><div class="gacha-card-name">' + r.name + '</div>' + ver + '</div>' +
+        '</div>';
+      gachaResult.style.opacity = '1';
+      gachaResult.style.transform = 'scale(1)';
+      gachaCap.style.opacity = '0';
+      gachaConfetti();
+      gachaPull.style.display = 'none';
+      gachaActions.style.display = 'flex';
+      gachaAgain.style.pointerEvents = 'auto';
+    }, 840);
+  }
+
+  function openGacha() {
+    document.body.style.overflow = 'hidden';
+    gachaToStart();
+    gachaOverlay.classList.add('open');
+  }
+
+  function closeGacha() {
+    document.body.style.overflow = '';
+    gachaOverlay.classList.remove('open');
+  }
+
+  gachaBtn.addEventListener('click', openGacha);
+  gachaPull.addEventListener('click', gachaPullOnce);
+  gachaAgain.addEventListener('click', gachaPullOnce);
+  gachaClose.addEventListener('click', closeGacha);
+  gachaOverlay.addEventListener('click', closeGacha);
+  gachaModal.addEventListener('click', (e) => e.stopPropagation());
+  gachaView.addEventListener('click', () => {
+    if (!gachaPicked) return;
+    const r = gachaPicked;
+    closeGacha();
+    openModal(r);
+  });
   homeBtn.addEventListener('click', () => {
     location.href = location.pathname + '?_r=' + Date.now();
   });

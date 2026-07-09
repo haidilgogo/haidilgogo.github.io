@@ -415,31 +415,104 @@ body {
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-.sort-toggle {
+.sort-dd {
   flex: none;
-  display: inline-flex;
-  gap: 2px;
-  background: #F5EFEC;
-  border-radius: 10px;
-  padding: 3px;
+  position: relative;
 }
 
-.sort-btn {
-  border: none;
-  background: transparent;
-  color: #9A8A83;
+.sort-dd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #E7DED9;
+  background: #fff;
+  color: #6E5F58;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 8px;
+  padding: 8px 13px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: border-color .15s, color .15s, background-color .15s, transform .09s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.sort-btn.active {
+@media (hover: hover) {
+  .sort-dd-btn:hover {
+    background: #FAF6F3;
+    border-color: #DBCFC8;
+  }
+}
+
+.sort-dd-btn:active {
+  transform: scale(.97);
+}
+
+/* 라벨 폭 고정(가나다순 등 글자 수 달라도 버튼 크기 안 변하게 → 옆 버튼 밀림 방지) */
+.sort-dd-current {
+  min-width: 64px;
+}
+
+.sort-dd-chev {
+  color: #B9ABA3;
+  transition: transform .2s ease;
+}
+
+.sort-dd.open .sort-dd-btn {
+  border-color: #E0301E;
+  color: #E0301E;
+}
+
+.sort-dd.open .sort-dd-chev {
+  color: #E0301E;
+  transform: rotate(180deg);
+}
+
+.sort-dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 150px;
+  background: #F5EFEC;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+  z-index: 30;
+  display: none;
+}
+
+.sort-dd.open .sort-dd-menu {
+  display: block;
+}
+
+.sort-dd-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #9A8A83;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 10px 13px;
+  margin: 2px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .sort-dd-item:not(.active):hover {
+    background: rgba(255, 255, 255, .6);
+    color: #6E5F58;
+  }
+}
+
+.sort-dd-item.active {
   background: #fff;
   color: #E0301E;
   box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
@@ -867,6 +940,231 @@ body {
 .modal-close:hover {
   background: #F5EFEC;
   color: #E0301E;
+}
+
+/* ===== 오늘의 소스 가챠 ===== */
+.head-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gacha-btn {
+  border: none;
+  background: #E0301E;
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform .09s ease, background-color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .gacha-btn:hover {
+    background: #CC2A1A;
+  }
+}
+
+.gacha-btn:active {
+  transform: scale(.95);
+  background: #B42416;
+}
+
+.gacha-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  background: rgba(58, 12, 8, .5);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gacha-overlay.open {
+  display: flex;
+}
+
+.gacha-modal {
+  position: relative;
+  width: 330px;
+  max-width: 100%;
+  background: #FBF5F1;
+  border-radius: 20px;
+  padding: 30px 24px 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+}
+
+.gacha-close {
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+}
+
+.gacha-close:active {
+  background: #EDE4DF;
+}
+
+.gacha-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #E0301E;
+}
+
+.gacha-stage {
+  position: relative;
+  width: 210px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gacha-cap {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  filter: drop-shadow(0 7px 12px rgba(170, 70, 40, .24));
+}
+
+.gacha-cap.shaking {
+  animation: gachaShake .5s ease-in-out 1;
+}
+
+@keyframes gachaShake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-7px) rotate(-7deg); }
+  40% { transform: translateX(7px) rotate(6deg); }
+  60% { transform: translateX(-6px) rotate(-5deg); }
+  80% { transform: translateX(6px) rotate(5deg); }
+}
+
+/* 반쪽 = 128px 원을 64px 창으로 잘라 만든 완벽한 반원 */
+.gacha-cap-half {
+  position: absolute;
+  left: 0;
+  width: 128px;
+  height: 64px;
+  overflow: hidden;
+  transition: transform .5s cubic-bezier(.5, -.3, .4, 1.3), opacity .5s;
+}
+
+.gacha-cap-top { top: 0; }
+.gacha-cap-bot { bottom: 0; box-shadow: inset 0 4px 6px -3px rgba(150, 90, 60, .3); }
+
+.gacha-ball {
+  position: absolute;
+  left: 0;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+}
+
+.gacha-ball-top { top: 0; background: #E23A22; }
+.gacha-ball-bot { bottom: 0; background: #EADBC8; }
+
+.gacha-gloss-a { position: absolute; top: 16px; left: 20px; width: 46px; height: 26px; background: rgba(255, 255, 255, .42); border-radius: 50%; transform: rotate(-22deg); filter: blur(3px); }
+.gacha-gloss-b { position: absolute; top: 24px; left: 56px; width: 11px; height: 11px; background: rgba(255, 255, 255, .55); border-radius: 50%; filter: blur(1px); }
+.gacha-bot-light { position: absolute; bottom: 16px; left: 41px; width: 46px; height: 20px; background: rgba(255, 255, 255, .5); border-radius: 50%; filter: blur(3px); }
+
+.gacha-result {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(.35);
+  transition: opacity .35s, transform .4s cubic-bezier(.2, .9, .3, 1.5);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.gacha-card {
+  width: 190px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(180, 80, 40, .26);
+  text-align: left;
+}
+
+.gacha-card-thumb { height: 122px; }
+.gacha-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gacha-card-body { padding: 10px 12px 12px; }
+.gacha-card-cat { font-size: 11px; font-weight: 700; color: #C0392B; background: #FBE3DE; padding: 2px 8px; border-radius: 6px; }
+.gacha-card-name { margin-top: 7px; font-size: 15px; font-weight: 800; color: #4A2418; }
+.gacha-card-ver { margin-top: 2px; font-size: 12px; font-weight: 500; color: #AD9384; }
+
+.gacha-pull {
+  border: none;
+  background: #E0301E;
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 13px 40px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform .09s ease, background-color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gacha-actions {
+  display: none;
+  gap: 9px;
+  width: 100%;
+}
+
+.gacha-view, .gacha-again {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  padding: 12px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  transition: transform .09s ease, background-color .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gacha-view { border: none; background: #E0301E; color: #fff; font-weight: 800; }
+.gacha-again { border: 1px solid #E0301E; background: #fff; color: #E0301E; font-weight: 700; }
+
+@media (hover: hover) {
+  .gacha-pull:hover, .gacha-view:hover { background: #CC2A1A; }
+  .gacha-again:hover { background: #FBEAE7; }
+}
+
+.gacha-pull:active, .gacha-view:active { transform: scale(.95); background: #B42416; }
+.gacha-again:active { transform: scale(.95); background: #F5D7D1; }
+
+/* 데스크톱에서 가챠 팝업 크게 */
+@media (min-width: 700px) {
+  .gacha-modal { width: 440px; padding: 40px 34px 32px; gap: 20px; }
+  .gacha-title { font-size: 24px; }
+  .gacha-close { font-size: 28px; }
+  .gacha-stage { transform: scale(1.36); margin: 36px 0; }
+  .gacha-pull { font-size: 18px; padding: 16px 50px; }
+  .gacha-view, .gacha-again { font-size: 15px; padding: 14px 10px; }
 }
 
 .modal-fav-btn {
