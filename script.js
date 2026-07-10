@@ -19,7 +19,7 @@
   const UNITS = ['스푼', '티스푼', '집게', '바퀴', '개', '공기', '접시', '인분', '넉넉하게', '적당히', '한 꼬집'];  // 정식 단위
 
   const RECIPES = [
-    { id: 's1', cat: '소스', emoji: '🥣', img: 'assets/recipe card_건희소스.png', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', source: '버블 건희(ONEUS)', desc: '아이돌 그룹 \'ONEUS\'의 \'건희\'가 버블에 공개한 소스로, 현 시점 대한민국에서 가장 유명한 소스이다.',
+    { id: 's1', cat: '소스', emoji: '🥣', img: 'assets/recipe card_건희소스.jpg', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', source: '버블 건희(ONEUS)', desc: '아이돌 그룹 \'ONEUS\'의 \'건희\'가 버블에 공개한 소스로, 현 시점 대한민국에서 가장 유명한 소스이다.',
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '2.5', '스푼'], ['다진마늘', '0.5', '스푼'], ['다진파', '0.5', '집게'], ['깨', '1', '티스푼'], ['땅콩가루', '1', '티스푼'], ['마라시즈닝(고춧가루)', '0.5', '티스푼'], ['고추기름', '1', '티스푼'], ['설탕', '0.3', '티스푼'], ['매운소고기소스', '0.5', '티스푼']],
       steps: [],
       tip: '너무 달면 스위트칠리소스는 1스푼으로 줄이기' },
@@ -27,7 +27,7 @@
       ings: [['땅콩참깨소스', '0.25', '스푼'], ['스위트칠리소스', '3.5~4', '스푼'], ['튀긴대두', '2~3', '스푼'], ['참기름', '0.5', '스푼'], ['고추기름', '0.5', '스푼'], ['다진양파', '3', '스푼'], ['다진파', '3', '집게'], ['다진마늘', '1', '스푼']],
       steps: [],
       tip: '튀긴대두, 양파, 다진파, 다진마늘은 많으면 많을수록 맛있음' },
-    { id: 's2', date: '2022-01-22', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디2호소스.png', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBDCD3,#F5B8A8)', name: '쑨디2호소스', source: 'X @deeplovehalf', desc: '트위터리안 \'쑨디\'가 2022년 트위터(현재: X)에 공개한 소스로 정식 명칭은 쑨디2호소스(1호는 없지만 멋있어 보여서 그냥 이름을 2호라고 지었다고 함)이다.',
+    { id: 's2', date: '2022-01-22', cat: '소스', emoji: '🥣', img: 'assets/recipe card_쑨디2호소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBDCD3,#F5B8A8)', name: '쑨디2호소스', source: 'X @deeplovehalf', desc: '트위터리안 \'쑨디\'가 2022년 트위터(현재: X)에 공개한 소스로 정식 명칭은 쑨디2호소스(1호는 없지만 멋있어 보여서 그냥 이름을 2호라고 지었다고 함)이다.',
       ings: [['매운소고기소스 - 건더기만', '0.5', '스푼'], ['청유훠궈소스 - 건더기만', '0.5', '스푼'], ['땅콩가루', '', '넉넉하게'], ['다진파', '', '넉넉하게'], ['다진마늘', '0.5', '스푼'], ['스위트칠리소스', '0.5', '스푼'], ['굴소스', '0.5', '스푼'], ['땅콩참깨소스', '0.25', '스푼']],
       steps: [],
       tip: '' },
@@ -51,7 +51,7 @@
       ings: [['참기름', '2', '스푼'], ['소금', '0.5', '스푼'], ['다진마늘', '1', '스푼'], ['다진파', '1', '스푼'], ['태국고추', '1', '스푼']],
       steps: [],
       tip: '' },
-    { id: 'r1', date: '2025-01-16', cat: '밥', emoji: '🍚', img: 'assets/recipe card_메기살덮밥.png', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', source: 'X @dduuuu__', desc: '마라훠궈 국물에 익힌 메기살을 특제소스에 비빈 밥에 얹어 먹는 히든 메뉴로 X에서 #초콜렛밥 이라는 해시태그가 걸려있다.',
+    { id: 'r1', date: '2025-01-16', cat: '밥', emoji: '🍚', img: 'assets/recipe card_메기살덮밥.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', source: 'X @dduuuu__', desc: '마라훠궈 국물에 익힌 메기살을 특제소스에 비빈 밥에 얹어 먹는 히든 메뉴로 X에서 #초콜렛밥 이라는 해시태그가 걸려있다.',
       order: [['팡가시우메기', '1', '접시'], ['공깃밥', '1', '공기']],
       ings: [['참기름', '1', '스푼'], ['간장소스', '1', '스푼'], ['굴소스', '0.5', '스푼'], ['중국식초', '0.5', '스푼'], ['다진파', '1', '집게']],
       steps: [
@@ -60,7 +60,7 @@
         '충분히 익힌 메기살을 밥에 얹어 으깨 먹는다',
       ],
       tip: '느끼한 것 같으면 마라훠궈 국물 1숟가락을 밥에 추가하기' },
-    { id: 'r2', cat: '밥', emoji: '🍚', img: 'assets/recipe card_토마토달걀밥.png', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토달걀밥', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀어, 밥에 끼얹어 비벼 먹는 히든 메뉴.',
+    { id: 'r2', cat: '밥', emoji: '🍚', img: 'assets/recipe card_토마토달걀밥.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토달걀밥', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀어, 밥에 끼얹어 비벼 먹는 히든 메뉴.',
       order: [['날계란', '1', '개'], ['공깃밥', '1', '공기']],
       ings: [['참기름', '0.5', '스푼'], ['오향우육(다진고기)', '2', '스푼'], ['다진파', '2', '집게']],
       steps: [
@@ -71,7 +71,7 @@
         '소스가 담긴 밥에 토마토계란탕을 끼얹어 비벼 먹는다',
       ],
       tip: '토마토탕 안에 토마토를 국자로 으깨주기' },
-    { id: 'n1', cat: '면', emoji: '🍜', img: 'assets/recipe card_토마토에그누들.png', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFECDD,#FFC2A6)', name: '토마토에그누들', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀고 생면을 익혀 먹는 히든 메뉴.',
+    { id: 'n1', cat: '면', emoji: '🍜', img: 'assets/recipe card_토마토에그누들.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFECDD,#FFC2A6)', name: '토마토에그누들', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀고 생면을 익혀 먹는 히든 메뉴.',
       order: [['날계란', '1', '개'], ['생면', '1', '인분']],
       ings: [['오향우육(다진고기)', '2', '스푼'], ['다진파', '2', '집게']],
       steps: [
