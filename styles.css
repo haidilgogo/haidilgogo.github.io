@@ -877,17 +877,28 @@ body {
 }
 
 .footer-report {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 9px 18px;
   font-size: 12px;
   font-weight: 500;
-  color: #C08A80;
+  color: #B0574A;
   text-decoration: none;
   text-align: center;
-  transition: color .15s ease;
+  background-color: #FDECE7;
+  border: 1px solid #F2D3CB;
+  border-radius: 999px;
+  transition: background-color .15s ease, color .15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .footer-report:hover {
+  background-color: #FADFD8;
   color: #A83226;
-  text-decoration: underline;
+}
+
+.footer-report:active {
+  background-color: #F5D2C9;
 }
 
 .footer-break-mobile {
