@@ -859,9 +859,10 @@ body {
 .footer {
   padding: 16px clamp(20px, 5vw, 40px);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background-color: #FFF7F4;
   border-top: 1px solid #F0DCD4;
   overflow: hidden;
@@ -873,6 +874,20 @@ body {
   color: #A83226;
   text-align: center;
   white-space: nowrap;
+}
+
+.footer-report {
+  font-size: 12px;
+  font-weight: 500;
+  color: #C08A80;
+  text-decoration: none;
+  text-align: center;
+  transition: color .15s ease;
+}
+
+.footer-report:hover {
+  color: #A83226;
+  text-decoration: underline;
 }
 
 .footer-break-mobile {
