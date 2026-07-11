@@ -27,7 +27,8 @@
   --brand-red-active: #B42416; /* 버튼 누를 때(press) 더 진한 빨강 */
   --brand-red-dark: #A83226;   /* 진한 빨강 (푸터 제목 등) */
   --logo-red-active: #A80014;  /* 로고 hover/press 시 진한 빨강 */
-  --card-hover-border: #D98476; /* 카드 hover 테두리 (로즈 레드 — 빨강+크림 중간) */
+  --card-hover-border: #D98476; /* 카드 hover/누름 테두리 (로즈 레드) */
+  --card-border: #E6D4BA;       /* 카드 기본 테두리 (크림) */
   --bg-card: #F4E9E0;          /* 페이지/카드 배경 크림색 */
   --bg-cream: #F5EFEC;         /* 밝은 크림 배경 */
   --text-dark: #2B120D;        /* 기본 진한 글자색 */
@@ -555,13 +556,13 @@ body {
 .recipe-card {
   cursor: pointer;
   background: #fff;
-  border: 1.5px solid rgba(43, 18, 13, .06);
+  border: 1.5px solid var(--card-border);
   border-radius: 14px;
   box-shadow: 0 1px 3px rgba(43, 18, 13, .10);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform .15s, box-shadow .15s;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
 }
 
 .empty-state {
@@ -589,11 +590,15 @@ body {
   }
   .recipe-card:has(.fav-star:active),
   .recipe-card:has(.like-btn:active) {
-    border-color: rgba(43, 18, 13, .06);
+    border-color: var(--card-border);
   }
   .recipe-card:has(.fav-star:active) .recipe-thumb-img,
   .recipe-card:has(.like-btn:active) .recipe-thumb-img {
     transform: none;
+  }
+  .recipe-card:has(.fav-star:active) .recipe-name,
+  .recipe-card:has(.like-btn:active) .recipe-name {
+    color: var(--text-dark);
   }
 }
 
@@ -837,10 +842,6 @@ body {
   .recipe-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-  }
-
-  .recipe-thumb {
-    margin-bottom: 8px;
   }
 
   .recipe-body {
