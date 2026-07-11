@@ -653,9 +653,10 @@ body {
   height: 15px;
 }
 
-/* 유튜브·트위터 로고는 여백이 많아 작아 보임 → 살짝 키움 */
+/* 유튜브·트위터·제미나이 로고는 여백이 많아 작아 보임 → 살짝 키움 */
 .recipe-thumb-source .src-ic--yt { width: 16px; height: 16px; }
 .recipe-thumb-source .src-ic--tw { width: 15px; height: 15px; }
+.recipe-thumb-source .src-ic--gm { width: 15px; height: 15px; }
 
 .recipe-thumb-source .src-txt {
   min-width: 0;
