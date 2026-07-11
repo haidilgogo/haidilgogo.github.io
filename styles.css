@@ -1290,11 +1290,22 @@ body {
 .gacha-result .recipe-name--long { font-size: 13px; }
 .gacha-result .recipe-ver { font-size: 12px; min-height: 15px; }
 
-/* 가챠 결과 카드에선 카테고리 배지·좋아요·책갈피 숨김(뽑기 결과 확인용이라 불필요).
+/* 가챠 결과 카드에선 좋아요·책갈피 숨김(뽑기 결과 확인용이라 불필요). 카테고리 배지는 표시.
    카드 클릭 → 레시피 모달은 유지. */
-.gacha-result .recipe-cat-label,
 .gacha-result .fav-star,
 .gacha-result .like-btn { display: none; }
+
+/* 가챠 카드: 제목(별 포함)·연도 가운데 정렬.
+   제목은 fit-content 박스를 가운데 둬서 별(absolute)이 첫 글자 왼쪽에 그대로 붙는다. */
+.gacha-result .recipe-name {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 100%;
+}
+.gacha-result .recipe-ver {
+  grid-column: 1 / -1;
+  text-align: center;
+}
 
 .gacha-pull {
   border: none;
