@@ -324,8 +324,8 @@
 
   // 출처 플랫폼 아이콘 (흰색 단색, 어두운 썸네일 위에 표시). 색은 CSS currentColor(흰색) 상속.
   const SRC_ICONS = {
-    youtube: '<svg class="src-ic" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
-    twitter: '<svg class="src-ic" viewBox="0 0 246.15 200.0126"><path d="M221.95 51.29c.15 2.17.15 4.34.15 6.53 0 66.73-50.8 143.69-143.69 143.69v-.04A142.966 142.966 0 0 1 1 178.83a102.726 102.726 0 0 0 12.02.73 101.407 101.407 0 0 0 62.72-21.66 50.564 50.564 0 0 1-47.18-35.07 50.338 50.338 0 0 0 22.8-.87 50.505 50.505 0 0 1-40.51-49.5v-.64a50.18 50.18 0 0 0 22.92 6.32 50.564 50.564 0 0 1-15.63-67.43 143.333 143.333 0 0 0 104.08 52.76 50.548 50.548 0 0 1 86.06-46.06 101.337 101.337 0 0 0 32.07-12.26 50.69 50.69 0 0 1-22.2 27.93 100.435 100.435 0 0 0 29-7.95 102.594 102.594 0 0 1-25.2 26.16Z" transform="translate(-1 -1.497)"/></svg>',
+    youtube: '<svg class="src-ic src-ic--yt" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+    twitter: '<svg class="src-ic src-ic--tw" viewBox="0 0 246.15 200.0126"><path d="M221.95 51.29c.15 2.17.15 4.34.15 6.53 0 66.73-50.8 143.69-143.69 143.69v-.04A142.966 142.966 0 0 1 1 178.83a102.726 102.726 0 0 0 12.02.73 101.407 101.407 0 0 0 62.72-21.66 50.564 50.564 0 0 1-47.18-35.07 50.338 50.338 0 0 0 22.8-.87 50.505 50.505 0 0 1-40.51-49.5v-.64a50.18 50.18 0 0 0 22.92 6.32 50.564 50.564 0 0 1-15.63-67.43 143.333 143.333 0 0 0 104.08 52.76 50.548 50.548 0 0 1 86.06-46.06 101.337 101.337 0 0 0 32.07-12.26 50.69 50.69 0 0 1-22.2 27.93 100.435 100.435 0 0 0 29-7.95 102.594 102.594 0 0 1-25.2 26.16Z" transform="translate(-1 -1.497)"/></svg>',
     x: '<svg class="src-ic" viewBox="0 0 128 115.7001"><path d="M100.808 0h19.627l-42.88 49.01L128 115.7H88.502L57.565 75.253 22.167 115.7H2.527L48.393 63.28 0 0h40.501l27.964 36.97Zm-6.89 103.952h10.877L34.592 11.131H22.92Z"/></svg>',
     naver: '<svg class="src-ic" viewBox="0 0 924.43 1000"><path d="M344.06 286.98c-70.27 0-135.39 22.03-188.86 59.55V70.18H0v858.3h155.2v-42.62c53.47 37.51 118.59 59.55 188.86 59.55 181.82 0 329.21-147.39 329.21-329.21s-147.4-329.22-329.21-329.22zm-14.78 514.64c-99.13 0-179.49-83.08-179.49-185.56S230.15 430.5 329.28 430.5s179.49 83.08 179.49 185.56-80.36 185.56-179.49 185.56zM862.35 0h62.08v1000h-62.08z"/></svg>',
     bubble: '<img class="src-ic" src="assets/icons/src-bubble.png?v=2" alt="" draggable="false">',
@@ -345,6 +345,47 @@
   // 연예인 "스타 표시" — 제목 첫 글자 왼쪽 위 골드 별 (그라데이션 def는 index.html)
   const STAR_SVG = '<svg class="star-accent" viewBox="0 0 24 24" fill="url(#starGold)" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
 
+  // 카드 1장(그리드·가챠 결과 공용) — 완전히 같은 마크업/핸들러를 쓰므로 스타일이 항상 동일하다.
+  function buildCard(r, opts) {
+    opts = opts || {};
+    const showSource = r.source && !opts.hideSource;
+    const card = document.createElement('div');
+    card.className = 'recipe-card';
+    card.innerHTML = `
+        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}" draggable="false" loading="lazy"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${showSource ? `<div class="recipe-thumb-source">${sourceHtml(r.source)}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
+        <div class="recipe-body">
+          <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}${r.star ? ' has-star' : ''}">${r.star ? STAR_SVG : ''}${r.nameHtml || r.name}</h3>
+          <span class="recipe-cat-label">${r.cat}</span>
+          <span class="recipe-ver">${r.ver || ''}</span>
+          <button class="like-btn${likedByMe.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="좋아요"><svg width="17" height="17" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="like-count">${getLikeCount(r.id)}</span></button>
+        </div>
+      `;
+    card.addEventListener('click', opts.onOpen || (() => openModal(r)));
+    card.querySelector('.fav-star').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      if (favorites.has(r.id)) {
+        favorites.delete(r.id);
+      } else {
+        favorites.add(r.id);
+      }
+      saveFavorites();
+      if (showFavoritesOnly) {
+        renderGrid();  // 즐겨찾기 화면에선 카드가 사라져야 하므로 재렌더
+      } else {
+        btn.classList.toggle('active', favorites.has(r.id));  // 그 외엔 별표만 토글(이미지 재로드 방지)
+      }
+    });
+    card.querySelector('.like-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      toggleLike(r.id);
+      btn.classList.toggle('active', likedByMe.has(r.id));
+      btn.querySelector('.like-count').textContent = getLikeCount(r.id);
+    });
+    return card;
+  }
+
   function renderGrid() {
     const filtered = getFiltered();
     countEl.textContent = filtered.length;
@@ -363,41 +404,7 @@
       return;
     }
     filtered.forEach((r) => {
-      const card = document.createElement('div');
-      card.className = 'recipe-card';
-      card.innerHTML = `
-        <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}" draggable="false" loading="lazy"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${sourceHtml(r.source)}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
-        <div class="recipe-body">
-          <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}${r.star ? ' has-star' : ''}">${r.star ? STAR_SVG : ''}${r.nameHtml || r.name}</h3>
-          <span class="recipe-cat-label">${r.cat}</span>
-          <span class="recipe-ver">${r.ver || ''}</span>
-          <button class="like-btn${likedByMe.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="좋아요"><svg width="17" height="17" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="like-count">${getLikeCount(r.id)}</span></button>
-        </div>
-      `;
-      card.addEventListener('click', () => openModal(r));
-      card.querySelector('.fav-star').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const btn = e.currentTarget;
-        if (favorites.has(r.id)) {
-          favorites.delete(r.id);
-        } else {
-          favorites.add(r.id);
-        }
-        saveFavorites();
-        if (showFavoritesOnly) {
-          renderGrid();  // 즐겨찾기 화면에선 카드가 사라져야 하므로 재렌더
-        } else {
-          btn.classList.toggle('active', favorites.has(r.id));  // 그 외엔 별표만 토글(이미지 재로드 방지)
-        }
-      });
-      card.querySelector('.like-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const btn = e.currentTarget;
-        toggleLike(r.id);
-        btn.classList.toggle('active', likedByMe.has(r.id));
-        btn.querySelector('.like-count').textContent = getLikeCount(r.id);
-      });
-      gridEl.appendChild(card);
+      gridEl.appendChild(buildCard(r));
     });
   }
 
@@ -685,14 +692,11 @@
       }, idx * 170);
     });
     setTimeout(() => {
-      const ver = r.ver ? '<div class="gacha-card-ver">' + r.ver + '</div>' : '';
+      // 메인 화면 카드와 완전히 동일한 마크업을 재사용(buildCard).
       // 카드는 opacity 0(리셋 상태)로 먼저 그려두고, 이미지가 실제로 로드된 뒤에만 공개한다.
       // → 캐시 여부와 무관하게 카드가 흰 네모로 먼저 뜨는 현상 방지.
-      gachaResult.innerHTML =
-        '<div class="gacha-card">' +
-        '<div class="gacha-card-thumb" style="background:' + (r.imgBg || '#fff') + '"><img src="' + r.img + '" alt="' + r.name + '" style="object-position:' + (r.imgPosition || 'center') + '" draggable="false"></div>' +
-        '<div class="gacha-card-body"><span class="gacha-card-cat">소스</span><div class="gacha-card-name">' + (r.nameHtml || r.name) + '</div>' + ver + '</div>' +
-        '</div>';
+      gachaResult.innerHTML = '';
+      gachaResult.appendChild(buildCard(r, { hideSource: true, onOpen: () => { closeGacha(); openModal(r); } }));
       let revealed = false;
       const reveal = () => {
         if (revealed) return;
@@ -707,7 +711,7 @@
         gachaActions.style.display = 'flex';
         gachaAgain.style.pointerEvents = 'auto';
       };
-      const cardImg = gachaResult.querySelector('.gacha-card-thumb img');
+      const cardImg = gachaResult.querySelector('.recipe-thumb-img');
       if (cardImg && cardImg.complete && cardImg.naturalWidth > 0) {
         reveal();
       } else if (cardImg) {

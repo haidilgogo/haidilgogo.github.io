@@ -649,9 +649,13 @@ body {
 
 /* 버블(PNG)은 이미지 안에 여백이 있어 SVG보다 작아 보임 → 살짝 키움 */
 .recipe-thumb-source img.src-ic {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
 }
+
+/* 유튜브·트위터 로고는 여백이 많아 작아 보임 → 살짝 키움 */
+.recipe-thumb-source .src-ic--yt { width: 16px; height: 16px; }
+.recipe-thumb-source .src-ic--tw { width: 15px; height: 15px; }
 
 .recipe-thumb-source .src-txt {
   min-width: 0;
@@ -1256,7 +1260,11 @@ body {
 
 .gacha-result {
   position: absolute;
-  inset: 0;
+  /* 제목(위)·버튼(아래) 사이 밴드에만 카드를 배치해 어느 쪽과도 겹치지 않게 한다. */
+  top: 44px;
+  right: 0;
+  bottom: 62px;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1267,21 +1275,26 @@ body {
   z-index: 4;
 }
 
-.gacha-card {
-  width: 190px;
-  background: #fff;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 12px 28px rgba(180, 80, 40, .26);
-  text-align: left;
+/* 가챠 결과 카드 = 메인 그리드 카드(.recipe-card)와 동일. 폭만 모달에 맞게 고정.
+   컨테이너는 클릭 통과(pointer-events:none)라 카드만 다시 클릭 가능하게 켠다.
+   모달의 text-align:center가 상속되지 않게 메인 카드처럼 왼쪽 정렬로 되돌린다. */
+.gacha-result .recipe-card { width: 190px; pointer-events: auto; text-align: left; }
+/* 모바일은 실제 그리드 카드 폭(162px)과 동일하게 — 작은 모달에서도 버튼과 안 겹침 */
+@media (max-width: 767px) {
+  .gacha-result .recipe-card { width: 162px; }
 }
+/* 가챠 카드는 데스크톱에서도 폭이 모바일 그리드 카드(162px)급이므로,
+   데스크톱 타이포(24px 등)를 쓰면 제목이 잘림 → 모바일 카드와 같은 크기를 항상 적용 */
+.gacha-result .recipe-body { padding: 9px 11px 10px; column-gap: 8px; row-gap: 4px; }
+.gacha-result .recipe-name { font-size: 15px; }
+.gacha-result .recipe-name--long { font-size: 13px; }
+.gacha-result .recipe-ver { font-size: 12px; min-height: 15px; }
 
-.gacha-card-thumb { height: 122px; }
-.gacha-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gacha-card-body { padding: 10px 12px 12px; }
-.gacha-card-cat { font-size: 11px; font-weight: 700; color: var(--brand-red); background: #FBE3DE; padding: 2px 8px; border-radius: 6px; }
-.gacha-card-name { margin-top: 7px; font-size: 15px; font-weight: 800; color: #4A2418; }
-.gacha-card-ver { margin-top: 2px; font-size: 12px; font-weight: 500; color: #AD9384; }
+/* 가챠 결과 카드에선 카테고리 배지·좋아요·책갈피 숨김(뽑기 결과 확인용이라 불필요).
+   카드 클릭 → 레시피 모달은 유지. */
+.gacha-result .recipe-cat-label,
+.gacha-result .fav-star,
+.gacha-result .like-btn { display: none; }
 
 .gacha-pull {
   border: none;
