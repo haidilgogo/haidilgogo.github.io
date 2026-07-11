@@ -1083,13 +1083,6 @@ body {
   .modal .modal-close { right: 14px; }
   .modal .modal-fav-btn { right: 62px; }
 
-  /* 썸네일이 위에 있으니 헤더 상단 여백 축소(버튼 자리 불필요)
-     + 히어로 헤더: 크림→흰색 은은한 그라데이션(iOS 안전 — filter 미사용) */
-  .modal-header {
-    padding-top: 22px;
-    background: linear-gradient(180deg, #FAECE3 0%, #FDF6F1 55%, #FFFFFF 100%);
-    border-bottom: none;
-  }
 }
 
 /* 데스크톱은 썸네일 미표시(데스크톱 디자인은 모바일 확정 후 별도 작업) */
@@ -1496,9 +1489,19 @@ body {
   transform: scale(.95);
 }
 
+.modal-like-btn svg path {
+  transition: fill .15s;
+}
+
+/* 누르면 하트가 빨갛게 채워지고(카드 하트와 동일) 알약 배경도 로즈로 — "눌림"이 확실하게 */
 .modal-like-btn.active {
   color: var(--brand-red);
   border-color: #F0B3A6;
+  background: #FBE3DE;
+}
+
+.modal-like-btn.active svg path {
+  fill: currentColor;
 }
 
 .modal-name {
@@ -1862,4 +1865,34 @@ body {
 .a2hs-steps li:last-child .a2hs-step-icon {
   font-size: 20px;
   font-weight: 700;
+}
+
+/* ══ 모바일 상세: 레시피 메모 컨셉 ══
+   (파일 맨 끝에 두는 이유: 위쪽 기본 규칙들과 특이성이 같아 소스 순서로 이겨야 함)
+   썸네일이 히어로 역할이므로 헤더는 흰 종이처럼 깔끔하게, 구획은 실선 대신 점선 —
+   종이에 적은 레시피 카드 느낌. */
+@media (max-width: 640px) {
+  .modal-cat { display: none; } /* 배지 제거: 탭·썸네일로 이미 아는 정보라 제목이 첫 자리 */
+
+  .modal-header {
+    padding-top: 18px;
+    border-bottom: 1.5px dashed #E3C7B8;
+  }
+
+  .modal-header .modal-name { margin-top: 0; }
+
+  /* 재료표: 크림 채움 박스 → 행 사이 점선의 레시피 메모 스타일 */
+  .ing-box {
+    background: none;
+    border-radius: 0;
+    padding: 0 2px;
+  }
+
+  .ing-row {
+    border-bottom: 1.5px dotted #DCC3B6;
+  }
+
+  .ing-row:last-child {
+    border-bottom: none;
+  }
 }
