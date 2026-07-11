@@ -767,39 +767,36 @@ body {
 
 .recipe-body {
   padding: 11px 14px 12px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 10px;
+  row-gap: 6px;
 }
 
-.recipe-cat-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
-  min-width: 0;
-}
-
-@media (min-width: 641px) {
-  .recipe-cat-row {
-    gap: 8px;
-  }
-}
-
+/* B 배치: 이름=좌상, 하트=우상, 버전=좌하, 배지=우하 */
 .recipe-cat-label {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  align-self: end;
   display: inline-block;
   font-size: 11px;
   padding: 3px 9px;
-  background: rgba(224, 48, 30, .1);
-  color: var(--brand-red);
+  background: rgba(43, 18, 13, .06);
+  color: #8A7A73;
   border-radius: 999px;
   font-weight: 700;
   font-family: 'Noto Sans KR', sans-serif;
 }
 
 .recipe-name {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin: 0;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 700;
@@ -809,7 +806,16 @@ body {
   transition: color .15s;
 }
 
+/* 이름 안의 작은 수식어 (예: 라젤(이 아는 동생)소스) — 카드·모달·가챠 공통 */
+.name-sub {
+  font-size: 0.68em;
+  font-weight: 700;
+}
+
 .recipe-ver {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
   display: block;
   margin: 0;
   font-family: 'Noto Sans KR', sans-serif;
@@ -820,8 +826,11 @@ body {
   min-height: 17px;
 }
 
-.recipe-cat-badge {
-  display: none;
+.recipe-body .like-btn {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
 }
 
 @media (hover: hover) {
@@ -846,12 +855,8 @@ body {
 
   .recipe-body {
     padding: 9px 11px 10px;
-    gap: 8px;
-  }
-
-  .recipe-cat-row {
-    align-items: flex-start;
-    gap: 5px;
+    column-gap: 8px;
+    row-gap: 4px;
   }
 
   .recipe-name {
@@ -1341,8 +1346,8 @@ body {
   display: inline-block;
   font-size: 13px;
   padding: 5px 13px;
-  background: rgba(224, 48, 30, .1);
-  color: var(--brand-red);
+  background: rgba(43, 18, 13, .06);
+  color: #8A7A73;
   border-radius: 999px;
   font-weight: 700;
   font-family: 'Noto Sans KR', sans-serif;

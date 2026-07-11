@@ -72,7 +72,7 @@
       ings: [['다진양파', '', '넉넉하게'], ['간장소스', '2', '스푼'], ['다진마늘', '1', '스푼'], ['다진파', '1', '스푼'], ['고추기름', '1', '스푼'], ['마라시즈닝(고춧가루)', '1', '스푼'], ['중국식초', '1', '스푼'], ['참기름', '0.5', '스푼'], ['태국고추', '', '넉넉하게']],
       steps: [],
       tip: '' },
-    { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤 아는 동생소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤 아는 동생소스', source: 'YouTube 라젤Razel', desc: '유튜브 채널 \'라젤Razel\'에서 라젤이 \'아는 동생이 이렇게 먹는다\'며 소개한 소스이다.',
+    { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤 아는 동생소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤 아는 동생소스', nameHtml: '라젤<span class="name-sub">(이 아는 동생)</span>소스', source: 'YouTube 라젤Razel', desc: '유튜브 채널 \'라젤Razel\'에서 라젤이 \'아는 동생이 이렇게 먹는다\'며 소개한 소스이다.',
       ings: [['참기름', '2', '스푼'], ['소금', '0.5', '스푼'], ['다진마늘', '1', '스푼'], ['다진파', '1', '스푼'], ['태국고추', '1', '스푼']],
       steps: [],
       tip: '' },
@@ -345,11 +345,9 @@
       card.innerHTML = `
         <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}" draggable="false" loading="lazy"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${r.source ? `<div class="recipe-thumb-source">${r.source}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}<button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div>
         <div class="recipe-body">
-          <div class="recipe-cat-row">
-            <span class="recipe-cat-label">${r.cat}</span>
-            <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}">${r.name}</h3>
-            <span class="recipe-ver">${r.ver || ''}</span>
-          </div>
+          <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}">${r.nameHtml || r.name}</h3>
+          <span class="recipe-cat-label">${r.cat}</span>
+          <span class="recipe-ver">${r.ver || ''}</span>
           <button class="like-btn${likedByMe.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="좋아요"><svg width="17" height="17" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="like-count">${getLikeCount(r.id)}</span></button>
         </div>
       `;
@@ -399,7 +397,8 @@
   function openModal(r) {
     currentModalRecipe = r;
     document.body.style.overflow = 'hidden';
-    document.getElementById('modalName').textContent = r.name;
+    const modalNameEl = document.getElementById('modalName');
+    if (r.nameHtml) modalNameEl.innerHTML = r.nameHtml; else modalNameEl.textContent = r.name;
     document.getElementById('modalCat').textContent = r.cat;
     document.getElementById('modalDesc').textContent = r.desc;
     modalFavBtn.classList.toggle('active', favorites.has(r.id));
@@ -669,7 +668,7 @@
       gachaResult.innerHTML =
         '<div class="gacha-card">' +
         '<div class="gacha-card-thumb" style="background:' + (r.imgBg || '#fff') + '"><img src="' + r.img + '" alt="' + r.name + '" style="object-position:' + (r.imgPosition || 'center') + '" draggable="false"></div>' +
-        '<div class="gacha-card-body"><span class="gacha-card-cat">소스</span><div class="gacha-card-name">' + r.name + '</div>' + ver + '</div>' +
+        '<div class="gacha-card-body"><span class="gacha-card-cat">소스</span><div class="gacha-card-name">' + (r.nameHtml || r.name) + '</div>' + ver + '</div>' +
         '</div>';
       let revealed = false;
       const reveal = () => {
