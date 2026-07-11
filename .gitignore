@@ -1,2 +1,8 @@
 .DS_Store
 .claude/
+
+# 썸네일 원본은 assets 루트에 임시로 놓고 cards/로 최적화 후 삭제함.
+# 혹시 남아도 커밋 안 되게 루트 직속 이미지는 무시(cards/·icons/·fonts/는 영향 없음).
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
