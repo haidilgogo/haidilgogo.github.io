@@ -16,6 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/Paperlogy-5Medium.subset.111.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Paperlogy-5Medium.subset.119.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css?v=167">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
@@ -29,32 +31,33 @@
   .splash {
     position: fixed; inset: 0; z-index: 9999;
     background: #F4E9E0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 16px;
+    display: flex; align-items: center; justify-content: center;
     opacity: 1; transition: opacity .4s ease;
   }
   .splash-hide { opacity: 0; pointer-events: none; }
-  .splash-logo {
-    width: 108px; height: 108px; object-fit: contain;
+  /* 로고+제목을 한 덩어리로 함께 등장시켜 시간차 방지 */
+  .splash-inner {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
     animation: splashPop .5s cubic-bezier(.2,.8,.2,1) both;
   }
+  .splash-logo { width: 140px; height: 140px; object-fit: contain; }
   .splash-title {
     font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
-    font-weight: 500; font-size: 23px; color: #E0301E;
+    font-weight: 500; font-size: 26px; color: #E0301E;
     letter-spacing: -.01em;
-    animation: splashFade .6s ease .12s both;
   }
   @keyframes splashPop { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
-  @keyframes splashFade { from { opacity: 0; } to { opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { .splash-logo, .splash-title { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .splash-inner { animation: none; } }
 </style>
 </head>
 <body>
 
 <!-- 스플래시(로고 인트로) — 콜드 스타트 때만, 세션당 1회 -->
 <div id="splash" class="splash">
-  <img class="splash-logo" src="assets/icons/splash-logo.png" alt="하딜고고" width="108" height="108" draggable="false">
-  <div class="splash-title">하딜고고</div>
+  <div class="splash-inner">
+    <img class="splash-logo" src="assets/icons/splash-logo.png" alt="하딜고고" width="140" height="140" draggable="false">
+    <div class="splash-title">하딜고고</div>
+  </div>
 </div>
 <script>
 (function () {
@@ -63,7 +66,7 @@
   // 이미 이번 세션에 봤으면(새로고침·로고클릭 등) 즉시 제거 — 깜빡임 없음
   if (sessionStorage.getItem('hg_splash')) { s.parentNode.removeChild(s); return; }
   sessionStorage.setItem('hg_splash', '1');
-  var MIN = 650, start = Date.now(), done = false;
+  var MIN = 1100, start = Date.now(), done = false;
   function hide() {
     if (done) return; done = true;
     s.classList.add('splash-hide');
