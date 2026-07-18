@@ -1017,8 +1017,10 @@
   }
   // (스크롤 축소/확대용) 트랜지션을 끄고 매 프레임 정확히 붙임 → 크기 변할 때 원이 더디게 안 쫓아옴
   let indicatorAnimId = 0;
+  let indicatorBusy = false; // 루프 진행 중엔 placeIndicator(즉시 스냅)가 끼어들어 슬라이드를 죽이지 않게
   function trackIndicator(duration) {
     cancelAnimationFrame(indicatorAnimId);
+    indicatorBusy = true;
     tabbarIndicator.style.transition = 'none';
     const start = performance.now();
     (function step(now) {
@@ -1026,21 +1028,50 @@
       if (now - start < duration) {
         indicatorAnimId = requestAnimationFrame(step);
       } else {
+        indicatorBusy = false;
         tabbarIndicator.style.transition = ''; // 다음 탭 전환의 부드러운 슬라이드를 위해 복구
       }
     })(start);
   }
-  // (탭 전환용) 트랜지션 켠 채 잠깐 매 프레임 목표 갱신 → 위치는 부드럽게 슬라이드,
-  // 혹시 크기 변화(스크롤 축소)가 아직 안 끝났어도 원 크기가 어긋나지 않게 따라감.
-  // 전환은 바 크기를 안 바꾸므로(과녁 고정) 예전 같은 지체가 없음.
-  function animateIndicator(duration) {
+  // (탭 전환용) 빨간 원 슬라이드 — Web Animations API로 브라우저 합성기(GPU)에서 재생.
+  // JS 시계(rAF)·CSS 트랜지션 방식은 전환 직후 메인스레드가 무거우면(iOS: 레시피 그리드
+  // 숨김+스크롤 점프) 프레임이 밀려 애니메이션이 잘려 보였음. WAAPI의 transform 애니메이션은
+  // 메인스레드가 바빠도 GPU에서 독립적으로 끝까지 재생됨(네이티브 앱과 같은 원리).
+  let indicatorWA = null;
+  function slideIndicator(targetBtn) {
     cancelAnimationFrame(indicatorAnimId);
-    tabbarIndicator.style.transition = ''; // CSS 트랜지션(transform .28s)으로 슬라이드
-    const start = performance.now();
-    (function step(now) {
-      updateIndicator();
-      if (now - start < duration) indicatorAnimId = requestAnimationFrame(step);
-    })(start);
+    if (indicatorWA) { indicatorWA.cancel(); indicatorWA = null; }
+    indicatorBusy = true;
+    // 출발점 = 지금 화면에 그려진 위치(진행 중이던 애니메이션의 중간값 포함)
+    const cs = getComputedStyle(tabbarIndicator);
+    const m = cs.transform && cs.transform !== 'none' ? new DOMMatrixReadOnly(cs.transform) : null;
+    const x0 = m ? m.e : 0, y0 = m ? m.f : 0;
+    // 도착점 = "펼침이 끝난 뒤"의 최종 위치를 트랜지션 없이 한 프레임 안에서 미리 측정(FLIP).
+    // 이러면 펼침(목표 이동)을 뒤쫓을 필요 없이 처음부터 정확한 목적지로 슬라이드함
+    const wasCompact = tabbarEl.classList.contains('tabbar--compact');
+    tabbarEl.classList.add('tabbar--freeze');
+    tabbarEl.classList.remove('tabbar--compact');
+    const fx = targetBtn.offsetLeft, fy = targetBtn.offsetTop;
+    const fw = targetBtn.offsetWidth, fh = targetBtn.offsetHeight;
+    if (wasCompact) { tabbarEl.classList.add('tabbar--compact'); void tabbarEl.offsetWidth; }
+    tabbarEl.classList.remove('tabbar--freeze');
+    // 크기는 즉시 최종값(축소·일반 차이가 몇 px라 안 보임), 위치만 슬라이드
+    tabbarIndicator.style.transition = 'none';
+    tabbarIndicator.style.width = fw + 'px';
+    tabbarIndicator.style.height = fh + 'px';
+    tabbarIndicator.style.transform = 'translate(' + fx + 'px,' + fy + 'px)';
+    const wa = tabbarIndicator.animate(
+      [{ transform: 'translate(' + x0 + 'px,' + y0 + 'px)' },
+       { transform: 'translate(' + fx + 'px,' + fy + 'px)' }],
+      { duration: 360, easing: 'cubic-bezier(.4, 0, .2, 1)' }
+    );
+    indicatorWA = wa;
+    wa.onfinish = wa.oncancel = () => {
+      if (indicatorWA !== wa) return; // 이미 다음 슬라이드가 시작됐으면 손대지 않음
+      indicatorWA = null;
+      indicatorBusy = false;
+      tabbarIndicator.style.transition = ''; // 다음 일반 슬라이드용 복구
+    };
   }
   function switchSection(name) {
     if (!SECTION_TITLES[name] && name !== 'recipe') return;
@@ -1061,14 +1092,24 @@
     });
     // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
     if (modalOverlay.classList.contains('open')) closeModal();
-    // 스크롤만 맨 위로 — 단, 이 프로그램 스크롤이 바 크기를 바꾸지 않게 다음 스크롤 이벤트 1회 무시.
-    // (전환이 바 크기를 안 건드림 → 원의 과녁이 고정되어 즉각·또렷하게 슬라이드)
+    // 스크롤만 맨 위로 — 이 프로그램 스크롤이 축소/펼침 판정에 끼어들지 않게 다음 스크롤 이벤트 1회 무시.
+    // (iOS는 같은 점프에도 스크롤 이벤트가 여러 번 오지만, 아래에서 이미 펼친 뒤라 나머지는 무해한 no-op)
     ignoreScrollOnce = true;
+    // 전역 scroll-behavior:smooth를 우회해 즉시 맨 위로.
+    // 부드러운 스크롤이면 수백 ms 동안 iOS 주소창 변화 → resize → placeIndicator 스냅이
+    // 진행 중인 원 슬라이드를 죽여서 "어떨 땐 애니메이션 없는" 복불복이 생김.
+    const se = document.scrollingElement || document.documentElement;
+    se.style.scrollBehavior = 'auto';
     window.scrollTo(0, 0);
+    se.style.scrollBehavior = '';
     lastScrollY = 0;
     requestAnimationFrame(() => { ignoreScrollOnce = false; });
-    // 현재 크기(작든 크든) 그대로, 빨간 원만 새 탭으로 슬라이드(과녁 고정이라 지체 없음)
-    animateIndicator(300);
+    // 탭 전환은 항상 바를 펼침(글자 복귀) — 원 추적은 trackIndicator(스냅)가 아니라
+    // 슬라이드가 맡아야 끊김이 없으므로 silent로 펼침만 함.
+    // 순서 중요: slideIndicator가 "펼침 완료 후 최종 위치"를 먼저 측정해야 하므로
+    // 펼침(setCompact)보다 먼저 호출 — 측정은 축소 상태를 건드리지 않고 한 프레임 안에서 끝남
+    slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
+    setCompact(false, { silent: true });
     syncTopbarH();
   }
 
@@ -1082,11 +1123,12 @@
   let tabbarCompact = false;
   let lastScrollY = window.scrollY;
   let ignoreScrollOnce = false; // 탭 전환의 프로그램 스크롤(맨 위로)이 바 크기를 바꾸지 않게 1회 무시
-  function setCompact(v) {
+  function setCompact(v, opts) {
     if (v === tabbarCompact) return;
     tabbarCompact = v;
     tabbarEl.classList.toggle('tabbar--compact', v);
-    trackIndicator(300); // 크기 변하는 동안 빨간 원이 딱 붙어 따라오게(트랜지션 끔)
+    // silent: 호출한 쪽이 원 움직임을 직접 책임질 때(탭 전환의 슬라이드를 스냅으로 끊지 않게)
+    if (!(opts && opts.silent)) trackIndicator(300); // 크기 변하는 동안 빨간 원이 딱 붙어 따라오게(트랜지션 끔)
   }
   function onScroll() {
     const y = window.scrollY;
@@ -1100,6 +1142,9 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   // 즉시 배치(슬라이드 없이) — 로드·리사이즈·폰트 로드 때 원이 구석에서 미끄러져 오지 않게
   function placeIndicator() {
+    // 슬라이드·추적 루프 진행 중이면 양보 — iOS 주소창 변화의 resize가 여길 불러
+    // 애니메이션을 즉시 스냅으로 죽이던 문제 방지(루프가 어차피 목표를 따라가고 있음)
+    if (indicatorBusy) return;
     tabbarIndicator.style.transition = 'none';
     updateIndicator();
     requestAnimationFrame(() => { tabbarIndicator.style.transition = ''; });

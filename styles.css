@@ -2264,17 +2264,23 @@ body {
 /* 스크롤 내렸을 때: 모든 라벨을 가로·세로로 접고 아이콘도 줄여 알약 전체가 작아짐(방향감지·안 사라짐) */
 .tabbar--compact .tabbar-btn {
   gap: 0;
-  min-width: 42px;
-  padding: 8px 10px;
+  min-width: 50px;
+  padding: 9px 12px;
 }
 .tabbar--compact .tabbar-icon {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 .tabbar--compact .tabbar-label {
   max-width: 0;
   max-height: 0;
   opacity: 0;
+}
+
+/* 최종 위치 측정용(FLIP): 한 프레임 안에서 펼친 상태를 재보고 되돌릴 때 트랜지션 개입 금지 */
+.tabbar--freeze,
+.tabbar--freeze * {
+  transition: none !important;
 }
 
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보 */
