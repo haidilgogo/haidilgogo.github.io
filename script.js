@@ -48,6 +48,24 @@
     { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
 
+  // 지점별 캐치테이블 예약·웨이팅 링크(있는 지점만 '예약' 버튼 표시). 키 = STORES의 name.
+  // 안산점은 링크가 없어 예약 버튼 안 뜸.
+  const STORE_CATCH = {
+    '명동점': 'https://app.catchtable.co.kr/ct/shop/haidilao_myungdong?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '서초점': 'https://app.catchtable.co.kr/ct/shop/haidilao_seocho?type=WAITING&foodKeywords=%ED%95%98%EC%9D%B4%EB%94%94%EB%9D%BC%EC%98%A4&currentSuggestionType=SHOP_NAME',
+    '홍대점': 'https://app.catchtable.co.kr/ct/shop/hidirao_hongdae?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '건대점': 'https://app.catchtable.co.kr/ct/shop/hidirao_konkuk?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '영등포점': 'https://app.catchtable.co.kr/ct/shop/hidirao_yeongdeungpo?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '대학로점': 'https://app.catchtable.co.kr/ct/shop/haidilao_hyehwa?type=WAITING&currentSuggestionType=SHOP_NAME',
+    'COEX점': 'https://app.catchtable.co.kr/ct/shop/hidirao_coex?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '가산점': 'https://app.catchtable.co.kr/ct/shop/hidiraohd?type=DINING&currentSuggestionType=SHOP_NAME',
+    '부천점': 'https://app.catchtable.co.kr/ct/shop/haidilao_bucheon?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '부산역점': 'https://app.catchtable.co.kr/ct/shop/haidilaobusan?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '안산점': 'soon', // 2026-07-25 오픈 예정 — 캐치테이블 아직 안 열림. 열리면 'soon'을 실제 URL로 교체.
+  };
+
   // 재료 표시 순서: SAUCE_BAR 배열 순서를 기준으로 자동 정렬(렌더 시에만 정렬, 원본 데이터는 그대로).
   // 목록에 없는 이름(오타 등)은 맨 뒤로 보내되 서로 간 원래 순서는 유지.
   const ING_ORDER = new Map(SAUCE_BAR.map((n, i) => [n, i]));
@@ -1246,9 +1264,20 @@
       card.appendChild(top);
 
       if (s.addr) {
+        const addr = s.addr.replace(/,\s*/g, ' '); // 주소에서 쉼표 제거(표시·복사 공통)
         const a = document.createElement('div');
-        a.className = 'store-info';
-        a.innerHTML = '<span class="store-i">📍</span><span>' + s.addr + '</span>';
+        a.className = 'store-info store-info--addr';
+        a.innerHTML = '<span class="store-i">📍</span><span class="store-addr">' + addr + '</span>';
+        // 주소 복사 버튼 — 주소 줄 오른쪽 끝
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'store-copy';
+        copy.setAttribute('aria-label', '주소 복사');
+        copy.innerHTML =
+          '<svg class="ic-copy" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>' +
+          '<svg class="ic-check" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+        copy.addEventListener('click', (e) => { e.stopPropagation(); copyAddr(copy, addr); });
+        a.appendChild(copy); // 주소 블록 옆(형제) — 짧으면 글자 바로 뒤, 2줄이면 오른쪽 위(혼자 안 떨어짐)
         card.appendChild(a);
       }
       if (s.hours) {
@@ -1268,6 +1297,22 @@
       if (!s.soon || s.addr) {
         const acts = document.createElement('div');
         acts.className = 'store-actions';
+        // 예약(캐치테이블 웨이팅) — 맨 앞 강조 버튼. 'soon'이면 비활성 '오픈 예정' 버튼.
+        const catchUrl = STORE_CATCH[s.name];
+        if (catchUrl === 'soon') {
+          const book = document.createElement('span');
+          book.className = 'store-btn book--soon';
+          book.textContent = '오픈 예정';
+          acts.appendChild(book);
+        } else if (catchUrl) {
+          const book = document.createElement('a');
+          book.className = 'store-btn book';
+          book.textContent = '캐치테이블';
+          book.href = catchUrl;
+          book.target = '_blank';
+          book.rel = 'noopener';
+          acts.appendChild(book);
+        }
         if (s.addr) {
           // '지도' 버튼 → 아래(위)로 펼쳐지는 드롭다운(네이버 지도/카카오맵)
           const dd = document.createElement('div');
@@ -1328,6 +1373,31 @@
   }
   document.addEventListener('click', closeAllMapDd); // 바깥 클릭 시 닫힘
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllMapDd(); });
+
+  // ── 주소 복사 ──
+  function copyAddr(btn, text) {
+    const done = () => {
+      btn.classList.add('copied'); // 잠깐 체크 표시
+      clearTimeout(btn._copyT);
+      btn._copyT = setTimeout(() => btn.classList.remove('copied'), 1200);
+    };
+    // clipboard API는 https·localhost(보안 컨텍스트)에서만 동작 → 실패 시 execCommand 폴백
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { /* 무시 */ }
+    document.body.removeChild(ta);
+  }
 
   renderTabs();
   renderGrid();

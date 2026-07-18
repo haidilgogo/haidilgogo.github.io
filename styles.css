@@ -2176,8 +2176,10 @@ body {
 }
 .stores {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  column-gap: 16px;
+  /* 최소폭 340px = 모바일 카드(335px)보다 넓게 → 데스크탑 좁은 창에서도 주소 줄바꿈 방지.
+     칼럼 간격 24px = 레시피 그리드와 통일. */
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  column-gap: 24px;
   row-gap: 14px;
   align-items: start; /* 카드 높이가 달라도 위로 정렬 */
 }
@@ -2240,28 +2242,78 @@ body {
 .store-btn {
   flex: 1;
   text-align: center;
+  font-family: 'Noto Sans KR', sans-serif; /* button 태그(지도)가 시스템폰트로 렌더되던 것 방지 → a(전화)와 통일 */
   font-size: 13px;
   font-weight: 700;
   padding: 9px 0;
   border-radius: 11px;
   text-decoration: none;
   border: 1.5px solid transparent;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, background .15s, border-color .15s;
 }
-.store-btn.map {
-  color: var(--brand-red);
-  background: rgba(224, 48, 30, .08);
-  border-color: rgba(224, 48, 30, .22);
-}
+/* 지도·전화 = 같은 보조 버튼(외부 앱 연결) — 중립 크림. 캐치테이블만 강조. */
+.store-btn.map,
 .store-btn.tel {
   color: var(--text-dark);
   background: var(--bg-card);
   border-color: var(--card-border);
 }
-@media (hover: hover) {
-  .store-btn.map:hover { background: rgba(224, 48, 30, .14); }
-  .store-btn.tel:hover { border-color: var(--card-hover-border); }
+/* 캐치테이블 버튼 — 캐치테이블 브랜드색 */
+.store-btn.book {
+  color: #fff;
+  background: #FF3D00;
+  border-color: #FF3D00;
 }
+/* 오픈 예정(캐치테이블 아직 안 열린 지점) — 캐치테이블 주황을 연하게 바랜 비활성 버튼
+   (어둡게 X → 눌린 활성처럼 보임. 연하게 desaturate O → 곧 캐치테이블 될 자리 힌트 + 비활성) */
+.store-btn.book--soon {
+  color: #c98a76;
+  background: #fbe2d9;
+  border-color: #f2cabb;
+  cursor: default;
+  pointer-events: none; /* 클릭·호버·누름 없음 */
+}
+@media (hover: hover) {
+  .store-btn.map:hover,
+  .store-btn.tel:hover { background: #ece1d7; border-color: var(--card-hover-border); }
+  .store-btn.book:hover { background: #E63700; border-color: #E63700; }
+}
+/* 누름(press) 반응 — 살짝 눌리고 진해짐 */
+.store-btn:active { transform: scale(.96); }
+.store-btn.map:active,
+.store-btn.tel:active { background: #e4d7ca; border-color: var(--card-hover-border); }
+.store-btn.book:active { background: #CC3100; border-color: #CC3100; }
+
+/* 주소 복사 버튼 — 주소 블록 옆(네모칸 없이 아이콘만).
+   .store-addr가 자연폭(flex-grow 0)이라 짧은 주소는 아이콘이 글자 바로 뒤,
+   2줄로 넘칠 땐 span이 줄고 아이콘은 오른쪽 위에 붙음(혼자 안 떨어짐). */
+.store-info--addr { align-items: flex-start; }
+/* keep-all = 한글을 글자 단위가 아니라 띄어쓰기(단어) 단위로만 줄바꿈 → "2층"이 "2"/"층"으로 안 쪼개짐 */
+.store-addr { flex: 0 1 auto; min-width: 0; word-break: keep-all; }
+.store-copy {
+  flex: none;
+  margin-left: -2px; /* .store-info gap(7px) 살짝 줄여 글자에 더 붙게 */
+  margin-top: 2px;   /* 첫 줄 텍스트 높이에 맞춤 */
+  padding: 1px;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, color .15s;
+}
+.store-copy:active { transform: scale(.86); }
+@media (hover: hover) {
+  .store-copy:hover { color: var(--text-dark); }
+}
+.store-copy.copied { color: var(--brand-red); }
+.store-copy .ic-check { display: none; }
+.store-copy.copied .ic-copy { display: none; }
+.store-copy.copied .ic-check { display: block; }
 
 /* 지도 앱 드롭다운(지도 버튼에서 위로 펼침 — 하단 탭바에 안 가리게) */
 .map-dd {
