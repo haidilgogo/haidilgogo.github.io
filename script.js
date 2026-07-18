@@ -1194,7 +1194,7 @@
   window.addEventListener('resize', placeIndicator);
 
   // ── 매장(지점) 렌더 ──
-  let activeRegion = '전체';
+  let activeRegion = '전국'; // 매장 지역 필터 기본값(=전체 지점). 탭 라벨·개수 표기 모두 '전국'
   // STORES에 등장하는 지역을 순서대로(중복 없이)
   const storeRegions = () => {
     const seen = [];
@@ -1216,7 +1216,7 @@
   function renderStoreTabs() {
     if (!storeTabsEl) return;
     storeTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
-    ['전체'].concat(storeRegions()).forEach((reg) => {
+    ['전국'].concat(storeRegions()).forEach((reg) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'tab-btn' + (reg === activeRegion ? ' active' : '');
@@ -1235,9 +1235,15 @@
     const wrap = document.getElementById('stores');
     if (!wrap) return;
     wrap.innerHTML = '';
-    const showAll = activeRegion === '전체';
+    const showAll = activeRegion === '전국';
+    const list = STORES.filter((s) => showAll || s.region === activeRegion);
+    // 개수 표기 — 전국은 '전국 N곳', 특정 지역은 '서울 N곳'(레시피 'N개'와 같은 언어)
+    const cLabel = document.getElementById('storeCountLabel');
+    const cNum = document.getElementById('storeCountNum');
+    if (cLabel) cLabel.textContent = activeRegion;
+    if (cNum) cNum.textContent = list.length;
     let lastRegion = null;
-    STORES.filter((s) => showAll || s.region === activeRegion).forEach((s) => {
+    list.forEach((s) => {
       // 지역 헤더는 '전체'일 때만(특정 지역 필터 중엔 칩이 이미 지역을 나타내므로 생략)
       if (showAll && s.region !== lastRegion) {
         lastRegion = s.region;
@@ -1548,6 +1554,7 @@
   // 친구에게 공유
   const favShareBtn = document.getElementById('favShareBtn');
   const topShareBtn = document.getElementById('topShareBtn');
+  const storeShareBtn = document.getElementById('storeShareBtn'); // 매장 섹션(모바일) 공유 버튼
   const shareToast = document.getElementById('shareToast');
   let shareToastTimer = null;
 
@@ -1578,4 +1585,5 @@
 
   favShareBtn.addEventListener('click', shareSite);
   topShareBtn.addEventListener('click', shareSite);
+  if (storeShareBtn) storeShareBtn.addEventListener('click', shareSite);
 })();

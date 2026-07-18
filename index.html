@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=202">
+<link rel="stylesheet" href="styles.css?v=212">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -131,6 +131,14 @@
         <div class="tabs" id="storeTabs">
           <span class="tabs-underline" id="storeTabsUnderline"></span>
         </div>
+        <button class="tabs-share-btn" id="storeShareBtn" type="button" aria-label="친구에게 공유">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M8.6 10.6l6.8-3.8M8.6 13.4l6.8 3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
       <div class="topbar-spacer"></div>
       <div class="search-box">
@@ -203,7 +211,10 @@
 
     <!-- 매장 섹션 -->
     <div class="view" id="view-store" hidden>
-      <p class="stores-note">예약·지도·전화는 앱 밖(캐치테이블·네이버 지도·전화 앱)으로 연결돼요. 영업시간은 매장 사정에 따라 다를 수 있어요.</p>
+      <div class="stores-head">
+        <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
+        <p class="stores-note">영업시간은 매장 사정에 따라 다를 수 있어요.</p>
+      </div>
       <div class="stores" id="stores"></div>
     </div>
 
@@ -457,7 +468,7 @@
   </div>
 </div>
 
-<script src="script.js?v=199"></script>
+<script src="script.js?v=202"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

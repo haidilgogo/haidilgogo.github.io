@@ -43,6 +43,15 @@ html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
   background-color: var(--bg-card);
+  /* 데스크탑에서 세로 스크롤바 자리를 항상 확보 → 카드 적은 카테고리(스크롤 없음)와
+     많은 카테고리(스크롤 생김) 사이를 오갈 때 15px 폭 변화로 레이아웃이 밀리던 것 방지.
+     ⚠️ overflow-y:scroll로 스크롤바 트랙을 항상 켜서 폭 고정(모바일은 오버레이라 폭 0=영향 없음).
+     ⚠️ 가로 클리핑(overflow-x:hidden)은 body가 아니라 여기(html)에 둠 — body에 두면 body가
+     중간 스크롤 컨테이너가 되어 상단바 position:sticky가 붙을 기준을 잃고 같이 밀려 올라감.
+     html이 유일한 스크롤 컨테이너여야 sticky 상단바가 정상 동작함. */
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -53,7 +62,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   color: var(--text-dark);
-  overflow-x: hidden;
+  /* overflow-x: hidden 은 html로 옮김(위 참고) — body를 스크롤 컨테이너로 만들면 sticky 상단바가 깨짐 */
   touch-action: manipulation;
 }
 
@@ -220,7 +229,8 @@ body {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: background .15s, color .15s, transform .08s ease;
+  -webkit-tap-highlight-color: transparent; /* 모바일 기본 검정 음영은 끄고, 아래 :active로 눌림 반응을 줌 */
 }
 
 @media (max-width: 640px) {
@@ -234,6 +244,12 @@ body {
     background: rgba(224, 48, 30, .16);
     color: var(--brand-red);
   }
+}
+/* 눌림 반응(터치·클릭 공통) — 검정 음영 대신 브랜드색 틴트 + 살짝 축소로 "눌리는 느낌" */
+.tabs-share-btn:active {
+  background: rgba(224, 48, 30, .16);
+  color: var(--brand-red);
+  transform: scale(.9);
 }
 
 .search-box {
@@ -392,12 +408,18 @@ body {
   border-radius: 50%;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: background .15s, color .15s, transform .08s ease;
+  -webkit-tap-highlight-color: transparent; /* 기본 검정 음영은 끄고, 아래 :active로 눌림 반응 */
 }
 
 .topbar-icon-btn:hover {
   background: var(--bg-cream);
   color: var(--brand-red);
+}
+.topbar-icon-btn:active {
+  background: var(--bg-cream);
+  color: var(--brand-red);
+  transform: scale(.9);
 }
 
 @media (max-width: 640px) {
@@ -2165,14 +2187,26 @@ body {
 }
 
 /* ===== 매장(지점) 목록 ===== */
+/* 매장 헤더 줄 = 레시피 툴바(.list-head)와 같은 구조: 왼쪽 개수 + 오른쪽 안내문, space-between.
+   min-height 36px = 레시피 툴바(오늘의 소스·정렬 버튼) 높이와 동일 → 세로 가운데 정렬 시 개수 글자가
+   레시피 개수와 같은 위치(탭 전환해도 안 튐)에 옴. margin-bottom은 레시피 list-head와 통일(데탑16/모바일12). */
+.stores-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  margin: 0 0 16px;
+}
+.stores-count { margin: 0; padding: 0; flex: none; } /* 개수는 왼쪽 고정폭(줄어들지 않음) */
+/* 안내문 = 박스 없이 회색 작은 글씨로 오른쪽 정렬(참고성 문구). 길면 줄어들며 왼쪽 개수를 안 밀침. */
 .stores-note {
-  margin: 4px 4px 16px;
+  margin: 0;
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.4;
   color: var(--text-muted);
-  background: var(--bg-cream);
-  border-radius: 12px;
-  padding: 10px 12px;
+  text-align: right;
+  flex: 0 1 auto;
 }
 .stores {
   display: grid;
@@ -2203,6 +2237,7 @@ body {
 #view-store { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
 /* 모바일: 한 줄에 하나(주소·버튼 있는 카드라 2열은 답답함) */
 @media (max-width: 640px) {
+  .stores-head { margin-bottom: 12px; } /* 레시피 list-head 모바일과 동일 */
   .stores { grid-template-columns: 1fr; row-gap: 12px; }
   .store-region { margin: 8px 4px 0; }
   .store-region:first-child { margin-top: 0; }
@@ -2286,15 +2321,15 @@ body {
 .store-btn.tel:active { background: #e4d7ca; border-color: var(--card-hover-border); }
 .store-btn.book:active { background: #CC3100; border-color: #CC3100; }
 
-/* 주소 복사 버튼 — 주소 블록 옆(네모칸 없이 아이콘만).
-   .store-addr가 자연폭(flex-grow 0)이라 짧은 주소는 아이콘이 글자 바로 뒤,
-   2줄로 넘칠 땐 span이 줄고 아이콘은 오른쪽 위에 붙음(혼자 안 떨어짐). */
+/* 주소 복사 버튼 — 주소 줄 오른쪽 끝에 아이콘만(네모칸 없이).
+   margin-left:auto로 남는 공간을 왼쪽 여백이 먹어 아이콘을 항상 오른쪽 끝으로 밀어냄
+   → 짧은 주소든 긴 주소든 아이콘이 오른쪽에 세로로 나란히 정렬(일관성). 2줄이면 오른쪽 위. */
 .store-info--addr { align-items: flex-start; }
 /* keep-all = 한글을 글자 단위가 아니라 띄어쓰기(단어) 단위로만 줄바꿈 → "2층"이 "2"/"층"으로 안 쪼개짐 */
 .store-addr { flex: 0 1 auto; min-width: 0; word-break: keep-all; }
 .store-copy {
   flex: none;
-  margin-left: -2px; /* .store-info gap(7px) 살짝 줄여 글자에 더 붙게 */
+  margin-left: auto; /* 오른쪽 끝으로 밀착(주소 길이와 무관하게 항상 오른쪽 정렬) */
   margin-top: 2px;   /* 첫 줄 텍스트 높이에 맞춤 */
   padding: 1px;
   display: inline-flex;
