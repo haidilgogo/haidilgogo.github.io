@@ -1044,8 +1044,9 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
-    // 빨간 원을 새 탭으로 슬라이드 + 라벨 펼쳐지며 넓어지는 것까지 따라가게
-    animateIndicator(340);
+    // 모든 탭이 같은 크기라 위치만 바뀜 → 한 번만 목표를 잡아 CSS 트랜지션으로 또렷하게 슬라이드
+    cancelAnimationFrame(indicatorAnimId);
+    updateIndicator();
     // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
     if (modalOverlay.classList.contains('open')) closeModal();
     window.scrollTo(0, 0);
