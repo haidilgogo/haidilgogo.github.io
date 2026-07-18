@@ -2173,14 +2173,11 @@ body {
 }
 
 /* 레시피가 아닌 섹션: 카테고리 탭·검색 숨기고 섹션 제목 표시 */
-.page[data-section="menu"] .tabs-group,
-.page[data-section="stamp"] .tabs-group,
-.page[data-section="menu"] .search-box,
-.page[data-section="stamp"] .search-box {
+.page:not([data-section="recipe"]) .tabs-group,
+.page:not([data-section="recipe"]) .search-box {
   display: none;
 }
-.page[data-section="menu"] .topbar-section-title,
-.page[data-section="stamp"] .topbar-section-title {
+.page:not([data-section="recipe"]) .topbar-section-title {
   display: inline-block;
 }
 
@@ -2206,15 +2203,15 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  min-width: 66px;
-  padding: 7px 14px;
+  min-width: 62px;
+  padding: 7px 12px;
   border: none;
   border-radius: 999px;
   background: none;
   color: var(--text-muted);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: color .15s, background .15s;
+  transition: color .15s, background .15s, gap .22s ease, padding .22s ease;
 }
 .tabbar-icon {
   display: block;
@@ -2224,6 +2221,9 @@ body {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: -.01em;
+  max-height: 16px;
+  overflow: hidden;
+  transition: max-height .22s ease, opacity .16s ease;
 }
 .tabbar-btn.active {
   color: var(--brand-red);
@@ -2233,6 +2233,20 @@ body {
   .tabbar-btn:not(.active):hover {
     color: var(--text-dark);
   }
+}
+
+/* 스크롤 내렸을 때: 라벨 접고 아이콘만 남겨 알약이 작아짐(안 사라짐) */
+.tabbar.tabbar--compact {
+  gap: 2px;
+  padding: 5px;
+}
+.tabbar--compact .tabbar-btn {
+  gap: 0;
+  padding: 9px 12px;
+}
+.tabbar--compact .tabbar-label {
+  max-height: 0;
+  opacity: 0;
 }
 
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보 */

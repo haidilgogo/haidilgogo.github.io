@@ -1002,7 +1002,7 @@
   const pageEl = document.querySelector('.page');
   const sectionTitleEl = document.getElementById('sectionTitle');
   const tabbarEl = document.getElementById('tabbar');
-  const SECTION_TITLES = { menu: '메뉴', stamp: '스탬프' };
+  const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '스탬프' };
   let activeSection = 'recipe';
 
   function switchSection(name) {
@@ -1032,6 +1032,17 @@
     btn.addEventListener('click', () => switchSection(btn.dataset.section));
   });
   pageEl.dataset.section = 'recipe';
+
+  // 인스타식 축소: 스크롤을 내리면 탭바가 아이콘만 남게 작아지고, 맨 위로 오면 다시 커짐(사라지진 않음)
+  let tabbarCompact = false;
+  function updateTabbarCompact() {
+    const compact = window.scrollY > 40;
+    if (compact !== tabbarCompact) {
+      tabbarCompact = compact;
+      tabbarEl.classList.toggle('tabbar--compact', compact);
+    }
+  }
+  window.addEventListener('scroll', updateTabbarCompact, { passive: true });
 
   renderTabs();
   renderGrid();

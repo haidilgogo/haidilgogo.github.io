@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=168">
+<link rel="stylesheet" href="styles.css?v=170">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -195,6 +195,15 @@
       </div>
     </div>
 
+    <!-- 매장 섹션 (준비 중) -->
+    <div class="view" id="view-store" hidden>
+      <div class="view-empty">
+        <span class="view-empty-emoji">📍</span>
+        <p class="view-empty-title">매장</p>
+        <p class="view-empty-desc">지점·영업시간·예약 링크를 볼 수 있는 화면이<br>곧 준비될 예정이에요.</p>
+      </div>
+    </div>
+
     <!-- 스탬프 섹션 (준비 중) -->
     <div class="view" id="view-stamp" hidden>
       <div class="view-empty">
@@ -224,6 +233,13 @@
       <circle cx="4" cy="6" r=".4" fill="currentColor" stroke="currentColor" stroke-width="1.2"/>
     </svg>
     <span class="tabbar-label">메뉴</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-section="store">
+    <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21s-6-5.2-6-10a6 6 0 0 1 12 0c0 4.8-6 10-6 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <circle cx="12" cy="11" r="2.2" stroke="currentColor" stroke-width="1.8"/>
+    </svg>
+    <span class="tabbar-label">매장</span>
   </button>
   <button class="tabbar-btn" type="button" data-section="stamp">
     <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -437,7 +453,7 @@
   </div>
 </div>
 
-<script src="script.js?v=163"></script>
+<script src="script.js?v=164"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
