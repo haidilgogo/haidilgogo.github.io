@@ -27,6 +27,26 @@
   const ORDER_ITEMS = ['공깃밥', '날계란', '생면', '만두', '팡가시우메기', '새우완자', '유부', '우유/청유 마라훠궈', '토마토탕훠궈', '버섯탕훠궈', '맑은 탕/물'];  // 직원에게 주문하는 항목 (order 에 쓰는 이름)
   const UNITS = ['스푼', '국자', '티스푼', '바퀴', '개', '공기', '그릇', '접시', '인분', '넉넉하게', '적당히', '한 꼬집'];  // 정식 단위 (국자=탕 국물 뜰 때, 그릇=소스바 종지)
 
+  // ── 매장(지점) 목록 ──
+  // 출처: 나무위키(2026-07 기준). 누구나 수정하는 곳이라 영업시간 등은 실제와 다를 수 있음 → 이상하면 갱신.
+  // region = 지역 그룹(화면 표시 순서). addr = 전체 주소(시/도 포함, 사용자가 준 그대로).
+  // 화면 지점명엔 '하이디라오 '가 앞에 붙음(renderStores). 지도 링크도 '하이디라오 {name}'으로 네이버 검색,
+  // 전화는 tel: 링크. (soon:true = 오픈 예정 표시 — 지금은 뺐지만 확정 시 필드만 붙이면 렌더가 처리)
+  const STORES = [
+    { region: '서울', name: '명동점',    addr: '서울 중구 명동3길 36, 마이티빌딩 1/2층',          hours: '10:00 ~ 03:00', tel: '02-3789-3888' },
+    { region: '서울', name: '서초점',    addr: '서울 서초구 서초대로77길 54, 서초W타워 2층',       hours: '10:00 ~ 07:00', tel: '02-533-8260' },
+    { region: '서울', name: '홍대점',    addr: '서울 마포구 양화로 176, 와이즈파크 5층',          hours: '10:00 ~ 05:00', tel: '02-332-7668' },
+    { region: '서울', name: '건대점',    addr: '서울 광진구 능동로 110, 스타시티 영존 A동 1/2층',   hours: '10:00 ~ 05:00', tel: '02-456-5683' },
+    { region: '서울', name: '영등포점',  addr: '서울 영등포구 경인로 870, 2층',                  hours: '10:00 ~ 03:00', tel: '02-456-0715' },
+    { region: '서울', name: '대학로점',  addr: '서울 종로구 대학로 146, 혜화동씨티밸리 3층',        hours: '10:00 ~ 05:00', tel: '02-743-6868' },
+    { region: '서울', name: 'COEX점',    addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 ~ 05:00', tel: '02-562-1005' },
+    { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 ~ 05:00', tel: '02-2136-9939' },
+    { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 ~ 03:00', tel: '032-666-0118' },
+    { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 ~ 03:00', tel: '051-466-8880' },
+    { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 ~ 05:00', tel: '053-428-7771' },
+    { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 ~ 03:00', tel: '064-747-8886' },
+  ];
+
   // 재료 표시 순서: SAUCE_BAR 배열 순서를 기준으로 자동 정렬(렌더 시에만 정렬, 원본 데이터는 그대로).
   // 목록에 없는 이름(오타 등)은 맨 뒤로 보내되 서로 간 원래 순서는 유지.
   const ING_ORDER = new Map(SAUCE_BAR.map((n, i) => [n, i]));
@@ -1151,8 +1171,117 @@
   }
   window.addEventListener('resize', placeIndicator);
 
+  // ── 매장(지점) 렌더 ──
+  let activeRegion = '전체';
+  // STORES에 등장하는 지역을 순서대로(중복 없이) — 필터 칩 목록
+  const storeRegions = () => {
+    const seen = [];
+    STORES.forEach((s) => { if (!seen.includes(s.region)) seen.push(s.region); });
+    return seen;
+  };
+  function renderStoreFilter() {
+    const bar = document.getElementById('storeFilter');
+    if (!bar) return;
+    bar.innerHTML = '';
+    ['전체'].concat(storeRegions()).forEach((reg) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'store-chip' + (reg === activeRegion ? ' active' : '');
+      btn.textContent = reg;
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', reg === activeRegion ? 'true' : 'false');
+      btn.addEventListener('click', () => {
+        if (activeRegion === reg) return;
+        activeRegion = reg;
+        renderStoreFilter();
+        renderStores();
+        window.scrollTo(0, 0); // 지역 바꾸면 목록 맨 위로
+      });
+      bar.appendChild(btn);
+    });
+  }
+  function renderStores() {
+    const wrap = document.getElementById('stores');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    const showAll = activeRegion === '전체';
+    let lastRegion = null;
+    STORES.filter((s) => showAll || s.region === activeRegion).forEach((s) => {
+      // 지역 헤더는 '전체'일 때만(특정 지역 필터 중엔 칩이 이미 지역을 나타내므로 생략)
+      if (showAll && s.region !== lastRegion) {
+        lastRegion = s.region;
+        const h = document.createElement('div');
+        h.className = 'store-region';
+        h.textContent = s.region;
+        wrap.appendChild(h);
+      }
+      const card = document.createElement('div');
+      card.className = 'store' + (s.soon ? ' store--soon' : '');
+
+      const top = document.createElement('div');
+      top.className = 'store-top';
+      const nm = document.createElement('span');
+      nm.className = 'store-name';
+      nm.textContent = '하이디라오 ' + s.name;
+      top.appendChild(nm);
+      if (s.soon) {
+        const badge = document.createElement('span');
+        badge.className = 'store-badge';
+        badge.textContent = '오픈 예정';
+        top.appendChild(badge);
+      }
+      card.appendChild(top);
+
+      if (s.addr) {
+        const a = document.createElement('div');
+        a.className = 'store-info';
+        a.innerHTML = '<span class="store-i">📍</span><span>' + s.addr + '</span>';
+        card.appendChild(a);
+      }
+      if (s.hours) {
+        const h = document.createElement('div');
+        h.className = 'store-info';
+        h.innerHTML = '<span class="store-i">🕐</span><span>' + s.hours + '</span>';
+        card.appendChild(h);
+      }
+      if (s.soon && !s.addr) {
+        const p = document.createElement('div');
+        p.className = 'store-info store-info--muted';
+        p.textContent = '자세한 정보가 곧 준비될 예정이에요.';
+        card.appendChild(p);
+      }
+
+      // 버튼: 오픈 예정이 아니고 주소/전화가 있을 때만
+      if (!s.soon || s.addr) {
+        const acts = document.createElement('div');
+        acts.className = 'store-actions';
+        if (s.addr) {
+          const map = document.createElement('a');
+          map.className = 'store-btn map';
+          map.textContent = '지도';
+          map.href = 'https://map.naver.com/p/search/' + encodeURIComponent('하이디라오 ' + s.name);
+          map.target = '_blank';
+          map.rel = 'noopener';
+          acts.appendChild(map);
+        }
+        if (s.tel) {
+          const tel = document.createElement('a');
+          tel.className = 'store-btn tel';
+          tel.textContent = '전화';
+          tel.href = 'tel:' + s.tel.replace(/[^0-9]/g, '');
+          acts.appendChild(tel);
+        }
+        if (acts.children.length) card.appendChild(acts);
+      }
+
+      wrap.appendChild(card);
+    });
+  }
+
   renderTabs();
   renderGrid();
+  renderStoreFilter();
+  renderStores();
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
   requestAnimationFrame(placeIndicator);
