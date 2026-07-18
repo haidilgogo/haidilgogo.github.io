@@ -998,12 +998,33 @@
     searchInput.focus();
   });
 
-  // ===== 섹션(뷰) 전환: 레시피 · 메뉴 · 스탬프 =====
+  // ===== 섹션(뷰) 전환: 레시피 · 메뉴 · 매장 · 스탬프 =====
   const pageEl = document.querySelector('.page');
   const sectionTitleEl = document.getElementById('sectionTitle');
   const tabbarEl = document.getElementById('tabbar');
+  const tabbarIndicator = document.getElementById('tabbarIndicator');
   const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '스탬프' };
   let activeSection = 'recipe';
+
+  // 빨간 원(하이라이트)을 현재 활성 탭 위치·크기에 맞춤
+  function updateIndicator() {
+    const active = tabbarEl.querySelector('.tabbar-btn.active');
+    if (!active) return;
+    tabbarIndicator.style.width = active.offsetWidth + 'px';
+    tabbarIndicator.style.height = active.offsetHeight + 'px';
+    tabbarIndicator.style.transform =
+      'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
+  }
+  // 탭바가 커지고/작아지는 동안(축소 전환)엔 매 프레임 따라붙게 — 트랜지션 끄고 직접 추적
+  function trackIndicator(duration) {
+    tabbarIndicator.style.transition = 'none';
+    const start = performance.now();
+    (function step(now) {
+      updateIndicator();
+      if (now - start < duration) requestAnimationFrame(step);
+      else tabbarIndicator.style.transition = '';
+    })(start);
+  }
 
   function switchSection(name) {
     if (!SECTION_TITLES[name] && name !== 'recipe') return;
@@ -1022,6 +1043,8 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
+    // 빨간 원을 새 탭으로 슬라이드(트랜지션 켜진 상태로 위치만 바꾸면 옆으로 미끄러짐)
+    updateIndicator();
     // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
     if (modalOverlay.classList.contains('open')) closeModal();
     window.scrollTo(0, 0);
@@ -1040,12 +1063,18 @@
     if (compact !== tabbarCompact) {
       tabbarCompact = compact;
       tabbarEl.classList.toggle('tabbar--compact', compact);
+      trackIndicator(300); // 알약이 줄었다 커지는 동안 빨간 원도 같이 따라오게
     }
   }
   window.addEventListener('scroll', updateTabbarCompact, { passive: true });
+  window.addEventListener('resize', updateIndicator);
 
   renderTabs();
   renderGrid();
+
+  // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
+  requestAnimationFrame(updateIndicator);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateIndicator);
 
   // 첫 화면 렌더 후, 브라우저가 한가할 때 나머지 카드 이미지를 "한 장씩 순차" 프리로드.
   // 스크롤 시 lazy 로딩 딜레이가 안 보이게 미리 받아두되, 한 장씩이라 다른 요청을 막지 않음
