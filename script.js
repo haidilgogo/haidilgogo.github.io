@@ -1015,15 +1015,19 @@
     tabbarIndicator.style.transform =
       'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
   }
-  // 전환(탭 이동·축소) 동안 매 프레임 목표를 갱신 — 트랜지션은 켜둔 채라 위치는 옆으로 미끄러지고
-  // 라벨이 펼쳐지며 넓어지는 것도 자연스럽게 따라감(어느 크기에서든 항상 애니메이션됨)
+  // 축소/확대 중엔 트랜지션을 끄고 매 프레임 정확히 붙임 → 알약이 줄고 커질 때 원이 더디게 안 쫓아옴
   let indicatorAnimId = 0;
-  function animateIndicator(duration) {
+  function trackIndicator(duration) {
     cancelAnimationFrame(indicatorAnimId);
+    tabbarIndicator.style.transition = 'none';
     const start = performance.now();
     (function step(now) {
       updateIndicator();
-      if (now - start < duration) indicatorAnimId = requestAnimationFrame(step);
+      if (now - start < duration) {
+        indicatorAnimId = requestAnimationFrame(step);
+      } else {
+        tabbarIndicator.style.transition = ''; // 다음 탭 전환의 부드러운 슬라이드를 위해 복구
+      }
     })(start);
   }
 
@@ -1044,8 +1048,9 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
-    // 모든 탭이 같은 크기라 위치만 바뀜 → 한 번만 목표를 잡아 CSS 트랜지션으로 또렷하게 슬라이드
+    // 모든 탭이 같은 크기라 위치만 바뀜 → 트랜지션 켠 채 한 번만 목표를 잡아 부드럽게 슬라이드
     cancelAnimationFrame(indicatorAnimId);
+    tabbarIndicator.style.transition = '';
     updateIndicator();
     // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
     if (modalOverlay.classList.contains('open')) closeModal();
@@ -1066,7 +1071,7 @@
     if (v === tabbarCompact) return;
     tabbarCompact = v;
     tabbarEl.classList.toggle('tabbar--compact', v);
-    animateIndicator(300); // 알약이 줄었다 커지는 동안 빨간 원도 같이 따라오게
+    trackIndicator(300); // 알약이 줄었다 커지는 동안 빨간 원이 딱 붙어 따라오게(트랜지션 끔)
   }
   function onScroll() {
     const y = window.scrollY;
@@ -1077,14 +1082,20 @@
     lastScrollY = y;
   }
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', updateIndicator);
+  // 즉시 배치(슬라이드 없이) — 로드·리사이즈·폰트 로드 때 원이 구석에서 미끄러져 오지 않게
+  function placeIndicator() {
+    tabbarIndicator.style.transition = 'none';
+    updateIndicator();
+    requestAnimationFrame(() => { tabbarIndicator.style.transition = ''; });
+  }
+  window.addEventListener('resize', placeIndicator);
 
   renderTabs();
   renderGrid();
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
-  requestAnimationFrame(updateIndicator);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateIndicator);
+  requestAnimationFrame(placeIndicator);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeIndicator);
 
   // 첫 화면 렌더 후, 브라우저가 한가할 때 나머지 카드 이미지를 "한 장씩 순차" 프리로드.
   // 스크롤 시 lazy 로딩 딜레이가 안 보이게 미리 받아두되, 한 장씩이라 다른 요청을 막지 않음
