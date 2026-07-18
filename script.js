@@ -1015,14 +1015,15 @@
     tabbarIndicator.style.transform =
       'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
   }
-  // 탭바가 커지고/작아지는 동안(축소 전환)엔 매 프레임 따라붙게 — 트랜지션 끄고 직접 추적
-  function trackIndicator(duration) {
-    tabbarIndicator.style.transition = 'none';
+  // 전환(탭 이동·축소) 동안 매 프레임 목표를 갱신 — 트랜지션은 켜둔 채라 위치는 옆으로 미끄러지고
+  // 라벨이 펼쳐지며 넓어지는 것도 자연스럽게 따라감(어느 크기에서든 항상 애니메이션됨)
+  let indicatorAnimId = 0;
+  function animateIndicator(duration) {
+    cancelAnimationFrame(indicatorAnimId);
     const start = performance.now();
     (function step(now) {
       updateIndicator();
-      if (now - start < duration) requestAnimationFrame(step);
-      else tabbarIndicator.style.transition = '';
+      if (now - start < duration) indicatorAnimId = requestAnimationFrame(step);
     })(start);
   }
 
@@ -1043,8 +1044,8 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
-    // 빨간 원을 새 탭으로 슬라이드(트랜지션 켜진 상태로 위치만 바꾸면 옆으로 미끄러짐)
-    updateIndicator();
+    // 빨간 원을 새 탭으로 슬라이드 + 라벨 펼쳐지며 넓어지는 것까지 따라가게
+    animateIndicator(340);
     // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
     if (modalOverlay.classList.contains('open')) closeModal();
     window.scrollTo(0, 0);
@@ -1056,17 +1057,25 @@
   });
   pageEl.dataset.section = 'recipe';
 
-  // 인스타식 축소: 스크롤을 내리면 탭바가 아이콘만 남게 작아지고, 맨 위로 오면 다시 커짐(사라지진 않음)
+  // 인스타·쓰레드식 방향 감지 축소: 내리면 작아지고, 조금이라도 올리면 바로 커짐(사라지진 않음).
+  // 손 떨림으로 깜빡이지 않게 6px 둔감 구간을 둠. 최상단은 항상 펼침.
   let tabbarCompact = false;
-  function updateTabbarCompact() {
-    const compact = window.scrollY > 40;
-    if (compact !== tabbarCompact) {
-      tabbarCompact = compact;
-      tabbarEl.classList.toggle('tabbar--compact', compact);
-      trackIndicator(300); // 알약이 줄었다 커지는 동안 빨간 원도 같이 따라오게
-    }
+  let lastScrollY = window.scrollY;
+  function setCompact(v) {
+    if (v === tabbarCompact) return;
+    tabbarCompact = v;
+    tabbarEl.classList.toggle('tabbar--compact', v);
+    animateIndicator(300); // 알약이 줄었다 커지는 동안 빨간 원도 같이 따라오게
   }
-  window.addEventListener('scroll', updateTabbarCompact, { passive: true });
+  function onScroll() {
+    const y = window.scrollY;
+    if (y <= 8) { setCompact(false); lastScrollY = y; return; }
+    const dy = y - lastScrollY;
+    if (Math.abs(dy) < 6) return;      // 둔감 구간(작은 움직임 무시, 다음에 누적)
+    setCompact(dy > 0);                // 내리는 중=축소 / 올리는 중=펼침
+    lastScrollY = y;
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', updateIndicator);
 
   renderTabs();

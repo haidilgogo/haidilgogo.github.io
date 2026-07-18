@@ -2185,17 +2185,19 @@ body {
 .tabbar {
   position: fixed;
   left: 50%;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px)); /* 홈 인디케이터와 겹치지 않게 살짝 위로 */
   transform: translateX(-50%);
   z-index: 50;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   padding: 6px;
-  background: rgba(255, 255, 255, .94);
-  border: 1px solid #EFDFD3;
+  /* 유리(글라스) 느낌: 반투명 흰색 + 블러(인스타·쓰레드 톤). iOS PWA용 -webkit- 접두사 필수 */
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(255, 255, 255, .55);
   border-radius: 999px;
-  box-shadow: 0 6px 22px rgba(80, 30, 20, .16);
-  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 22px rgba(80, 30, 20, .14);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
 }
 
 /* 활성 탭 뒤에서 옆으로 미끄러지는 빨간 원(하이라이트) */
@@ -2218,18 +2220,17 @@ body {
   position: relative;
   z-index: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 3px;
-  min-width: 62px;
-  padding: 7px 12px;
+  gap: 0;
+  padding: 9px 13px;
   border: none;
   border-radius: 999px;
   background: none;
   color: var(--text-muted);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: color .15s, min-width .24s ease, padding .24s ease;
+  transition: color .15s, padding .24s ease;
 }
 .tabbar-icon {
   display: block;
@@ -2237,19 +2238,26 @@ body {
   height: 22px;
   transition: width .24s ease, height .24s ease;
 }
+/* 라벨은 기본 숨김(아이콘만) — 활성 탭에서만 아이콘 옆에 펼쳐짐 */
 .tabbar-label {
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -.01em;
   white-space: nowrap;
-  max-width: 60px;
-  max-height: 16px;
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
   overflow: hidden;
-  transition: max-width .24s ease, max-height .24s ease, opacity .18s ease;
+  transition: max-width .26s ease, margin-left .26s ease, opacity .2s ease;
 }
 .tabbar-btn.active {
   color: var(--brand-red);
+}
+.tabbar:not(.tabbar--compact) .tabbar-btn.active .tabbar-label {
+  max-width: 56px;
+  margin-left: 5px;
+  opacity: 1;
 }
 @media (hover: hover) {
   .tabbar-btn:not(.active):hover {
@@ -2257,24 +2265,13 @@ body {
   }
 }
 
-/* 스크롤 내렸을 때: 라벨을 가로·세로로 접고 아이콘도 줄여 알약 전체가 작아짐(인스타식·안 사라짐) */
-.tabbar.tabbar--compact {
-  gap: 3px;
-  padding: 5px;
-}
+/* 스크롤 내렸을 때: 활성 라벨까지 접고 아이콘도 줄여 알약 전체가 작아짐(인스타식·안 사라짐) */
 .tabbar--compact .tabbar-btn {
-  gap: 0;
-  min-width: 42px;
-  padding: 8px 10px;
+  padding: 8px 11px;
 }
 .tabbar--compact .tabbar-icon {
   width: 20px;
   height: 20px;
-}
-.tabbar--compact .tabbar-label {
-  max-width: 0;
-  max-height: 0;
-  opacity: 0;
 }
 
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보 */
