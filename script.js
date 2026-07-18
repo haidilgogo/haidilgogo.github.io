@@ -998,6 +998,41 @@
     searchInput.focus();
   });
 
+  // ===== 섹션(뷰) 전환: 레시피 · 메뉴 · 스탬프 =====
+  const pageEl = document.querySelector('.page');
+  const sectionTitleEl = document.getElementById('sectionTitle');
+  const tabbarEl = document.getElementById('tabbar');
+  const SECTION_TITLES = { menu: '메뉴', stamp: '스탬프' };
+  let activeSection = 'recipe';
+
+  function switchSection(name) {
+    if (!SECTION_TITLES[name] && name !== 'recipe') return;
+    activeSection = name;
+    // 뷰 보이기/숨기기
+    document.querySelectorAll('.view').forEach((v) => {
+      v.hidden = v.id !== 'view-' + name;
+    });
+    // 상단바: 레시피만 탭·검색 노출, 그 외엔 섹션 제목으로 교체
+    pageEl.dataset.section = name;
+    sectionTitleEl.textContent = SECTION_TITLES[name] || '';
+    // 하단 탭바 활성 표시
+    tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
+      const on = btn.dataset.section === name;
+      btn.classList.toggle('active', on);
+      if (on) btn.setAttribute('aria-current', 'page');
+      else btn.removeAttribute('aria-current');
+    });
+    // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
+    if (modalOverlay.classList.contains('open')) closeModal();
+    window.scrollTo(0, 0);
+    syncTopbarH();
+  }
+
+  tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
+    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+  });
+  pageEl.dataset.section = 'recipe';
+
   renderTabs();
   renderGrid();
 

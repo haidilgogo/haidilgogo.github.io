@@ -2127,3 +2127,115 @@ body {
 .ing-row:has(+ .ing-row--same) {
   border-bottom: none;
 }
+
+/* ===== 섹션(뷰) 전환 ===== */
+.view[hidden] { display: none; }
+
+/* 비어있는(준비 중) 화면 */
+.view-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 52vh;
+  padding: 40px 20px;
+}
+.view-empty-emoji {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 18px;
+}
+.view-empty-title {
+  margin: 0 0 8px;
+  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--text-darkest);
+}
+.view-empty-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+/* 상단바 섹션 제목 (메뉴·스탬프 섹션일 때 탭 자리에 표시) */
+.topbar-section-title {
+  display: none;
+  flex: none;
+  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--text-darkest);
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+
+/* 레시피가 아닌 섹션: 카테고리 탭·검색 숨기고 섹션 제목 표시 */
+.page[data-section="menu"] .tabs-group,
+.page[data-section="stamp"] .tabs-group,
+.page[data-section="menu"] .search-box,
+.page[data-section="stamp"] .search-box {
+  display: none;
+}
+.page[data-section="menu"] .topbar-section-title,
+.page[data-section="stamp"] .topbar-section-title {
+  display: inline-block;
+}
+
+/* ===== 하단 플로팅 탭바 ===== */
+.tabbar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid #EFDFD3;
+  border-radius: 999px;
+  box-shadow: 0 6px 22px rgba(80, 30, 20, .16);
+  backdrop-filter: blur(6px);
+}
+
+.tabbar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 66px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s, background .15s;
+}
+.tabbar-icon {
+  display: block;
+}
+.tabbar-label {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+.tabbar-btn.active {
+  color: var(--brand-red);
+  background: rgba(224, 48, 30, .09);
+}
+@media (hover: hover) {
+  .tabbar-btn:not(.active):hover {
+    color: var(--text-dark);
+  }
+}
+
+/* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보 */
+.main {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}

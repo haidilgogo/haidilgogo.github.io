@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=167">
+<link rel="stylesheet" href="styles.css?v=168">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -106,6 +106,7 @@
         <img class="topbar-logo-mark" src="assets/icons/logo-mark.png" alt="" draggable="false">
         <span class="topbar-title">하딜고고</span>
       </button>
+      <span class="topbar-section-title" id="sectionTitle"></span>
       <div class="tabs-group">
         <div class="tabs" id="tabs">
           <span class="tabs-underline" id="tabsUnderline"></span>
@@ -154,35 +155,84 @@
     </div>
   </header>
 
-  <!-- RECIPE GRID -->
+  <!-- MAIN -->
   <main class="main">
-    <div class="list-head">
-      <p class="count-line">레시피 <span class="count-num" id="countNum">0</span>개</p>
-      <div class="head-actions">
-        <button class="gacha-btn" id="gachaBtn" type="button">🎲 오늘의 소스</button>
-        <div class="sort-dd" id="sortDd">
-          <button class="sort-dd-btn" id="sortDdBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="정렬 방식">
-            <span class="sort-dd-current" id="sortDdCurrent">♥️ 인기순</span>
-            <svg class="sort-dd-chev" width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div class="sort-dd-menu" id="sortDdMenu" role="listbox">
-            <button class="sort-dd-item active" type="button" role="option" data-sort="popular">♥️ 인기순</button>
-            <button class="sort-dd-item" type="button" role="option" data-sort="recent">🕐 최신순</button>
-            <button class="sort-dd-item" type="button" role="option" data-sort="name">🔤 가나다순</button>
+
+    <!-- 레시피 섹션 -->
+    <div class="view" id="view-recipe">
+      <div class="list-head">
+        <p class="count-line">레시피 <span class="count-num" id="countNum">0</span>개</p>
+        <div class="head-actions">
+          <button class="gacha-btn" id="gachaBtn" type="button">🎲 오늘의 소스</button>
+          <div class="sort-dd" id="sortDd">
+            <button class="sort-dd-btn" id="sortDdBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="정렬 방식">
+              <span class="sort-dd-current" id="sortDdCurrent">♥️ 인기순</span>
+              <svg class="sort-dd-chev" width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="sort-dd-menu" id="sortDdMenu" role="listbox">
+              <button class="sort-dd-item active" type="button" role="option" data-sort="popular">♥️ 인기순</button>
+              <button class="sort-dd-item" type="button" role="option" data-sort="recent">🕐 최신순</button>
+              <button class="sort-dd-item" type="button" role="option" data-sort="name">🔤 가나다순</button>
+            </div>
           </div>
         </div>
       </div>
+      <div class="recipe-grid" id="recipeGrid"></div>
+
+      <!-- FOOTER (레시피 섹션에만) -->
+      <footer class="footer">
+        <span class="footer-title">하딜고고는 하이디라오 소스바 앞에서 매번 건희소스를 <br class="footer-break-mobile">검색하는 (나 같은) 사람들을 위해 만들어졌습니다</span>
+        <a class="footer-report" id="footerReport" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener">💌 레시피 제보 · 문의</a>
+      </footer>
     </div>
-    <div class="recipe-grid" id="recipeGrid"></div>
+
+    <!-- 메뉴 섹션 (준비 중) -->
+    <div class="view" id="view-menu" hidden>
+      <div class="view-empty">
+        <span class="view-empty-emoji">🍲</span>
+        <p class="view-empty-title">메뉴</p>
+        <p class="view-empty-desc">전체 메뉴를 미리 볼 수 있는 화면이<br>곧 준비될 예정이에요.</p>
+      </div>
+    </div>
+
+    <!-- 스탬프 섹션 (준비 중) -->
+    <div class="view" id="view-stamp" hidden>
+      <div class="view-empty">
+        <span class="view-empty-emoji">📮</span>
+        <p class="view-empty-title">스탬프</p>
+        <p class="view-empty-desc">방문할 때마다 도장을 찍는 기록장이<br>곧 준비될 예정이에요.</p>
+      </div>
+    </div>
+
   </main>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <span class="footer-title">하딜고고는 하이디라오 소스바 앞에서 매번 건희소스를 <br class="footer-break-mobile">검색하는 (나 같은) 사람들을 위해 만들어졌습니다</span>
-    <a class="footer-report" id="footerReport" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener">💌 레시피 제보 · 문의</a>
-  </footer>
-
 </div>
+
+<!-- 하단 플로팅 탭바 -->
+<nav class="tabbar" id="tabbar" aria-label="섹션 이동">
+  <button class="tabbar-btn active" type="button" data-section="recipe" aria-current="page">
+    <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H18a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6.5A1.5 1.5 0 0 1 5 18.5v-14z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M5 17.5A1.5 1.5 0 0 1 6.5 16H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 7.5h6M9 10.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span class="tabbar-label">레시피</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-section="menu">
+    <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="4" cy="6" r=".4" fill="currentColor" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    <span class="tabbar-label">메뉴</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-section="stamp">
+    <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 8a3 3 0 1 1 6 0c0 1.5-1 2-1.5 3-.4.8-.5 1.5-.5 2h-2c0-.5-.1-1.2-.5-2C10 10 9 9.5 9 8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="5" y="17" width="14" height="3.2" rx="1.2" stroke="currentColor" stroke-width="1.8"/>
+    </svg>
+    <span class="tabbar-label">스탬프</span>
+  </button>
+</nav>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
@@ -387,7 +437,7 @@
   </div>
 </div>
 
-<script src="script.js?v=162"></script>
+<script src="script.js?v=163"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
