@@ -1030,18 +1030,18 @@
       }
     })(start);
   }
-  // (탭 전환용) 트랜지션은 켜둔 채 매 프레임 목표 갱신 → 위치는 부드럽게 슬라이드,
-  // 축소 상태에서 눌러 펼쳐지는 동안 크기가 커지는 것도 따라감(어느 상태에서도 슬라이드 유지)
+  // (탭 전환용) 트랜지션 켠 채 잠깐 매 프레임 목표 갱신 → 위치는 부드럽게 슬라이드,
+  // 혹시 크기 변화(스크롤 축소)가 아직 안 끝났어도 원 크기가 어긋나지 않게 따라감.
+  // 전환은 바 크기를 안 바꾸므로(과녁 고정) 예전 같은 지체가 없음.
   function animateIndicator(duration) {
     cancelAnimationFrame(indicatorAnimId);
-    tabbarIndicator.style.transition = ''; // CSS 트랜지션(transform .28s) 사용
+    tabbarIndicator.style.transition = ''; // CSS 트랜지션(transform .28s)으로 슬라이드
     const start = performance.now();
     (function step(now) {
       updateIndicator();
       if (now - start < duration) indicatorAnimId = requestAnimationFrame(step);
     })(start);
   }
-
   function switchSection(name) {
     if (!SECTION_TITLES[name] && name !== 'recipe') return;
     activeSection = name;
@@ -1059,17 +1059,16 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
-    // 전환 시 바는 항상 펼침. 단 이 펼침은 트랜지션을 끄지 않아야(슬라이드 유지) 하므로
-    // setCompact의 자체 추적(trackIndicator)을 잠시 막고, 아래 animateIndicator로 슬라이드+확대 추적.
-    suppressCompactIndicator = true;
-    setCompact(false);
-    suppressCompactIndicator = false;
     // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
     if (modalOverlay.classList.contains('open')) closeModal();
+    // 스크롤만 맨 위로 — 단, 이 프로그램 스크롤이 바 크기를 바꾸지 않게 다음 스크롤 이벤트 1회 무시.
+    // (전환이 바 크기를 안 건드림 → 원의 과녁이 고정되어 즉각·또렷하게 슬라이드)
+    ignoreScrollOnce = true;
     window.scrollTo(0, 0);
     lastScrollY = 0;
-    // 트랜지션 켠 채 빨간 원을 새 탭으로 슬라이드(축소→확대되며 커지는 것도 함께 추적)
-    animateIndicator(340);
+    requestAnimationFrame(() => { ignoreScrollOnce = false; });
+    // 현재 크기(작든 크든) 그대로, 빨간 원만 새 탭으로 슬라이드(과녁 고정이라 지체 없음)
+    animateIndicator(300);
     syncTopbarH();
   }
 
@@ -1082,16 +1081,16 @@
   // 손 떨림으로 깜빡이지 않게 6px 둔감 구간을 둠. 최상단은 항상 펼침.
   let tabbarCompact = false;
   let lastScrollY = window.scrollY;
-  let suppressCompactIndicator = false; // 탭 전환이 부르는 펼침일 땐 trackIndicator를 막음(슬라이드 유지)
+  let ignoreScrollOnce = false; // 탭 전환의 프로그램 스크롤(맨 위로)이 바 크기를 바꾸지 않게 1회 무시
   function setCompact(v) {
     if (v === tabbarCompact) return;
     tabbarCompact = v;
     tabbarEl.classList.toggle('tabbar--compact', v);
-    // 스크롤로 인한 크기 변화만 딱 붙게 추적(탭 전환의 펼침은 switchSection이 슬라이드로 처리)
-    if (!suppressCompactIndicator) trackIndicator(300);
+    trackIndicator(300); // 크기 변하는 동안 빨간 원이 딱 붙어 따라오게(트랜지션 끔)
   }
   function onScroll() {
     const y = window.scrollY;
+    if (ignoreScrollOnce) { ignoreScrollOnce = false; lastScrollY = y; return; }
     if (y <= 8) { setCompact(false); lastScrollY = y; return; }
     const dy = y - lastScrollY;
     if (Math.abs(dy) < 6) return;      // 둔감 구간(작은 움직임 무시, 다음에 누적)
