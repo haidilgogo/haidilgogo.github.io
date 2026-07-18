@@ -345,11 +345,20 @@
       };
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       likesRef = firebase.database().ref('likes');
-      // 집계가 바뀔 때마다(내가/남이 눌렀든) 실시간으로 화면 숫자 갱신
+      // 집계가 바뀔 때마다(내가/남이 눌렀든) 실시간으로 화면 숫자 갱신.
+      // 🐛 첫 로드 땐 좋아요가 아직 도착 전이라 인기순이 전부 0으로 정렬돼 어긋남(사실상 가나다순).
+      //    Firebase에서 좋아요가 처음 오면, 인기순일 때 딱 한 번 재정렬해 바로잡는다.
+      //    (cardCache 재사용이라 깜빡임 없음. 이후엔 숫자만 갱신 — 사용자가 좋아요 눌렀을 때 카드가 튀지 않게.)
+      let likesInitialSorted = false;
       likesRef.on('value', (snapshot) => {
         likeCounts = snapshot.val() || {};
         saveLikes();
-        refreshLikeCounts();
+        if (sortMode === 'popular' && !likesInitialSorted) {
+          renderGrid();
+        } else {
+          refreshLikeCounts();
+        }
+        likesInitialSorted = true;
       });
     }
   } catch (err) {
