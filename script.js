@@ -1059,6 +1059,9 @@
   let indicatorBusy = false; // 루프 진행 중엔 placeIndicator(즉시 스냅)가 끼어들어 슬라이드를 죽이지 않게
   function trackIndicator(duration) {
     cancelAnimationFrame(indicatorAnimId);
+    // 슬라이드 WAAPI가 남아 있으면(진행 중이거나 fill:forwards 홀드) 인계 — WAAPI가 인라인 쓰기를
+    // 덮어써서 아래 프레임 추적이 안 먹는 것 방지. 같은 틱에 updateIndicator가 바로 그리므로 깜빡임 없음.
+    if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
     indicatorBusy = true;
     tabbarIndicator.style.transition = 'none';
     const start = performance.now();
@@ -1079,12 +1082,14 @@
   let indicatorWA = null;
   function slideIndicator(targetBtn) {
     cancelAnimationFrame(indicatorAnimId);
-    if (indicatorWA) { indicatorWA.cancel(); indicatorWA = null; }
-    indicatorBusy = true;
-    // 출발점 = 지금 화면에 그려진 위치(진행 중이던 애니메이션의 중간값 포함)
+    // 출발점 = 지금 화면에 그려진 위치. ⚠️ 진행 중 애니메이션의 "현재 중간값"을 취소 *전에* 읽어야 함 —
+    // 취소부터 하면 밑그림(이전 슬라이드 도착점)으로 스냅된 값이 읽혀서, 빠르게 연속 탭할 때
+    // 원이 목적지로 순간이동했다가 다시 미끄러지는 "뚝뚝 끊김"이 됨(iOS 실기기 보고).
     const cs = getComputedStyle(tabbarIndicator);
     const m = cs.transform && cs.transform !== 'none' ? new DOMMatrixReadOnly(cs.transform) : null;
     const x0 = m ? m.e : 0, y0 = m ? m.f : 0;
+    if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
+    indicatorBusy = true;
     // 도착점 = "펼침이 끝난 뒤"의 최종 위치를 트랜지션 없이 한 프레임 안에서 미리 측정(FLIP).
     // 이러면 펼침(목표 이동)을 뒤쫓을 필요 없이 처음부터 정확한 목적지로 슬라이드함
     const wasCompact = tabbarEl.classList.contains('tabbar--compact');
@@ -1094,7 +1099,11 @@
     const fw = targetBtn.offsetWidth, fh = targetBtn.offsetHeight;
     if (wasCompact) { tabbarEl.classList.add('tabbar--compact'); void tabbarEl.offsetWidth; }
     tabbarEl.classList.remove('tabbar--freeze');
-    // 크기는 즉시 최종값(축소·일반 차이가 몇 px라 안 보임), 위치만 슬라이드
+    // 크기는 즉시 최종값(축소·일반 차이가 몇 px라 안 보임), 위치만 슬라이드.
+    // 밑그림(인라인)=도착점, 애니메이션이 출발→도착을 덧그림 — v178 원형(실기기 "아주 잘됩니다" 검증본).
+    // ⚠️ fill:forwards+종료 시 인라인 확정 방식(v206)은 iOS에서 "애니 제거→인라인 반영" 타이밍이 어긋나
+    // 원이 출발점으로 되돌아갔다 트랜지션으로 다시 미끄러지는 "두 번 반복" 회귀를 냈음 → 원복.
+    // 자연 종료 시 애니 끝값=인라인 값이라 제거 순간 값 변화가 없어 종료 레이스 자체가 없음.
     tabbarIndicator.style.transition = 'none';
     tabbarIndicator.style.width = fw + 'px';
     tabbarIndicator.style.height = fh + 'px';
@@ -1111,6 +1120,17 @@
       indicatorBusy = false;
       tabbarIndicator.style.transition = ''; // 다음 일반 슬라이드용 복구
     };
+  }
+  // (축소 상태에서 탭 전환용) 원 즉시 배치 — 슬라이드 없이 활성 탭 위치로 스냅.
+  // 축소→펼침 전환은 바 폭·중앙정렬·아이콘 좌표가 동시에 바뀌어 iOS 합성기 레이스가 반복됐던 구간
+  // (실기기 영상 3건: 오른쪽 오버슈트·뚝뚝 끊김·두 번 반복) → 이 구간만 애니메이션을 포기함.
+  function snapIndicator() {
+    cancelAnimationFrame(indicatorAnimId);
+    if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
+    indicatorBusy = false;
+    tabbarIndicator.style.transition = 'none';
+    updateIndicator();
+    requestAnimationFrame(() => { tabbarIndicator.style.transition = ''; });
   }
   function switchSection(name) {
     if (!SECTION_TITLES[name] && name !== 'recipe') return;
@@ -1143,12 +1163,13 @@
     se.style.scrollBehavior = '';
     lastScrollY = 0;
     requestAnimationFrame(() => { ignoreScrollOnce = false; });
-    // 탭 전환은 항상 바를 펼침(글자 복귀) — 원 추적은 trackIndicator(스냅)가 아니라
-    // 슬라이드가 맡아야 끊김이 없으므로 silent로 펼침만 함.
-    // 순서 중요: slideIndicator가 "펼침 완료 후 최종 위치"를 먼저 측정해야 하므로
-    // 펼침(setCompact)보다 먼저 호출 — 측정은 축소 상태를 건드리지 않고 한 프레임 안에서 끝남
-    slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
-    setCompact(false, { silent: true });
+    // 탭 전환은 항상 바를 펼침(글자 복귀).
+    // 축소 상태였다면: 바 즉시 펼침 + 원 즉시 배치(애니메이션 없음) — 이 구간은 iOS 합성기 레이스의
+    // 온상이라(실기기 영상 3건) 슬라이드를 포기. 펼침 상태였다면: v178 슬라이드(실기기 검증본) 그대로.
+    const wasCompactAtTap = tabbarEl.classList.contains('tabbar--compact');
+    setCompact(false, { silent: true, instant: true });
+    if (wasCompactAtTap) snapIndicator();
+    else slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
@@ -1168,7 +1189,16 @@
   function setCompact(v, opts) {
     if (v === tabbarCompact) return;
     tabbarCompact = v;
-    tabbarEl.classList.toggle('tabbar--compact', v);
+    if (opts && opts.instant) {
+      // 탭 전환 시: 펼침을 애니메이션 없이 즉시 적용(--freeze로 트랜지션 끔) → 아이콘(특히 맨끝 스탬프)이
+      // 곧장 최종 위치로 가서, "최종 위치로 슬라이드하는 인디케이터"와 안 어긋남(오른쪽 오버슈트 방지).
+      tabbarEl.classList.add('tabbar--freeze');
+      tabbarEl.classList.toggle('tabbar--compact', v);
+      void tabbarEl.offsetWidth; // 강제 리플로우로 즉시 확정
+      tabbarEl.classList.remove('tabbar--freeze');
+    } else {
+      tabbarEl.classList.toggle('tabbar--compact', v); // 스크롤 축소/펼침은 CSS 트랜지션으로 부드럽게
+    }
     // silent: 호출한 쪽이 원 움직임을 직접 책임질 때(탭 전환의 슬라이드를 스냅으로 끊지 않게)
     if (!(opts && opts.silent)) trackIndicator(300); // 크기 변하는 동안 빨간 원이 딱 붙어 따라오게(트랜지션 끔)
   }
@@ -1443,32 +1473,16 @@
     if (e.target.closest('.recipe-thumb-img')) e.preventDefault();
   });
 
-  // 플로팅 버튼(공유/설치)이 카드 하단과 푸터 사이 여백의 "중앙"에 오도록.
-  // 여백(.main 아래쪽)을 플로터 높이 + 위아래 간격만큼 확보한 뒤, 푸터가 보이면 그만큼 위로 밀어 올림
+  // 설치 CTA(모바일 전용 #floatingActions)는 하단 플로팅 탭바 "위"에 뜬다(위치는 CSS로 고정).
+  // 이 버튼이 보이면 body에 클래스를 붙여, 그 버튼 뒤로 콘텐츠가 안 가리게 .main 하단여백을 더 준다(CSS 처리).
+  // (예전엔 이 함수가 .main 패딩을 인라인으로 조작 → 플로터가 비면 40px로 줄어 탭바 회피 여백을 무력화했었음. 폐기.)
   const floatingActions = document.getElementById('floatingActions');
-  const footerEl = document.querySelector('.footer');
-  const mainEl = document.querySelector('.main');
-  const FLOATING_GAP = 20;
-
-  function updateFloatingActionsDock() {
-    if (window.innerWidth > 640) {
-      floatingActions.style.bottom = '';
-      mainEl.style.paddingBottom = '';
-      return;
-    }
-    const faHeight = floatingActions.getBoundingClientRect().height;
-    // 카드-푸터 사이 여백 = 플로터 높이 + 위아래 각 FLOATING_GAP → 플로터가 그 중앙에 위치
-    const pad = `${Math.round(faHeight + FLOATING_GAP * 2)}px`;
-    if (mainEl.style.paddingBottom !== pad) {
-      mainEl.style.paddingBottom = pad;
-    }
-    const footerVisible = window.innerHeight - footerEl.getBoundingClientRect().top;
-    floatingActions.style.bottom = footerVisible > 0 ? `${FLOATING_GAP + footerVisible}px` : '';
+  function updateInstallCtaSpacing() {
+    const visible = window.innerWidth <= 640 && floatingActions.getBoundingClientRect().height > 0;
+    document.body.classList.toggle('install-cta-visible', visible);
   }
-
-  window.addEventListener('scroll', updateFloatingActionsDock, { passive: true });
-  window.addEventListener('resize', updateFloatingActionsDock);
-  updateFloatingActionsDock();
+  window.addEventListener('resize', updateInstallCtaSpacing);
+  updateInstallCtaSpacing();
 
   // 기기/브라우저 판별
   const ua = navigator.userAgent;
@@ -1491,6 +1505,7 @@
   if (a2hsBtn && isIosSafariNotInstalled()) {
     a2hsBtn.style.display = 'flex';
     topInstallBtn.style.display = 'flex';
+    updateInstallCtaSpacing(); // 버튼이 떴으니 .main 하단여백 반영
     const openA2hsOverlay = () => a2hsOverlay.classList.add('open');
     a2hsBtn.addEventListener('click', openA2hsOverlay);
     topInstallBtn.addEventListener('click', openA2hsOverlay);
@@ -1510,6 +1525,7 @@
     deferredInstallPrompt = e;
     androidInstallBtn.style.display = 'flex';
     topInstallBtn.style.display = 'flex';
+    updateInstallCtaSpacing();
   });
 
   async function promptAndroidInstall() {
@@ -1519,6 +1535,7 @@
     deferredInstallPrompt = null;
     androidInstallBtn.style.display = 'none';
     topInstallBtn.style.display = 'none';
+    updateInstallCtaSpacing();
   }
 
   androidInstallBtn.addEventListener('click', promptAndroidInstall);
@@ -1529,6 +1546,7 @@
   window.addEventListener('appinstalled', () => {
     androidInstallBtn.style.display = 'none';
     topInstallBtn.style.display = 'none';
+    updateInstallCtaSpacing();
   });
 
   // 카카오톡 등 인앱 브라우저 안내
