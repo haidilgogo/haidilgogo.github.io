@@ -2165,47 +2165,6 @@ body {
 }
 
 /* ===== 매장(지점) 목록 ===== */
-/* 지역 필터 바 — 상단바 바로 아래에 달라붙어(sticky) 스크롤해도 보임 */
-.store-filter {
-  position: sticky;
-  top: var(--topbar-h, 0px);
-  z-index: 30;
-  display: flex;
-  gap: 8px;
-  padding: 12px 0 10px;
-  margin-bottom: 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  background: var(--bg-card); /* 스크롤 시 뒤 카드가 안 비치게 페이지 배경으로 덮음 */
-}
-.store-filter::-webkit-scrollbar { display: none; }
-.store-chip {
-  flex: none;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--card-border);
-  background: var(--bg-cream);
-  color: var(--text-muted);
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background .15s, color .15s, border-color .15s;
-}
-.store-chip.active {
-  background: var(--brand-red);
-  border-color: var(--brand-red);
-  color: #fff;
-}
-@media (hover: hover) {
-  .store-chip:not(.active):hover {
-    border-color: var(--card-hover-border);
-    color: var(--text-dark);
-  }
-}
 .stores-note {
   margin: 4px 4px 16px;
   font-size: 12px;
@@ -2237,6 +2196,9 @@ body {
   border-radius: 18px;
   padding: 16px 16px 14px;
 }
+/* 매장은 푸터가 없어서 마지막 카드가 하단 플로팅 탭바(바닥 ~95px)에 가림 → 아래 여백 추가(안전영역 포함).
+   데스크탑·모바일 공통 — .main 하단여백만으론 부족(마지막 카드가 탭바에 묻힘). */
+#view-store { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
 /* 모바일: 한 줄에 하나(주소·버튼 있는 카드라 2열은 답답함) */
 @media (max-width: 640px) {
   .stores { grid-template-columns: 1fr; row-gap: 12px; }
@@ -2301,6 +2263,62 @@ body {
   .store-btn.tel:hover { border-color: var(--card-hover-border); }
 }
 
+/* 지도 앱 드롭다운(지도 버튼에서 위로 펼침 — 하단 탭바에 안 가리게) */
+.map-dd {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+.map-dd > .store-btn.map { width: 100%; }
+.map-dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);   /* 기본: 아래로 펼침(누른 매장 이름 안 가림) */
+  left: 0;
+  min-width: 170px;
+  background: var(--bg-cream);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(80, 30, 20, .18);
+  z-index: 30;
+  display: none;
+}
+/* 아래 공간 부족(화면 하단·탭바 근처)할 때만 위로 뒤집음 */
+.map-dd--up .map-dd-menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+.map-dd.open .map-dd-menu { display: block; }
+.map-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  margin: 2px 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-dark);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+@media (hover: hover) {
+  .map-dd-item:hover { background: rgba(255, 255, 255, .6); }
+}
+.map-dd-ic {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 /* 상단바 섹션 제목 (메뉴·스탬프 섹션일 때 탭 자리에 표시) */
 .topbar-section-title {
   display: none;
@@ -2313,12 +2331,16 @@ body {
   white-space: nowrap;
 }
 
-/* 레시피가 아닌 섹션: 카테고리 탭·검색 숨기고 섹션 제목 표시 */
-.page:not([data-section="recipe"]) .tabs-group,
+/* 레시피 카테고리 탭·검색: 레시피에서만 */
+.page:not([data-section="recipe"]) .tabs-group--recipe,
 .page:not([data-section="recipe"]) .search-box {
   display: none;
 }
-.page:not([data-section="recipe"]) .topbar-section-title {
+/* 매장 지역 탭(레시피 탭과 동일 형태): 매장에서만 */
+.tabs-group--store { display: none; }
+.page[data-section="store"] .tabs-group--store { display: flex; }
+/* 섹션 제목: 탭이 없는 섹션(메뉴·스탬프)에서만 */
+.page:not([data-section="recipe"]):not([data-section="store"]) .topbar-section-title {
   display: inline-block;
 }
 

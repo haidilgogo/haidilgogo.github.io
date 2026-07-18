@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=183">
+<link rel="stylesheet" href="styles.css?v=190">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -107,7 +107,7 @@
         <span class="topbar-title">하딜고고</span>
       </button>
       <span class="topbar-section-title" id="sectionTitle"></span>
-      <div class="tabs-group">
+      <div class="tabs-group tabs-group--recipe">
         <div class="tabs" id="tabs">
           <span class="tabs-underline" id="tabsUnderline"></span>
         </div>
@@ -125,6 +125,12 @@
             <path d="M8.6 10.6l6.8-3.8M8.6 13.4l6.8 3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
+      </div>
+      <!-- 매장 섹션: 지역 탭(레시피 카테고리 탭과 동일 형태, 매장에서만 표시) -->
+      <div class="tabs-group tabs-group--store" id="storeTabsGroup">
+        <div class="tabs" id="storeTabs">
+          <span class="tabs-underline" id="storeTabsUnderline"></span>
+        </div>
       </div>
       <div class="topbar-spacer"></div>
       <div class="search-box">
@@ -197,7 +203,6 @@
 
     <!-- 매장 섹션 -->
     <div class="view" id="view-store" hidden>
-      <div class="store-filter" id="storeFilter" role="tablist" aria-label="지역 선택"></div>
       <p class="stores-note">지도·전화는 앱 밖(네이버 지도·전화 앱)으로 연결돼요. 영업시간은 매장 사정에 따라 다를 수 있어요.</p>
       <div class="stores" id="stores"></div>
     </div>
@@ -452,7 +457,7 @@
   </div>
 </div>
 
-<script src="script.js?v=184"></script>
+<script src="script.js?v=191"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

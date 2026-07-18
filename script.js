@@ -33,18 +33,19 @@
   // 화면 지점명엔 '하이디라오 '가 앞에 붙음(renderStores). 지도 링크도 '하이디라오 {name}'으로 네이버 검색,
   // 전화는 tel: 링크. (soon:true = 오픈 예정 표시 — 지금은 뺐지만 확정 시 필드만 붙이면 렌더가 처리)
   const STORES = [
-    { region: '서울', name: '명동점',    addr: '서울 중구 명동3길 36, 마이티빌딩 1/2층',          hours: '10:00 ~ 03:00', tel: '02-3789-3888' },
-    { region: '서울', name: '서초점',    addr: '서울 서초구 서초대로77길 54, 서초W타워 2층',       hours: '10:00 ~ 07:00', tel: '02-533-8260' },
-    { region: '서울', name: '홍대점',    addr: '서울 마포구 양화로 176, 와이즈파크 5층',          hours: '10:00 ~ 05:00', tel: '02-332-7668' },
-    { region: '서울', name: '건대점',    addr: '서울 광진구 능동로 110, 스타시티 영존 A동 1/2층',   hours: '10:00 ~ 05:00', tel: '02-456-5683' },
-    { region: '서울', name: '영등포점',  addr: '서울 영등포구 경인로 870, 2층',                  hours: '10:00 ~ 03:00', tel: '02-456-0715' },
-    { region: '서울', name: '대학로점',  addr: '서울 종로구 대학로 146, 혜화동씨티밸리 3층',        hours: '10:00 ~ 05:00', tel: '02-743-6868' },
-    { region: '서울', name: 'COEX점',    addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 ~ 05:00', tel: '02-562-1005' },
-    { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 ~ 05:00', tel: '02-2136-9939' },
-    { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 ~ 03:00', tel: '032-666-0118' },
-    { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 ~ 03:00', tel: '051-466-8880' },
-    { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 ~ 05:00', tel: '053-428-7771' },
-    { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 ~ 03:00', tel: '064-747-8886' },
+    { region: '서울', name: '명동점',    addr: '서울 중구 명동3길 36, 마이티빌딩 1/2층',          hours: '10:00 – 03:00', tel: '02-3789-3888' },
+    { region: '서울', name: '서초점',    addr: '서울 서초구 서초대로77길 54, 서초W타워 2층',       hours: '10:00 – 07:00', tel: '02-533-8260' },
+    { region: '서울', name: '홍대점',    addr: '서울 마포구 양화로 176, 와이즈파크 5층',          hours: '10:00 – 05:00', tel: '02-332-7668' },
+    { region: '서울', name: '건대점',    addr: '서울 광진구 능동로 110, 스타시티 영존 A동 1/2층',   hours: '10:00 – 05:00', tel: '02-456-5683' },
+    { region: '서울', name: '영등포점',  addr: '서울 영등포구 경인로 870, 2층',                  hours: '10:00 – 03:00', tel: '02-2678-0715' },
+    { region: '서울', name: '대학로점',  addr: '서울 종로구 대학로 146, 혜화동씨티밸리 3층',        hours: '10:00 – 05:00', tel: '02-743-6868' },
+    { region: '서울', name: 'COEX점',    addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 – 05:00', tel: '02-562-1005' },
+    { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 – 05:00', tel: '02-2136-9939' },
+    { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 03:00', tel: '032-666-0118' },
+    { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 현대타워랜드 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
+    { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
+    { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
+    { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
 
   // 재료 표시 순서: SAUCE_BAR 배열 순서를 기준으로 자동 정렬(렌더 시에만 정렬, 원본 데이터는 그대로).
@@ -1130,6 +1131,9 @@
     // 펼침(setCompact)보다 먼저 호출 — 측정은 축소 상태를 건드리지 않고 한 프레임 안에서 끝남
     slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     setCompact(false, { silent: true });
+    // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
+    // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
+    if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
     syncTopbarH();
   }
 
@@ -1173,32 +1177,41 @@
 
   // ── 매장(지점) 렌더 ──
   let activeRegion = '전체';
-  // STORES에 등장하는 지역을 순서대로(중복 없이) — 필터 칩 목록
+  // STORES에 등장하는 지역을 순서대로(중복 없이)
   const storeRegions = () => {
     const seen = [];
     STORES.forEach((s) => { if (!seen.includes(s.region)) seen.push(s.region); });
     return seen;
   };
-  function renderStoreFilter() {
-    const bar = document.getElementById('storeFilter');
-    if (!bar) return;
-    bar.innerHTML = '';
+  // 매장 지역 탭 — 레시피 카테고리 탭과 동일 형태(.tab-btn + 밑줄 슬라이더). 상단바 안 #storeTabs.
+  const storeTabsEl = document.getElementById('storeTabs');
+  const storeUnderline = document.getElementById('storeTabsUnderline');
+  function updateStoreUnderline() {
+    if (!storeTabsEl || !storeUnderline) return;
+    const active = storeTabsEl.querySelector('.tab-btn.active');
+    // 매장 섹션이 숨겨져 있으면 offsetWidth=0 → 위치 못 잡으므로, 보일 때(switchSection) 다시 호출됨
+    if (active && active.offsetWidth) {
+      storeUnderline.style.width = active.offsetWidth + 'px';
+      storeUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    }
+  }
+  function renderStoreTabs() {
+    if (!storeTabsEl) return;
+    storeTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
     ['전체'].concat(storeRegions()).forEach((reg) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'store-chip' + (reg === activeRegion ? ' active' : '');
+      btn.className = 'tab-btn' + (reg === activeRegion ? ' active' : '');
       btn.textContent = reg;
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', reg === activeRegion ? 'true' : 'false');
       btn.addEventListener('click', () => {
         if (activeRegion === reg) return;
         activeRegion = reg;
-        renderStoreFilter();
+        renderStoreTabs();
         renderStores();
-        window.scrollTo(0, 0); // 지역 바꾸면 목록 맨 위로
       });
-      bar.appendChild(btn);
+      storeTabsEl.appendChild(btn);
     });
+    updateStoreUnderline();
   }
   function renderStores() {
     const wrap = document.getElementById('stores');
@@ -1256,13 +1269,44 @@
         const acts = document.createElement('div');
         acts.className = 'store-actions';
         if (s.addr) {
-          const map = document.createElement('a');
-          map.className = 'store-btn map';
-          map.textContent = '지도';
-          map.href = 'https://map.naver.com/p/search/' + encodeURIComponent('하이디라오 ' + s.name);
-          map.target = '_blank';
-          map.rel = 'noopener';
-          acts.appendChild(map);
+          // '지도' 버튼 → 아래(위)로 펼쳐지는 드롭다운(네이버 지도/카카오맵)
+          const dd = document.createElement('div');
+          dd.className = 'map-dd';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'store-btn map';
+          btn.textContent = '지도';
+          const menu = document.createElement('div');
+          menu.className = 'map-dd-menu';
+          const q = encodeURIComponent('하이디라오 ' + s.name);
+          [
+            { label: '네이버지도', img: 'assets/icons/navermap.png?v=1', href: 'https://map.naver.com/p/search/' + q },
+            { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1', href: 'https://map.kakao.com/?q=' + q },
+          ].forEach((o) => {
+            const a = document.createElement('a');
+            a.className = 'map-dd-item';
+            a.href = o.href;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.innerHTML = '<img class="map-dd-ic" src="' + o.img + '" alt="" draggable="false">' + o.label;
+            a.addEventListener('click', closeAllMapDd);
+            menu.appendChild(a);
+          });
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 바깥클릭 닫기 리스너가 곧바로 닫지 않게
+            const open = dd.classList.contains('open');
+            closeAllMapDd();
+            if (!open) {
+              dd.classList.add('open');
+              // 기본은 아래로 펼침. 단, 버튼 아래 공간이 부족하면(하단 탭바 영역 ~100px 감안) 위로 뒤집음.
+              const rect = btn.getBoundingClientRect();
+              const spaceBelow = window.innerHeight - rect.bottom - 100;
+              dd.classList.toggle('map-dd--up', spaceBelow < menu.offsetHeight);
+            }
+          });
+          dd.appendChild(btn);
+          dd.appendChild(menu);
+          acts.appendChild(dd);
         }
         if (s.tel) {
           const tel = document.createElement('a');
@@ -1278,10 +1322,18 @@
     });
   }
 
+  // ── 지도 드롭다운(네이버/카카오) 닫기 ──
+  function closeAllMapDd() {
+    document.querySelectorAll('.map-dd.open').forEach((d) => d.classList.remove('open'));
+  }
+  document.addEventListener('click', closeAllMapDd); // 바깥 클릭 시 닫힘
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllMapDd(); });
+
   renderTabs();
   renderGrid();
-  renderStoreFilter();
+  renderStoreTabs();
   renderStores();
+  window.addEventListener('resize', updateStoreUnderline);
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
   requestAnimationFrame(placeIndicator);
