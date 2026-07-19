@@ -39,7 +39,7 @@
     { region: '서울', name: '건대점',    addr: '서울 광진구 능동로 110, 스타시티 영존 A동 1/2층',   hours: '10:00 – 05:00', tel: '02-456-5683' },
     { region: '서울', name: '영등포점',  addr: '서울 영등포구 경인로 870, 2층',                  hours: '10:00 – 03:00', tel: '02-2678-0715' },
     { region: '서울', name: '대학로점',  addr: '서울 종로구 대학로 146, 혜화동씨티밸리 3층',        hours: '10:00 – 05:00', tel: '02-743-6868' },
-    { region: '서울', name: 'COEX점',    addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 – 05:00', tel: '02-562-1005' },
+    { region: '서울', name: '코엑스점',  addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 – 05:00', tel: '02-562-1005' },
     { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 – 05:00', tel: '02-2136-9939' },
     { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 03:00', tel: '032-666-0118' },
     { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 현대타워랜드 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
@@ -57,7 +57,7 @@
     '건대점': 'https://app.catchtable.co.kr/ct/shop/hidirao_konkuk?type=WAITING&currentSuggestionType=SHOP_NAME',
     '영등포점': 'https://app.catchtable.co.kr/ct/shop/hidirao_yeongdeungpo?type=WAITING&currentSuggestionType=SHOP_NAME',
     '대학로점': 'https://app.catchtable.co.kr/ct/shop/haidilao_hyehwa?type=WAITING&currentSuggestionType=SHOP_NAME',
-    'COEX점': 'https://app.catchtable.co.kr/ct/shop/hidirao_coex?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '코엑스점': 'https://app.catchtable.co.kr/ct/shop/hidirao_coex?type=WAITING&currentSuggestionType=SHOP_NAME',
     '가산점': 'https://app.catchtable.co.kr/ct/shop/hidiraohd?type=DINING&currentSuggestionType=SHOP_NAME',
     '부천점': 'https://app.catchtable.co.kr/ct/shop/haidilao_bucheon?type=WAITING&currentSuggestionType=SHOP_NAME',
     '부산역점': 'https://app.catchtable.co.kr/ct/shop/haidilaobusan?type=WAITING&currentSuggestionType=SHOP_NAME',
@@ -1447,6 +1447,8 @@
     '홍대점': 'assets/stickers/홍대점.webp',
     '건대점': 'assets/stickers/건대점.webp',
     '영등포점': 'assets/stickers/영등포점.webp',
+    '대학로점': 'assets/stickers/대학로점.webp',
+    '코엑스점': 'assets/stickers/코엑스점.webp',
   };
   let stampData = { version: 1, stamps: {} };
   try {
