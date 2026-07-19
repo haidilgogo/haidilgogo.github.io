@@ -1173,6 +1173,7 @@
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
+    if (name === 'stamp') { updateStampUnderline(); requestAnimationFrame(updateStampUnderline); }
     syncTopbarH();
   }
 
@@ -1456,17 +1457,31 @@
     '제주점': 'assets/stickers/제주점.webp',
     '안산점': 'assets/stickers/안산점.webp',
   };
-  let stampData = { version: 1, stamps: {} };
-  try {
-    const savedStamps = JSON.parse(localStorage.getItem(STAMPS_KEY));
-    if (savedStamps && savedStamps.stamps) stampData = savedStamps;
-  } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
+  // v2(2026-07-19): 매장당 1개(stamps 객체) → 기록 목록(records 배열)으로 구조 변경.
+  // 같은 매장을 여러 번 방문해도 각각 기록됨(일기 컨셉). 기록 = { id, name, date, memo, with?, addedAt }
+  let stampData = { version: 2, records: [] };
   function saveStamps() {
     try { localStorage.setItem(STAMPS_KEY, JSON.stringify(stampData)); } catch (e) { /* 시크릿 모드 등 저장 실패 무시 */ }
   }
-  function fmtStampDate(iso) {
-    return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso.replace(/-/g, '.') : iso; // 'YYYY-MM-DD' → 'YYYY.MM.DD'
+  function newStampId() {
+    return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
+  try {
+    const savedStamps = JSON.parse(localStorage.getItem(STAMPS_KEY));
+    if (savedStamps && Array.isArray(savedStamps.records)) {
+      stampData = savedStamps;
+    } else if (savedStamps && savedStamps.stamps) {
+      // v1 → v2 자동 이전: 기존 사용자의 기록을 그대로 배열로 옮김(유실 0)
+      stampData = {
+        version: 2,
+        records: Object.keys(savedStamps.stamps).map((name) => {
+          const r = savedStamps.stamps[name];
+          return { id: newStampId(), name: name, date: r.date, memo: r.memo || '', with: r.with, addedAt: r.addedAt || 0 };
+        }),
+      };
+      saveStamps();
+    }
+  } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
 
   // 스티커 카드 DOM(그리드 타일·시트 슬롯 공용). 지점명 밴드는 앱이 얹음(그림 하단 빈 띠 위).
   function buildStampCard(name) {
@@ -1486,42 +1501,91 @@
     return card;
   }
 
+  // ── 발도장 지역 탭 — 매장 지역 탭과 동일 형태·같은 고정 목록(방문 여부와 무관하게 항상 전부 표시) ──
+  let activeStampRegion = '전국';
+  const stampTabsEl = document.getElementById('stampTabs');
+  const stampUnderline = document.getElementById('stampTabsUnderline');
+  const STAMP_REGION_OF = {}; // 지점명 → 지역 (필터용)
+  STORES.forEach((s) => { STAMP_REGION_OF[s.name] = s.region; });
+  function updateStampUnderline() {
+    if (!stampTabsEl || !stampUnderline) return;
+    const active = stampTabsEl.querySelector('.tab-btn.active');
+    // 발도장 섹션이 숨겨져 있으면 offsetWidth=0 → 위치 못 잡으므로, 보일 때(switchSection) 다시 호출됨
+    if (active && active.offsetWidth) {
+      stampUnderline.style.width = active.offsetWidth + 'px';
+      stampUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    }
+  }
+  function renderStampTabs() {
+    if (!stampTabsEl) return;
+    stampTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    ['전국'].concat(storeRegions()).forEach((reg) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (reg === activeStampRegion ? ' active' : '');
+      btn.textContent = reg;
+      btn.addEventListener('click', () => {
+        if (activeStampRegion === reg) return;
+        activeStampRegion = reg;
+        renderStampTabs();
+        renderStamps();
+      });
+      stampTabsEl.appendChild(btn);
+    });
+    updateStampUnderline();
+  }
+
   function renderStamps() {
     const grid = document.getElementById('stampGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    const total = STORES.length;
-    const names = STORES.map((s) => s.name).filter((n) => stampData.stamps[n]);
-    document.getElementById('stampCountNum').textContent = names.length;
-    document.getElementById('stampTotalNum').textContent = total;
-    document.getElementById('stampProgressFill').style.width = ((names.length / total) * 100) + '%';
-    names.forEach((name) => {
-      const rec = stampData.stamps[name];
-      const cell = document.createElement('div');
-      cell.className = 'stamp-cell';
-      const tile = buildStampCard(name);
-      tile.className = 'stamp-tile';
-      tile.style.cursor = 'pointer';
-      tile.setAttribute('role', 'button');
-      tile.setAttribute('aria-label', name + ' 발도장 수정');
-      tile.addEventListener('click', () => openStampSheet(name)); // 탭 → 수정 모드
-      cell.appendChild(tile);
-      const cap = document.createElement('div');
-      cap.className = 'stamp-cap';
-      cap.textContent = fmtStampDate(rec.date) + (rec.memo ? ' · ' + rec.memo : '');
-      cap.title = cap.textContent;
-      cell.appendChild(cap);
-      grid.appendChild(cell);
+    const showAll = activeStampRegion === '전국';
+    const list = stampData.records
+      .filter((r) => showAll || STAMP_REGION_OF[r.name] === activeStampRegion)
+      .slice();
+    // "다녀온 매장 N곳" = 고유 매장 수(같은 매장 여러 번 기록해도 1곳으로 셈 — 라벨과 의미 일치)
+    document.getElementById('stampCountNum').textContent = new Set(list.map((r) => r.name)).size;
+    // 일기라 최신이 먼저: 날짜 최근순, 같은 날짜면 나중에 기록한 것(addedAt)이 위.
+    // addedAt 없는 옛 기록은 0 취급 → 같은 날짜 안에서 맨 아래(정렬 안 깨짐).
+    list.sort((a, b) => {
+      if ((a.date || '') !== (b.date || '')) return (a.date || '') < (b.date || '') ? 1 : -1;
+      return (b.addedAt || 0) - (a.addedAt || 0);
     });
-    // 마지막 = ➕ 추가 타일 (13곳 다 모으면 자연히 사라짐)
-    if (names.length < total) {
-      const add = document.createElement('button');
-      add.type = 'button';
-      add.className = 'stamp-add';
-      add.innerHTML = '<span class="stamp-add-plus">+</span><span class="stamp-add-label">발도장 찍기</span>';
-      add.addEventListener('click', () => openStampSheet());
-      grid.appendChild(add);
+    // 빈 상태 — 기록이 아예 없으면 첫 기록 유도, 지역 필터만 비면 그 지역 안내
+    if (!list.length) {
+      const empty = document.createElement('div');
+      empty.className = 'stamp-empty';
+      const anyAtAll = stampData.records.length > 0;
+      empty.innerHTML = '<span class="stamp-empty-paw">🐾</span>' + (anyAtAll
+        ? '아직 ' + activeStampRegion + '엔 발도장이 없어요'
+        : '아직 발도장이 없어요<br>✏️ 기록하기로 첫 방문을 남겨보세요');
+      grid.appendChild(empty);
+      return;
     }
+    list.forEach((rec) => {
+      // 컴팩트 가로 카드: [작은 스티커] 날짜 → 매장명 — 리스트는 색인만(한 화면 6개 목표),
+      // 메모·동행 등 상세는 카드 탭 → 수정 시트에서 확인
+      const card = document.createElement('div');
+      card.className = 'stamp-rec';
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', rec.name + ' 기록 수정');
+      const tile = buildStampCard(rec.name);
+      tile.className = 'stamp-tile';
+      card.appendChild(tile);
+      const info = document.createElement('div');
+      info.className = 'stamp-rec-info';
+      const date = document.createElement('div');
+      date.className = 'stamp-rec-date';
+      date.textContent = fmtStampDateKr(rec.date); // 시트와 같은 '2026년 7월 19일' 형식
+      info.appendChild(date);
+      const nm = document.createElement('div');
+      nm.className = 'stamp-rec-name';
+      nm.textContent = rec.name;
+      info.appendChild(nm);
+      card.appendChild(info);
+      card.addEventListener('click', () => openStampSheet(rec.id)); // 탭 → 그 기록 수정(메모·동행은 여기서)
+      grid.appendChild(card);
+    });
   }
 
   // ── 발도장 입력 시트: 점선 슬롯 → 지점 선택 → "발도장 찍기" → 스티커 탁!(stampPop) ──
@@ -1529,83 +1593,119 @@
   const stampSlot = document.getElementById('stampSlot');
   const stampSlotEmpty = document.getElementById('stampSlotEmpty');
   const stampSlotHint = document.getElementById('stampSlotHint');
-  const stampBranchesEl = document.getElementById('stampBranches');
+  const stampDdEl = document.getElementById('stampDd');           // 매장 선택 드롭다운(정렬 dd와 같은 문법)
+  const stampDdBtn = document.getElementById('stampDdBtn');
+  const stampDdCurrent = document.getElementById('stampDdCurrent');
+  const stampDdMenu = document.getElementById('stampDdMenu');
   const stampDateEl = document.getElementById('stampDate');
+  const stampDateText = document.getElementById('stampDateText'); // 투명 입력 위에 얹는 앱 폰트 날짜 글자
+  function fmtStampDateKr(iso) { // 'YYYY-MM-DD' → '2026년 7월 19일' (시트·기록 카드 공용 날짜 형식)
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    return m ? m[1] + '년 ' + Number(m[2]) + '월 ' + Number(m[3]) + '일' : iso;
+  }
+  function syncStampDateText() { stampDateText.textContent = fmtStampDateKr(stampDateEl.value); }
+  stampDateEl.addEventListener('input', syncStampDateText);
+  stampDateEl.addEventListener('change', syncStampDateText);
   const stampMemoEl = document.getElementById('stampMemo');
   const stampSubmitEl = document.getElementById('stampSubmit');
-  const stampQEl = document.getElementById('stampQ');
-  const stampBranchFixed = document.getElementById('stampBranchFixed');
   const stampDeleteEl = document.getElementById('stampDelete');
-  let stampSelected = null;   // 고른 지점 이름
+  let stampSelected = null;   // 고른 매장 이름
+  let stampEditId = null;     // 수정 중인 기록 id (add면 null)
   let stampAnimating = false; // 찍기 연출 중 중복 제출·닫기 방지
-  let stampMode = 'add';      // 'add'(새로 찍기) | 'edit'(모은 스티커 수정)
+  let stampMode = 'add';      // 'add'(새로 찍기) | 'edit'(기록 수정)
   let stampDeleteArmed = false; // 삭제 두 번 눌러 확인용
 
-  // editName 있으면 = 이미 모은 스티커 수정 모드(날짜·메모 수정 + 삭제), 없으면 새로 찍기
-  function openStampSheet(editName) {
-    const editing = !!editName && !!stampData.stamps[editName];
-    stampMode = editing ? 'edit' : 'add';
-    stampSelected = editing ? editName : null;
+  // 매장 선택 반영 — add: 슬롯 힌트+버튼 활성 / edit: 슬롯의 스티커 교체(매장도 수정 가능, v2)
+  function setStampStore(name) {
+    stampSelected = name;
+    stampDdCurrent.textContent = name;
+    stampDdCurrent.classList.remove('placeholder');
+    stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.toggle('active', i.dataset.value === name));
+    if (stampMode === 'edit') {
+      stampSlot.querySelectorAll('.stamp-slot-card').forEach((el) => el.remove());
+      const card = buildStampCard(name);
+      card.className = 'stamp-slot-card';
+      stampSlot.appendChild(card);
+    } else {
+      stampSlotHint.textContent = name + ' 스티커 붙이는 곳';
+      stampSubmitEl.disabled = false;
+    }
+    if (STAMP_IMGS[name]) { const pre = new Image(); pre.src = STAMP_IMGS[name]; } // 미리 로드 → 팝/교체 때 흰 카드 안 뜸
+  }
+
+  // editId 있으면 = 그 기록 수정 모드(매장·날짜·메모·동행 수정 + 삭제), 없으면 새로 찍기
+  function openStampSheet(editId) {
+    const rec = editId ? stampData.records.find((r) => r.id === editId) : null;
+    stampMode = rec ? 'edit' : 'add';
+    stampEditId = rec ? rec.id : null;
     stampAnimating = false;
     stampDeleteArmed = false;
     stampSlot.querySelectorAll('.stamp-slot-card').forEach((el) => el.remove());
     stampDeleteEl.textContent = '이 발도장 삭제';
     stampDeleteEl.classList.remove('armed');
+    closeStampDd();
 
-    if (editing) {
-      // 슬롯에 이미 모은 스티커를 정적으로 표시(팝 없음)
+    if (rec) {
       stampSlotEmpty.hidden = true;
-      const card = buildStampCard(editName);
-      card.className = 'stamp-slot-card';
-      stampSlot.appendChild(card);
-      // 지점 선택 숨기고 고정 라벨 표시(지점은 스티커 정체성이라 변경 불가)
-      stampQEl.hidden = true;
-      stampBranchesEl.hidden = true;
-      stampBranchFixed.hidden = false;
-      stampBranchFixed.textContent = editName;
-      const rec = stampData.stamps[editName];
       stampDateEl.value = rec.date || '';
       stampMemoEl.value = rec.memo || '';
+      stampWithEl.value = rec.with || '';
+      setStampStore(rec.name); // 드롭다운 라벨·슬롯 스티커 세팅(edit 모드라 슬롯에 정적 표시)
       stampSubmitEl.textContent = '저장';
       stampSubmitEl.disabled = false;
       stampDeleteEl.hidden = false;
     } else {
       stampSlotEmpty.hidden = false;
-      stampSlotHint.textContent = '여기에 스티커가 붙어요';
-      stampQEl.hidden = false;
-      stampBranchesEl.hidden = false;
-      stampBranchFixed.hidden = true;
+      stampSlotHint.textContent = '스티커 붙이는 곳';
+      stampSelected = null;
+      stampDdCurrent.textContent = '선택'; // 앞에 「매장」 라벨이 있어 "매장 선택"이면 중복
+      stampDdCurrent.classList.add('placeholder');
+      stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.remove('active'));
       const now = new Date(); // 오늘(이 기기 시간대) — toISOString은 UTC라 자정 전후 하루 밀림
       stampDateEl.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
       stampMemoEl.value = '';
       stampSubmitEl.textContent = '발도장 찍기 🐾';
       stampSubmitEl.disabled = true;
       stampDeleteEl.hidden = true;
-      stampBranchesEl.innerHTML = '';
-      STORES.forEach((s) => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        const done = !!stampData.stamps[s.name];
-        chip.className = 'stamp-chip' + (done ? ' done' : '');
-        chip.textContent = done ? s.name + ' ✓' : s.name;
-        if (!done) {
-          chip.addEventListener('click', () => {
-            stampSelected = s.name;
-            stampBranchesEl.querySelectorAll('.stamp-chip').forEach((c) => c.classList.toggle('on', c === chip));
-            stampSlotHint.textContent = s.name + ' 스티커가 붙을 자리예요';
-            stampSubmitEl.disabled = false;
-            if (STAMP_IMGS[s.name]) { const pre = new Image(); pre.src = STAMP_IMGS[s.name]; } // 찍기 전에 미리 로드 → 팝 때 흰 카드 안 뜸
-          });
-        }
-        stampBranchesEl.appendChild(chip);
-      });
+      stampWithEl.value = '';
     }
+    syncStampDateText(); // 새로 찍기(오늘)·수정(기존 날짜) 모두 값 세팅 후 표시 글자 갱신
     stampSheetOverlay.classList.add('open');
   }
   function closeStampSheet() {
     if (stampAnimating) return; // 찍히는 중엔 닫기 무시(연출 보장)
     stampSheetOverlay.classList.remove('open');
   }
+  // 매장 드롭다운 열기/닫기 — 정렬 dd와 같은 동작(버튼 토글, 바깥 클릭 시 닫힘)
+  function closeStampDd() {
+    stampDdEl.classList.remove('open');
+    stampDdBtn.setAttribute('aria-expanded', 'false');
+  }
+  stampDdBtn.addEventListener('click', () => {
+    const open = stampDdEl.classList.toggle('open');
+    stampDdBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', (e) => {
+    if (stampDdEl.classList.contains('open') && !stampDdEl.contains(e.target)) closeStampDd();
+  });
+
+  // ── 누구랑 — 자유 입력(이름도 적을 수 있게 드롭다운→글칸으로 변경, 선택 항목) ──
+  const stampWithEl = document.getElementById('stampWith');
+
+  // 매장 드롭다운 메뉴 — v2: 같은 매장 여러 번 기록 가능이라 ✓ 잠금 없음(전부 선택 가능), 항목 고정이라 한 번만 생성
+  STORES.forEach((s) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.setAttribute('role', 'option');
+    item.className = 'stamp-dd-item';
+    item.dataset.value = s.name;
+    item.textContent = s.name;
+    item.addEventListener('click', () => {
+      setStampStore(s.name);
+      closeStampDd();
+    });
+    stampDdMenu.appendChild(item);
+  });
   document.getElementById('stampSheetClose').addEventListener('click', closeStampSheet);
   stampSheetOverlay.addEventListener('click', (e) => { if (e.target === stampSheetOverlay) closeStampSheet(); });
   document.addEventListener('keydown', (e) => {
@@ -1614,12 +1714,16 @@
 
   stampSubmitEl.addEventListener('click', () => {
     if (!stampSelected || stampAnimating) return;
-    // 수정 모드: 날짜·메모만 갱신하고 바로 닫음(팝 애니 없음 — 이미 붙은 스티커)
+    // 수정 모드: 그 기록(id)만 갱신하고 바로 닫음(팝 애니 없음 — 이미 붙은 스티커). 매장도 변경 가능(v2)
     if (stampMode === 'edit') {
-      stampData.stamps[stampSelected] = {
-        date: stampDateEl.value || stampData.stamps[stampSelected].date,
-        memo: stampMemoEl.value.trim(),
-      };
+      const rec = stampData.records.find((r) => r.id === stampEditId);
+      if (rec) {
+        rec.name = stampSelected;
+        rec.date = stampDateEl.value || rec.date;
+        rec.memo = stampMemoEl.value.trim();
+        rec.with = stampWithEl.value.trim() || undefined; // 동행(선택·자유 입력) — 없으면 JSON에서 자동 생략
+        // addedAt은 그대로(처음 기록한 시각 보존 — 같은 날짜 안 정렬 기준)
+      }
       saveStamps();
       stampSheetOverlay.classList.remove('open');
       renderStamps();
@@ -1634,10 +1738,14 @@
     stampSlot.appendChild(card);
     if (navigator.vibrate) navigator.vibrate(35); // 지원 기기(안드로이드)만 살짝 진동
     // 저장은 즉시(연출이 끊겨도 기록은 남게), 화면 정리는 연출이 끝난 뒤
-    stampData.stamps[stampSelected] = {
+    stampData.records.push({
+      id: newStampId(),
+      name: stampSelected,
       date: stampDateEl.value || new Date().toISOString().slice(0, 10),
       memo: stampMemoEl.value.trim(),
-    };
+      with: stampWithEl.value.trim() || undefined, // 동행(선택·자유 입력) — 없으면 JSON에서 자동 생략
+      addedAt: Date.now(), // 같은 날짜 안에선 나중에 기록한 것이 위로(일기 정렬)
+    });
     saveStamps();
     setTimeout(() => {
       stampAnimating = false;
@@ -1646,9 +1754,9 @@
     }, 1250); // 팝 0.55s + 붙은 스티커 감상 시간
   });
 
-  // 삭제 — 실수 방지로 두 번 눌러야(첫 클릭=확인 상태, 3초 뒤 자동 원복)
+  // 삭제 — 실수 방지로 두 번 눌러야(첫 클릭=확인 상태, 3초 뒤 자동 원복). v2: 그 기록(id)만 삭제
   stampDeleteEl.addEventListener('click', () => {
-    if (stampMode !== 'edit' || !stampSelected) return;
+    if (stampMode !== 'edit' || !stampEditId) return;
     if (!stampDeleteArmed) {
       stampDeleteArmed = true;
       stampDeleteEl.textContent = '한 번 더 누르면 삭제돼요';
@@ -1662,18 +1770,24 @@
       return;
     }
     clearTimeout(stampDeleteEl._t);
-    delete stampData.stamps[stampSelected];
+    stampData.records = stampData.records.filter((r) => r.id !== stampEditId);
     saveStamps();
     stampSheetOverlay.classList.remove('open');
     renderStamps();
   });
 
+  // 상단바 ✏️ 기록하기(발도장 섹션 전용) → 새로 찍기 시트
+  const stampWriteBtn = document.getElementById('stampWriteBtn');
+  if (stampWriteBtn) stampWriteBtn.addEventListener('click', () => openStampSheet());
+
   renderTabs();
   renderGrid();
   renderStoreTabs();
   renderStores();
+  renderStampTabs();
   renderStamps();
   window.addEventListener('resize', updateStoreUnderline);
+  window.addEventListener('resize', updateStampUnderline);
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
   requestAnimationFrame(placeIndicator);
@@ -1826,4 +1940,6 @@
   favShareBtn.addEventListener('click', shareSite);
   topShareBtn.addEventListener('click', shareSite);
   if (storeShareBtn) storeShareBtn.addEventListener('click', shareSite);
+  const stampShareBtn = document.getElementById('stampShareBtn'); // 발도장 섹션(모바일) 공유 버튼
+  if (stampShareBtn) stampShareBtn.addEventListener('click', shareSite);
 })();

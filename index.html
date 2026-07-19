@@ -3,6 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+// iOS 사파리: 16px 미만 입력칸(발도장 메모 등)을 누르면 화면이 자동 확대되는 것 방지.
+// maximum-scale=1은 iOS(10+)에선 이 자동 확대만 막고 손가락 핀치줌은 그대로 허용됨.
+// 안드로이드에선 핀치줌까지 막아버리므로(접근성 문제) iOS 기기에서만 적용.
+(function () {
+  var ua = navigator.userAgent;
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document); // 신형 iPad는 Mac UA
+  if (!isIOS) return;
+  var v = document.querySelector('meta[name="viewport"]');
+  if (v && !/maximum-scale/.test(v.content)) v.content += ', maximum-scale=1';
+})();
+</script>
 <title>하딜고고</title>
 <meta name="description" content="하이디라오(훠궈) 소스·레시피 꿀팁 모음">
 <meta property="og:type" content="website">
@@ -16,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=223">
+<link rel="stylesheet" href="styles.css?v=237">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -154,6 +166,20 @@
           </svg>
         </button>
       </div>
+      <!-- 발도장 섹션: 지역 탭(매장 지역 탭과 동일 형태, 발도장에서만 표시) -->
+      <div class="tabs-group tabs-group--stamp" id="stampTabsGroup">
+        <div class="tabs" id="stampTabs">
+          <span class="tabs-underline" id="stampTabsUnderline"></span>
+        </div>
+        <button class="tabs-share-btn" id="stampShareBtn" type="button" aria-label="친구에게 공유">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M8.6 10.6l6.8-3.8M8.6 13.4l6.8 3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
       <div class="topbar-spacer"></div>
       <div class="search-box">
         <span class="search-icon" id="searchIcon">
@@ -165,6 +191,9 @@
         <input class="search-input" id="searchInput" type="text" placeholder="검색">
         <button class="search-clear" id="searchClear" type="button" aria-label="검색어 지우기">&times;</button>
       </div>
+      <!-- 발도장 기록하기 — 오늘의 소스와 같은 스타일(.gacha-btn), 발도장 섹션에서만 표시.
+           모바일=로고 줄 오른쪽 / 데스크탑=우측 상단(공유 아이콘 왼쪽) -->
+      <button class="gacha-btn stamp-write-btn" id="stampWriteBtn" type="button">✏️ 기록하기</button>
       <button class="topbar-icon-btn" id="topShareBtn" type="button" aria-label="친구에게 공유">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
@@ -232,11 +261,10 @@
       <div class="stores" id="stores"></div>
     </div>
 
-    <!-- 발도장 섹션 — 가본 지점에 발도장을 찍어 스티커를 모으는 기록장 -->
+    <!-- 발도장 섹션 — 다녀온 매장을 기록하는 방문 일기(수집 아님: 진행바·총계 없음) -->
     <div class="view" id="view-stamp" hidden>
       <div class="stamps-head">
-        <p class="count-line stamps-count">모은 스티커 <span class="count-num" id="stampCountNum">0</span>곳 <span class="stamps-total">/ <span id="stampTotalNum">13</span>곳</span></p>
-        <div class="stamps-progress" aria-hidden="true"><i id="stampProgressFill"></i></div>
+        <p class="count-line stamps-count">다녀온 매장 <span class="count-num" id="stampCountNum">0</span>곳</p>
       </div>
       <div class="stamps" id="stampGrid"></div>
     </div>
@@ -288,18 +316,33 @@
     <button class="stamp-sheet-close" id="stampSheetClose" type="button" aria-label="닫기">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
+    <p class="stamp-req-note"><span class="stamp-req-star">*</span> 필수 입력</p>
+    <p class="stamp-q">언제 다녀오셨어요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
+    <div class="stamp-fields">
+      <!-- 날짜: 브라우저 기본 입력은 폰트·형식을 못 바꿔서, 투명하게 깔고 앱 폰트 글자를 얹음(누르면 기기 달력 그대로) -->
+      <label class="stamp-field stamp-field--date"><span class="stamp-field-label">날짜</span><span class="stamp-date-text" id="stampDateText"></span><svg class="stamp-date-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input type="date" id="stampDate" aria-label="방문 날짜"></label>
+    </div>
+    <p class="stamp-q" id="stampQ">어느 매장에 다녀오셨어요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
+    <div class="stamp-dd" id="stampDd">
+      <button class="stamp-dd-btn" id="stampDdBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span class="stamp-field-label">매장</span>
+        <span class="stamp-dd-current" id="stampDdCurrent">선택</span>
+        <svg class="stamp-dd-chev" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="stamp-dd-menu" id="stampDdMenu" role="listbox"></div>
+    </div>
+    <p class="stamp-q">누구랑 다녀오셨어요?</p>
+    <div class="stamp-fields">
+      <label class="stamp-field"><span class="stamp-field-label">동행</span><input type="text" id="stampWith" maxlength="20" placeholder="혼자, 친구, 이름 등 (선택)" autocomplete="off"></label>
+    </div>
+    <div class="stamp-fields">
+      <label class="stamp-field"><span class="stamp-field-label">메모</span><input type="text" id="stampMemo" maxlength="40" placeholder="한 줄 메모 (선택)" autocomplete="off"></label>
+    </div>
     <div class="stamp-slot" id="stampSlot">
       <div class="stamp-slot-empty" id="stampSlotEmpty">
         <span class="stamp-slot-paw">🐾</span>
-        <span class="stamp-slot-hint" id="stampSlotHint">여기에 스티커가 붙어요</span>
+        <span class="stamp-slot-hint" id="stampSlotHint">스티커 붙이는 곳</span>
       </div>
-    </div>
-    <p class="stamp-q" id="stampQ">어느 지점에 다녀오셨어요?</p>
-    <div class="stamp-branches" id="stampBranches"></div>
-    <p class="stamp-branch-fixed" id="stampBranchFixed" hidden></p>
-    <div class="stamp-fields">
-      <label class="stamp-field"><span class="stamp-field-label">날짜</span><input type="date" id="stampDate"></label>
-      <label class="stamp-field"><span class="stamp-field-label">메모</span><input type="text" id="stampMemo" maxlength="40" placeholder="한 줄 메모 (선택)" autocomplete="off"></label>
     </div>
     <button class="stamp-submit" id="stampSubmit" type="button" disabled>발도장 찍기 🐾</button>
     <button class="stamp-delete" id="stampDelete" type="button" hidden>이 발도장 삭제</button>
@@ -501,7 +544,7 @@
   </div>
 </div>
 
-<script src="script.js?v=222"></script>
+<script src="script.js?v=231"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

@@ -2179,12 +2179,15 @@ body {
 }
 .stores {
   display: grid;
-  /* 최소폭 340px = 모바일 카드(335px)보다 넓게 → 데스크탑 좁은 창에서도 주소 줄바꿈 방지.
-     칼럼 간격 24px = 레시피 그리드와 통일. */
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  /* 최소폭 420px → 데스크탑(콘텐츠 ~1080px)에서 최대 2칸(길게) — 발도장 기록 카드와 결 통일.
+     칼럼 간격 24px = 레시피 그리드와 통일. 좁은 화면은 자동 1칸. */
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   column-gap: 24px;
   row-gap: 14px;
   align-items: start; /* 카드 높이가 달라도 위로 정렬 */
+}
+@media (max-width: 640px) {
+  .stores { grid-template-columns: 1fr; } /* 420 minmax는 375px에서 overflow라 명시적으로 1칸 */
 }
 .store-region {
   grid-column: 1 / -1; /* 지역 헤더는 한 줄 전체 차지 */
@@ -2394,8 +2397,18 @@ body {
 /* 매장 지역 탭(레시피 탭과 동일 형태): 매장에서만 */
 .tabs-group--store { display: none; }
 .page[data-section="store"] .tabs-group--store { display: flex; }
-/* 섹션 제목: 탭이 없는 섹션(메뉴·스탬프)에서만 */
-.page:not([data-section="recipe"]):not([data-section="store"]) .topbar-section-title {
+/* 발도장 지역 탭(매장 지역 탭과 동일 형태): 발도장에서만 */
+.tabs-group--stamp { display: none; }
+.page[data-section="stamp"] .tabs-group--stamp { display: flex; }
+/* 발도장 기록하기 버튼(오늘의 소스 스타일): 발도장에서만 */
+.stamp-write-btn { display: none; }
+.page[data-section="stamp"] .stamp-write-btn { display: inline-flex; }
+@media (max-width: 900px) {
+  /* 모바일·태블릿: 로고 줄 오른쪽 끝으로(탭 줄은 wrap으로 아랫줄) — 데스크탑은 spacer가 밀어줌 */
+  .stamp-write-btn { margin-left: auto; }
+}
+/* 섹션 제목: 탭이 없는 섹션(메뉴)에서만 — 발도장은 지역 탭이 생겨 제목 대신 탭 표시 */
+.page:not([data-section="recipe"]):not([data-section="store"]):not([data-section="stamp"]) .topbar-section-title {
   display: inline-block;
 }
 
@@ -2518,47 +2531,99 @@ body {
 }
 
 /* ============================================================
-   발도장 (방문 스티커 기록장)
-   - 상단: 모은 개수 + 진행바
-   - 그리드: 모은 스티커 카드 + 마지막에 ➕ 추가 타일
+   발도장 (방문 기록 일기 — 수집 아님: 진행바·총계 없음)
+   - 상단바: 지역 탭(매장과 동일) + ✏️ 기록하기(오늘의 소스 스타일)
+   - 본문: "다녀온 매장 N곳" + 가로 기록 카드(스티커 왼쪽, 날짜→매장명→메모)
+   - 정렬: 날짜 최근순, 같은 날짜면 나중에 기록한 것이 위(addedAt)
    - 입력 시트: 점선 슬롯 → 지점 고르고 "발도장 찍기" → 스티커 탁! (stampPop)
-   스티커 카드 비율 = 0.58 고정(타로카드 톤, 세로 랜드마크 최적). 에셋 처리(.claude/make_stickers.py)가
-   모든 스티커를 600×1034 라운드 다이컷으로 재조립 → 카드마다 크기·틀 동일. 앱은 drop-shadow만.
+   스티커 카드 비율 = 0.58 고정. 에셋 처리(.claude/make_stickers.py)가 모든 스티커를
+   600×1034 라운드 다이컷으로 재조립 → 카드마다 크기·틀 동일. 앱은 drop-shadow만.
    ============================================================ */
 .stamps-head {
   margin-bottom: 14px;
 }
 .stamps-count {
-  margin: 0 0 10px;
+  margin: 0;
   padding-top: 9px; /* 매장 개수와 같은 세로 위치 보정(툴바 36px 가운데 정렬 값) */
 }
-.stamps-total {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-.stamps-progress {
-  height: 8px;
-  border-radius: 99px;
-  background: #E8DCD0;
-  overflow: hidden;
-}
-.stamps-progress i {
-  display: block;
-  height: 100%;
-  width: 0;
-  border-radius: 99px;
-  background: var(--brand-red);
-  transition: width 0.5s cubic-bezier(.4, 0, .2, 1);
-}
 
-/* 스티커 그리드 — 모바일 2칸, 넓어지면 알아서 늘어남 */
+/* 기록 카드 그리드 — 가로 카드라 minmax를 넓게: 모바일 1칸, 데스크탑 2칸(3칸 안 나옴) */
 .stamps {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 14px 13px;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  column-gap: 24px;
+  row-gap: 14px;
+  align-items: start;
 }
-.stamp-cell { min-width: 0; }
+@media (max-width: 640px) {
+  /* 모바일 = 한 줄에 2개(사용자 확정) — 컴팩트 가로 카드라 2칸이어도 날짜·매장명이 들어감 */
+  .stamps {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 10px;
+    row-gap: 10px;
+  }
+  .stamp-rec {
+    gap: 10px;
+    padding: 9px 11px;
+    border-radius: 14px;
+  }
+  .stamp-rec .stamp-tile { width: 40px; }
+  .stamp-rec-date { font-size: 11px; }
+  .stamp-rec-name { font-size: 16px; }
+}
+
+/* 컴팩트 가로 기록 카드 — 리스트는 색인(날짜·매장명만, 한 화면 6개 목표),
+   메모·동행 등 상세는 카드 탭 → 수정 시트에서. 크림 박스는 매장 카드와 통일 */
+.stamp-rec {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-cream);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 9px 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, border-color .15s;
+}
+@media (hover: hover) {
+  .stamp-rec:hover { border-color: var(--brand-red); }
+}
+.stamp-rec:active { transform: scale(.985); }
+.stamp-rec .stamp-tile { width: 44px; flex: none; }
+.stamp-rec-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stamp-rec-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.stamp-rec-name {
+  /* 매장 탭 카드 이름(.store-name)과 동일한 글씨체·굵기 */
+  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--text-darkest);
+}
+
+/* 빈 상태 — 전체(첫 기록 유도) / 지역(그 지역만 없음) 공용 */
+.stamp-empty {
+  grid-column: 1 / -1;
+  padding: 56px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.stamp-empty .stamp-empty-paw {
+  display: block;
+  font-size: 36px;
+  margin-bottom: 10px;
+  opacity: .45;
+}
 /* 스티커 = 투명 배경 라운드 다이컷 PNG. 앱은 그림자만 얹음(다이컷·테두리는 에셋에 구움).
    그래서 사용자가 픽셀메이터로 만든 사각 카드도, 처리 스크립트가 흰 외곽선+라운드+투명을
    입혀 '스티커'로 만들어줌 → 앱은 drop-shadow로 떠 있는 느낌만. */
@@ -2606,64 +2671,16 @@ body {
   color: var(--brand-red);
   letter-spacing: 0.5px;
 }
-.stamp-cap {
-  margin-top: 5px;
-  font-size: 11px;
-  color: var(--text-muted);
-  text-align: center;
-  line-height: 1.45;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* ➕ 추가 타일 */
-.stamp-add {
-  width: 100%;
-  aspect-ratio: 0.58;
-  border: 2.5px dashed #D6C6BA;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.35);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
-  color: #B7A699;
-  transition: background 0.15s, border-color 0.15s, transform 0.08s;
-  -webkit-tap-highlight-color: transparent;
-}
-.stamp-add:hover { background: rgba(255, 255, 255, 0.6); border-color: #C9B5A6; }
-.stamp-add:active { transform: scale(0.97); }
-.stamp-add-plus {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--brand-red);
-  color: #fff;
-  font-size: 26px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  box-shadow: 0 3px 10px rgba(224, 48, 30, 0.3);
-}
-.stamp-add-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #B7A699;
-}
+/* (구 ➕ 추가 타일·타일 밑 캡션 제거 — 기록하기는 상단바 버튼, 날짜·메모는 카드 안으로) */
 
-/* ── 입력 시트 ── */
+/* ── 입력 시트 — 데스크탑=가운데 모달 / 모바일=레시피 상세처럼 상단바 아래 전체화면 ── */
 .stamp-sheet-overlay {
   position: fixed;
   inset: 0;
   background: rgba(43, 18, 13, 0.45);
   z-index: 205; /* 레시피 모달(200)과 같은 층, 토스트(210) 아래 */
   display: flex;
-  align-items: flex-end; /* 모바일: 바닥에서 올라오는 시트 */
+  align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
@@ -2676,19 +2693,33 @@ body {
 .stamp-sheet {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   max-height: 88vh;
   overflow-y: auto;
+  overscroll-behavior-y: contain; /* 맨 위에서 당겨도 브라우저 새로고침으로 안 번지게(레시피 모달과 동일) */
   background: var(--bg-cream);
-  border-radius: 22px 22px 0 0;
-  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  border-radius: 22px;
+  padding: 24px 20px;
   transform: translateY(24px);
   transition: transform 0.26s cubic-bezier(.3, .9, .3, 1);
 }
 .stamp-sheet-overlay.open .stamp-sheet { transform: translateY(0); }
-@media (min-width: 641px) {
-  .stamp-sheet-overlay { align-items: center; } /* 데스크탑: 가운데 모달 */
-  .stamp-sheet { border-radius: 22px; max-width: 440px; padding-bottom: 24px; }
+/* 모바일: 레시피 상세와 같은 문법 — 상단바 아래 전체화면(상단바는 그대로 동작),
+   불투명 배경 + 둘레 8px 틈으로 카드가 화면에 얹힌 느낌 유지 */
+@media (max-width: 640px) {
+  .stamp-sheet-overlay {
+    top: var(--topbar-h, 0px); /* JS(syncTopbarH)가 상단바 실제 높이를 넣어줌 */
+    padding: 8px;
+    background: var(--bg-card);
+    align-items: stretch;
+  }
+  .stamp-sheet {
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
 }
 .stamp-sheet-close {
   position: absolute;
@@ -2764,33 +2795,99 @@ body {
   color: var(--text-dark);
   margin-bottom: 10px;
 }
-/* 지점 선택 칩 */
-.stamp-branches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
+/* 필수 항목 별표 — 날짜·매장(필수)에만. 선택 항목(누구랑·메모)은 "(선택)" 문구로 구분 */
+.stamp-q-star {
+  color: var(--brand-red);
+  margin-left: 3px;
+}
+/* 시트 맨 위 범례 — 별표 뜻을 알려줌 */
+.stamp-req-note {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+.stamp-req-star {
+  color: var(--brand-red);
+  margin-right: 1px;
+}
+/* 매장 선택 드롭다운 — 정렬 드롭다운(.sort-dd)과 같은 문법, 시트 폭에 맞춘 풀와이드.
+   버튼 룩은 날짜·메모 필드(.stamp-field)와 통일(흰 배경 + 1.5px 테두리 + radius 12). */
+.stamp-dd {
+  position: relative;
   margin-bottom: 16px;
 }
-.stamp-chip {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark);
-  background: #fff;
+.stamp-dd-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 날짜·메모 필드(.stamp-field)와 같은 라벨-값 간격 */
+  width: 100%;
+  height: 44px;
   border: 1.5px solid var(--card-border);
-  border-radius: 999px;
-  padding: 7px 13px;
+  background: #fff;
+  color: var(--text-dark);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 13px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.08s;
+  transition: border-color .15s, color .15s;
   -webkit-tap-highlight-color: transparent;
 }
-.stamp-chip:active { transform: scale(0.95); }
-.stamp-chip.on {
-  background: var(--brand-red);
-  border-color: var(--brand-red);
-  color: #fff;
+.stamp-dd-current {
+  flex: 1;          /* 값이 남는 폭을 차지 → 화살표는 오른쪽 끝 고정 */
+  min-width: 0;
+  text-align: left;
 }
-.stamp-chip.done {
+.stamp-dd-current.placeholder { color: var(--text-muted); } /* 아직 선택 전 */
+.stamp-dd-chev { color: #B9ABA3; flex: none; transition: transform .15s ease; }
+.stamp-dd.open .stamp-dd-btn { border-color: var(--brand-red); }
+.stamp-dd.open .stamp-dd-chev { color: var(--brand-red); transform: rotate(180deg); }
+.stamp-dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--bg-cream);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+  z-index: 30;
+  display: none;
+  max-height: 264px; /* 13곳이라 길어짐 → 메뉴 안에서 스크롤 */
+  overflow-y: auto;
+}
+.stamp-dd.open .stamp-dd-menu { display: block; }
+.stamp-dd-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 10px 13px;
+  margin: 2px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .stamp-dd-item:not(.active):not(.done):hover {
+    background: rgba(255, 255, 255, .6);
+    color: #6E5F58;
+  }
+}
+.stamp-dd-item.active {
+  background: #fff;
+  color: var(--brand-red);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+.stamp-dd-item.done {
   opacity: 0.42;
   cursor: default;
   pointer-events: none;
@@ -2809,12 +2906,14 @@ body {
   background: #fff;
   border: 1.5px solid var(--card-border);
   border-radius: 12px;
-  padding: 9px 13px;
+  min-height: 44px; /* 드롭다운 버튼(.stamp-dd-btn 44px)과 같은 높이로 통일 */
+  padding: 0 13px;
+  box-sizing: border-box;
 }
 .stamp-field-label {
   flex: 0 0 auto;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 14px;   /* 드롭다운 플레이스홀더("매장 선택" 등)와 크기·굵기 통일 */
+  font-weight: 600;
   color: var(--text-muted);
 }
 .stamp-field input {
@@ -2825,12 +2924,41 @@ body {
   background: none;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
+  font-weight: 600; /* 날짜 텍스트·드롭다운(600)과 통일 — 메모만 400으로 가늘어 보이던 것 */
   color: var(--text-dark);
   padding: 0;
 }
-.stamp-field input[type='date'] {
+.stamp-field input::placeholder {
+  color: var(--text-muted); /* 브라우저 기본 차가운 회색 → 다른 칸 플레이스홀더와 같은 회갈색 */
+  opacity: 1; /* 파이어폭스가 기본으로 흐리게 깔아서 명시 */
+}
+/* 날짜 필드 — 브라우저 기본 날짜 입력은 폰트·형식이 시스템 고정이라,
+   입력을 투명 오버레이로 깔고(달력 기능만 씀) 보이는 글자는 앱 폰트(.stamp-date-text)로 그림 */
+.stamp-field--date {
+  position: relative;
+  cursor: pointer;
+}
+.stamp-field--date input[type='date'] {
   -webkit-appearance: none;
   appearance: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0; /* 기능(탭→기기 달력)만 남기고 시스템 글자·아이콘은 숨김 */
+  cursor: pointer;
+}
+.stamp-date-text {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+.stamp-date-ic {
+  flex: none;
+  color: #B9ABA3;
 }
 /* 발도장 찍기 버튼 */
 .stamp-submit {
@@ -2854,14 +2982,7 @@ body {
   cursor: default;
   transform: none;
 }
-/* 수정 모드: 지점 고정 라벨 + 삭제 버튼 */
-.stamp-branch-fixed {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--brand-red);
-  text-align: center;
-  margin: 2px 0 16px;
-}
+/* 수정 모드: 삭제 버튼 (v2: 매장 고정 라벨 제거 — 수정에서도 드롭다운으로 매장 변경 가능) */
 .stamp-delete {
   width: 100%;
   margin-top: 10px;
