@@ -1450,6 +1450,8 @@
     '대학로점': 'assets/stickers/대학로점.webp',
     '코엑스점': 'assets/stickers/코엑스점.webp',
     '가산점': 'assets/stickers/가산점.webp',
+    '부천점': 'assets/stickers/부천점.webp',
+    '부산역점': 'assets/stickers/부산역점.webp',
   };
   let stampData = { version: 1, stamps: {} };
   try {
