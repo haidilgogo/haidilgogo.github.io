@@ -1449,6 +1449,7 @@
     '영등포점': 'assets/stickers/영등포점.webp',
     '대학로점': 'assets/stickers/대학로점.webp',
     '코엑스점': 'assets/stickers/코엑스점.webp',
+    '가산점': 'assets/stickers/가산점.webp',
   };
   let stampData = { version: 1, stamps: {} };
   try {
