@@ -1452,6 +1452,7 @@
     '가산점': 'assets/stickers/가산점.webp',
     '부천점': 'assets/stickers/부천점.webp',
     '부산역점': 'assets/stickers/부산역점.webp',
+    '대구점': 'assets/stickers/대구점.webp',
   };
   let stampData = { version: 1, stamps: {} };
   try {
