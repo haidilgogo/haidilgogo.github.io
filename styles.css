@@ -1060,9 +1060,9 @@ body {
 
 /* FOOTER */
 .footer {
-  margin-top: 24px; /* 마지막 카드와 붙어(겹쳐) 보이던 것 방지 — 카드↔푸터 구분선 위 여백 */
+  margin-top: 16px; /* 마지막 카드와 붙어(겹쳐) 보이던 것 방지 — 카드↔푸터 구분선 위 여백 */
   padding: 16px clamp(20px, 5vw, 40px);
-  padding-bottom: 24px;
+  padding-bottom: 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1107,7 +1107,7 @@ body {
 @media (max-width: 640px) {
   .footer {
     padding: 12px clamp(20px, 5vw, 40px);
-    padding-bottom: 34px;
+    padding-bottom: 16px;
   }
 
   .footer-title {
@@ -2514,5 +2514,371 @@ body {
    하단 플로팅 탭바 footprint ≈ 바닥에서 95px(탭바 높이 69 + bottom 26) → 여기에 여유 ~25px + 안전영역.
    ⚠️ 모바일에선 script.js가 인라인으로 이 값을 덮을 수 있으니(설치 버튼 있을 때만) 함께 관리할 것. */
 .main {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ============================================================
+   발도장 (방문 스티커 기록장)
+   - 상단: 모은 개수 + 진행바
+   - 그리드: 모은 스티커 카드 + 마지막에 ➕ 추가 타일
+   - 입력 시트: 점선 슬롯 → 지점 고르고 "발도장 찍기" → 스티커 탁! (stampPop)
+   스티커 카드 비율 = 0.58 고정(타로카드 톤, 세로 랜드마크 최적). 에셋 처리(.claude/make_stickers.py)가
+   모든 스티커를 600×1034 라운드 다이컷으로 재조립 → 카드마다 크기·틀 동일. 앱은 drop-shadow만.
+   ============================================================ */
+.stamps-head {
+  margin-bottom: 14px;
+}
+.stamps-count {
+  margin: 0 0 10px;
+  padding-top: 9px; /* 매장 개수와 같은 세로 위치 보정(툴바 36px 가운데 정렬 값) */
+}
+.stamps-total {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.stamps-progress {
+  height: 8px;
+  border-radius: 99px;
+  background: #E8DCD0;
+  overflow: hidden;
+}
+.stamps-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background: var(--brand-red);
+  transition: width 0.5s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* 스티커 그리드 — 모바일 2칸, 넓어지면 알아서 늘어남 */
+.stamps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px 13px;
+}
+.stamp-cell { min-width: 0; }
+/* 스티커 = 투명 배경 라운드 다이컷 PNG. 앱은 그림자만 얹음(다이컷·테두리는 에셋에 구움).
+   그래서 사용자가 픽셀메이터로 만든 사각 카드도, 처리 스크립트가 흰 외곽선+라운드+투명을
+   입혀 '스티커'로 만들어줌 → 앱은 drop-shadow로 떠 있는 느낌만. */
+.stamp-tile {
+  position: relative;
+  aspect-ratio: 0.58;
+}
+.stamp-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 3px 5px rgba(80, 30, 20, 0.24));
+}
+/* 아직 그림 없는 지점의 자리표시 카드 — 스티커 톤에 맞춘 라운드 카드 */
+.stamp-ph {
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  border: 3px solid #fff;
+  outline: 1.5px solid #E6D8C9;
+  background: linear-gradient(180deg, #FBF4EC 0%, #F1E3D4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 5px rgba(80, 30, 20, 0.16);
+}
+.stamp-ph span {
+  font-size: 44px;
+  opacity: 0.4;
+}
+/* 지점명 밴드 — 스티커 그림의 하단 빈 띠 위에 앱이 얹는 글자.
+   위치는 에셋의 밴드(안쪽 그림 하단 13.5%)에 맞춤. */
+.stamp-band {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 3%;
+  height: 12.2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--brand-red);
+  letter-spacing: 0.5px;
+}
+.stamp-cap {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* ➕ 추가 타일 */
+.stamp-add {
+  width: 100%;
+  aspect-ratio: 0.58;
+  border: 2.5px dashed #D6C6BA;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #B7A699;
+  transition: background 0.15s, border-color 0.15s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.stamp-add:hover { background: rgba(255, 255, 255, 0.6); border-color: #C9B5A6; }
+.stamp-add:active { transform: scale(0.97); }
+.stamp-add-plus {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-red);
+  color: #fff;
+  font-size: 26px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 3px 10px rgba(224, 48, 30, 0.3);
+}
+.stamp-add-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #B7A699;
+}
+
+/* ── 입력 시트 ── */
+.stamp-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 18, 13, 0.45);
+  z-index: 205; /* 레시피 모달(200)과 같은 층, 토스트(210) 아래 */
+  display: flex;
+  align-items: flex-end; /* 모바일: 바닥에서 올라오는 시트 */
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+.stamp-sheet-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.stamp-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--bg-cream);
+  border-radius: 22px 22px 0 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(24px);
+  transition: transform 0.26s cubic-bezier(.3, .9, .3, 1);
+}
+.stamp-sheet-overlay.open .stamp-sheet { transform: translateY(0); }
+@media (min-width: 641px) {
+  .stamp-sheet-overlay { align-items: center; } /* 데스크탑: 가운데 모달 */
+  .stamp-sheet { border-radius: 22px; max-width: 440px; padding-bottom: 24px; }
+}
+.stamp-sheet-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(43, 18, 13, 0.06);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.stamp-sheet-close:active { transform: scale(0.9); }
+
+/* 점선 슬롯 — 스티커가 붙을 자리 */
+.stamp-slot {
+  width: 158px;
+  aspect-ratio: 0.58;
+  margin: 4px auto 16px;
+  position: relative;
+}
+.stamp-slot-empty {
+  position: absolute;
+  inset: 0;
+  border: 2.5px dashed #D6C6BA;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 10px;
+  text-align: center;
+}
+.stamp-slot-paw { font-size: 34px; opacity: 0.4; }
+.stamp-slot-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: #B7A699;
+  line-height: 1.4;
+}
+/* 슬롯에 붙는 스티커 카드 (제출 시 JS가 생성) */
+.stamp-slot-card {
+  position: absolute;
+  inset: 0;
+}
+.stamp-slot-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 6px 11px rgba(80, 30, 20, 0.3));
+}
+.stamp-slot-card.pop {
+  animation: stampPop 0.55s cubic-bezier(.2, .8, .3, 1) both;
+}
+@keyframes stampPop {
+  0%   { transform: scale(2.1) rotate(-18deg); opacity: 0; }
+  55%  { transform: scale(0.93) rotate(-2deg); opacity: 1; }
+  78%  { transform: scale(1.045) rotate(-5deg); }
+  100% { transform: scale(1) rotate(-3.5deg); }
+}
+
+.stamp-q {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+/* 지점 선택 칩 */
+.stamp-branches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+.stamp-chip {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: #fff;
+  border: 1.5px solid var(--card-border);
+  border-radius: 999px;
+  padding: 7px 13px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.stamp-chip:active { transform: scale(0.95); }
+.stamp-chip.on {
+  background: var(--brand-red);
+  border-color: var(--brand-red);
+  color: #fff;
+}
+.stamp-chip.done {
+  opacity: 0.42;
+  cursor: default;
+  pointer-events: none;
+}
+/* 날짜·메모 */
+.stamp-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 18px;
+}
+.stamp-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid var(--card-border);
+  border-radius: 12px;
+  padding: 9px 13px;
+}
+.stamp-field-label {
+  flex: 0 0 auto;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.stamp-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: var(--text-dark);
+  padding: 0;
+}
+.stamp-field input[type='date'] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* 발도장 찍기 버튼 */
+.stamp-submit {
+  width: 100%;
+  border: none;
+  border-radius: 13px;
+  background: var(--brand-red);
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.08s, opacity 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.stamp-submit:hover { background: var(--brand-red-hover); }
+.stamp-submit:active { background: var(--brand-red-active); transform: scale(0.98); }
+.stamp-submit:disabled {
+  background: #D8CCC2;
+  cursor: default;
+  transform: none;
+}
+/* 수정 모드: 지점 고정 라벨 + 삭제 버튼 */
+.stamp-branch-fixed {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--brand-red);
+  text-align: center;
+  margin: 2px 0 16px;
+}
+.stamp-delete {
+  width: 100%;
+  margin-top: 10px;
+  border: none;
+  border-radius: 11px;
+  background: none;
+  color: var(--text-muted);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 11px 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.14s, background 0.14s, transform 0.08s;
+}
+.stamp-delete:active { transform: scale(0.98); }
+.stamp-delete.armed {
+  color: #fff;
+  background: var(--brand-red);
 }

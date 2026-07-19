@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=217">
+<link rel="stylesheet" href="styles.css?v=223">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -232,13 +232,13 @@
       <div class="stores" id="stores"></div>
     </div>
 
-    <!-- 스탬프 섹션 (준비 중) -->
+    <!-- 발도장 섹션 — 가본 지점에 발도장을 찍어 스티커를 모으는 기록장 -->
     <div class="view" id="view-stamp" hidden>
-      <div class="view-empty">
-        <span class="view-empty-emoji">📮</span>
-        <p class="view-empty-title">스탬프</p>
-        <p class="view-empty-desc">방문할 때마다 도장을 찍는 기록장이<br>곧 준비될 예정이에요.</p>
+      <div class="stamps-head">
+        <p class="count-line stamps-count">모은 스티커 <span class="count-num" id="stampCountNum">0</span>곳 <span class="stamps-total">/ <span id="stampTotalNum">13</span>곳</span></p>
+        <div class="stamps-progress" aria-hidden="true"><i id="stampProgressFill"></i></div>
       </div>
+      <div class="stamps" id="stampGrid"></div>
     </div>
 
   </main>
@@ -272,12 +272,39 @@
   </button>
   <button class="tabbar-btn" type="button" data-section="stamp">
     <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M9 8a3 3 0 1 1 6 0c0 1.5-1 2-1.5 3-.4.8-.5 1.5-.5 2h-2c0-.5-.1-1.2-.5-2C10 10 9 9.5 9 8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-      <rect x="5" y="17" width="14" height="3.2" rx="1.2" stroke="currentColor" stroke-width="1.8"/>
+      <ellipse cx="7.2" cy="9.4" rx="1.7" ry="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <ellipse cx="16.8" cy="9.4" rx="1.7" ry="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <ellipse cx="10" cy="5.8" rx="1.7" ry="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <ellipse cx="14" cy="5.8" rx="1.7" ry="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M12 12.2c2.6 0 4.6 1.9 4.6 4a3 3 0 0 1-3 3c-.6 0-1.1-.15-1.6-.4-.5.25-1 .4-1.6.4a3 3 0 0 1-3-3c0-2.1 2-4 4.6-4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
     </svg>
-    <span class="tabbar-label">스탬프</span>
+    <span class="tabbar-label">발도장</span>
   </button>
 </nav>
+
+<!-- 발도장 입력 시트 — ➕에서 열림. 점선 슬롯에 지점 고르고 찍으면 스티커가 탁! 붙음 -->
+<div class="stamp-sheet-overlay" id="stampSheetOverlay">
+  <div class="stamp-sheet" role="dialog" aria-modal="true" aria-label="발도장 찍기">
+    <button class="stamp-sheet-close" id="stampSheetClose" type="button" aria-label="닫기">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="stamp-slot" id="stampSlot">
+      <div class="stamp-slot-empty" id="stampSlotEmpty">
+        <span class="stamp-slot-paw">🐾</span>
+        <span class="stamp-slot-hint" id="stampSlotHint">여기에 스티커가 붙어요</span>
+      </div>
+    </div>
+    <p class="stamp-q" id="stampQ">어느 지점에 다녀오셨어요?</p>
+    <div class="stamp-branches" id="stampBranches"></div>
+    <p class="stamp-branch-fixed" id="stampBranchFixed" hidden></p>
+    <div class="stamp-fields">
+      <label class="stamp-field"><span class="stamp-field-label">날짜</span><input type="date" id="stampDate"></label>
+      <label class="stamp-field"><span class="stamp-field-label">메모</span><input type="text" id="stampMemo" maxlength="40" placeholder="한 줄 메모 (선택)" autocomplete="off"></label>
+    </div>
+    <button class="stamp-submit" id="stampSubmit" type="button" disabled>발도장 찍기 🐾</button>
+    <button class="stamp-delete" id="stampDelete" type="button" hidden>이 발도장 삭제</button>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
@@ -474,7 +501,7 @@
   </div>
 </div>
 
-<script src="script.js?v=208"></script>
+<script src="script.js?v=214"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
