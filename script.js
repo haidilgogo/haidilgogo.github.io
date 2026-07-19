@@ -1473,17 +1473,6 @@
     if (e.target.closest('.recipe-thumb-img')) e.preventDefault();
   });
 
-  // 설치 CTA(모바일 전용 #floatingActions)는 하단 플로팅 탭바 "위"에 뜬다(위치는 CSS로 고정).
-  // 이 버튼이 보이면 body에 클래스를 붙여, 그 버튼 뒤로 콘텐츠가 안 가리게 .main 하단여백을 더 준다(CSS 처리).
-  // (예전엔 이 함수가 .main 패딩을 인라인으로 조작 → 플로터가 비면 40px로 줄어 탭바 회피 여백을 무력화했었음. 폐기.)
-  const floatingActions = document.getElementById('floatingActions');
-  function updateInstallCtaSpacing() {
-    const visible = window.innerWidth <= 640 && floatingActions.getBoundingClientRect().height > 0;
-    document.body.classList.toggle('install-cta-visible', visible);
-  }
-  window.addEventListener('resize', updateInstallCtaSpacing);
-  updateInstallCtaSpacing();
-
   // 기기/브라우저 판별
   const ua = navigator.userAgent;
   const isIos = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -1496,19 +1485,28 @@
     return isIos && isSafari && !isStandalone && !isInAppBrowser;
   }
 
-  // ADD TO HOME SCREEN (iOS Safari — no install API exists, so we guide manually)
-  const a2hsBtn = document.getElementById('a2hsBtn');
+  // 앱 설치 진입점 = 헤더 아이콘만 (데스크탑 = 우측 topInstallBtn, 모바일 = 탭줄 공유 옆 .tabs-install-btn).
+  // 예전 우하단 플로팅 CTA는 하단 탭바와 계속 겹쳐(콘텐츠 가림) 제거 — 설치는 의지가 있는 재방문자가
+  // 아이콘으로도 충분히 찾는다는 판단(사용자 합의). 설치 가능할 때만 아래 로직이 아이콘을 표시.
   const a2hsOverlay = document.getElementById('a2hsOverlay');
   const a2hsClose = document.getElementById('a2hsClose');
   const topInstallBtn = document.getElementById('topInstallBtn');
-
-  if (a2hsBtn && isIosSafariNotInstalled()) {
-    a2hsBtn.style.display = 'flex';
+  const tabsInstallBtns = [...document.querySelectorAll('.tabs-install-btn')];
+  const installBtns = [topInstallBtn].concat(tabsInstallBtns);
+  function showInstallBtns() {
     topInstallBtn.style.display = 'flex';
-    updateInstallCtaSpacing(); // 버튼이 떴으니 .main 하단여백 반영
+    // 탭줄 아이콘은 인라인만 걷어내면 CSS가 표시를 결정(모바일 flex / 데스크탑 none — 공유 버튼과 동일 규칙)
+    tabsInstallBtns.forEach((b) => { b.style.display = ''; });
+  }
+  function hideInstallBtns() {
+    installBtns.forEach((b) => { b.style.display = 'none'; });
+  }
+
+  // ADD TO HOME SCREEN (iOS Safari — no install API exists, so we guide manually)
+  if (isIosSafariNotInstalled()) {
+    showInstallBtns();
     const openA2hsOverlay = () => a2hsOverlay.classList.add('open');
-    a2hsBtn.addEventListener('click', openA2hsOverlay);
-    topInstallBtn.addEventListener('click', openA2hsOverlay);
+    installBtns.forEach((b) => b.addEventListener('click', openA2hsOverlay));
     a2hsOverlay.addEventListener('click', (e) => {
       if (e.target === a2hsOverlay) a2hsOverlay.classList.remove('open');
     });
@@ -1516,16 +1514,13 @@
   }
 
   // INSTALL APP (Android Chrome/삼성 인터넷 — 표준 설치 프롬프트 이용)
-  const androidInstallBtn = document.getElementById('androidInstallBtn');
   let deferredInstallPrompt = null;
 
   window.addEventListener('beforeinstallprompt', (e) => {
     if (isInAppBrowser || isStandalone) return;
     e.preventDefault();
     deferredInstallPrompt = e;
-    androidInstallBtn.style.display = 'flex';
-    topInstallBtn.style.display = 'flex';
-    updateInstallCtaSpacing();
+    showInstallBtns();
   });
 
   async function promptAndroidInstall() {
@@ -1533,21 +1528,14 @@
     deferredInstallPrompt.prompt();
     await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
-    androidInstallBtn.style.display = 'none';
-    topInstallBtn.style.display = 'none';
-    updateInstallCtaSpacing();
+    hideInstallBtns();
   }
 
-  androidInstallBtn.addEventListener('click', promptAndroidInstall);
-  topInstallBtn.addEventListener('click', () => {
+  installBtns.forEach((b) => b.addEventListener('click', () => {
     if (deferredInstallPrompt) promptAndroidInstall();
-  });
+  }));
 
-  window.addEventListener('appinstalled', () => {
-    androidInstallBtn.style.display = 'none';
-    topInstallBtn.style.display = 'none';
-    updateInstallCtaSpacing();
-  });
+  window.addEventListener('appinstalled', hideInstallBtns);
 
   // 카카오톡 등 인앱 브라우저 안내
   const inappBanner = document.getElementById('inappBanner');

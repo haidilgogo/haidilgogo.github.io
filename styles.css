@@ -215,7 +215,9 @@ body {
   fill: currentColor;
 }
 
-/* 모바일 헤더 공유 아이콘 — 즐겨찾기 오른쪽. 데스크톱/태블릿은 우측 topShareBtn을 씀 */
+/* 모바일 헤더 공유·설치 아이콘 — 즐겨찾기 오른쪽. 데스크톱/태블릿은 우측 topShareBtn/topInstallBtn을 씀.
+   ⚠️ 박스(배경·테두리) 없이 아이콘만 — 크림 박스인 즐겨찾기 버튼과 시각적으로 구별(사용자 요청).
+   누름 반응은 배경 대신 색(브랜드레드)+살짝 축소로만 준다. */
 .tabs-share-btn {
   display: none;
   flex: none;
@@ -224,12 +226,11 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
-  background: var(--bg-cream);
+  background: none;
   color: var(--text-muted);
   border: none;
-  border-radius: 10px;
   cursor: pointer;
-  transition: background .15s, color .15s, transform .08s ease;
+  transition: color .15s, transform .08s ease;
   -webkit-tap-highlight-color: transparent; /* 모바일 기본 검정 음영은 끄고, 아래 :active로 눌림 반응을 줌 */
 }
 
@@ -241,13 +242,11 @@ body {
 
 @media (hover: hover) {
   .tabs-share-btn:hover {
-    background: rgba(224, 48, 30, .16);
     color: var(--brand-red);
   }
 }
-/* 눌림 반응(터치·클릭 공통) — 검정 음영 대신 브랜드색 틴트 + 살짝 축소로 "눌리는 느낌" */
+/* 눌림 반응(터치·클릭 공통) — 박스 없이 색만 브랜드레드로 + 살짝 축소로 "눌리는 느낌" */
 .tabs-share-btn:active {
-  background: rgba(224, 48, 30, .16);
   color: var(--brand-red);
   transform: scale(.9);
 }
@@ -363,13 +362,23 @@ body {
     row-gap: 6px;
   }
 
-  /* 공유 아이콘이 탭 줄에 추가되어 폭이 늘었으므로, 간격을 줄여 '기타' 탭까지 보이게 함 */
+  /* 공유(+설치) 아이콘이 탭 줄에 추가되어 폭이 늘었으므로, 간격을 줄여 '기타' 탭까지 보이게 함.
+     설치 아이콘까지 보일 때 390px 기준 12px 넘치던 것 → 8px(간격 3곳 ×4px 절약)로 해소.
+     375px(SE·mini)에선 설치 아이콘이 보일 때만 '기타'가 살짝 잘리지만 탭줄이 가로 스크롤이라 OK. */
   .tabs-group {
-    gap: 12px;
+    gap: 8px;
   }
 
   .tabs {
     gap: 16px;
+    flex: 0 1 auto; /* 폭을 다 채우지 않게(데스크탑처럼) — 즐겨찾기는 탭 옆에 붙고, 남는 공간은 아래 margin-auto가 먹음 */
+  }
+
+  /* 즐겨찾기 = 카테고리 탭과 함께 왼쪽(레시피 필터 묶음). 공유·설치 = 오른쪽으로 분리(데스크탑 레이아웃과 통일).
+     공유 버튼(오른쪽 묶음의 첫 버튼)에 margin-left:auto → 공유+설치를 줄 오른쪽 끝으로 밀어냄.
+     (:not(.tabs-install-btn)로 공유만 대상 — 설치까지 auto면 공유·설치 사이에도 틈이 생김) */
+  .tabs-share-btn:not(.tabs-install-btn) {
+    margin-left: auto;
   }
 
   .search-box {
@@ -396,6 +405,8 @@ body {
   cursor: pointer;
 }
 
+/* 데스크탑 공유·설치 아이콘 — 박스(원형 배경) 없이 아이콘만(즐겨찾기 알약과 구별, 사용자 요청).
+   상호작용은 배경 없이 색+살짝 축소로만. */
 .topbar-icon-btn {
   flex: none;
   width: 38px;
@@ -405,19 +416,16 @@ body {
   justify-content: center;
   background: none;
   border: none;
-  border-radius: 50%;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background .15s, color .15s, transform .08s ease;
+  transition: color .15s, transform .08s ease;
   -webkit-tap-highlight-color: transparent; /* 기본 검정 음영은 끄고, 아래 :active로 눌림 반응 */
 }
 
 .topbar-icon-btn:hover {
-  background: var(--bg-cream);
   color: var(--brand-red);
 }
 .topbar-icon-btn:active {
-  background: var(--bg-cream);
   color: var(--brand-red);
   transform: scale(.9);
 }
@@ -1811,48 +1819,7 @@ body {
 }
 
 
-/* FLOATING ACTIONS */
-.floating-actions {
-  position: fixed;
-  right: 18px;
-  /* 하단 플로팅 탭바(바닥에서 ~95px 차지) "위"에 뜨게 → 탭바와 안 겹침. z-index도 탭바(50)보다 위. */
-  bottom: calc(107px + env(safe-area-inset-bottom, 0px));
-  z-index: 150;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-/* Desktop already surfaces share/install as icon buttons in the topbar,
-   so the floating buttons would just duplicate them. Mobile keeps them
-   since the topbar has no room there yet. */
-@media (min-width: 641px) {
-  .floating-actions {
-    display: none;
-  }
-}
-
-/* ADD TO HOME SCREEN / INSTALL */
-.a2hs-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(224, 48, 30, .85);
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 9px 14px;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.a2hs-btn-icon {
-  font-size: 13px;
-  line-height: 1;
-}
+/* (우하단 플로팅 설치 CTA 제거 — 하단 탭바와 겹쳐서 헤더 아이콘(.tabs-install-btn/topInstallBtn)으로 이동) */
 
 /* SHARE */
 .share-btn {
@@ -2548,10 +2515,4 @@ body {
    ⚠️ 모바일에선 script.js가 인라인으로 이 값을 덮을 수 있으니(설치 버튼 있을 때만) 함께 관리할 것. */
 .main {
   padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
-}
-/* 설치 CTA(모바일 전용, 탭바 위에 뜸)가 보일 땐 그 버튼(바닥~145px) 뒤로 콘텐츠가 안 가리게 여백 더 확보 */
-@media (max-width: 640px) {
-  body.install-cta-visible .main {
-    padding-bottom: calc(164px + env(safe-area-inset-bottom, 0px));
-  }
 }
