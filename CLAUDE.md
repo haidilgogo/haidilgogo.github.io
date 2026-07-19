@@ -9,6 +9,17 @@
 - 별도 빌드 과정 없음 — 파일 수정 후 push하면 그대로 반영됨
 - 배포 브랜치: main
 
+## 🔴 발도장 스티커 처리 규칙 (반드시 지킬 것)
+발도장 탭(`#view-stamp`)의 지점 스티커는 **정해진 파이프라인으로만** 만든다. 어기면 카드마다 모양이 달라진다(실제로 그런 적 있음 — 흰 다이컷 테두리·둥근 모서리가 빠져 다른 카드와 어긋남).
+
+- **새 스티커 추가·수정 = 무조건 `.claude/make_stickers.py` 사용.** PIL 등으로 직접 webp 변환 **절대 금지**.
+  1. 사용자가 만든 완성 카드 원본(테두리+풍경+빨간밴드+구운 이름 PNG)을 `../../02. Data/Haidilgogo/sticker/complete/<지점명>.png`에 둔다.
+  2. `.claude/make_stickers.py`의 `STAMP_MAP`에 `('<지점명>.png', '<지점명>.webp')` 한 줄 추가.
+  3. `python3 .claude/make_stickers.py` 실행 → 흰 다이컷 테두리 + 둥근 모서리 + 검은 테두리 재드로우 + 600×1034(0.58)로 자동 통일해 `assets/stickers/`에 저장.
+  4. `script.js`의 `STAMP_IMGS`에 `'<지점명>': 'assets/stickers/<지점명>.webp'` 한 줄 추가, `index.html`의 `script.js?v=` 숫자 올림.
+- 스티커 규격(고정): **0.58 비율(600×1034), 배민 주아체, 빨간 밴드 `#D0402E` + 크림 글자 `#FBF5EA`, 흰 다이컷 테두리(앱은 CSS drop-shadow만).** 이름은 카드에 구워져 있으므로 앱 오버레이 안 함(`buildStampCard`: STAMP_IMGS 있으면 밴드 X).
+- 자세한 배경·진행현황은 유저 메모리 `[[haidilgogo-nav-features-plan]]` 참고.
+
 ## 폴더/파일 구조
 ```
 Haidilgogo/
