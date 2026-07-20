@@ -2629,7 +2629,7 @@ img {
   border: none;
   border-radius: 999px;
   background: none;
-  color: var(--text-muted);
+  color: #4D4139; /* 비활성 = 따뜻한 진회색(흐린 회갈색 --text-muted는 반투명 바에서 안 보임). 순검정은 활성 빨강과 대비 죽어 지양 */
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color .15s, min-width .24s ease, padding .24s ease;
