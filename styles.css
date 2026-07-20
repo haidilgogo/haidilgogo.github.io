@@ -2532,9 +2532,10 @@ img {
 .tabbar {
   position: fixed;
   left: 50%;
-  /* 사파리(safe-area=0)와 PWA(≈34px)의 높이 차이 해소 — 더하지 않고 max()로 "둘 중 큰 값만".
-     사파리=26px / PWA=인디케이터 위 4px 여유(≈38px) → 체감 높이 비슷해짐 */
-  bottom: max(26px, env(safe-area-inset-bottom, 0px) + 4px);
+  /* 사파리↔PWA 높이 차이 해소.
+     사파리는 자체 하단 툴바가 바닥을 차지 → 탭바는 "툴바 위"에 앉으므로 여백을 최소(12px)로.
+     PWA는 전체 화면이라 safe-area(≈34px)+4px 여유. max()라 이중 가산 없음. */
+  bottom: max(12px, env(safe-area-inset-bottom, 0px) + 4px);
   transform: translateX(-50%);
   width: calc(100% - 28px);
   max-width: 412px; /* 앱 폭 440 - 좌우 여백 28 */
@@ -2547,8 +2548,9 @@ img {
   border: 1px solid rgba(255, 255, 255, .75);
   border-radius: 999px;
   box-shadow: 0 8px 28px rgba(43, 18, 13, .16);
-  -webkit-backdrop-filter: blur(18px) saturate(1.6);
-  backdrop-filter: blur(18px) saturate(1.6);
+  /* 채도 1.6→1.15: 뒤에 빨간 버튼이 지나갈 때 바에 빨간 기운이 번지던 것 완화 */
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
   overflow: visible;
   touch-action: none;
 }
@@ -2658,7 +2660,7 @@ img {
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보.
    = 탭바 bottom(max 공식, 위 .tabbar와 동일하게 관리) + 바 높이(~59px) + 여유(~20px). */
 .main {
-  padding-bottom: calc(max(26px, env(safe-area-inset-bottom, 0px) + 4px) + 80px);
+  padding-bottom: calc(max(12px, env(safe-area-inset-bottom, 0px) + 4px) + 80px);
 }
 
 /* ============================================================
