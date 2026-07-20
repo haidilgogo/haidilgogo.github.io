@@ -2532,7 +2532,9 @@ img {
 .tabbar {
   position: fixed;
   left: 50%;
-  bottom: calc(26px + env(safe-area-inset-bottom, 0px)); /* 조금 더 위로(18→26) */
+  /* 사파리(safe-area=0)와 PWA(≈34px)의 높이 차이 해소 — 더하지 않고 max()로 "둘 중 큰 값만".
+     사파리=26px / PWA=인디케이터 위 4px 여유(≈38px) → 체감 높이 비슷해짐 */
+  bottom: max(26px, env(safe-area-inset-bottom, 0px) + 4px);
   transform: translateX(-50%);
   width: calc(100% - 28px);
   max-width: 412px; /* 앱 폭 440 - 좌우 여백 28 */
@@ -2654,9 +2656,9 @@ img {
 }
 
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보.
-   떠 있는 알약 footprint ≈ 바닥에서 83px(바 높이 ~71 + bottom 12) → 여유 ~20px 포함 104px + 안전영역. */
+   = 탭바 bottom(max 공식, 위 .tabbar와 동일하게 관리) + 바 높이(~59px) + 여유(~20px). */
 .main {
-  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(max(26px, env(safe-area-inset-bottom, 0px) + 4px) + 80px);
 }
 
 /* ============================================================
