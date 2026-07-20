@@ -2570,9 +2570,9 @@ img {
   height: 0;
   box-sizing: border-box;
   border-radius: 16px; /* 바(R20) 안에 맞는 필 라운드 */
-  background: #FFFDFA; /* 불투명 웜화이트 — 반투명 바 위에서 또렷하게 */
-  border: 1px solid rgba(43, 18, 13, .05);
-  box-shadow: 0 2px 8px rgba(43, 18, 13, .10);
+  background: #EDE7DF; /* 배민식 정지 상태: 완전 불투명 연회색(웜그레이) 플랫 채움 */
+  border: none;
+  box-shadow: none; /* 정지 땐 그림자·투명감 없이 순수 채움 (유리 질감은 --glass에서만) */
   z-index: 0;
   pointer-events: none;
   will-change: transform;
