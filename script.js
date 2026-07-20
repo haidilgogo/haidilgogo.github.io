@@ -1115,14 +1115,23 @@
   const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '발도장' };
   let activeSection = 'recipe';
 
-  // 빨간 원(하이라이트)을 현재 활성 탭 위치·크기에 맞춤
+  // 유리 버블(배민식) 지름 — 버튼 중심에 원형으로 얹혀 바 위아래로 살짝 삐져나옴.
+  // 크기·위치는 여기서 인라인으로, 질감은 CSS .tabbar-indicator가 담당.
+  const BUBBLE = 76;
+  function bubblePosFor(btn) {
+    return {
+      x: btn.offsetLeft + btn.offsetWidth / 2 - BUBBLE / 2,
+      y: btn.offsetTop + btn.offsetHeight / 2 - BUBBLE / 2,
+    };
+  }
+  // 버블을 현재 활성 탭 중심에 맞춤
   function updateIndicator() {
     const active = tabbarEl.querySelector('.tabbar-btn.active');
     if (!active) return;
-    tabbarIndicator.style.width = active.offsetWidth + 'px';
-    tabbarIndicator.style.height = active.offsetHeight + 'px';
-    tabbarIndicator.style.transform =
-      'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
+    const p = bubblePosFor(active);
+    tabbarIndicator.style.width = BUBBLE + 'px';
+    tabbarIndicator.style.height = BUBBLE + 'px';
+    tabbarIndicator.style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
   }
   // (스크롤 축소/확대용) 트랜지션을 끄고 매 프레임 정확히 붙임 → 크기 변할 때 원이 더디게 안 쫓아옴
   let indicatorAnimId = 0;
@@ -1165,8 +1174,9 @@
     const wasCompact = tabbarEl.classList.contains('tabbar--compact');
     tabbarEl.classList.add('tabbar--freeze');
     tabbarEl.classList.remove('tabbar--compact');
-    const fx = targetBtn.offsetLeft, fy = targetBtn.offsetTop;
-    const fw = targetBtn.offsetWidth, fh = targetBtn.offsetHeight;
+    const fp = bubblePosFor(targetBtn); // 원형 버블: 도착점 = 대상 버튼 중심
+    const fx = fp.x, fy = fp.y;
+    const fw = BUBBLE, fh = BUBBLE;
     if (wasCompact) { tabbarEl.classList.add('tabbar--compact'); void tabbarEl.offsetWidth; }
     tabbarEl.classList.remove('tabbar--freeze');
     // 크기는 즉시 최종값(축소·일반 차이가 몇 px라 안 보임), 위치만 슬라이드.
@@ -1233,13 +1243,11 @@
     se.style.scrollBehavior = '';
     lastScrollY = 0;
     requestAnimationFrame(() => { ignoreScrollOnce = false; });
-    // 탭 전환은 항상 바를 펼침(글자 복귀).
-    // 축소 상태였다면: 바 즉시 펼침 + 원 즉시 배치(애니메이션 없음) — 이 구간은 iOS 합성기 레이스의
-    // 온상이라(실기기 영상 3건) 슬라이드를 포기. 펼침 상태였다면: v178 슬라이드(실기기 검증본) 그대로.
-    const wasCompactAtTap = tabbarEl.classList.contains('tabbar--compact');
+    // 탭 전환은 항상 바를 펼침(상태 플래그 정리).
+    // 과거엔 축소 상태 전환 시 스냅으로 우회했지만(iOS 합성기 레이스), 축소 시각효과(compact CSS)를
+    // 제거해 바 좌표가 더는 변하지 않으므로 항상 v178 슬라이드(실기기 검증본)로 통일.
     setCompact(false, { silent: true, instant: true });
-    if (wasCompactAtTap) snapIndicator();
-    else slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
+    slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
@@ -1248,9 +1256,74 @@
   }
 
   tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
-    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+    btn.addEventListener('click', () => {
+      if (suppressClick) return; // 드래그로 끝난 제스처의 잔여 click 무시
+      switchSection(btn.dataset.section);
+    });
   });
   pageEl.dataset.section = 'recipe';
+
+  // ── 탭바 드래그(배민식) ── 버블을 손가락으로 끌면 따라오고, 놓으면 가장 가까운 탭으로 전환.
+  // 놓는 순간의 이동은 기존 switchSection→slideIndicator를 그대로 탐 — slideIndicator가
+  // "지금 화면에 그려진 위치"에서 출발하므로 드래그 지점→목적지 슬라이드가 자연스럽게 이어짐.
+  // (WAAPI 종료처리 등 검증된 구조는 손대지 않고, 진행 중 애니 인계는 trackIndicator와 같은 패턴)
+  let dragPointerId = null;
+  let dragMoved = false; // 6px 이상 움직였을 때만 드래그로 판정(그냥 탭은 click이 처리)
+  let dragStartX = 0;
+  let suppressClick = false;
+  function nearestTabBtn(clientX) {
+    let best = null, bestD = Infinity;
+    tabbarEl.querySelectorAll('.tabbar-btn').forEach((b) => {
+      const r = b.getBoundingClientRect();
+      const d = Math.abs(clientX - (r.left + r.width / 2));
+      if (d < bestD) { bestD = d; best = b; }
+    });
+    return best;
+  }
+  tabbarEl.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    dragPointerId = e.pointerId;
+    dragMoved = false;
+    dragStartX = e.clientX;
+    try { tabbarEl.setPointerCapture(e.pointerId); } catch (_) { /* 일부 브라우저 방어 */ }
+  });
+  tabbarEl.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== dragPointerId) return;
+    if (!dragMoved) {
+      if (Math.abs(e.clientX - dragStartX) < 6) return; // 아직 클릭 범위
+      dragMoved = true;
+      // 진행 중인 슬라이드/추적 인계 후 손가락 직접 추적 시작
+      cancelAnimationFrame(indicatorAnimId);
+      if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
+      indicatorBusy = true; // resize의 placeIndicator가 끼어들지 않게
+      tabbarIndicator.style.transition = 'none';
+    }
+    const barRect = tabbarEl.getBoundingClientRect();
+    const active = tabbarEl.querySelector('.tabbar-btn.active');
+    const y = active ? bubblePosFor(active).y : 0;
+    let x = e.clientX - barRect.left - BUBBLE / 2;
+    x = Math.max(-6, Math.min(x, barRect.width - BUBBLE + 6)); // 양끝 살짝만 넘게 제한
+    tabbarIndicator.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  });
+  function endTabbarDrag(e) {
+    if (e.pointerId !== dragPointerId) return;
+    dragPointerId = null;
+    if (!dragMoved) return; // 드래그 아님 → click 리스너가 처리
+    dragMoved = false;
+    indicatorBusy = false;
+    tabbarIndicator.style.transition = '';
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 0); // 이 제스처의 잔여 click만 무시
+    const target = nearestTabBtn(e.clientX);
+    const activeBtn = tabbarEl.querySelector('.tabbar-btn.active');
+    if (!target || target === activeBtn) {
+      slideIndicator(activeBtn); // 같은 탭이면 제자리 복귀 슬라이드
+    } else {
+      switchSection(target.dataset.section);
+    }
+  }
+  tabbarEl.addEventListener('pointerup', endTabbarDrag);
+  tabbarEl.addEventListener('pointercancel', endTabbarDrag);
 
   // 인스타·쓰레드식 방향 감지 축소: 내리면 작아지고, 조금이라도 올리면 바로 커짐(사라지진 않음).
   // 손 떨림으로 깜빡이지 않게 6px 둔감 구간을 둠. 최상단은 항상 펼침.

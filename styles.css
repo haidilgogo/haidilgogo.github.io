@@ -2526,36 +2526,51 @@ img {
 }
 
 /* ===== 하단 플로팅 탭바 ===== */
-/* 바닥 고정 탭바(2026-07-20, 떠 있는 알약→표준 앱 패턴 29CM·토스식).
-   앱 폭(440px)에 맞춰 중앙 정렬, 불투명 오프화이트 + 위 구분선 = 상단바와 대칭.
-   이전 리퀴드 글래스 알약은 git 이력(525e6f2 이전) 참고. */
+/* 배민식 떠 있는 알약 탭바(2026-07-20). 반투명 블러 알약 + 활성 탭 위 "유리 렌즈 버블".
+   버블은 바 위아래로 살짝 삐져나오고(overflow:visible), 드래그로 끌어서 탭 전환 가능(script.js 탭바 드래그).
+   touch-action:none = 드래그 제스처를 브라우저 스크롤이 가로채지 않게. */
 .tabbar {
   position: fixed;
   left: 50%;
-  bottom: 0;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 440px; /* 앱 폭과 동일 — .topbar-inner/.main과 같이 관리 */
+  width: calc(100% - 28px);
+  max-width: 412px; /* 앱 폭 440 - 좌우 여백 28 */
   z-index: 50;
   display: flex;
   justify-content: space-around;
   gap: 2px;
-  padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px)); /* 홈 인디케이터 영역까지 자연스럽게 */
-  background: var(--bg-card);
-  border-top: 1px solid #ECE5DC;
+  padding: 8px 10px;
+  background: rgba(252, 249, 245, .78); /* 오프화이트 유리 */
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: 999px;
+  box-shadow: 0 8px 28px rgba(43, 18, 13, .16);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  overflow: visible;
+  touch-action: none;
 }
 
 /* 활성 탭 뒤에서 옆으로 미끄러지는 빨간 원(하이라이트).
    블러 안에서도 뚝뚝 끊기지 않게 독립 레이어(will-change)로 띄우고 위치(transform)만 부드럽게 굴림.
    width/height는 트랜지션 없이 JS가 매 프레임 맞춤(축소/확대 시 더디게 안 쫓아오게). */
+/* 유리 렌즈 버블(배민식) — 크기(지름)는 script.js BUBBLE 상수가 인라인으로 지정, 여기선 질감만.
+   ⚠️ 부모(.tabbar)에 backdrop-filter가 있으면 iOS에서 자식 backdrop-filter가 무시될 수 있어
+   버블은 반투명 흰색 + inset 하이라이트로만 유리 질감을 냄(블러 중첩 안 함). */
 .tabbar-indicator {
   position: absolute;
   left: 0;
   top: 0;
   width: 0;
   height: 0;
-  border-radius: 999px;
-  background: rgba(224, 48, 30, .10);
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .34);
+  border: 1px solid rgba(255, 255, 255, .92);
+  box-shadow:
+    0 4px 14px rgba(43, 18, 13, .18),
+    inset 0 1px 1px rgba(255, 255, 255, .95),
+    inset 0 -6px 10px rgba(255, 255, 255, .25);
   z-index: 0;
   pointer-events: none;
   will-change: transform;
@@ -2606,21 +2621,9 @@ img {
   }
 }
 
-/* 스크롤 내렸을 때: 모든 라벨을 가로·세로로 접고 아이콘도 줄여 알약 전체가 작아짐(방향감지·안 사라짐) */
-.tabbar--compact .tabbar-btn {
-  gap: 0;
-  min-width: 50px;
-  padding: 9px 12px;
-}
-.tabbar--compact .tabbar-icon {
-  width: 22px;
-  height: 22px;
-}
-.tabbar--compact .tabbar-label {
-  max-width: 0;
-  max-height: 0;
-  opacity: 0;
-}
+/* 스크롤 축소(compact) 시각효과 제거(2026-07-20) — 바닥 고정 바는 높이가 변하지 않는 게 표준(29CM·토스).
+   script.js는 여전히 .tabbar--compact 클래스를 토글하지만(WAAPI 인디케이터 FLIP과 얽혀 있어 JS는 안 건드림),
+   아래 규칙이 없으므로 화면상 아무 변화 없음. 복원하려면 git 이력(1b74a4b) 참고. */
 
 /* 최종 위치 측정용(FLIP): 한 프레임 안에서 펼친 상태를 재보고 되돌릴 때 트랜지션 개입 금지 */
 .tabbar--freeze,
@@ -2629,10 +2632,9 @@ img {
 }
 
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보.
-   바닥 고정 탭바 높이 ≈ 67px(패딩 6+6 + 버튼 55) → 여유 ~20px 포함 88px + 안전영역.
-   ⚠️ 모바일에선 script.js가 인라인으로 이 값을 덮을 수 있으니(설치 버튼 있을 때만) 함께 관리할 것. */
+   떠 있는 알약 footprint ≈ 바닥에서 83px(바 높이 ~71 + bottom 12) → 여유 ~20px 포함 104px + 안전영역. */
 .main {
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ============================================================
