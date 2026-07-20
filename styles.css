@@ -2555,8 +2555,9 @@ img {
    블러 안에서도 뚝뚝 끊기지 않게 독립 레이어(will-change)로 띄우고 위치(transform)만 부드럽게 굴림.
    width/height는 트랜지션 없이 JS가 매 프레임 맞춤(축소/확대 시 더디게 안 쫓아오게). */
 /* 유리 렌즈 버블(배민식) — 크기(지름)는 script.js BUBBLE 상수가 인라인으로 지정, 여기선 질감만.
-   ⚠️ 부모(.tabbar)에 backdrop-filter가 있으면 iOS에서 자식 backdrop-filter가 무시될 수 있어
-   버블은 반투명 흰색 + inset 하이라이트로만 유리 질감을 냄(블러 중첩 안 함). */
+   유리 3요소: ①렌즈(자체 backdrop-filter로 뒤를 살짝 뭉개고 밝힘 — iOS가 중첩을 무시해도
+   그라데이션·하이라이트만으로 유리로 보이게 점진적 강화) ②표면 반사광(::before 블롭)
+   ③가장자리 광택(radial 그라데이션 + inset 명암). */
 .tabbar-indicator {
   position: absolute;
   left: 0;
@@ -2565,16 +2566,37 @@ img {
   height: 0;
   box-sizing: border-box;
   border-radius: 50%;
-  background: rgba(255, 255, 255, .34);
-  border: 1px solid rgba(255, 255, 255, .92);
+  /* 왼쪽 위에서 빛이 드는 렌즈: 위=밝은 반사, 가운데=거의 투명, 아래 가장자리=되반사 */
+  background: radial-gradient(140% 140% at 30% 18%,
+    rgba(255, 255, 255, .60) 0%,
+    rgba(255, 255, 255, .10) 40%,
+    rgba(255, 255, 255, .02) 62%,
+    rgba(255, 255, 255, .26) 100%);
+  border: 1px solid rgba(255, 255, 255, .60);
   box-shadow:
-    0 4px 14px rgba(43, 18, 13, .18),
-    inset 0 1px 1px rgba(255, 255, 255, .95),
-    inset 0 -6px 10px rgba(255, 255, 255, .25);
+    0 6px 16px rgba(43, 18, 13, .22),                  /* 바닥 그림자(살짝 떠 있는 렌즈) */
+    inset 0 1.5px 2px rgba(255, 255, 255, 1),           /* 윗변 선명한 반사광 */
+    inset 0 -2px 3px rgba(255, 255, 255, .55),          /* 아랫변 얇은 되반사(유리 두께) */
+    inset 5px 9px 12px -6px rgba(255, 255, 255, .55),   /* 좌상단 안쪽 광 */
+    inset -6px -10px 16px -8px rgba(120, 70, 50, .20);  /* 우하단 안쪽 음영(볼록 렌즈 깊이감) */
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.5) brightness(1.12);
+  backdrop-filter: blur(1.5px) saturate(1.5) brightness(1.12);
   z-index: 0;
   pointer-events: none;
   will-change: transform;
   transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+}
+/* 표면 반사광 블롭 — 유리구슬 특유의 좌상단 뽀얀 하이라이트 */
+.tabbar-indicator::before {
+  content: '';
+  position: absolute;
+  left: 16%;
+  top: 9%;
+  width: 40%;
+  height: 26%;
+  border-radius: 50%;
+  background: linear-gradient(rgba(255, 255, 255, .85), rgba(255, 255, 255, 0));
+  filter: blur(1px);
 }
 
 .tabbar-btn {
