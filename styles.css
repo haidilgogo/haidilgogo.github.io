@@ -2526,31 +2526,23 @@ img {
 }
 
 /* ===== 하단 플로팅 탭바 ===== */
+/* 바닥 고정 탭바(2026-07-20, 떠 있는 알약→표준 앱 패턴 29CM·토스식).
+   앱 폭(440px)에 맞춰 중앙 정렬, 불투명 오프화이트 + 위 구분선 = 상단바와 대칭.
+   이전 리퀴드 글래스 알약은 git 이력(525e6f2 이전) 참고. */
 .tabbar {
   position: fixed;
   left: 50%;
-  bottom: calc(26px + env(safe-area-inset-bottom, 0px)); /* 홈 인디케이터와 겹치지 않게 살짝 위로 */
+  bottom: 0;
   transform: translateX(-50%);
+  width: 100%;
+  max-width: 440px; /* 앱 폭과 동일 — .topbar-inner/.main과 같이 관리 */
   z-index: 50;
   display: flex;
+  justify-content: space-around;
   gap: 2px;
-  padding: 6px;
-  /* 리퀴드 글래스: 위가 더 밝은 세로 그라데이션 + 블러 위에 밝기·채도만 살짝(블러 반경은 그대로=성능 안전).
-     반사광(specular)은 inset 하이라이트로 표현 — 추가 블러 패스 없이 유리 질감만 강화. iOS PWA용 -webkit- 접두사 필수. */
-  background:
-    linear-gradient(125deg, rgba(255, 255, 255, .40) 0%, rgba(255, 255, 255, 0) 34%),  /* 대각선 빛줄기(sheen) */
-    linear-gradient(to bottom, rgba(255, 255, 255, .46), rgba(255, 255, 255, .74));      /* 기본 유리 바탕(더 투명) */
-  border: 1px solid rgba(255, 255, 255, .7);
-  border-radius: 999px;
-  box-shadow:
-    0 10px 30px rgba(80, 30, 20, .18),           /* 바깥 그림자(더 깊게 떠 보이게) */
-    inset 0 1.5px 1.5px rgba(255, 255, 255, 1),    /* 윗변 밝은 반사광(specular) */
-    inset 0 -1px 1px rgba(255, 255, 255, .5),      /* 아랫변 얇은 반사(유리 두께감) */
-    inset 0 -10px 16px rgba(255, 255, 255, .2),    /* 아래쪽 은은한 안쪽 광택 */
-    inset 0 0 0 .5px rgba(255, 255, 255, .45);     /* 유리 테두리 안쪽 라인 */
-  /* 블러 16→18px: 더 투명해진 만큼 글자 가독성 지키려 서리 살짝 ↑ */
-  -webkit-backdrop-filter: blur(18px) saturate(1.85) brightness(1.08);
-  backdrop-filter: blur(18px) saturate(1.85) brightness(1.08);
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px)); /* 홈 인디케이터 영역까지 자연스럽게 */
+  background: var(--bg-card);
+  border-top: 1px solid #ECE5DC;
 }
 
 /* 활성 탭 뒤에서 옆으로 미끄러지는 빨간 원(하이라이트).
@@ -2637,10 +2629,10 @@ img {
 }
 
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보.
-   하단 플로팅 탭바 footprint ≈ 바닥에서 95px(탭바 높이 69 + bottom 26) → 여기에 여유 ~25px + 안전영역.
+   바닥 고정 탭바 높이 ≈ 67px(패딩 6+6 + 버튼 55) → 여유 ~20px 포함 88px + 안전영역.
    ⚠️ 모바일에선 script.js가 인라인으로 이 값을 덮을 수 있으니(설치 버튼 있을 때만) 함께 관리할 것. */
 .main {
-  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ============================================================
