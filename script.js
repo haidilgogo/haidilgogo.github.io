@@ -583,7 +583,46 @@
   // 매번 새로 만들면 <img>가 재디코딩되어 썸네일이 깜빡이고 늦게 뜸(탭 이동 시 딜레이의 원인).
   const cardCache = new Map();
 
+  // ── 이 주의 소스(주간 피처) ── 매주 월요일 자동 교체, 서버 없이 날짜 계산이라 모든 방문자가 같은 주에 같은 소스를 봄
+  const weeklyFeatureEl = document.getElementById('weeklyFeature');
+  const wfHero = document.getElementById('wfHero');
+  const wfImg = document.getElementById('wfImg');
+  const wfSrc = document.getElementById('wfSrc');
+  const wfName = document.getElementById('wfName');
+  const wfDesc = document.getElementById('wfDesc');
+
+  function pickWeeklyFeature() {
+    const pool = RECIPES.filter((r) => r.img); // 피처는 큰 이미지가 필요해 img 있는 레시피만
+    if (!pool.length) return null;
+    // 2026-01-05(월) 기준 경과 주 수 → 월요일마다 1씩 증가
+    const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+    const week = Math.floor((Date.now() - new Date(2026, 0, 5).getTime()) / WEEK_MS);
+    // 배열 순서 그대로 돌면 같은 카테고리가 몇 주 연속 나옴 → 13칸씩 건너뛰며 순회(13·33은 서로소라 전부 한 번씩 돎)
+    const idx = (((week * 13) % pool.length) + pool.length) % pool.length;
+    return pool[idx];
+  }
+
+  function initWeeklyFeature() {
+    const r = pickWeeklyFeature();
+    if (!r) return;
+    wfImg.src = r.img;
+    wfImg.alt = r.name;
+    wfName.textContent = r.name;
+    wfDesc.innerHTML = r.desc || ''; // desc엔 <b> 강조가 들어있음 — 모달(descEl.innerHTML)과 동일 처리
+    if (r.source) {
+      wfSrc.textContent = 'ⓒ ' + r.source;
+      wfSrc.hidden = false;
+    }
+    wfHero.addEventListener('click', () => openModal(r));
+  }
+
+  function syncWeeklyFeature() {
+    // 기본 화면(전체 탭·검색 없음·즐겨찾기 아님)에서만 노출 — 필터 중엔 결과에 집중
+    weeklyFeatureEl.hidden = !(activeCat === '전체' && !query.trim() && !showFavoritesOnly);
+  }
+
   function renderGrid() {
+    syncWeeklyFeature();
     const filtered = getFiltered();
     countEl.textContent = filtered.length;
     gridEl.innerHTML = '';
@@ -1974,6 +2013,7 @@
   });
 
   renderTabs();
+  initWeeklyFeature();
   renderGrid();
   renderStoreTabs();
   renderStores();
