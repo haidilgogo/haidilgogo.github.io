@@ -638,7 +638,11 @@
   function openModal(r) {
     currentModalRecipe = r;
     syncTopbarH(); // 모바일 전체화면 패널이 상단바 바로 아래에서 시작하도록 열 때마다 재측정
-    document.body.style.overflow = 'hidden';
+    // 배경 스크롤 잠금은 반드시 html(실제 스크롤 컨테이너)에 걸어야 한다. body에 걸면
+    // body가 새 스크롤 컨테이너가 되어, sticky 상단바가 "스크롤 0인 body" 기준으로 붙어
+    // 스크롤한 만큼 화면 밖(위)으로 사라진다(모바일에서 상단바 실종 버그). html은
+    // scrollbar-gutter:stable이라 overflow:hidden이어도 데스크톱 스크롤바 폭 변화 없음.
+    document.documentElement.style.overflow = 'hidden';
 
     // 원본 썸네일(모바일 전용 표시) — 카드와 동일한 이미지·출처 오버레이 재사용
     const thumbEl = document.getElementById('modalThumb');
@@ -718,7 +722,7 @@
   }
 
   function closeModal() {
-    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     modalOverlay.classList.remove('open');
   }
 
@@ -749,6 +753,14 @@
   }
   syncTopbarH();
   window.addEventListener('resize', syncTopbarH);
+
+  // 데스크톱 우클릭으로 이미지 저장·복사 막기 — 사이트 모든 <img>(로고·카드/모달 썸네일·발도장 스티커 등)에
+  // 컨텍스트 메뉴 차단. 문서 위임이라 나중에 동적 생성되는 이미지도 자동 적용.
+  // ⚠️ 완벽한 보호 아님(개발자도구·네트워크 탭으로 우회 가능) — 무심코 저장하는 것만 억제.
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target && e.target.tagName === 'IMG') e.preventDefault();
+  });
+
   // 상세가 열린 채 상단바(탭·검색·즐겨찾기 등)를 누르면 상세를 닫고 그 동작을 그대로 실행
   topbarEl.addEventListener('click', () => {
     if (modalOverlay.classList.contains('open')) closeModal();
@@ -999,7 +1011,7 @@
 
   let gachaPreloaded = false;
   function openGacha() {
-    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden'; // body 아닌 html에 — 상단바 sticky 유지 (openModal 주석 참고)
     // 첫 뽑기에서도 카드가 흰 네모로 안 뜨게, 소스 이미지를 미리 받아둔다(한 번만)
     if (!gachaPreloaded) {
       gachaPreloaded = true;
@@ -1010,7 +1022,7 @@
   }
 
   function closeGacha() {
-    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     gachaOverlay.classList.remove('open');
   }
 
@@ -1603,7 +1615,17 @@
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
     return m ? m[1] + '년 ' + Number(m[2]) + '월 ' + Number(m[3]) + '일' : iso;
   }
-  function syncStampDateText() { stampDateText.textContent = fmtStampDateKr(stampDateEl.value); }
+  function todayIso() { // 이 기기 시간대 기준 오늘 (toISOString은 UTC라 자정 전후 하루 밀림 → 로컬로 조립)
+    const n = new Date();
+    return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+  }
+  // 발도장 = 방문 기록이라 미래 날짜는 무의미 → 오늘 이후 선택 금지. max로 달력에서 미래를 비활성화하고,
+  // 혹시 미래 값이 들어오면(직접 입력·기존 데이터) 오늘로 되돌린다.
+  function clampStampDate() {
+    const max = todayIso();
+    if (stampDateEl.value && stampDateEl.value > max) stampDateEl.value = max;
+  }
+  function syncStampDateText() { clampStampDate(); stampDateText.textContent = fmtStampDateKr(stampDateEl.value); }
   stampDateEl.addEventListener('input', syncStampDateText);
   stampDateEl.addEventListener('change', syncStampDateText);
   const stampMemoEl = document.getElementById('stampMemo');
@@ -1643,6 +1665,7 @@
     stampSlot.querySelectorAll('.stamp-slot-card').forEach((el) => el.remove());
     stampDeleteEl.textContent = '이 발도장 삭제';
     stampDeleteEl.classList.remove('armed');
+    stampDateEl.max = todayIso(); // 달력에서 미래 날짜 선택 막기 (열 때마다 갱신 = 날짜 바뀌어도 정확)
     closeStampDd();
 
     if (rec) {
@@ -1661,8 +1684,7 @@
       stampDdCurrent.textContent = '선택'; // 앞에 「매장」 라벨이 있어 "매장 선택"이면 중복
       stampDdCurrent.classList.add('placeholder');
       stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.remove('active'));
-      const now = new Date(); // 오늘(이 기기 시간대) — toISOString은 UTC라 자정 전후 하루 밀림
-      stampDateEl.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      stampDateEl.value = todayIso(); // 새로 찍기 기본값 = 오늘
       stampMemoEl.value = '';
       stampSubmitEl.textContent = '발도장 찍기 🐾';
       stampSubmitEl.disabled = true;

@@ -66,6 +66,18 @@ body {
   touch-action: manipulation;
 }
 
+/* 사이트 전 이미지 저장 방지 — 모바일 꾹 누르기(iOS 콜아웃)·드래그·선택 차단.
+   로고·카드/모달 썸네일·발도장 스티커·아이콘 전부 한 곳에서 커버(새 이미지도 자동).
+   데스크톱 우클릭 차단은 script.js의 contextmenu 리스너가 담당.
+   ⚠️ 완벽한 보호 아님(개발자도구·네트워크로 우회 가능) — 무심코 저장하는 것만 억제. */
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .page {
   min-height: 100vh;
   display: flex;
@@ -109,6 +121,10 @@ body {
   padding: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* 꾹 눌러도 로고 이미지 저장·「하딜고고」 글자 선택 콜아웃 안 뜨게 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .topbar-logo-mark {
@@ -117,8 +133,7 @@ body {
   height: 34px;
   margin-right: 2px;
   object-fit: contain;
-  -webkit-user-drag: none;
-  user-drag: none;
+  /* 이미지 저장·드래그·콜아웃 차단은 전역 img 규칙이 담당 */
 }
 
 .topbar-title {
@@ -2568,8 +2583,8 @@ body {
     border-radius: 14px;
   }
   .stamp-rec .stamp-tile { width: 40px; }
-  .stamp-rec-date { font-size: 11px; }
-  .stamp-rec-name { font-size: 16px; }
+  /* 특이성(.stamps 접두)을 기본 규칙보다 높여 모바일 11px가 확실히 이김 — 2칸에서 날짜 한 줄 폭 확보 */
+  .stamps .stamp-rec-date { font-size: 11px; }
 }
 
 /* 컴팩트 가로 기록 카드 — 리스트는 색인(날짜·매장명만, 한 화면 6개 목표),
@@ -2596,16 +2611,22 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  /* 스티커 기준 세로 가운데(.stamp-rec align-items:center)가 아니라 위쪽 정렬 — 아래 여백은 나중에 메모/동행 한 줄 여지 */
+  align-self: flex-start;
 }
 .stamp-rec-date {
   font-size: 12px;
   color: var(--text-muted);
+  /* 날짜는 한 줄 유지 — 2칸 배치에서 "…21"/"일"로 CJK 줄바꿈되던 것 방지.
+     모바일 폭은 아래 `.stamps .stamp-rec-date`(11px)로 맞춤(특이성 높여 확실히 적용). */
+  white-space: nowrap;
 }
 .stamp-rec-name {
-  /* 매장 탭 카드 이름(.store-name)과 동일한 글씨체·굵기 */
+  /* 매장 탭 카드 이름(.store-name)과 같은 글씨체·굵기. 2칸 컴팩트 카드라 스티커가 주역 → 지점명은
+     보조 정보로 살짝 작게(날짜 11px와 균형). 사용자가 17px도 크다고 해서 16px로. */
   font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
   font-weight: 500;
-  font-size: 17px;
+  font-size: 16px;
   color: var(--text-darkest);
 }
 
