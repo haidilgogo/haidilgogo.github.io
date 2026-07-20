@@ -2742,6 +2742,116 @@ img {
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* ── 발도장 보기 모달 (카드 탭 시, 읽기 전용) — 입력 시트와 같은 오버레이 문법 ── */
+.stamp-view-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 18, 13, 0.45);
+  z-index: 205; /* 입력 시트와 같은 층 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+.stamp-view-overlay.open { opacity: 1; pointer-events: auto; }
+.stamp-view {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-cream);
+  border-radius: 22px;
+  padding: 20px 20px 16px;
+  transform: translateY(24px);
+  transition: transform 0.26s cubic-bezier(.3, .9, .3, 1);
+}
+.stamp-view-overlay.open .stamp-view { transform: translateY(0); }
+.stamp-view-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  color: #9A8A83;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 2;
+}
+/* 스티커+정보 = 가운데(빈 공간 자연스럽게), 버튼은 맨 아래 */
+.stamp-view-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 0;
+}
+.stamp-view-sticker { width: 168px; margin: 0 auto 22px; }
+.stamp-view-sticker > * { width: 100%; }
+.stamp-view-sticker img {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 10px 16px rgba(80, 30, 20, 0.28));
+}
+.stamp-view-sticker .stamp-ph { aspect-ratio: 0.58; } /* 그림 없는 지점 자리표시 */
+.stamp-view-info {
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.stamp-view-row { display: flex; gap: 12px; font-size: 15px; line-height: 1.45; }
+.stamp-view-label { color: var(--text-muted); flex: none; width: 44px; font-size: 14px; padding-top: 1px; }
+.stamp-view-val { color: var(--text-dark); word-break: break-word; }
+.stamp-view-btns { display: flex; gap: 10px; margin-top: 16px; }
+.stamp-view-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.stamp-view-edit { background: var(--brand-red); color: #fff; }
+.stamp-view-delete { background: #F3EDE7; color: #B0554A; transition: background .15s, color .15s; }
+.stamp-view-delete.armed { background: var(--brand-red); color: #fff; } /* 두 번 눌러 삭제 — 확인 상태 */
+
+/* 모바일: 상단바 아래 전체화면 (레시피 상세·입력 시트와 동일) */
+@media (max-width: 640px) {
+  .stamp-view-overlay {
+    top: var(--topbar-h, 0px);
+    padding: 8px;
+    background: var(--bg-card);
+    align-items: stretch;
+  }
+  .stamp-view {
+    max-width: none;
+    max-height: none;
+    flex: 1;
+    border-radius: 18px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 .stamp-sheet-close {
   position: absolute;
   top: 14px;
