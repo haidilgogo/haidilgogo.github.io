@@ -830,6 +830,23 @@
     renderGrid();
   });
   searchIcon.addEventListener('click', () => searchInput.focus());
+
+  // ── 검색 접기(2026-07-20) ── 기본은 🔍 아이콘만, 누르면 입력창 펼침.
+  // 비어 있는 채로 포커스가 빠지면 다시 아이콘으로 접힘(검색어가 있으면 필터 중임을 보여주려 펼침 유지)
+  const searchToggle = document.getElementById('searchToggle');
+  function openSearch() {
+    searchBox.classList.add('open');
+    searchToggle.hidden = true;
+    searchInput.focus();
+  }
+  function collapseSearch() {
+    if (query.trim()) return; // 검색어가 남아 있으면 접지 않음
+    searchBox.classList.remove('open');
+    searchToggle.hidden = false;
+  }
+  searchToggle.addEventListener('click', openSearch);
+  // blur 직후 ✕(지우기) 클릭이 씹히지 않게 살짝 늦춰 접음
+  searchInput.addEventListener('blur', () => setTimeout(collapseSearch, 150));
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
