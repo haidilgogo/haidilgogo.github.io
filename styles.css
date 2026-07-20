@@ -2532,7 +2532,7 @@ img {
 .tabbar {
   position: fixed;
   left: 50%;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* 살짝 더 위로(12→18) */
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px)); /* 조금 더 위로(18→26) */
   transform: translateX(-50%);
   width: calc(100% - 28px);
   max-width: 412px; /* 앱 폭 440 - 좌우 여백 28 */
