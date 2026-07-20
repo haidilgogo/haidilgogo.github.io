@@ -1115,8 +1115,8 @@
   const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '발도장' };
   let activeSection = 'recipe';
 
-  // 유리 버블(배민식) 지름 — 버튼 중심에 원형으로 얹혀 바 위아래로 살짝 삐져나옴.
-  // 크기·위치는 여기서 인라인으로, 질감은 CSS .tabbar-indicator가 담당.
+  // 인디케이터 2상태(배민식): 정지=불투명 필(활성 버튼에 딱 맞음) / 이동=유리구슬(원형 76px).
+  // 크기·위치는 여기서 인라인으로, 질감(필↔유리)은 CSS .tabbar-indicator(--glass)가 담당.
   const BUBBLE = 76;
   function bubblePosFor(btn) {
     return {
@@ -1124,14 +1124,18 @@
       y: btn.offsetTop + btn.offsetHeight / 2 - BUBBLE / 2,
     };
   }
-  // 버블을 현재 활성 탭 중심에 맞춤
+  function setGlass(on) {
+    tabbarIndicator.classList.toggle('tabbar-indicator--glass', on);
+  }
+  // (정지 상태) 필을 현재 활성 탭에 딱 맞춤
   function updateIndicator() {
     const active = tabbarEl.querySelector('.tabbar-btn.active');
     if (!active) return;
-    const p = bubblePosFor(active);
-    tabbarIndicator.style.width = BUBBLE + 'px';
-    tabbarIndicator.style.height = BUBBLE + 'px';
-    tabbarIndicator.style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
+    setGlass(false);
+    tabbarIndicator.style.width = active.offsetWidth + 'px';
+    tabbarIndicator.style.height = active.offsetHeight + 'px';
+    tabbarIndicator.style.transform =
+      'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
   }
   // (스크롤 축소/확대용) 트랜지션을 끄고 매 프레임 정확히 붙임 → 크기 변할 때 원이 더디게 안 쫓아옴
   let indicatorAnimId = 0;
@@ -1167,6 +1171,11 @@
     const cs = getComputedStyle(tabbarIndicator);
     const m = cs.transform && cs.transform !== 'none' ? new DOMMatrixReadOnly(cs.transform) : null;
     const x0 = m ? m.e : 0, y0 = m ? m.f : 0;
+    // 필(사각)→유리(원) 변신 시 중심이 튀지 않게, 현재 크기 기준으로 버블 좌표계로 환산
+    const w0 = parseFloat(tabbarIndicator.style.width) || BUBBLE;
+    const h0 = parseFloat(tabbarIndicator.style.height) || BUBBLE;
+    const bx0 = x0 + (w0 - BUBBLE) / 2;
+    const by0 = y0 + (h0 - BUBBLE) / 2;
     if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
     indicatorBusy = true;
     // 도착점 = "펼침이 끝난 뒤"의 최종 위치를 트랜지션 없이 한 프레임 안에서 미리 측정(FLIP).
@@ -1185,11 +1194,12 @@
     // 원이 출발점으로 되돌아갔다 트랜지션으로 다시 미끄러지는 "두 번 반복" 회귀를 냈음 → 원복.
     // 자연 종료 시 애니 끝값=인라인 값이라 제거 순간 값 변화가 없어 종료 레이스 자체가 없음.
     tabbarIndicator.style.transition = 'none';
+    setGlass(true); // 이동 시작 = 유리구슬로 변신(질감은 CSS --glass가 담당)
     tabbarIndicator.style.width = fw + 'px';
     tabbarIndicator.style.height = fh + 'px';
     tabbarIndicator.style.transform = 'translate(' + fx + 'px,' + fy + 'px)';
     const wa = tabbarIndicator.animate(
-      [{ transform: 'translate(' + x0 + 'px,' + y0 + 'px)' },
+      [{ transform: 'translate(' + bx0 + 'px,' + by0 + 'px)' },
        { transform: 'translate(' + fx + 'px,' + fy + 'px)' }],
       { duration: 360, easing: 'cubic-bezier(.4, 0, .2, 1)' }
     );
@@ -1199,6 +1209,9 @@
       indicatorWA = null;
       indicatorBusy = false;
       tabbarIndicator.style.transition = ''; // 다음 일반 슬라이드용 복구
+      // 도착: 다음 프레임에 유리→필 복귀(updateIndicator가 --glass 제거 + 버튼에 딱 맞춤).
+      // 스타일시트의 width/height/radius transition이 변신을 부드럽게 이어줌.
+      requestAnimationFrame(() => { if (!indicatorWA && !indicatorBusy) updateIndicator(); });
     };
   }
   // (축소 상태에서 탭 전환용) 원 즉시 배치 — 슬라이드 없이 활성 탭 위치로 스냅.
@@ -1297,6 +1310,9 @@
       if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
       indicatorBusy = true; // resize의 placeIndicator가 끼어들지 않게
       tabbarIndicator.style.transition = 'none';
+      setGlass(true); // 드래그 시작 = 필→유리구슬 변신
+      tabbarIndicator.style.width = BUBBLE + 'px';
+      tabbarIndicator.style.height = BUBBLE + 'px';
     }
     const barRect = tabbarEl.getBoundingClientRect();
     const active = tabbarEl.querySelector('.tabbar-btn.active');

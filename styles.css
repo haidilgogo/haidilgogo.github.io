@@ -2558,10 +2558,10 @@ img {
 /* 활성 탭 뒤에서 옆으로 미끄러지는 빨간 원(하이라이트).
    블러 안에서도 뚝뚝 끊기지 않게 독립 레이어(will-change)로 띄우고 위치(transform)만 부드럽게 굴림.
    width/height는 트랜지션 없이 JS가 매 프레임 맞춤(축소/확대 시 더디게 안 쫓아오게). */
-/* 유리 렌즈 버블(배민식) — 크기(지름)는 script.js BUBBLE 상수가 인라인으로 지정, 여기선 질감만.
-   유리 3요소: ①렌즈(자체 backdrop-filter로 뒤를 살짝 뭉개고 밝힘 — iOS가 중첩을 무시해도
-   그라데이션·하이라이트만으로 유리로 보이게 점진적 강화) ②표면 반사광(::before 블롭)
-   ③가장자리 광택(radial 그라데이션 + inset 명암). */
+/* 인디케이터 2상태(배민식, 2026-07-21). 크기·위치는 script.js가 인라인으로 지정.
+   ① 기본(정지) = 불투명 필: 활성 탭을 감싸고 바 안에 딱 맞음.
+   ② 이동 중(.tabbar-indicator--glass) = 유리구슬: 원형(76px)으로 변신해 바 밖으로 삐져나오며 미끄러짐.
+   도착하면 JS가 클래스를 떼고 필 지오메트리로 복귀 — 아래 transition이 변신을 부드럽게 이어줌. */
 .tabbar-indicator {
   position: absolute;
   left: 0;
@@ -2569,28 +2569,20 @@ img {
   width: 0;
   height: 0;
   box-sizing: border-box;
-  border-radius: 50%;
-  /* 왼쪽 위에서 빛이 드는 렌즈: 위=밝은 반사, 가운데=거의 투명, 아래 가장자리=되반사 */
-  background: radial-gradient(140% 140% at 30% 18%,
-    rgba(255, 255, 255, .60) 0%,
-    rgba(255, 255, 255, .10) 40%,
-    rgba(255, 255, 255, .02) 62%,
-    rgba(255, 255, 255, .26) 100%);
-  border: 1px solid rgba(255, 255, 255, .60);
-  box-shadow:
-    0 6px 16px rgba(43, 18, 13, .22),                  /* 바닥 그림자(살짝 떠 있는 렌즈) */
-    inset 0 1.5px 2px rgba(255, 255, 255, 1),           /* 윗변 선명한 반사광 */
-    inset 0 -2px 3px rgba(255, 255, 255, .55),          /* 아랫변 얇은 되반사(유리 두께) */
-    inset 5px 9px 12px -6px rgba(255, 255, 255, .55),   /* 좌상단 안쪽 광 */
-    inset -6px -10px 16px -8px rgba(120, 70, 50, .20);  /* 우하단 안쪽 음영(볼록 렌즈 깊이감) */
-  -webkit-backdrop-filter: blur(1.5px) saturate(1.5) brightness(1.12);
-  backdrop-filter: blur(1.5px) saturate(1.5) brightness(1.12);
+  border-radius: 16px; /* 바(R20) 안에 맞는 필 라운드 */
+  background: #FFFDFA; /* 불투명 웜화이트 — 반투명 바 위에서 또렷하게 */
+  border: 1px solid rgba(43, 18, 13, .05);
+  box-shadow: 0 2px 8px rgba(43, 18, 13, .10);
   z-index: 0;
   pointer-events: none;
   will-change: transform;
-  transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+  transition:
+    transform .28s cubic-bezier(.4, 0, .2, 1),
+    width .2s ease, height .2s ease,
+    border-radius .2s ease, background .2s ease,
+    box-shadow .2s ease, border-color .2s ease;
 }
-/* 표면 반사광 블롭 — 유리구슬 특유의 좌상단 뽀얀 하이라이트 */
+/* 표면 반사광 블롭 — 유리구슬 상태에서만 */
 .tabbar-indicator::before {
   content: '';
   position: absolute;
@@ -2601,7 +2593,29 @@ img {
   border-radius: 50%;
   background: linear-gradient(rgba(255, 255, 255, .85), rgba(255, 255, 255, 0));
   filter: blur(1px);
+  opacity: 0;
+  transition: opacity .2s ease;
 }
+
+/* 이동 중 유리구슬 상태 — 렌즈(backdrop)+반사광+가장자리 광택 */
+.tabbar-indicator--glass {
+  border-radius: 50%;
+  background: radial-gradient(140% 140% at 30% 18%,
+    rgba(255, 255, 255, .60) 0%,
+    rgba(255, 255, 255, .10) 40%,
+    rgba(255, 255, 255, .02) 62%,
+    rgba(255, 255, 255, .26) 100%);
+  border: 1px solid rgba(255, 255, 255, .60);
+  box-shadow:
+    0 6px 16px rgba(43, 18, 13, .22),
+    inset 0 1.5px 2px rgba(255, 255, 255, 1),
+    inset 0 -2px 3px rgba(255, 255, 255, .55),
+    inset 5px 9px 12px -6px rgba(255, 255, 255, .55),
+    inset -6px -10px 16px -8px rgba(120, 70, 50, .20);
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.5) brightness(1.12);
+  backdrop-filter: blur(1.5px) saturate(1.5) brightness(1.12);
+}
+.tabbar-indicator--glass::before { opacity: 1; }
 
 .tabbar-btn {
   position: relative;
