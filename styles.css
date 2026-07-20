@@ -2584,7 +2584,7 @@ img {
   }
   .stamp-rec .stamp-tile { width: 40px; }
   /* 특이성(.stamps 접두)을 기본 규칙보다 높여 모바일 11px가 확실히 이김 — 2칸에서 날짜 한 줄 폭 확보 */
-  .stamps .stamp-rec-date { font-size: 11px; }
+  .stamps .stamp-rec-date { font-size: 11px; } /* 동행(.stamp-rec-with)은 13.5px 유지 — 날짜보다 크게 */
 }
 
 /* 컴팩트 가로 기록 카드 — 리스트는 색인(날짜·매장명만, 한 화면 6개 목표),
@@ -2628,6 +2628,12 @@ img {
   font-weight: 500;
   font-size: 16px;
   color: var(--text-darkest);
+}
+/* 동행 — 이름 아래 회갈색. 날짜(11px)보다 크게(누구랑 갔는지가 더 눈에 들어오게). 있을 때만 렌더됨 */
+.stamp-rec-with {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* 빈 상태 — 전체(첫 기록 유도) / 지역(그 지역만 없음) 공용 */
@@ -2970,6 +2976,7 @@ img {
   flex: 1;          /* 값이 남는 폭을 차지 → 화살표는 오른쪽 끝 고정 */
   min-width: 0;
   text-align: left;
+  font-weight: 400; /* 선택값(매장·동행)은 얇게 — 라벨만 굵게 */
 }
 .stamp-dd-current.placeholder { color: var(--text-muted); } /* 아직 선택 전 */
 .stamp-dd-chev { color: #B9ABA3; flex: none; transition: transform .15s ease; }
@@ -2990,6 +2997,14 @@ img {
   overflow-y: auto;
 }
 .stamp-dd.open .stamp-dd-menu { display: block; }
+/* 동행 메뉴 = 2열(짧은 항목 6개라 높이 절반). '직접 입력'은 맨 아래 한 줄 전체. */
+.stamp-dd.open .stamp-dd-menu--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+.stamp-dd-menu--grid .stamp-dd-item { margin: 0; }
+.stamp-dd-menu--grid .stamp-dd-item:last-child { grid-column: 1 / -1; }
 .stamp-dd-item {
   display: block;
   width: 100%;
@@ -3008,9 +3023,9 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 @media (hover: hover) {
-  .stamp-dd-item:not(.active):not(.done):hover {
-    background: rgba(255, 255, 255, .6);
-    color: #6E5F58;
+  .stamp-dd-item:not(.active):not(.done):not(.soon):hover {
+    background: rgba(224, 48, 30, .08);
+    color: var(--brand-red);
   }
 }
 .stamp-dd-item.active {
@@ -3018,10 +3033,30 @@ img {
   color: var(--brand-red);
   box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
 }
+/* 눌림(터치·클릭) 피드백 — 터치 땐 지금 반응이 없어서 브랜드 레드 옅은 틴트로 티나게 */
+.stamp-dd-item:not(.done):not(.soon):active { background: rgba(224, 48, 30, .14); color: var(--brand-red); }
 .stamp-dd-item.done {
   opacity: 0.42;
   cursor: default;
   pointer-events: none;
+}
+/* 오픈 예정 매장 — 아직 방문 불가라 흐리게 + 선택 불가, 오른쪽에 "오픈 예정" 칩 */
+.stamp-dd-item.soon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  opacity: 0.5;
+  cursor: default;
+}
+.stamp-dd-soon {
+  flex: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, .05);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 /* 날짜·메모 */
 .stamp-fields {
@@ -3030,6 +3065,8 @@ img {
   gap: 9px;
   margin-bottom: 18px;
 }
+/* hidden 속성이 display:flex에 밀리지 않게 — 동행 '직접 입력' 칸 숨김이 실제로 먹도록 */
+.stamp-fields[hidden] { display: none; }
 .stamp-field {
   display: flex;
   align-items: center;
@@ -3055,7 +3092,7 @@ img {
   background: none;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
-  font-weight: 600; /* 날짜 텍스트·드롭다운(600)과 통일 — 메모만 400으로 가늘어 보이던 것 */
+  font-weight: 400; /* 값(입력 글자)은 얇게 — 라벨(메모·입력)만 굵게, 날짜·드롭다운 값과 통일 */
   color: var(--text-dark);
   padding: 0;
 }
@@ -3063,6 +3100,8 @@ img {
   color: var(--text-muted); /* 브라우저 기본 차가운 회색 → 다른 칸 플레이스홀더와 같은 회갈색 */
   opacity: 1; /* 파이어폭스가 기본으로 흐리게 깔아서 명시 */
 }
+/* 안내문구(placeholder) 굵기 연하게 — 동행 '직접 입력' 칸, 메모 칸 공용 */
+.stamp-field--light-ph input::placeholder { font-weight: 400; }
 /* 날짜 필드 — 브라우저 기본 날짜 입력은 폰트·형식이 시스템 고정이라,
    입력을 투명 오버레이로 깔고(달력 기능만 씀) 보이는 글자는 앱 폰트(.stamp-date-text)로 그림 */
 .stamp-field--date {
@@ -3084,7 +3123,7 @@ img {
   min-width: 0;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 400; /* 값은 얇게(라벨 '날짜'만 굵게) — 필드명↔값 위계 */
   color: var(--text-dark);
 }
 .stamp-date-ic {

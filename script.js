@@ -1579,6 +1579,13 @@
     nm.className = 'stamp-rec-name';
     nm.textContent = rec.name;
     info.appendChild(nm);
+    // 동행 — 있을 때만. 카드엔 프리셋이면 그 값, 직접 입력(프리셋에 없는 값)이면 '기타'(상세는 보기 모달에 실제 값).
+    if (rec.with) {
+      const w = document.createElement('div');
+      w.className = 'stamp-rec-with';
+      w.textContent = COMPANIONS.includes(rec.with) ? rec.with : '기타';
+      info.appendChild(w);
+    }
     card.appendChild(info);
     card.addEventListener('click', () => openStampView(rec.id)); // 탭 → 보기 모달(수정/삭제는 거기서)
     return card;
@@ -1670,7 +1677,7 @@
       card.className = 'stamp-slot-card';
       stampSlot.appendChild(card);
     } else {
-      stampSlotHint.textContent = name + ' 스티커 붙이는 곳';
+      stampSlotHint.textContent = '스티커 붙이는 곳'; // 지점 선택해도 지점명 안 붙이고 고정 문구 유지
       stampSubmitEl.disabled = false;
     }
     if (STAMP_IMGS[name]) { const pre = new Image(); pre.src = STAMP_IMGS[name]; } // 미리 로드 → 팝/교체 때 흰 카드 안 뜸
@@ -1685,12 +1692,13 @@
     stampSlot.querySelectorAll('.stamp-slot-card').forEach((el) => el.remove());
     stampDateEl.max = todayIso(); // 달력에서 미래 날짜 선택 막기 (열 때마다 갱신 = 날짜 바뀌어도 정확)
     closeStampDd();
+    closeStampWithDd();
 
     if (rec) {
       stampSlotEmpty.hidden = true;
       stampDateEl.value = rec.date || '';
       stampMemoEl.value = rec.memo || '';
-      stampWithEl.value = rec.with || '';
+      loadStampWith(rec.with); // 프리셋이면 그걸로, 자유 입력이면 '직접 입력'+글자
       setStampStore(rec.name); // 드롭다운 라벨·슬롯 스티커 세팅(edit 모드라 슬롯에 정적 표시)
       stampSubmitEl.textContent = '저장';
       stampSubmitEl.disabled = false;
@@ -1705,7 +1713,7 @@
       stampMemoEl.value = '';
       stampSubmitEl.textContent = '기록하기';
       stampSubmitEl.disabled = true;
-      stampWithEl.value = '';
+      resetStampWith();
     }
     syncStampDateText(); // 새로 찍기(오늘)·수정(기존 날짜) 모두 값 세팅 후 표시 글자 갱신
     stampSheetOverlay.classList.add('open');
@@ -1727,8 +1735,78 @@
     if (stampDdEl.classList.contains('open') && !stampDdEl.contains(e.target)) closeStampDd();
   });
 
-  // ── 누구랑 — 자유 입력(이름도 적을 수 있게 드롭다운→글칸으로 변경, 선택 항목) ──
-  const stampWithEl = document.getElementById('stampWith');
+  // ── 누구랑(동행) — 드롭다운(프리셋) + "직접 입력" 선택 시 자유 입력 칸. 선택 항목(비워도 됨). ──
+  const COMPANIONS = ['혼자', '가족', '친구', '연인', '동료', '지인'];
+  const WITH_CUSTOM = '직접 입력';
+  const stampWithEl = document.getElementById('stampWith'); // 직접 입력 칸(직접 입력 선택 때만 보임)
+  const stampWithDdEl = document.getElementById('stampWithDd');
+  const stampWithDdBtn = document.getElementById('stampWithDdBtn');
+  const stampWithDdCurrent = document.getElementById('stampWithDdCurrent');
+  const stampWithDdMenu = document.getElementById('stampWithDdMenu');
+  const stampWithCustomWrap = document.getElementById('stampWithCustomWrap');
+  let stampWithSelected = null; // 고른 동행(프리셋 or '직접 입력' or null=미선택)
+
+  function closeStampWithDd() {
+    stampWithDdEl.classList.remove('open');
+    stampWithDdBtn.setAttribute('aria-expanded', 'false');
+  }
+  // 동행 옵션 선택 반영. '직접 입력'이면 자유 입력 칸 노출, 프리셋이면 숨기고 칸 비움.
+  function setStampWithOption(label) {
+    stampWithSelected = label;
+    stampWithDdCurrent.textContent = label;
+    stampWithDdCurrent.classList.remove('placeholder');
+    stampWithDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.toggle('active', i.dataset.value === label));
+    const custom = label === WITH_CUSTOM;
+    stampWithCustomWrap.hidden = !custom;
+    if (!custom) stampWithEl.value = '';
+  }
+  // 미선택 상태로 초기화(새로 찍기·비움)
+  function resetStampWith() {
+    stampWithSelected = null;
+    stampWithDdCurrent.textContent = '선택';
+    stampWithDdCurrent.classList.add('placeholder');
+    stampWithDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.remove('active'));
+    stampWithCustomWrap.hidden = true;
+    stampWithEl.value = '';
+  }
+  // 저장에 쓸 동행 값 — 프리셋이면 그 라벨, '직접 입력'이면 자유 입력 글자, 미선택이면 ''
+  function getStampWithValue() {
+    if (stampWithSelected === WITH_CUSTOM) return stampWithEl.value.trim();
+    if (stampWithSelected) return stampWithSelected;
+    return '';
+  }
+  // 기존 자유 입력 기록도 편집 시 자동 매핑 — 프리셋에 있으면 그걸로, 아니면 '직접 입력'+그 글자
+  function loadStampWith(value) {
+    if (value && COMPANIONS.includes(value)) {
+      setStampWithOption(value);
+    } else if (value) {
+      setStampWithOption(WITH_CUSTOM);
+      stampWithEl.value = value;
+    } else {
+      resetStampWith();
+    }
+  }
+  COMPANIONS.concat([WITH_CUSTOM]).forEach((label) => { // '직접 입력'을 맨 아래로(2열 메뉴에서 프리셋 다음)
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.setAttribute('role', 'option');
+    item.className = 'stamp-dd-item';
+    item.dataset.value = label;
+    item.textContent = label;
+    item.addEventListener('click', () => {
+      setStampWithOption(label);
+      closeStampWithDd();
+      if (label === WITH_CUSTOM) stampWithEl.focus(); // 직접 입력이면 바로 타이핑
+    });
+    stampWithDdMenu.appendChild(item);
+  });
+  stampWithDdBtn.addEventListener('click', () => {
+    const open = stampWithDdEl.classList.toggle('open');
+    stampWithDdBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', (e) => {
+    if (stampWithDdEl.classList.contains('open') && !stampWithDdEl.contains(e.target)) closeStampWithDd();
+  });
 
   // 매장 드롭다운 메뉴 — v2: 같은 매장 여러 번 기록 가능이라 ✓ 잠금 없음(전부 선택 가능), 항목 고정이라 한 번만 생성
   STORES.forEach((s) => {
@@ -1737,11 +1815,20 @@
     item.setAttribute('role', 'option');
     item.className = 'stamp-dd-item';
     item.dataset.value = s.name;
-    item.textContent = s.name;
-    item.addEventListener('click', () => {
-      setStampStore(s.name);
-      closeStampDd();
-    });
+    // 오픈 예정 매장(STORE_CATCH='soon')은 아직 방문 불가 → 비활성(선택 X, "오픈 예정" 표시).
+    // 매장 탭의 '오픈 예정' 버튼과 같은 신호를 재사용 — 실제 오픈해 URL로 바뀌면 자동으로 선택 가능해짐.
+    if (STORE_CATCH[s.name] === 'soon') {
+      item.classList.add('soon');
+      item.disabled = true;
+      item.setAttribute('aria-disabled', 'true');
+      item.innerHTML = s.name + '<span class="stamp-dd-soon">오픈 예정</span>';
+    } else {
+      item.textContent = s.name;
+      item.addEventListener('click', () => {
+        setStampStore(s.name);
+        closeStampDd();
+      });
+    }
     stampDdMenu.appendChild(item);
   });
   document.getElementById('stampSheetClose').addEventListener('click', closeStampSheet);
@@ -1759,7 +1846,7 @@
         rec.name = stampSelected;
         rec.date = stampDateEl.value || rec.date;
         rec.memo = stampMemoEl.value.trim();
-        rec.with = stampWithEl.value.trim() || undefined; // 동행(선택·자유 입력) — 없으면 JSON에서 자동 생략
+        rec.with = getStampWithValue() || undefined; // 동행(프리셋 or 직접입력) — 없으면 JSON에서 자동 생략
         // addedAt은 그대로(처음 기록한 시각 보존 — 같은 날짜 안 정렬 기준)
       }
       stampCardCache.delete(stampEditId); // 내용 바뀌었으니 카드 새로 그리게(날짜·매장·스티커 갱신)
@@ -1784,7 +1871,7 @@
         name: stampSelected,
         date: stampDateEl.value || todayIso(),
         memo: stampMemoEl.value.trim(),
-        with: stampWithEl.value.trim() || undefined, // 동행(선택·자유 입력) — 없으면 JSON에서 자동 생략
+        with: getStampWithValue() || undefined, // 동행(프리셋 or 직접입력) — 없으면 JSON에서 자동 생략
         addedAt: Date.now(), // 같은 날짜 안에선 나중에 기록한 것이 위로(일기 정렬)
       });
       saveStamps();

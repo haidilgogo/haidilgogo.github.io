@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=242">
+<link rel="stylesheet" href="styles.css?v=252">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -331,12 +331,22 @@
       </button>
       <div class="stamp-dd-menu" id="stampDdMenu" role="listbox"></div>
     </div>
-    <p class="stamp-q">누구랑 다녀오셨어요?</p>
-    <div class="stamp-fields">
-      <label class="stamp-field"><span class="stamp-field-label">동행</span><input type="text" id="stampWith" maxlength="20" placeholder="혼자, 친구, 이름 등 (선택)" autocomplete="off"></label>
+    <p class="stamp-q">누구와 함께 다녀오셨어요?</p>
+    <div class="stamp-dd" id="stampWithDd">
+      <button class="stamp-dd-btn" id="stampWithDdBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span class="stamp-field-label">동행</span>
+        <span class="stamp-dd-current" id="stampWithDdCurrent">선택</span>
+        <svg class="stamp-dd-chev" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="stamp-dd-menu stamp-dd-menu--grid" id="stampWithDdMenu" role="listbox"></div>
     </div>
+    <!-- "직접 입력" 선택 시에만 나타나는 자유 입력 칸 -->
+    <div class="stamp-fields" id="stampWithCustomWrap" hidden>
+      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">입력</span><input type="text" id="stampWith" maxlength="20" placeholder="자유롭게 입력해주세요" autocomplete="off"></label>
+    </div>
+    <p class="stamp-q">기억하고 싶은 게 있나요?</p>
     <div class="stamp-fields">
-      <label class="stamp-field"><span class="stamp-field-label">메모</span><input type="text" id="stampMemo" maxlength="40" placeholder="한 줄 메모 (선택)" autocomplete="off"></label>
+      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">메모</span><input type="text" id="stampMemo" maxlength="40" placeholder="그날의 맛, 기분, 메뉴 등" autocomplete="off"></label>
     </div>
     <div class="stamp-slot" id="stampSlot">
       <div class="stamp-slot-empty" id="stampSlotEmpty">
@@ -560,7 +570,7 @@
   </div>
 </div>
 
-<script src="script.js?v=240"></script>
+<script src="script.js?v=246"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
