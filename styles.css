@@ -2570,7 +2570,7 @@ img {
   height: 0;
   box-sizing: border-box;
   border-radius: 16px; /* 바(R20) 안에 맞는 필 라운드 */
-  background: #EDE7DF; /* 배민식 정지 상태: 완전 불투명 연회색(웜그레이) 플랫 채움 */
+  background: #EBEBED; /* 배민식 정지 상태: 중립 연회색 플랫 채움 (웜톤 #EDE7DF는 모래색으로 보인다는 피드백) */
   border: none;
   box-shadow: none; /* 정지 땐 그림자·투명감 없이 순수 채움 (유리 질감은 --glass에서만) */
   z-index: 0;
