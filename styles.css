@@ -2546,7 +2546,7 @@ img {
   padding: 5px 10px; /* 세로 슬림(8→5) — 버블(76px)이 더 삐져나와 렌즈 느낌 강조 */
   background: rgba(252, 249, 245, .55); /* 더 투명하게(.78→.55), 블러가 가독성 담당 */
   border: 1px solid rgba(255, 255, 255, .75);
-  border-radius: 999px;
+  border-radius: 20px; /* 캡슐(999)→라운드 사각: 원형 버블과 형태 대비(2026-07-21) */
   box-shadow: 0 8px 28px rgba(43, 18, 13, .16);
   /* 채도 1.6→1.15: 뒤에 빨간 버튼이 지나갈 때 바에 빨간 기운이 번지던 것 완화 */
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
