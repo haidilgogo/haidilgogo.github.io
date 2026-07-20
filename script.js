@@ -1703,7 +1703,7 @@
       stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.remove('active'));
       stampDateEl.value = todayIso(); // 새로 찍기 기본값 = 오늘
       stampMemoEl.value = '';
-      stampSubmitEl.textContent = '발도장 찍기 🐾';
+      stampSubmitEl.textContent = '기록하기';
       stampSubmitEl.disabled = true;
       stampWithEl.value = '';
     }
@@ -1881,7 +1881,10 @@
 
   // 상단바 ✏️ 기록하기(발도장 섹션 전용) → 새로 찍기 시트
   const stampWriteBtn = document.getElementById('stampWriteBtn');
-  if (stampWriteBtn) stampWriteBtn.addEventListener('click', () => openStampSheet());
+  if (stampWriteBtn) stampWriteBtn.addEventListener('click', () => {
+    if (stampSheetOverlay.classList.contains('open')) return; // 이미 작성 중이면 무시 — 다시 누르면 입력 리셋되던 것 방지
+    openStampSheet();
+  });
 
   renderTabs();
   renderGrid();
