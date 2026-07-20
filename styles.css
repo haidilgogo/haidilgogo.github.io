@@ -2532,10 +2532,10 @@ img {
 .tabbar {
   position: fixed;
   left: 50%;
-  /* 사파리↔PWA 높이 차이 해소.
-     사파리는 자체 하단 툴바가 바닥을 차지 → 탭바는 "툴바 위"에 앉으므로 여백을 최소(12px)로.
-     PWA는 전체 화면이라 safe-area(≈34px)+4px 여유. max()라 이중 가산 없음. */
-  bottom: max(12px, env(safe-area-inset-bottom, 0px) + 4px);
+  /* 사파리↔PWA 높이 각자 최적(2026-07-21 사용자 확정).
+     사파리: 자체 하단 툴바 위 12px — "딱 좋다" 확정.
+     PWA(아래 display-mode 오버라이드): 홈 인디케이터(safe-area)+26px ≈ 60px — 38px은 낮다는 피드백. */
+  bottom: 12px;
   transform: translateX(-50%);
   width: calc(100% - 28px);
   max-width: 412px; /* 앱 폭 440 - 좌우 여백 28 */
@@ -2674,7 +2674,12 @@ img {
 /* 탭바가 마지막 콘텐츠·푸터를 가리지 않도록 하단 여백 확보.
    = 탭바 bottom(max 공식, 위 .tabbar와 동일하게 관리) + 바 높이(~59px) + 여유(~20px). */
 .main {
-  padding-bottom: calc(max(12px, env(safe-area-inset-bottom, 0px) + 4px) + 80px);
+  padding-bottom: 92px; /* 탭바 bottom 12 + 바 높이 ~59 + 여유 ~20 */
+}
+/* 홈 화면 웹앱(PWA)에서만: 탭바를 홈 인디케이터 위로 넉넉히 */
+@media (display-mode: standalone) {
+  .tabbar { bottom: calc(env(safe-area-inset-bottom, 0px) + 26px); }
+  .main { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 106px); }
 }
 
 /* ============================================================
