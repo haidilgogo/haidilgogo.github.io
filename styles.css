@@ -2570,7 +2570,7 @@ img {
   height: 0;
   box-sizing: border-box;
   border-radius: 16px; /* 바(R20) 안에 맞는 필 라운드 */
-  background: #EBEBED; /* 배민식 정지 상태: 중립 연회색 플랫 채움 (웜톤 #EDE7DF는 모래색으로 보인다는 피드백) */
+  background: #C4574B; /* 정지 상태: 회색 섞인(먼지 낀) 브랜드 빨강 채움 + 흰 글씨(아래 .active) — 2026-07-21 */
   border: none;
   box-shadow: none; /* 정지 땐 그림자·투명감 없이 순수 채움 (유리 질감은 --glass에서만) */
   z-index: 0;
@@ -2653,7 +2653,12 @@ img {
   transition: max-width .24s ease, max-height .24s ease, opacity .18s ease;
 }
 .tabbar-btn.active {
-  color: var(--brand-red);
+  color: #fff; /* 빨간 박스 위 흰 글씨·아이콘 */
+}
+/* 이동 중(.tabbar--moving = 구슬이 유리로 미끄러지는 동안): 박스가 떠난 자리의 흰 글씨는
+   밝은 바 위에서 안 보이므로, 도착해서 빨간 박스가 채워질 때까지 진회색 유지 */
+.tabbar--moving .tabbar-btn.active {
+  color: #4D4139;
 }
 @media (hover: hover) {
   .tabbar-btn:not(.active):hover {

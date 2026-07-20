@@ -1126,6 +1126,8 @@
   }
   function setGlass(on) {
     tabbarIndicator.classList.toggle('tabbar-indicator--glass', on);
+    // 이동 중엔 활성 탭 글씨를 흰색 대신 진회색으로(밝은 바 위 흰 글씨 가독성) — CSS .tabbar--moving
+    tabbarEl.classList.toggle('tabbar--moving', on);
   }
   // (정지 상태) 필을 현재 활성 탭에 딱 맞춤
   function updateIndicator() {
