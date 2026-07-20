@@ -1711,7 +1711,7 @@
       stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.remove('active'));
       stampDateEl.value = todayIso(); // 새로 찍기 기본값 = 오늘
       stampMemoEl.value = '';
-      stampSubmitEl.textContent = '기록하기';
+      stampSubmitEl.textContent = '스티커 붙이기';
       stampSubmitEl.disabled = true;
       resetStampWith();
     }

@@ -1,3 +1,15 @@
+/* ============================================================================
+   [레이아웃 방침] 모바일 단일 레이아웃 (2026-07-20 결정)
+   방문자 대부분이 스마트폰이라, 데스크탑용 별도 레이아웃을 없애고 "폰 화면 하나"로
+   통일함. 데스크탑에서도 폰 화면이 가운데(폭 440px)에 놓이고 양옆은 배경 여백.
+   → 수정은 한 곳만 하면 폰·데스크탑에 동시 반영됨.
+
+   구현 방식:
+   - 예전 모바일 규칙 @media (max-width: 640/767/900px) → @media all 로 바꿔 "항상 적용".
+   - 앱 폭은 .topbar-inner / .main 의 max-width: 440px 하나로 조절(이 숫자만 바꾸면 폭 변경).
+   - @media (hover: hover) = 마우스 올렸을 때만 나오는 잔효과(카드 살짝 뜸). 레이아웃 아님, 유지.
+   - @media (min-width: 100000px) = 절대 적용 안 됨(옛 데스크탑 전용 가챠 확대를 비활성화한 흔적).
+   ============================================================================ */
 * {
   box-sizing: border-box;
 }
@@ -29,7 +41,7 @@
   --logo-red-active: #A80014;  /* 로고 hover/press 시 진한 빨강 */
   --card-hover-border: #D98476; /* 카드 hover/누름 테두리 (로즈 레드) */
   --card-border: #E6D4BA;       /* 카드 기본 테두리 (크림) */
-  --bg-card: #F4E9E0;          /* 페이지/카드 배경 크림색 */
+  --bg-card: #FCF9F5;         /* 페이지·상단바·상태바 공통 배경 = 오프화이트(2026-07-20 확정). 이전=크림 #F4E9E0 */
   --bg-cream: #F5EFEC;         /* 밝은 크림 배경 */
   --text-dark: #2B120D;        /* 기본 진한 글자색 */
   --text-darkest: #241C18;     /* 가장 진한 글자색 */
@@ -58,7 +70,7 @@ body {
   margin: 0;
   overscroll-behavior-y: none;
   background-color: var(--bg-card);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   color: var(--text-dark);
@@ -91,15 +103,14 @@ img {
   top: 0;
   z-index: 40;
   padding: 14px 0;
-  background: rgba(244, 233, 224, .92);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #F7DCD3;
+  background: #FCF9F5; /* 불투명 단색 = 폰 상태바(theme-color)와 정확히 일치 → 위쪽 경계선 제거. 원래=반투명 rgba(250,245,239,.92)+blur(10px)(스크롤 시 상태바와 톤 어긋나 선 보임) */
+  border-bottom: 1px solid #ECE5DC; /* 은은한 회백색 구분선(오프화이트와 자연스럽게). 이전=분홍 #F7DCD3 */
 }
 
 .topbar-inner {
   box-sizing: border-box;
   width: 100%;
-  max-width: 1160px;
+  max-width: 440px;
   margin: 0 auto;
   padding: 0 clamp(20px, 5vw, 40px);
   display: flex;
@@ -137,7 +148,7 @@ img {
 }
 
 .topbar-title {
-  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-family: 'Paperlogy', 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 500;
   font-size: 19px;
   color: var(--brand-red);
@@ -196,7 +207,7 @@ img {
   border: none;
   border-radius: 12px;
   padding: 9px 16px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
@@ -249,7 +260,7 @@ img {
   -webkit-tap-highlight-color: transparent; /* 모바일 기본 검정 음영은 끄고, 아래 :active로 눌림 반응을 줌 */
 }
 
-@media (max-width: 640px) {
+@media all {
   .tabs-share-btn {
     display: flex;
   }
@@ -280,7 +291,7 @@ img {
 
 .tab-btn {
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 15px;
   font-weight: 500;
   padding: 10px 2px;
@@ -301,7 +312,7 @@ img {
   font-weight: 700;
 }
 
-@media (max-width: 900px) {
+@media all {
   .topbar {
     padding: 10px 0;
   }
@@ -371,7 +382,7 @@ img {
   }
 }
 
-@media (max-width: 640px) {
+@media all {
   .topbar-inner {
     gap: 8px;
     row-gap: 6px;
@@ -445,7 +456,7 @@ img {
   transform: scale(.9);
 }
 
-@media (max-width: 640px) {
+@media all {
   .topbar-icon-btn {
     display: none;
   }
@@ -458,7 +469,7 @@ img {
   outline: none;
   background: transparent;
   font-size: 14px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   color: var(--text-dark);
   padding-right: 8px;
 }
@@ -467,7 +478,7 @@ img {
   color: var(--text-muted);
 }
 
-@media (max-width: 640px) {
+@media all {
   .search-input {
     font-size: 16px;
   }
@@ -499,7 +510,7 @@ img {
 .main {
   flex: 1;
   width: 100%;
-  max-width: 1160px;
+  max-width: 440px;
   margin: 0 auto;
   padding: 24px clamp(20px, 5vw, 40px) 70px;
 }
@@ -516,7 +527,7 @@ img {
   margin: 0;
   font-size: 13px;
   color: #AD8177;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .sort-dd {
@@ -538,7 +549,7 @@ img {
   border: 1px solid #E7DED9;
   background: #fff;
   color: #6E5F58;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -604,7 +615,7 @@ img {
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
@@ -672,7 +683,7 @@ img {
 }
 
 /* 모바일: 프레임 좌·우·하단 테두리를 더 얇게 (상단 밴드는 배지 때문에 유지) */
-@media (max-width: 640px) {
+@media all {
   .recipe-card {
     --band-h: 34px;
     padding-left: 4px;
@@ -696,7 +707,7 @@ img {
   padding: 60px 20px;
   color: #A88F87;
   font-size: 15px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 @media (hover: hover) {
@@ -761,7 +772,7 @@ img {
   font-size: 11px;
   font-weight: 400;
   color: #fff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .recipe-thumb-source .src-ic {
@@ -868,7 +879,7 @@ img {
 }
 
 /* 모바일: 탭 영역 넉넉히(폭) + 글리프 살짝 키움, 높이는 밴드에 맞춰 세로 중앙 */
-@media (max-width: 640px) {
+@media all {
   .fav-star {
     width: 38px;
     right: 5px;
@@ -912,7 +923,7 @@ img {
 .like-count {
   font-size: 14px;
   font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   min-width: 8px;
 }
 
@@ -950,7 +961,7 @@ img {
   border: 1px solid var(--frame-line, #D9C3A8);
   border-radius: 999px;
   font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .recipe-name {
@@ -962,7 +973,7 @@ img {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 700;
   font-size: 24px;
   color: var(--text-dark);
@@ -1003,7 +1014,7 @@ img {
   align-self: baseline;
   display: block;
   margin: 0;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #A88F87;
@@ -1029,7 +1040,7 @@ img {
   color: var(--brand-red);
 }
 
-@media (max-width: 640px) {
+@media all {
   .main {
     padding-top: 12px; /* 헤더~툴바 간격을 카드 간격(12px)과 맞춰 위아래 리듬 통일 */
     padding-bottom: 100px;
@@ -1119,7 +1130,7 @@ img {
   display: none;
 }
 
-@media (max-width: 640px) {
+@media all {
   .footer {
     padding: 12px clamp(20px, 5vw, 40px);
     padding-bottom: 16px;
@@ -1228,7 +1239,7 @@ img {
 .modal .modal-fav-btn { right: 60px; }
 
 /* 모바일: 상단바 아래 전체화면 (상단바는 그대로 동작 — 탭·검색 누르면 상세 자동 닫힘) */
-@media (max-width: 640px) {
+@media all {
   .modal-overlay {
     top: var(--topbar-h, 0px); /* JS가 상단바 실제 높이를 넣어줌 */
     padding: 8px; /* 프레임 둘레 여백 — 뒤로 페이지 크림색이 보임 */
@@ -1238,7 +1249,7 @@ img {
 
   .modal {
     width: 100%;
-    max-width: none;
+    max-width: 440px;
     height: 100%;
     max-height: none;
     box-shadow: none;
@@ -1258,7 +1269,7 @@ img {
   font-size: 13px;
   font-weight: 500;
   color: #9A8A83;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .modal-close {
@@ -1301,7 +1312,7 @@ img {
   border: none;
   background: var(--brand-red);
   color: #fff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -1510,7 +1521,7 @@ img {
    배지·즐겨찾기·좋아요 다 없어 상단 밴드 불필요 → 사방 균일한 얇은 로즈 프레임 */
 .gacha-result .recipe-card { --band-h: 6px; --frame: #E0A294; width: 190px; pointer-events: auto; text-align: left; padding: var(--band-h) 6px 6px; }
 /* 모바일은 실제 그리드 카드 폭(162px)과 동일하게 — 작은 모달에서도 버튼과 안 겹침 */
-@media (max-width: 767px) {
+@media all {
   .gacha-result .recipe-card { width: 162px; }
 }
 /* 가챠 카드는 데스크톱에서도 폭이 모바일 그리드 카드(162px)급이므로,
@@ -1538,7 +1549,7 @@ img {
   border: none;
   background: var(--brand-red);
   color: #fff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 800;
   padding: 13px 40px;
@@ -1557,7 +1568,7 @@ img {
 .gacha-view, .gacha-again {
   flex: 1;
   min-width: 0;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px;
   padding: 12px 10px;
   border-radius: 999px;
@@ -1580,7 +1591,7 @@ img {
 .gacha-again:active { transform: scale(.95); background: #F5D7D1; }
 
 /* 데스크톱에서 가챠 팝업 크게 */
-@media (min-width: 700px) {
+@media (min-width: 100000px) {
   .gacha-modal { width: 440px; padding: 40px 34px 32px; gap: 20px; }
   .gacha-title { font-size: 24px; }
   .gacha-close { font-size: 30px; }
@@ -1650,7 +1661,7 @@ img {
   color: #B29288;
   border-radius: 999px;
   padding: 11px 26px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 700;
   transition: color .15s, border-color .15s, transform .1s;
@@ -1690,7 +1701,7 @@ img {
 
 .modal-name {
   margin: 12px 0 0;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 800;
   font-size: 30px;
   color: var(--text-darkest);
@@ -1705,7 +1716,7 @@ img {
   color: #8A7A73;
   border-radius: 999px;
   font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .modal-desc {
@@ -1713,7 +1724,7 @@ img {
   font-size: 14px;
   line-height: 1.6;
   color: #8B6F68;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .modal-body {
@@ -1728,7 +1739,7 @@ img {
   font-size: 16px;
   font-weight: 700;
   color: var(--text-darkest);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .ing-box {
@@ -1750,7 +1761,7 @@ img {
   font-size: 15px;
   font-weight: 500;
   color: #3A241F;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   word-break: keep-all;
 }
 
@@ -1819,7 +1830,7 @@ img {
   line-height: 1.55;
   color: #4a4038;
   padding-top: 1px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 .tip-box {
@@ -1830,7 +1841,7 @@ img {
   font-size: 14px;
   line-height: 1.6;
   color: #7a3b33;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
 
 
@@ -1846,7 +1857,7 @@ img {
   border: none;
   border-radius: 999px;
   padding: 9px 14px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -1867,7 +1878,7 @@ img {
   z-index: 250;
   background: rgba(43, 18, 13, .9);
   color: #fff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
   padding: 10px 18px;
@@ -1893,7 +1904,7 @@ img {
   background: var(--text-dark);
   color: #fff;
   padding: 12px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
@@ -1955,7 +1966,7 @@ img {
 
 .a2hs-title {
   margin: 0 0 20px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-dark);
@@ -1976,7 +1987,7 @@ img {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px;
   color: #5A3F39;
   line-height: 1.5;
@@ -2158,7 +2169,7 @@ img {
 }
 .view-empty-title {
   margin: 0 0 8px;
-  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 500;
   font-size: 22px;
   color: var(--text-darkest);
@@ -2201,7 +2212,7 @@ img {
   row-gap: 14px;
   align-items: start; /* 카드 높이가 달라도 위로 정렬 */
 }
-@media (max-width: 640px) {
+@media all {
   .stores { grid-template-columns: 1fr; } /* 420 minmax는 375px에서 overflow라 명시적으로 1칸 */
 }
 .store-region {
@@ -2222,7 +2233,7 @@ img {
 /* (매장 전용 하단여백 제거) 예전엔 .main 여백이 JS 때문에 40px로 줄어 마지막 카드가 탭바에 가려서
    #view-store에 별도 패딩을 줬으나, JS 버그를 고쳐 .main이 탭바 회피를 제대로 하므로 더는 불필요. */
 /* 모바일: 한 줄에 하나(주소·버튼 있는 카드라 2열은 답답함) */
-@media (max-width: 640px) {
+@media all {
   .stores-head { margin-bottom: 12px; } /* 레시피 list-head 모바일과 동일 */
   .stores { grid-template-columns: 1fr; row-gap: 12px; }
   .store-region { margin: 8px 4px 0; }
@@ -2236,7 +2247,7 @@ img {
   margin-bottom: 9px;
 }
 .store-name {
-  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 500;
   font-size: 17px;
   color: var(--text-darkest);
@@ -2263,7 +2274,7 @@ img {
 .store-btn {
   flex: 1;
   text-align: center;
-  font-family: 'Noto Sans KR', sans-serif; /* button 태그(지도)가 시스템폰트로 렌더되던 것 방지 → a(전화)와 통일 */
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif; /* button 태그(지도)가 시스템폰트로 렌더되던 것 방지 → a(전화)와 통일 */
   font-size: 13px;
   font-weight: 700;
   padding: 9px 0;
@@ -2371,7 +2382,7 @@ img {
   border-radius: 9px;
   background: transparent;
   color: var(--text-dark);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
@@ -2396,7 +2407,7 @@ img {
 .topbar-section-title {
   display: none;
   flex: none;
-  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 500;
   font-size: 18px;
   color: var(--text-darkest);
@@ -2418,7 +2429,7 @@ img {
 /* 발도장 기록하기 버튼(오늘의 소스 스타일): 발도장에서만 */
 .stamp-write-btn { display: none; }
 .page[data-section="stamp"] .stamp-write-btn { display: inline-flex; }
-@media (max-width: 900px) {
+@media all {
   /* 모바일·태블릿: 로고 줄 오른쪽 끝으로(탭 줄은 wrap으로 아랫줄) — 데스크탑은 spacer가 밀어줌 */
   .stamp-write-btn { margin-left: auto; }
 }
@@ -2497,7 +2508,7 @@ img {
 }
 /* 라벨은 모든 탭에 표시(아이콘 밑) — 스크롤 내리면 접힘 */
 .tabbar-label {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: -.01em;
@@ -2570,7 +2581,7 @@ img {
   row-gap: 14px;
   align-items: start;
 }
-@media (max-width: 640px) {
+@media all {
   /* 모바일 = 한 줄에 2개(사용자 확정) — 컴팩트 가로 카드라 2칸이어도 날짜·매장명이 들어감 */
   .stamps {
     grid-template-columns: repeat(2, 1fr);
@@ -2624,7 +2635,7 @@ img {
 .stamp-rec-name {
   /* 매장 탭 카드 이름(.store-name)과 같은 글씨체·굵기. 2칸 컴팩트 카드라 스티커가 주역 → 지점명은
      보조 정보로 살짝 작게(날짜 11px와 균형). 사용자가 17px도 크다고 해서 16px로. */
-  font-family: 'Paperlogy', 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 500;
   font-size: 16px;
   color: var(--text-darkest);
@@ -2733,7 +2744,7 @@ img {
 .stamp-sheet-overlay.open .stamp-sheet { transform: translateY(0); }
 /* 모바일: 레시피 상세와 같은 문법 — 상단바 아래 전체화면(상단바는 그대로 동작),
    불투명 배경 + 둘레 8px 틈으로 카드가 화면에 얹힌 느낌 유지 */
-@media (max-width: 640px) {
+@media all {
   .stamp-sheet-overlay {
     top: var(--topbar-h, 0px); /* JS(syncTopbarH)가 상단바 실제 높이를 넣어줌 */
     padding: 8px;
@@ -2741,7 +2752,7 @@ img {
     align-items: stretch;
   }
   .stamp-sheet {
-    max-width: none;
+    max-width: 440px;
     height: 100%;
     max-height: none;
     box-sizing: border-box;
@@ -2833,7 +2844,7 @@ img {
   font-size: 16px;
   font-weight: 600;
   border: none;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -2842,7 +2853,7 @@ img {
 .stamp-view-delete.armed { background: var(--brand-red); color: #fff; } /* 두 번 눌러 삭제 — 확인 상태 */
 
 /* 모바일: 상단바 아래 전체화면 (레시피 상세·입력 시트와 동일) */
-@media (max-width: 640px) {
+@media all {
   .stamp-view-overlay {
     top: var(--topbar-h, 0px);
     padding: 8px;
@@ -2850,7 +2861,7 @@ img {
     align-items: stretch;
   }
   .stamp-view {
-    max-width: none;
+    max-width: 440px;
     max-height: none;
     flex: 1;
     border-radius: 18px;
@@ -2963,7 +2974,7 @@ img {
   border: 1.5px solid var(--card-border);
   background: #fff;
   color: var(--text-dark);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
   padding: 0 13px;
@@ -3012,7 +3023,7 @@ img {
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13.5px;
   font-weight: 400; /* 메뉴 항목도 얇게 — 선택된 값(400)과 톤 통일 */
   padding: 10px 13px;
@@ -3090,7 +3101,7 @@ img {
   border: none;
   outline: none;
   background: none;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 400; /* 값(입력 글자)은 얇게 — 라벨(메모·입력)만 굵게, 날짜·드롭다운 값과 통일 */
   color: var(--text-dark);
@@ -3121,7 +3132,7 @@ img {
 .stamp-date-text {
   flex: 1;
   min-width: 0;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 400; /* 값은 얇게(라벨 '날짜'만 굵게) — 필드명↔값 위계 */
   color: var(--text-dark);
@@ -3137,7 +3148,7 @@ img {
   border-radius: 13px;
   background: var(--brand-red);
   color: #fff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 800;
   padding: 14px 0;
@@ -3160,7 +3171,7 @@ img {
   border-radius: 11px;
   background: none;
   color: var(--text-muted);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 13.5px;
   font-weight: 700;
   padding: 11px 0;
@@ -3173,3 +3184,4 @@ img {
   color: #fff;
   background: var(--brand-red);
 }
+

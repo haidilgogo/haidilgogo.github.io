@@ -25,14 +25,14 @@
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://haidilgogo.github.io/">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=255">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="styles.css?v=266">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
-<link rel="manifest" href="manifest.json?v=2">
+<link rel="manifest" href="manifest.json?v=4">
+<meta name="theme-color" content="#FCF9F5"><!-- 폰 브라우저 상단(주소창/상태바) 색 = 오프화이트 배경과 톤 맞춤. 원래=없음 -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="하딜고고">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -64,7 +64,7 @@
   }
   .splash-logo { width: 140px; height: 140px; object-fit: contain; }
   .splash-title {
-    font-family: 'PaperlogySplash', 'Noto Sans KR', sans-serif;
+    font-family: 'PaperlogySplash', 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
     font-weight: 500; font-size: 26px; color: #E0301E;
     letter-spacing: -.01em;
     /* 로고 PNG 아래 투명여백(약 23px) 상쇄해 트레이 바로 밑에 붙임 */
@@ -354,7 +354,7 @@
         <span class="stamp-slot-hint" id="stampSlotHint">스티커 붙이는 곳</span>
       </div>
     </div>
-    <button class="stamp-submit" id="stampSubmit" type="button" disabled>기록하기</button>
+    <button class="stamp-submit" id="stampSubmit" type="button" disabled>스티커 붙이기</button>
   </div>
 </div>
 
@@ -570,7 +570,7 @@
   </div>
 </div>
 
-<script src="script.js?v=246"></script>
+<script src="script.js?v=247"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
