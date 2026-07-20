@@ -1362,41 +1362,11 @@
     // silent: 호출한 쪽이 원 움직임을 직접 책임질 때(탭 전환의 슬라이드를 스냅으로 끊지 않게)
     if (!(opts && opts.silent)) trackIndicator(300); // 크기 변하는 동안 빨간 원이 딱 붙어 따라오게(트랜지션 끔)
   }
-  // ── 스크롤 출렁임(배민 리퀴드) ── 스크롤 중엔 구슬이 유리로 변해 스크롤 반대 방향으로
-  // 살짝 눌렸다가(관성), 멈추면 회색 필로 복귀. 슬라이드·드래그 중엔 양보.
-  let scrollGlassTimer = 0;
-  let scrollGlassActive = false;
-  function onScrollBubble(dy) {
-    if (indicatorBusy || dragPointerId !== null) return;
-    const active = tabbarEl.querySelector('.tabbar-btn.active');
-    if (!active) return;
-    if (!scrollGlassActive) {
-      scrollGlassActive = true;
-      setGlass(true);
-      // 출렁임은 즉각 반응해야 해서 짧은 트랜지션으로 교체(복귀 때 '' 복원)
-      tabbarIndicator.style.transition = 'transform .18s cubic-bezier(.3,.7,.4,1), width .2s ease, height .2s ease, border-radius .2s ease, background .2s ease, box-shadow .2s ease';
-      tabbarIndicator.style.width = BUBBLE + 'px';
-      tabbarIndicator.style.height = BUBBLE + 'px';
-    }
-    const p = bubblePosFor(active);
-    const push = Math.max(-7, Math.min(7, -dy * 0.25)); // 스크롤 반대로 최대 7px 눌림
-    tabbarIndicator.style.transform = 'translate(' + p.x + 'px,' + (p.y + push) + 'px)';
-    clearTimeout(scrollGlassTimer);
-    scrollGlassTimer = setTimeout(() => {
-      scrollGlassActive = false;
-      if (!indicatorBusy && dragPointerId === null) {
-        tabbarIndicator.style.transition = '';
-        updateIndicator(); // 필 복귀 — 스타일시트 트랜지션이 변신을 부드럽게
-      }
-    }, 160);
-  }
+  // 스크롤 중엔 인디케이터가 반응하지 않는다(2026-07-21 확정) — 채워진 필이 탭 위에 그대로.
+  // 구슬 변신·이동은 오직 "탭 이동(클릭·드래그)" 때만. (스크롤 출렁임을 넣었다가 제거한 이력: e853805)
   function onScroll() {
     const y = window.scrollY;
-    if (ignoreScrollOnce) { ignoreScrollOnce = false; lastScrollY = y; return; }
-    const dy = y - lastScrollY;
-    if (Math.abs(dy) < 2) return; // 미세 떨림 무시
-    // (구 compact 축소 로직 제거 — 시각효과가 사라져 setCompact 스냅이 출렁임을 덮는 잔재였음)
-    onScrollBubble(dy);
+    if (ignoreScrollOnce) { ignoreScrollOnce = false; }
     lastScrollY = y;
   }
   window.addEventListener('scroll', onScroll, { passive: true });
