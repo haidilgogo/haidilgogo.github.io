@@ -1126,8 +1126,6 @@
   }
   function setGlass(on) {
     tabbarIndicator.classList.toggle('tabbar-indicator--glass', on);
-    // 이동 중엔 활성 탭 글씨를 흰색 대신 진회색으로(밝은 바 위 흰 글씨 가독성) — CSS .tabbar--moving
-    tabbarEl.classList.toggle('tabbar--moving', on);
   }
   // (정지 상태) 필을 현재 활성 탭에 딱 맞춤
   function updateIndicator() {
@@ -1300,13 +1298,16 @@
     dragPointerId = e.pointerId;
     dragMoved = false;
     dragStartX = e.clientX;
-    try { tabbarEl.setPointerCapture(e.pointerId); } catch (_) { /* 일부 브라우저 방어 */ }
+    // ⚠️ 여기서 캡처하면 안 됨 — pointer capture가 걸리면 click 이벤트가 버튼 대신 바로 재타게팅되어
+    // 탭 클릭 전환이 죽는다(실제 버그였음). 캡처는 드래그로 판정된 순간(pointermove 6px)에만.
   });
   tabbarEl.addEventListener('pointermove', (e) => {
     if (e.pointerId !== dragPointerId) return;
     if (!dragMoved) {
       if (Math.abs(e.clientX - dragStartX) < 6) return; // 아직 클릭 범위
       dragMoved = true;
+      // 드래그로 확정된 지금만 캡처(pointerdown에서 걸면 click이 죽음) — 손가락이 바 밖으로 나가도 추적 유지
+      try { tabbarEl.setPointerCapture(e.pointerId); } catch (_) { /* 일부 브라우저 방어 */ }
       // 진행 중인 슬라이드/추적 인계 후 손가락 직접 추적 시작
       cancelAnimationFrame(indicatorAnimId);
       if (indicatorWA) { const prev = indicatorWA; indicatorWA = null; prev.cancel(); }
