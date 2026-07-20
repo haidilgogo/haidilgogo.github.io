@@ -1496,12 +1496,16 @@
   } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
 
   // 스티커 카드 DOM(그리드 타일·시트 슬롯 공용). 지점명 밴드는 앱이 얹음(그림 하단 빈 띠 위).
-  function buildStampCard(name) {
+  function buildStampCard(name, opts) {
     const card = document.createElement('div');
     const img = STAMP_IMGS[name];
     if (img) {
-      // 스티커 이미지엔 지점명이 이미 구워져 있음 → 앱 밴드 오버레이 안 붙임
-      card.innerHTML = '<img src="' + img + '" alt="' + name + ' 스티커">';
+      // 스티커 이미지엔 지점명이 이미 구워져 있음 → 앱 밴드 오버레이 안 붙임.
+      // loading: 기록 그리드 카드는 lazy(화면 밖은 스크롤 시 로드). 수정 슬롯·찍기(pop)는
+      // 반드시 즉시 보여야 하는 초점 이미지라 eager — lazy면 시트 슬라이드 중 로드가 미뤄져
+      // 스티커가 한 박자 늦게 떴음(opts.eager로 지정).
+      const loading = opts && opts.eager ? 'eager' : 'lazy';
+      card.innerHTML = '<img src="' + img + '" alt="' + name + ' 스티커" loading="' + loading + '">';
     } else {
       // 아직 그림 없는 지점 = 자리표시 카드에만 이름 밴드 표시
       card.innerHTML = '<div class="stamp-ph"><span>🐾</span></div>';
@@ -1645,7 +1649,7 @@
     stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.toggle('active', i.dataset.value === name));
     if (stampMode === 'edit') {
       stampSlot.querySelectorAll('.stamp-slot-card').forEach((el) => el.remove());
-      const card = buildStampCard(name);
+      const card = buildStampCard(name, { eager: true }); // 수정 슬롯 = 즉시 보여야 함(늦게 뜸 방지)
       card.className = 'stamp-slot-card';
       stampSlot.appendChild(card);
     } else {
@@ -1753,27 +1757,44 @@
     }
     stampAnimating = true;
     stampSubmitEl.disabled = true;
-    // 점선 슬롯 자리에 스티커가 탁! 붙는 연출
-    stampSlotEmpty.hidden = true;
-    const card = buildStampCard(stampSelected);
-    card.className = 'stamp-slot-card pop';
-    stampSlot.appendChild(card);
-    if (navigator.vibrate) navigator.vibrate(35); // 지원 기기(안드로이드)만 살짝 진동
-    // 저장은 즉시(연출이 끊겨도 기록은 남게), 화면 정리는 연출이 끝난 뒤
-    stampData.records.push({
-      id: newStampId(),
-      name: stampSelected,
-      date: stampDateEl.value || new Date().toISOString().slice(0, 10),
-      memo: stampMemoEl.value.trim(),
-      with: stampWithEl.value.trim() || undefined, // 동행(선택·자유 입력) — 없으면 JSON에서 자동 생략
-      addedAt: Date.now(), // 같은 날짜 안에선 나중에 기록한 것이 위로(일기 정렬)
-    });
-    saveStamps();
-    setTimeout(() => {
-      stampAnimating = false;
-      stampSheetOverlay.classList.remove('open');
-      renderStamps();
-    }, 1250); // 팝 0.55s + 붙은 스티커 감상 시간
+    // 점선 슬롯 자리에 스티커가 탁! 붙는 연출. ⚠️ 스티커 이미지가 준비된 뒤에 시작해야
+    // 빈 카드가 안 뜬다 — 선택 시 미리 로드하지만, 느린 망·빠른 탭이면 아직 로딩 중일 수 있음.
+    const playStampPop = () => {
+      stampSlotEmpty.hidden = true;
+      const card = buildStampCard(stampSelected, { eager: true }); // 찍기 연출 = 즉시 보여야 함
+      card.className = 'stamp-slot-card pop';
+      stampSlot.appendChild(card);
+      if (navigator.vibrate) navigator.vibrate(35); // 지원 기기(안드로이드)만 살짝 진동
+      // 저장은 즉시(연출이 끊겨도 기록은 남게), 화면 정리는 연출이 끝난 뒤
+      stampData.records.push({
+        id: newStampId(),
+        name: stampSelected,
+        date: stampDateEl.value || todayIso(),
+        memo: stampMemoEl.value.trim(),
+        with: stampWithEl.value.trim() || undefined, // 동행(선택·자유 입력) — 없으면 JSON에서 자동 생략
+        addedAt: Date.now(), // 같은 날짜 안에선 나중에 기록한 것이 위로(일기 정렬)
+      });
+      saveStamps();
+      setTimeout(() => {
+        stampAnimating = false;
+        stampSheetOverlay.classList.remove('open');
+        renderStamps();
+      }, 1250); // 팝 0.55s + 붙은 스티커 감상 시간
+    };
+    // 이미지가 캐시됐으면(대개 이 경우) 즉시, 아직이면 로드 완료 후 pop. 실패·지연 시엔 안전장치로 진행.
+    const stampImgUrl = STAMP_IMGS[stampSelected];
+    if (stampImgUrl) {
+      const pre = new Image();
+      let started = false;
+      const go = () => { if (started) return; started = true; playStampPop(); };
+      pre.onload = go;
+      pre.onerror = go; // 실패해도 진행(자리표시라도 뜨게, 기록은 남아야 함)
+      pre.src = stampImgUrl;
+      if (pre.complete) go(); // 이미 로드됨 → 즉시
+      else setTimeout(go, 1500); // 안전장치: 느려도 최대 1.5초 뒤엔 진행
+    } else {
+      playStampPop(); // 그림 없는 지점(자리표시) — 기다릴 것 없음
+    }
   });
 
   // 삭제 — 실수 방지로 두 번 눌러야(첫 클릭=확인 상태, 3초 뒤 자동 원복). v2: 그 기록(id)만 삭제
