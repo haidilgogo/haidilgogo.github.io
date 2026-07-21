@@ -3460,8 +3460,6 @@ img {
   color: var(--text-muted);
   cursor: pointer;
   padding: 4px 0 4px 12px;
-  text-decoration: underline;         /* 화살표(›) 대신 밑줄로 링크 표시(2026-07-22) */
-  text-underline-offset: 3px;         /* 글자에 붙지 않게 살짝 띄움 */
 }
 .home-sec-sub {
   margin: 0 0 14px;

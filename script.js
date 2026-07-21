@@ -804,7 +804,7 @@
       + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i></span>'
       + homeCardMeta(r) + '</button>'
     ).join('')
-      + '<button class="hp-more" id="hpMore" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>소스<br>모두 보기</button>';
+      + '<button class="hp-more" id="hpMore" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>소스<br>전체보기</button>';
     bindHomeCards(popularRailEl);
     document.getElementById('hpMore').addEventListener('click', () => enterBrowse('소스'));
   }
