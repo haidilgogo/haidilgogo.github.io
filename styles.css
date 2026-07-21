@@ -686,10 +686,9 @@ img {
 }
 .mf-kicker-lead { color: var(--text-dark); } /* "이 달의"만 다른 색(진한 글자색) */
 
-/* 캐러셀 = .main 좌우 패딩 상쇄해 화면 끝까지(full-bleed) + 인디케이터 고정 기준점 */
+/* 캐러셀 = 콘텐츠 폭(로고·아이콘 라인)에 맞춤. 히어로가 양쪽 다 정렬되도록 full-bleed 안 함 */
 .mf-carousel {
   position: relative;
-  margin: 0 -20px; /* .main 고정 패딩(20px) 상쇄 full-bleed */
 }
 /* 가로 스와이프 — 첫/끝 카드 인셋은 작게(카드 크게) */
 .mf-scroll {
@@ -697,7 +696,7 @@ img {
   gap: 10px;              /* 카드 사이 간격(간격 색 = 깨끗한 배경색, 그림자 제거로 띠 안 생김) */
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 0 12px;
+  padding: 0;              /* 히어로가 콘텐츠 폭에 딱 맞도록 스크롤 인셋 제거(좌우 정렬) */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -717,7 +716,7 @@ img {
 /* 히어로 카드 (1:1, 원본 이미지 안 잘림) */
 .mf-hero {
   position: relative;
-  flex: 0 0 96%;                 /* 29CM식: 크게 꽉 차게, 옆 카드 살짝만 삐죽(peek) */
+  flex: 0 0 100%;                /* 콘텐츠 폭 꽉 채움 → 좌우 라인 로고·아이콘과 정렬(peek 없음) */
   scroll-snap-align: center;
   scroll-snap-stop: always;      /* 한 번 스와이프 = 한 장만(빠르게 튕겨도 다음 장에서 멈춤) */
   aspect-ratio: 1 / 1;
