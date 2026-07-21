@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=327">
+<link rel="stylesheet" href="styles.css?v=328">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -119,16 +119,9 @@
         <span class="topbar-title">하딜고고</span>
       </button>
       <span class="topbar-section-title" id="sectionTitle"></span>
+      <!-- 카테고리 필터 탭 제거(2026-07-21 홈 7단 개편) — 카테고리는 홈 섹션으로 이동.
+           즐겨찾기 버튼은 topbar-right로 이사, 이 그룹은 숨김(favShareBtn 등은 script 참조 때문에 DOM 유지) -->
       <div class="tabs-group tabs-group--recipe">
-        <div class="tabs" id="tabs">
-          <span class="tabs-underline" id="tabsUnderline"></span>
-        </div>
-        <button class="fav-toggle-btn" id="favToggleBtn" type="button" aria-label="즐겨찾기">
-          <svg class="fav-toggle-icon" id="favToggleIcon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-          </svg>
-          <span class="fav-toggle-label">즐겨찾기</span>
-        </button>
         <button class="tabs-share-btn" id="favShareBtn" type="button" aria-label="친구에게 공유">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
@@ -183,6 +176,13 @@
       <div class="topbar-spacer"></div>
       <!-- 상단 우측 그룹(2026-07-21): 검색 + 공유 + 설치. 검색 열면 공유·설치는 접혀 사라짐 -->
       <div class="topbar-right">
+      <!-- 즐겨찾기(레시피 섹션 전용) — 탭줄 제거 후 우측 그룹으로 이동(2026-07-21) -->
+      <button class="fav-toggle-btn" id="favToggleBtn" type="button" aria-label="즐겨찾기">
+        <svg class="fav-toggle-icon" id="favToggleIcon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        </svg>
+        <span class="fav-toggle-label">즐겨찾기</span>
+      </button>
       <!-- 검색 접기: 기본은 🔍만, 누르면 입력창 펼침 -->
       <div class="search-box">
         <button class="search-toggle" id="searchToggle" type="button" aria-label="검색 열기">
@@ -221,8 +221,8 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- 레시피 섹션 -->
-    <div class="view" id="view-recipe">
+    <!-- 레시피 섹션 — 기본은 홈(7단 섹션), 검색·즐겨찾기·전체보기 땐 is-home 해제되고 그리드 뷰 -->
+    <div class="view is-home" id="view-recipe">
       <!-- 이 달의 레시피 — 월간 큐레이션 히어로(29CM식). 가로 스와이프 3-5개. 기본 화면(전체·검색X·즐겨찾기X)에서만 보임 -->
       <section class="monthly-feature" id="monthlyFeature" hidden>
         <p class="mf-kicker"><span class="mf-kicker-lead">이 달의</span> 레시피</p>
@@ -233,8 +233,47 @@
         </div>
       </section>
 
+      <!-- ── 홈 7단 섹션(2026-07-21 확정) — is-home일 때만 표시, 내용은 script.js가 렌더 ── -->
+      <section class="home-sec" id="homeCelebs">
+        <div class="home-sec-head"><h2 class="home-sec-title">셀럽 레시피</h2></div>
+        <p class="home-sec-sub">그 사람이 진짜 먹는 조합</p>
+        <div class="celeb-rail" id="celebRail"></div>
+      </section>
+      <section class="home-sec" id="homePopular">
+        <div class="home-sec-head">
+          <h2 class="home-sec-title">인기 소스 <span class="home-sec-cnt" id="popularCnt"></span></h2>
+          <button class="home-sec-more" id="popularMore" type="button">전체 ›</button>
+        </div>
+        <p class="home-sec-sub">지금 제일 많이 찍는 조합</p>
+        <div class="hp-rail" id="popularRail"></div>
+      </section>
+      <button class="home-guide home-sec" id="homeGuide" type="button">
+        <span class="home-guide-ic">📖</span>
+        <span class="home-guide-txt">
+          <span class="home-guide-title">하이디라오가 처음인 당신에게</span>
+          <span class="home-guide-sub">주문법부터 소스바 사용법까지 · 3분 가이드</span>
+        </span>
+        <svg class="home-guide-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <section class="home-sec" id="homeTang">
+        <div class="home-sec-head"><h2 class="home-sec-title">탕 <span class="home-sec-cnt" id="tangCnt"></span></h2></div>
+        <p class="home-sec-sub">베이스가 되는 국물부터 고르기</p>
+        <div class="home-grid" id="tangGrid"></div>
+      </section>
+      <section class="home-sec" id="homeHidden">
+        <div class="home-sec-head"><h2 class="home-sec-title">히든메뉴 <span class="home-sec-cnt" id="hiddenCnt"></span></h2></div>
+        <p class="home-sec-sub">아는 사람만 시키는 조합</p>
+        <div class="home-grid" id="hiddenGrid"></div>
+      </section>
+      <section class="home-sec home-random" id="homeRandom">
+        <span class="home-random-dice">🎲</span>
+        <p class="home-random-title">그래도 못 골랐다면</p>
+        <p class="home-random-sub">오늘의 운명을 소스에 맡겨보세요</p>
+        <button class="home-random-btn" id="homeRandomBtn" type="button">운명의 소스 뽑기</button>
+      </section>
+
       <div class="list-head">
-        <p class="count-line">레시피 <span class="count-num" id="countNum">0</span>개</p>
+        <p class="count-line"><button class="browse-back" id="browseBack" type="button" aria-label="홈으로">‹</button><span id="listTitle">레시피</span> <span class="count-num" id="countNum">0</span>개</p>
         <div class="head-actions">
           <button class="gacha-btn" id="gachaBtn" type="button">🎲 오늘의 소스</button>
           <div class="sort-dd" id="sortDd">
@@ -586,7 +625,7 @@
   </div>
 </div>
 
-<script src="script.js?v=278"></script>
+<script src="script.js?v=279"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

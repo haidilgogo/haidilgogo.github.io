@@ -314,7 +314,8 @@
     }
   })();
 
-  let activeCat = '전체';
+  let activeCat = '전체';       // '전체'가 아니면 카테고리 전체보기(그리드 뷰) 상태
+  let personFilter = null;      // 셀럽 레일에서 인물을 고르면 그 사람 레시피만(그리드 뷰)
   let query = '';
   let showFavoritesOnly = false;
   let sortMode = 'popular'; // 'popular'(좋아요) | 'recent'(날짜) | 'name'(가나다)
@@ -363,7 +364,8 @@
 
   // 화면에 그려진 하트 숫자들을 현재 likeCounts로 갱신 (active 상태는 기기별이라 건드리지 않음)
   function refreshLikeCounts() {
-    document.querySelectorAll('.like-btn').forEach((btn) => {
+    // 그리드 카드(.like-btn)와 홈 인기소스 칩(.hp-like) 모두 갱신
+    document.querySelectorAll('.like-btn, .hp-like').forEach((btn) => {
       const countEl = btn.querySelector('.like-count');
       if (countEl) countEl.textContent = getLikeCount(btn.dataset.id);
     });
@@ -392,8 +394,11 @@
       likesRef.on('value', (snapshot) => {
         likeCounts = snapshot.val() || {};
         saveLikes();
-        if (sortMode === 'popular' && !likesInitialSorted) {
-          renderGrid();
+        if (!likesInitialSorted) {
+          // 첫 도착: 인기순 그리드 재정렬 + 홈 인기소스 순위도 실데이터로 다시 그림
+          if (sortMode === 'popular') renderGrid();
+          if (typeof renderHomePopular === 'function') renderHomePopular();
+          refreshLikeCounts();
         } else {
           refreshLikeCounts();
         }
@@ -420,8 +425,6 @@
     }
   }
 
-  const tabsEl = document.getElementById('tabs');
-  const tabsUnderline = document.getElementById('tabsUnderline');
   const gridEl = document.getElementById('recipeGrid');
   const countEl = document.getElementById('countNum');
   const searchInput = document.getElementById('searchInput');
@@ -439,42 +442,14 @@
   const modalClose = document.getElementById('modalClose');
   const modalFavBtn = document.getElementById('modalFavBtn');
 
-  function renderTabs() {
-    tabsEl.querySelectorAll('.tab-btn').forEach((btn) => btn.remove());
-    CATS.forEach((cat) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tab-btn' + (cat === activeCat ? ' active' : '');
-      btn.textContent = cat;
-      btn.addEventListener('click', () => {
-        activeCat = cat;
-        // 카테고리를 고르면 검색·즐겨찾기 모드에서 빠져나옴(카테고리와 독립이므로 함께 켜두면 혼란)
-        if (showFavoritesOnly) {
-          showFavoritesOnly = false;
-          favToggleBtn.classList.remove('active');
-        }
-        if (query) {
-          query = '';
-          searchInput.value = '';
-          searchBox.classList.remove('has-value');
-        }
-        renderTabs();
-        renderGrid();
-      });
-      tabsEl.appendChild(btn);
-    });
-    const activeBtn = tabsEl.querySelector('.tab-btn.active');
-    if (activeBtn) {
-      tabsUnderline.style.width = `${activeBtn.offsetWidth}px`;
-      tabsUnderline.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
-    }
-  }
-
   function getFiltered() {
     const q = query.trim();
-    // 검색·즐겨찾기는 카테고리와 독립 — 둘 중 하나라도 켜지면 전체에서 필터함
+    // 검색·즐겨찾기는 카테고리·인물과 독립 — 둘 중 하나라도 켜지면 전체에서 필터함
     const ignoreCat = showFavoritesOnly || q;
     let filtered = RECIPES.filter((r) => ignoreCat || activeCat === '전체' || r.cat === activeCat);
+    if (!ignoreCat && personFilter) {
+      filtered = filtered.filter((r) => r.person === personFilter);
+    }
     if (showFavoritesOnly) {
       filtered = filtered.filter((r) => favorites.has(r.id));
     }
@@ -685,16 +660,54 @@
     }, true);
   }
 
+  // ── 홈 ↔ 그리드 뷰 전환(2026-07-21 7단 개편) ──
+  // 홈 = 필터가 하나도 없는 기본 상태. 검색·즐겨찾기·카테고리 전체보기·인물 보기가 켜지면 그리드 뷰.
+  const viewRecipeEl = document.getElementById('view-recipe');
+  const listTitleEl = document.getElementById('listTitle');
+
+  function isHome() {
+    return activeCat === '전체' && !personFilter && !query.trim() && !showFavoritesOnly;
+  }
+  function syncHome() {
+    viewRecipeEl.classList.toggle('is-home', isHome());
+  }
+  function browseTitle() {
+    if (query.trim()) return '검색 결과';
+    if (showFavoritesOnly) return '즐겨찾기';
+    if (personFilter) return personFilter + ' 레시피';
+    if (activeCat !== '전체') return activeCat;
+    return '레시피';
+  }
+  // 홈 섹션(전체 ›·아바타)에서 그리드 뷰로 들어가거나(cat/person), 초기화해 홈으로 돌아옴
+  function enterBrowse(cat, person) {
+    activeCat = cat || '전체';
+    personFilter = person || null;
+    if (showFavoritesOnly) {
+      showFavoritesOnly = false;
+      favToggleBtn.classList.remove('active');
+    }
+    if (query) {
+      query = '';
+      searchInput.value = '';
+      searchBox.classList.remove('has-value');
+    }
+    renderGrid();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  function goHome() { enterBrowse('전체', null); }
+
   function syncMonthlyFeature() {
-    // 기본 화면(전체 탭·검색 없음·즐겨찾기 아님)에서만 노출 — 필터 중엔 결과에 집중
-    monthlyFeatureEl.hidden = !(activeCat === '전체' && !query.trim() && !showFavoritesOnly);
+    // 홈에서만 노출 — 필터 중엔 결과에 집중
+    monthlyFeatureEl.hidden = !isHome();
     // 보이게 된 직후 인디케이터 막대 재배치(숨김일 때 측정한 0값 교정)
     if (!monthlyFeatureEl.hidden && monthlyUpdatePill) monthlyUpdatePill();
   }
 
   function renderGrid() {
+    syncHome();
     syncMonthlyFeature();
     const filtered = getFiltered();
+    listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
     gridEl.innerHTML = '';
     if (filtered.length === 0) {
@@ -724,6 +737,95 @@
       }
       gridEl.appendChild(el);
     });
+  }
+
+  // ── 홈 섹션 렌더링(2026-07-21 7단 구조) ──
+  // ② 셀럽 레일: person 필드로 그룹핑. 사진(assets/people/<이름>.jpg)이 없으면 이니셜 원으로 표시
+  //    — img onerror가 스스로 제거되는 방식이라, 나중에 사진만 넣으면 자동으로 얼굴로 바뀜.
+  const celebRailEl = document.getElementById('celebRail');
+  const popularRailEl = document.getElementById('popularRail');
+  const tangGridEl = document.getElementById('tangGrid');
+  const hiddenGridEl = document.getElementById('hiddenGrid');
+  const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#5F5E5A', '#A3612E', '#3E7C8A', '#8A5FB0'];
+
+  function renderCelebRail() {
+    const people = [];
+    const byName = new Map();
+    RECIPES.forEach((r) => {
+      if (!r.person) return;
+      if (!byName.has(r.person)) {
+        byName.set(r.person, { name: r.person, count: 0 });
+        people.push(byName.get(r.person));
+      }
+      byName.get(r.person).count++;
+    });
+    people.sort((a, b) => b.count - a.count);
+    celebRailEl.innerHTML = people.map((p, i) => {
+      const color = CELEB_COLORS[i % CELEB_COLORS.length];
+      return '<button class="celeb" type="button" data-person="' + p.name + '">'
+        + '<span class="celeb-img" style="background:' + color + '">' + p.name.charAt(0)
+        + '<img src="assets/people/' + p.name + '.jpg" alt="" loading="lazy" draggable="false" onerror="this.remove()">'
+        + '<i class="celeb-cnt">' + p.count + '</i></span>'
+        + '<span class="celeb-name">' + p.name + '</span></button>';
+    }).join('');
+    celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
+      btn.addEventListener('click', () => enterBrowse('전체', btn.dataset.person));
+    });
+  }
+
+  // 홈 카드(클린 스타일) 공통 마크업 — 캐러셀·그리드가 함께 씀. 클릭은 컨테이너에서 data-id로 위임.
+  function homeCardBody(r) {
+    const thumb = r.img
+      ? '<img src="' + r.img + '" alt="' + r.name + '" loading="lazy" draggable="false">'
+      : '<span class="hc-emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
+    return thumb;
+  }
+  function homeCardMeta(r) {
+    return '<span class="hp-name">' + (r.nameHtml || r.name)
+      + (r.ver ? '<span class="hp-ver">' + r.ver + '</span>' : '') + '</span>'
+      + (r.source ? '<span class="hp-src">' + r.source + '</span>' : '');
+  }
+  function bindHomeCards(container) {
+    container.querySelectorAll('[data-id]').forEach((btn) => {
+      const r = RECIPES.find((x) => x.id === btn.dataset.id);
+      if (r) btn.addEventListener('click', () => openModal(r));
+    });
+  }
+
+  // ③ 인기 소스: 좋아요순 상위 5개 캐러셀. 순서는 렌더 시점 고정(좋아요 눌러도 즉시 재정렬 안 함 —
+  //    카드가 눈앞에서 튀지 않게. 숫자만 refreshLikeCounts로 갱신, 순서는 다음 방문 때 반영).
+  function renderHomePopular() {
+    const sauces = RECIPES.filter((r) => r.cat === '소스').slice()
+      .sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || a.name.localeCompare(b.name, 'ko'));
+    document.getElementById('popularCnt').textContent = sauces.length;
+    const top = sauces.slice(0, 5);
+    popularRailEl.innerHTML = top.map((r, i) =>
+      '<button class="hp-card" type="button" data-id="' + r.id + '">'
+      + '<span class="hp-thumb"><i class="hp-rank">' + (i + 1) + '</i>' + homeCardBody(r)
+      + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i></span>'
+      + homeCardMeta(r) + '</button>'
+    ).join('')
+      + '<button class="hp-more" id="hpMore" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>소스<br>전체 보기</button>';
+    bindHomeCards(popularRailEl);
+    document.getElementById('hpMore').addEventListener('click', () => enterBrowse('소스'));
+  }
+
+  // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)
+  function renderHomeCatGrid(cat, gridElement, cntId) {
+    const list = RECIPES.filter((r) => r.cat === cat);
+    document.getElementById(cntId).textContent = list.length;
+    gridElement.innerHTML = list.map((r) =>
+      '<button class="hc-card" type="button" data-id="' + r.id + '">'
+      + '<span class="hc-thumb">' + homeCardBody(r) + '</span>'
+      + homeCardMeta(r) + '</button>'
+    ).join('');
+    bindHomeCards(gridElement);
+  }
+  function renderHomeSections() {
+    renderCelebRail();
+    renderHomePopular();
+    renderHomeCatGrid('탕', tangGridEl, 'tangCnt');
+    renderHomeCatGrid('히든메뉴', hiddenGridEl, 'hiddenCnt');
   }
 
   function renderIngList(el, items) {
@@ -897,10 +999,10 @@
   searchInput.addEventListener('input', (e) => {
     query = e.target.value;
     searchBox.classList.toggle('has-value', query.length > 0);
-    // 검색은 카테고리와 독립 — 검색 시작하면 탭을 '전체'로 되돌려 켜진 탭과 결과를 일치시킴
-    if (query.trim() && activeCat !== '전체') {
+    // 검색은 카테고리·인물과 독립 — 검색 시작하면 전체보기·인물 보기에서 빠져나옴
+    if (query.trim() && (activeCat !== '전체' || personFilter)) {
       activeCat = '전체';
-      renderTabs();
+      personFilter = null;
     }
     renderGrid();
   });
@@ -936,10 +1038,10 @@
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
-    // 즐겨찾기도 카테고리와 독립 — 켤 때 탭을 '전체'로 되돌림
-    if (showFavoritesOnly && activeCat !== '전체') {
+    // 즐겨찾기도 카테고리·인물과 독립 — 켤 때 전체보기·인물 보기에서 빠져나옴
+    if (showFavoritesOnly && (activeCat !== '전체' || personFilter)) {
       activeCat = '전체';
-      renderTabs();
+      personFilter = null;
     }
     renderGrid();
   });
@@ -1171,6 +1273,9 @@
   }
 
   gachaBtn.addEventListener('click', openGacha);
+  // 홈 맨 아래 '운명의 소스 뽑기'도 같은 가챠를 연다
+  const homeRandomBtn = document.getElementById('homeRandomBtn');
+  if (homeRandomBtn) homeRandomBtn.addEventListener('click', openGacha);
   gachaPull.addEventListener('click', gachaPullOnce);
   gachaAgain.addEventListener('click', gachaPullOnce);
   gachaClose.addEventListener('click', closeGacha);
@@ -2222,7 +2327,11 @@
     openStampSheet();
   });
 
-  renderTabs();
+  // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
+  document.getElementById('browseBack').addEventListener('click', goHome);
+  document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
+
+  renderHomeSections();
   initMonthlyFeature();
   renderGrid();
   renderStoreTabs();
