@@ -113,7 +113,7 @@ img {
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  padding: 0 clamp(20px, 5vw, 40px);
+  padding: 0 20px; /* 앱 고정폭 440 기둥 → 가로 패딩도 고정(5vw는 모니터 넓으면 40까지 커져 로고↔히어로 정렬 어긋남, 2026-07-21) */
   display: flex;
   align-items: center;
   gap: 26px;
@@ -537,7 +537,7 @@ img {
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  padding: 24px clamp(20px, 5vw, 40px) 70px;
+  padding: 24px 20px 70px;
 }
 
 .list-head {
@@ -689,7 +689,7 @@ img {
 /* 캐러셀 = .main 좌우 패딩 상쇄해 화면 끝까지(full-bleed) + 인디케이터 고정 기준점 */
 .mf-carousel {
   position: relative;
-  margin: 0 calc(-1 * clamp(20px, 5vw, 40px));
+  margin: 0 -20px; /* .main 고정 패딩(20px) 상쇄 full-bleed */
 }
 /* 가로 스와이프 — 첫/끝 카드 인셋은 작게(카드 크게) */
 .mf-scroll {
@@ -1248,7 +1248,7 @@ img {
 /* FOOTER */
 .footer {
   margin-top: 16px; /* 마지막 카드와 붙어(겹쳐) 보이던 것 방지 — 카드↔푸터 구분선 위 여백 */
-  padding: 16px clamp(20px, 5vw, 40px);
+  padding: 16px 20px;
   padding-bottom: 16px;
   display: flex;
   flex-direction: column;
@@ -1293,7 +1293,7 @@ img {
 
 @media all {
   .footer {
-    padding: 12px clamp(20px, 5vw, 40px);
+    padding: 12px 20px;
     padding-bottom: 16px;
   }
 
