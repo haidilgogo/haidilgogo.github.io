@@ -3461,12 +3461,12 @@ img {
   cursor: pointer;
   padding: 4px 0 4px 12px;
 }
-/* 화살표만 크게(2026-07-22) — 글자 크기는 유지, > 만 강조 */
+/* 화살표 = 선으로 그린 쉐브론 아이콘(2026-07-22, 배민식) — 폰트 › 대신 SVG라 각지고 깔끔 */
 .home-sec-more-arrow {
-  font-size: 21px;
-  line-height: 1;
+  width: 16px;
+  height: 16px;
   margin-left: 4px;
-  vertical-align: -2px;
+  vertical-align: -3px;
 }
 .home-sec-sub {
   margin: 0 0 14px;
