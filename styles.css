@@ -3473,7 +3473,7 @@ img {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  margin: 0 -20px;
+  margin: 12px -20px 0; /* 부제 제거(2026-07-21) 후 제목과의 간격 확보 */
   padding: 2px 20px 4px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
