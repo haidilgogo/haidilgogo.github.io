@@ -787,7 +787,7 @@ img {
 .mf-dots {
   position: absolute; right: 34px; top: 14px;
   z-index: 3;
-  display: flex; gap: 5px;
+  display: flex; gap: 10px; /* 알약(16px)이 옆 점을 안 덮도록 간격을 알약 길이에 맞춰 확보(2026-07-21) */
   pointer-events: none;
 }
 .mf-dots[hidden] { display: none; }
@@ -799,7 +799,7 @@ img {
 /* 스크롤에 실시간 연동해 미끄러지는 활성 막대(② 2026-07-21). 위치는 JS가 translateX로 매 프레임 지정 */
 .mf-dots-pill {
   position: absolute; top: 0; left: 0;
-  width: 10px; height: 6px;
+  width: 16px; height: 6px; /* 목업(16px) 비율로 — 간격 10px와 세트(짧아 보임 피드백 반영) */
   border-radius: 3px;
   background: #fff;
   will-change: transform;
@@ -3784,6 +3784,8 @@ img {
   justify-content: center;
   padding: 20px;
 }
+/* display:flex가 hidden 속성(UA display:none)을 이기므로 명시적으로 다시 숨김 — 없으면 첫 로드부터 열려 보임 */
+.guide-overlay[hidden] { display: none; }
 .guide-sheet {
   position: relative;
   width: 100%;
