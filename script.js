@@ -797,7 +797,6 @@
   function renderHomePopular() {
     const sauces = RECIPES.filter((r) => r.cat === '소스').slice()
       .sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || a.name.localeCompare(b.name, 'ko'));
-    document.getElementById('popularCnt').textContent = sauces.length;
     const top = sauces.slice(0, 5);
     popularRailEl.innerHTML = top.map((r, i) =>
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
