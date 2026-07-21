@@ -1276,6 +1276,12 @@
   // 홈 맨 아래 '운명의 소스 뽑기'도 같은 가챠를 연다
   const homeRandomBtn = document.getElementById('homeRandomBtn');
   if (homeRandomBtn) homeRandomBtn.addEventListener('click', openGacha);
+
+  // 초심자 가이드 패널(뼈대) — 배너 클릭으로 열고, X·바깥 클릭으로 닫음
+  const guideOverlay = document.getElementById('guideOverlay');
+  document.getElementById('homeGuide').addEventListener('click', () => { guideOverlay.hidden = false; });
+  document.getElementById('guideClose').addEventListener('click', () => { guideOverlay.hidden = true; });
+  guideOverlay.addEventListener('click', (e) => { if (e.target === guideOverlay) guideOverlay.hidden = true; });
   gachaPull.addEventListener('click', gachaPullOnce);
   gachaAgain.addEventListener('click', gachaPullOnce);
   gachaClose.addEventListener('click', closeGacha);
