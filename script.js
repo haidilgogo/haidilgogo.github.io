@@ -675,6 +675,9 @@
   let currentModalRecipe = null;
 
   function openModal(r) {
+    // 카드는 레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
+    // "메뉴/매장 위에 레시피 모달이 뜨는" desync(모달·섹션 어긋남)를 원천 차단(2026-07-21).
+    if (pageEl.dataset.section !== 'recipe') return;
     currentModalRecipe = r;
     syncTopbarH(); // 모바일 전체화면 패널이 상단바 바로 아래에서 시작하도록 열 때마다 재측정
     // 배경 스크롤 잠금은 반드시 html(실제 스크롤 컨테이너)에 걸어야 한다. body에 걸면
@@ -768,6 +771,7 @@
   modalOverlay.addEventListener('click', closeModal);
   modalScroll.addEventListener('click', (e) => e.stopPropagation());
   modalClose.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
 
   // 모달 하단 좋아요 — 그리드 카드의 하트 숫자도 재렌더 없이 동기화(이미지 깜빡임 방지)
   const modalLikeBtn = document.getElementById('modalLikeBtn');
@@ -1117,7 +1121,7 @@
 
   // 인디케이터 2상태(배민식): 정지=불투명 필(활성 버튼에 딱 맞음) / 이동=유리구슬(원형 76px).
   // 크기·위치는 여기서 인라인으로, 질감(필↔유리)은 CSS .tabbar-indicator(--glass)가 담당.
-  const BUBBLE = 76;
+  const BUBBLE = 58; // 유리구슬 지름(2026-07-21: 76→66→58로 축소). 위치·클램프 계산 모두 이 값 기준
   function bubblePosFor(btn) {
     return {
       x: btn.offsetLeft + btn.offsetWidth / 2 - BUBBLE / 2,
@@ -1293,6 +1297,19 @@
     });
     return best;
   }
+  // 드래그 중 "버블 밑 탭만 빨강"(2026-07-21): 버블이 지나는 탭에만 --candidate 부여, 나머지는 뗌.
+  // 색 전환(빨강↔회색)은 CSS(.tabbar--dragging 규칙 + .tabbar-btn transition:color)가 담당.
+  function setDragCandidate(btn) {
+    tabbarEl.querySelectorAll('.tabbar-btn--candidate').forEach((b) => {
+      if (b !== btn) b.classList.remove('tabbar-btn--candidate');
+    });
+    if (btn) btn.classList.add('tabbar-btn--candidate');
+  }
+  function clearDragCandidate() {
+    tabbarEl.classList.remove('tabbar--dragging');
+    tabbarEl.querySelectorAll('.tabbar-btn--candidate')
+      .forEach((b) => b.classList.remove('tabbar-btn--candidate'));
+  }
   tabbarEl.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     dragPointerId = e.pointerId;
@@ -1314,6 +1331,7 @@
       indicatorBusy = true; // resize의 placeIndicator가 끼어들지 않게
       tabbarIndicator.style.transition = 'none';
       setGlass(true); // 드래그 시작 = 필→유리구슬 변신
+      tabbarEl.classList.add('tabbar--dragging'); // 출발(active) 빨강을 회색으로 풀어 "버블 밑만 빨강" 성립
       tabbarIndicator.style.width = BUBBLE + 'px';
       tabbarIndicator.style.height = BUBBLE + 'px';
     }
@@ -1323,12 +1341,15 @@
     let x = e.clientX - barRect.left - BUBBLE / 2;
     x = Math.max(-6, Math.min(x, barRect.width - BUBBLE + 6)); // 양끝 살짝만 넘게 제한
     tabbarIndicator.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    // 버블(클램프된 실제 위치) 중심 밑에 있는 탭만 빨강으로 물듦
+    setDragCandidate(nearestTabBtn(barRect.left + x + BUBBLE / 2));
   });
   function endTabbarDrag(e) {
     if (e.pointerId !== dragPointerId) return;
     dragPointerId = null;
     if (!dragMoved) return; // 드래그 아님 → click 리스너가 처리
     dragMoved = false;
+    clearDragCandidate(); // dragging 클래스·candidate 해제 → 아래 switchSection의 .active가 빨강 인계(같은 색이라 깜빡임 없음)
     indicatorBusy = false;
     tabbarIndicator.style.transition = '';
     suppressClick = true;

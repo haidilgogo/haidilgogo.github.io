@@ -1375,6 +1375,12 @@ img {
   transition: background .15s, color .15s;
   -webkit-tap-highlight-color: transparent;
 }
+/* 보이는 원(38px)은 그대로, 터치 영역만 사방 8px 확장(≈54px) — "눌렀는데 안 눌림" 완화(2026-07-21) */
+.modal-close::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
 
 .modal-close:hover {
   background: var(--bg-cream);
@@ -2546,7 +2552,7 @@ img {
   padding: 5px 10px; /* 세로 슬림(8→5) — 버블(76px)이 더 삐져나와 렌즈 느낌 강조 */
   background: rgba(252, 249, 245, .55); /* 더 투명하게(.78→.55), 블러가 가독성 담당 */
   border: 1px solid rgba(255, 255, 255, .75);
-  border-radius: 20px; /* 캡슐(999)→라운드 사각: 원형 버블과 형태 대비(2026-07-21) */
+  border-radius: 24px; /* 캡슐(999)→라운드 사각: 원형 버블과 형태 대비(2026-07-21). 20→24로 살짝 더 둥글게 */
   box-shadow: 0 8px 28px rgba(43, 18, 13, .16);
   /* 채도 1.6→1.15: 뒤에 빨간 버튼이 지나갈 때 바에 빨간 기운이 번지던 것 완화 */
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
@@ -2569,8 +2575,8 @@ img {
   width: 0;
   height: 0;
   box-sizing: border-box;
-  border-radius: 16px; /* 바(R20) 안에 맞는 필 라운드 */
-  background: #E4E4E7; /* 정지 상태: 중립(살짝 쿨한) 연회색 플랫 채움. 이력: 웜 #EDE7DF(모래색)→중립 #EBEBED→더스티레드 #C4574B(기각)→#E4E4E7 */
+  border-radius: 19px; /* 바(R24) 안에 맞는 필 라운드 (16→19) */
+  background: #F5D9D2; /* 정지 상태: 따뜻한 로즈 크림 필 — 위에 얹히는 빨강 아이콘과 같은 웜 계열이라 조화(배민식 쿨 회색과 차별). 이력: 웜 #EDE7DF(모래색)→중립 #EBEBED→더스티레드 #C4574B(기각)→쿨 #E4E4E7→웜 로즈 #F5D9D2(2026-07-21, 회색+빨강 온도 충돌 해결) */
   border: none;
   box-shadow: none; /* 정지 땐 그림자·투명감 없이 순수 채움 (유리 질감은 --glass에서만) */
   z-index: 0;
@@ -2578,9 +2584,11 @@ img {
   will-change: transform;
   transition:
     transform .28s cubic-bezier(.4, 0, .2, 1),
-    width .2s ease, height .2s ease,
-    border-radius .2s ease, background .2s ease,
-    box-shadow .2s ease, border-color .2s ease;
+    /* 유리구슬→필 복귀 모프를 빠릿하게(.2s→.13s ease-out, 2026-07-21).
+       이동 시작 땐 JS가 transition:none이라 이 값은 "필로 복귀"에만 작동 → 이동 슬라이드는 그대로. */
+    width .13s ease-out, height .13s ease-out,
+    border-radius .13s ease-out, background .13s ease-out,
+    box-shadow .13s ease-out, border-color .13s ease-out;
 }
 /* 표면 반사광 블롭 — 유리구슬 상태에서만 */
 .tabbar-indicator::before {
@@ -2601,12 +2609,17 @@ img {
 .tabbar-indicator--glass {
   border-radius: 50%;
   background: radial-gradient(140% 140% at 30% 18%,
-    rgba(255, 255, 255, .60) 0%,
-    rgba(255, 255, 255, .10) 40%,
-    rgba(255, 255, 255, .02) 62%,
-    rgba(255, 255, 255, .26) 100%);
+    rgba(255, 255, 255, .58) 0%,
+    rgba(255, 244, 242, .12) 38%,
+    rgba(245, 217, 210, .10) 60%,
+    rgba(224, 48, 30, .12) 100%); /* 중심은 맑은 유리(흰 반사광) 유지, 가장자리로 갈수록 은은한 브랜드 빨강 틴트 → 로즈 필에서 굴러나올 때 색이 안 빠지고 "로즈 유리구슬"로 이어짐(2026-07-21) */
   border: 1px solid rgba(255, 255, 255, .60);
+  /* 가장자리 빨강 엣지광(2026-07-21): 원래 무지개 색수차 → 브랜드 빨강 단색으로 은은하게.
+     쿨한 시안이 웜 팔레트(로즈·크림·빨강)와 유일하게 어긋나 빼고, 같은 빨강 계열로 통일.
+     프리즘 분광감은 줄지만 톤이 정돈됨. 세기는 alpha·blur로 조절. */
   box-shadow:
+    -2px 0 5px rgba(224, 48, 30, .30),
+    2px 0 5px rgba(224, 48, 30, .30),
     0 6px 16px rgba(43, 18, 13, .22),
     inset 0 1.5px 2px rgba(255, 255, 255, 1),
     inset 0 -2px 3px rgba(255, 255, 255, .55),
@@ -2654,6 +2667,17 @@ img {
 }
 .tabbar-btn.active {
   color: var(--brand-red); /* 회색 박스 위 브랜드 빨강 글씨·아이콘 */
+}
+/* 드래그 중 "버블 밑 탭만 빨강"(2026-07-21):
+   출발(active) 탭도 회색으로 풀고, 버블이 지나는 탭(--candidate)만 브랜드 빨강.
+   .active.candidate 변형까지 명시해 버블이 출발 탭 위에 있을 때도 빨강이 이김.
+   전환은 .tabbar-btn의 transition:color .15s가 부드럽게 담당. */
+.tabbar--dragging .tabbar-btn.active {
+  color: #4D4139; /* 드래그 중엔 출발 탭 빨강 해제 → 회색 */
+}
+.tabbar--dragging .tabbar-btn--candidate,
+.tabbar--dragging .tabbar-btn--candidate.active {
+  color: var(--brand-red); /* 버블 밑 탭만 빨강 */
 }
 @media (hover: hover) {
   .tabbar-btn:not(.active):hover {
