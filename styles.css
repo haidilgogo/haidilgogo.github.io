@@ -3457,16 +3457,16 @@ img {
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-dark);            /* 회색 → 검정(2026-07-22) */
   cursor: pointer;
   padding: 4px 0 4px 12px;
 }
 /* 화살표만 크게(2026-07-22) — 글자 크기는 유지, > 만 강조 */
 .home-sec-more-arrow {
-  font-size: 17px;
+  font-size: 21px;
   line-height: 1;
-  margin-left: 3px;
-  vertical-align: -1px;
+  margin-left: 4px;
+  vertical-align: -2px;
 }
 .home-sec-sub {
   margin: 0 0 14px;
