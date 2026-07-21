@@ -786,9 +786,13 @@ img {
   background: rgba(255, 255, 255, .5);
   display: block;
 }
-.mf-dots i.on {
-  width: 16px; border-radius: 3px;
+/* 스크롤에 실시간 연동해 미끄러지는 활성 막대(② 2026-07-21). 위치는 JS가 translateX로 매 프레임 지정 */
+.mf-dots-pill {
+  position: absolute; top: 0; left: 0;
+  width: 10px; height: 6px;
+  border-radius: 3px;
   background: #fff;
+  will-change: transform;
 }
 
 .recipe-grid {

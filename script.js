@@ -606,6 +606,7 @@
   }
 
   let monthlyList = [];
+  let monthlyUpdatePill = null; // 인디케이터 막대 재배치 함수(섹션 보일 때 호출)
   function initMonthlyFeature() {
     monthlyList = pickMonthlyFeatures();
     if (!monthlyList.length) { monthlyFeatureEl.hidden = true; return; }
@@ -622,26 +623,33 @@
         + '<div class="mf-caption"><div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + desc + '</div>'
         + '</button>';
     }).join('');
-    // 뷰포트 고정 인디케이터(카드와 안 움직임) — 점 N개, 스크롤 위치로 활성만 갱신
-    mfDots.innerHTML = monthlyList.map((_, i) => '<i' + (i === 0 ? ' class="on"' : '') + '></i>').join('');
+    // 뷰포트 고정 인디케이터: 작은 점 N개 + 스크롤에 실시간 연동해 미끄러지는 활성 막대(pill)
+    mfDots.innerHTML = monthlyList.map(() => '<i></i>').join('') + '<b class="mf-dots-pill"></b>';
     mfDots.hidden = total <= 1;
     const heroes = [...mfScroll.querySelectorAll('.mf-hero')];
     heroes.forEach((el, i) => el.addEventListener('click', () => openModal(monthlyList[i])));
-    // 스크롤 → 활성 점만 바꿈(카드 한 칸 폭 기준 반올림)
-    let dotRaf = 0;
-    mfScroll.addEventListener('scroll', () => {
-      cancelAnimationFrame(dotRaf);
-      dotRaf = requestAnimationFrame(() => {
-        const step = (heroes[1] ? heroes[1].offsetLeft - heroes[0].offsetLeft : heroes[0].offsetWidth) || 1;
-        const idx = Math.max(0, Math.min(total - 1, Math.round(mfScroll.scrollLeft / step)));
-        [...mfDots.children].forEach((d, i) => d.classList.toggle('on', i === idx));
-      });
-    }, { passive: true });
+    const pill = mfDots.querySelector('.mf-dots-pill');
+    const dotEls = [...mfDots.querySelectorAll('i')];
+    // 스크롤 위치(소수 인덱스)로 막대를 점 위에 실시간 배치 → 손가락 따라 스르륵.
+    // 측정은 매번 실시간(섹션이 숨김일 땐 offset이 0이라 캐시하면 안 됨 — 초기 hidden 이슈 회피).
+    function updatePill() {
+      const step = (heroes[1] ? heroes[1].offsetLeft - heroes[0].offsetLeft : heroes[0].offsetWidth) || 1;
+      const stride = dotEls[1] ? dotEls[1].offsetLeft - dotEls[0].offsetLeft : 11;
+      const base = dotEls[0].offsetLeft + dotEls[0].offsetWidth / 2;
+      const frac = Math.max(0, Math.min(total - 1, mfScroll.scrollLeft / step));
+      pill.style.transform = 'translateX(' + (base + frac * stride - pill.offsetWidth / 2) + 'px)';
+    }
+    monthlyUpdatePill = updatePill; // 섹션이 보이게 될 때(syncMonthlyFeature) 재배치용
+    mfScroll.addEventListener('scroll', updatePill, { passive: true });
+    window.addEventListener('resize', updatePill);
+    updatePill();
   }
 
   function syncMonthlyFeature() {
     // 기본 화면(전체 탭·검색 없음·즐겨찾기 아님)에서만 노출 — 필터 중엔 결과에 집중
     monthlyFeatureEl.hidden = !(activeCat === '전체' && !query.trim() && !showFavoritesOnly);
+    // 보이게 된 직후 인디케이터 막대 재배치(숨김일 때 측정한 0값 교정)
+    if (!monthlyFeatureEl.hidden && monthlyUpdatePill) monthlyUpdatePill();
   }
 
   function renderGrid() {
