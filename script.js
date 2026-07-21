@@ -129,7 +129,7 @@
       ings: [['참기름', '4', '스푼'], ['중국식초', '1', '스푼'], ['다진 마늘', '2', '스푼'], ['소금', '', '한 꼬집']],
       steps: [],
       tip: '' },
-    { id: 's20', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6DFC8,#ECBE96)', name: '박은영소스', ver: '마장', source: 'YouTube 밥은영', star: true, desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스로, <u>핫바리들은 잘 모르는 두 가지 소스(부추 소스, 홍두부 소스)가 들어가야 된다</u>라고 했다.',
+    { id: 's20', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6DFC8,#ECBE96)', name: '박은영소스', ver: '마장', source: 'YouTube 밥은영', star: true, heroDesc: '은영 셰프의 시그니처 마장 소스', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스로, <u>핫바리들은 잘 모르는 두 가지 소스(부추 소스, 홍두부 소스)가 들어가야 된다</u>라고 했다.',
       order: [['우유/청유 마라훠궈', '1', '스푼']],
       ings: [['땅콩참깨소스', '3', '스푼'], ['중국식초', '2', '스푼'], ['산초기름', '1', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['태국고추', '1', '스푼'], ['라조장', '1', '스푼'], ['부추소스', '1', '스푼'], ['발효두부소스', '0.33', '스푼']],
       steps: [],
@@ -611,10 +611,15 @@
     if (!monthlyList.length) { monthlyFeatureEl.hidden = true; return; }
     const total = monthlyList.length;
     mfScroll.innerHTML = monthlyList.map((r) => {
-      const src = r.source ? '<div class="mf-source">' + sourceHtml(r.source) + '</div>' : '';
+      // 히어로 전용 이미지(heroImg) 있으면 그걸, 없으면 카드 썸네일(img)로 폴백(2026-07-21)
+      const heroImg = r.heroImg || r.img;
+      // 이름 밑 부제(29CM식): 히어로용 짧은 카피 heroDesc 우선, 없으면 desc로 폴백(CSS가 1줄로 자름).
+      // 👉 깔끔하려면 레시피마다 heroDesc를 짧게(예: "언제 어디로든 달릴 준비" 처럼) 써두면 됨.
+      const tagline = r.heroDesc || r.desc;
+      const desc = tagline ? '<div class="mf-desc">' + tagline + '</div>' : '';
       return '<button class="mf-hero" type="button" aria-label="' + r.name + ' 자세히 보기">'
-        + '<img src="' + r.img + '" alt="' + r.name + '" draggable="false">'
-        + '<div class="mf-caption"><div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + src + '</div>'
+        + '<img src="' + heroImg + '" alt="' + r.name + '" draggable="false">'
+        + '<div class="mf-caption"><div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + desc + '</div>'
         + '</button>';
     }).join('');
     // 뷰포트 고정 인디케이터(카드와 안 움직임) — 점 N개, 스크롤 위치로 활성만 갱신

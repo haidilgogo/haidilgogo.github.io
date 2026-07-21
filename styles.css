@@ -537,7 +537,7 @@ img {
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  padding: 14px clamp(20px, 5vw, 40px) 70px; /* 상단 간격 축소(24→14, 2026-07-21) */
+  padding: 24px clamp(20px, 5vw, 40px) 70px;
 }
 
 .list-head {
@@ -682,7 +682,7 @@ img {
   line-height: 1.5;              /* iOS 사파리에서 line-height:normal이 한글 받침 클리핑 → 명시적으로(2026-07-21) */
   letter-spacing: -.01em;
   color: var(--brand-red);       /* "레시피" = 빨강 */
-  margin-bottom: 12px;
+  margin: 0 0 12px;              /* <p> 기본 위 여백(15px) 제거 → 상단바와 간격 좁힘(2026-07-21) */
 }
 .mf-kicker-lead { color: var(--text-dark); } /* "이 달의"만 다른 색(진한 글자색) */
 
@@ -736,7 +736,7 @@ img {
 
 /* 사진 안 캡션(좌하단): 이름(힘 줌) + 출처(힘 뺌) */
 .mf-caption {
-  position: absolute; left: 16px; right: 16px; bottom: 15px;
+  position: absolute; left: 16px; right: 16px; bottom: 24px; /* 29CM처럼 하단에서 살짝 띄움 */
   z-index: 2;
   text-align: left;
 }
@@ -748,6 +748,19 @@ img {
   line-height: 1.1;
   text-shadow: 0 1px 8px rgba(0, 0, 0, .4);
 }
+/* 이름 밑 한 줄 설명(29CM식) — 한 줄 넘으면 …로 자름 */
+.mf-desc {
+  margin-top: 7px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, .85);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, .45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mf-desc b { font-weight: 600; } /* desc 안 <b> 강조는 살짝만 */
 .mf-source {
   display: flex;
   align-items: center;
