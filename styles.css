@@ -3457,7 +3457,7 @@ img {
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-dark);            /* 회색 → 검정(2026-07-22) */
+  color: #4D4139;                     /* 상단바 돋보기·공유 아이콘과 통일(2026-07-22) */
   cursor: pointer;
   padding: 4px 0 4px 12px;
 }
