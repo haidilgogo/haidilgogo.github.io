@@ -537,7 +537,7 @@ img {
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  padding: 24px clamp(20px, 5vw, 40px) 70px;
+  padding: 14px clamp(20px, 5vw, 40px) 70px; /* 상단 간격 축소(24→14, 2026-07-21) */
 }
 
 .list-head {
@@ -673,76 +673,109 @@ img {
 /* ── 이 주의 소스(주간 피처) ──
    29CM 큐레이션식: 킥커(빨간점+라벨) → 큰 이미지 → 굵은 제목 → 얇은 설명.
    이미지는 정사각(카드 원본 1:1 그대로, 크롭 없음). 매주 자동 순환은 script.js pickWeeklyFeature. */
-.weekly-feature { margin-bottom: 30px; }
+/* ── 이 달의 레시피(월간 히어로 카레셀, 2026-07-21) ── 29CM식 큰 히어로 가로 스와이프 */
+.monthly-feature { margin-bottom: 30px; }
 
-.wf-kicker {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
+.mf-kicker {
+  font-size: 15px;
+  font-weight: 600;              /* 500은 획이 얇아 작게 렌더 시 흐릿 → 600으로 또렷하게(2026-07-21) */
+  line-height: 1.5;              /* iOS 사파리에서 line-height:normal이 한글 받침 클리핑 → 명시적으로(2026-07-21) */
   letter-spacing: -.01em;
-  color: var(--brand-red);
-  margin-bottom: 10px;
+  color: var(--brand-red);       /* "레시피" = 빨강 */
+  margin-bottom: 12px;
 }
-.wf-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand-red); }
+.mf-kicker-lead { color: var(--text-dark); } /* "이 달의"만 다른 색(진한 글자색) */
 
-.wf-hero {
-  display: block;
-  width: 100%;
+/* 캐러셀 = .main 좌우 패딩 상쇄해 화면 끝까지(full-bleed) + 인디케이터 고정 기준점 */
+.mf-carousel {
+  position: relative;
+  margin: 0 calc(-1 * clamp(20px, 5vw, 40px));
+}
+/* 가로 스와이프 — 첫/끝 카드 인셋은 작게(카드 크게) */
+.mf-scroll {
+  display: flex;
+  gap: 10px;              /* 카드 사이 간격(간격 색 = 깨끗한 배경색, 그림자 제거로 띠 안 생김) */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.mf-scroll::-webkit-scrollbar { display: none; }
+
+/* 히어로 카드 (1:1, 원본 이미지 안 잘림) */
+.mf-hero {
+  position: relative;
+  flex: 0 0 96%;                 /* 29CM식: 크게 꽉 차게, 옆 카드 살짝만 삐죽(peek) */
+  scroll-snap-align: center;
+  scroll-snap-stop: always;      /* 한 번 스와이프 = 한 장만(빠르게 튕겨도 다음 장에서 멈춤) */
+  aspect-ratio: 1 / 1;
   padding: 0;
   border: none;
-  background: none;
-  cursor: pointer;
-  position: relative;
-  border-radius: 14px;
+  background: #eadfd6;           /* 로딩 전 임시 배경 */
+  border-radius: 10px;           /* 29CM식 낮은 라운드 */
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(43, 18, 13, .08);
-  margin-bottom: 13px;
+  cursor: pointer;
+  /* 그림자 없음(플랫) — 그림자가 간격으로 번져 배경과 다른 띠로 보이던 문제 해결(2026-07-21) */
   -webkit-tap-highlight-color: transparent;
 }
-.wf-img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1; /* 카드 원본이 1:1 규격이라 크롭 없이 꽉 참 */
+.mf-hero img {
+  width: 100%; height: 100%;
   object-fit: cover;
-  -webkit-user-drag: none;
-  user-select: none;
+  display: block;
+  -webkit-user-drag: none; user-select: none;
 }
-.wf-hero:active .wf-img { transform: scale(.99); }
-
-/* 이미지 위 출처 알약(원본에 출처가 구워진 카드가 많아 기본 hidden, source 있을 때만) */
-.wf-src {
-  position: absolute;
-  left: 11px;
-  bottom: 11px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #6a5a44;
-  background: rgba(255, 255, 255, .82);
-  padding: 3px 10px;
-  border-radius: 20px;
+.mf-hero:active img { transform: scale(.99); }
+/* 균일 검정 오버레이 — 위·아래 대비 동일(점·글씨 어디서나 또렷) */
+.mf-hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(20, 10, 6, .42);
+  pointer-events: none;
 }
 
-.wf-name {
-  font-size: 27px;
+/* 사진 안 캡션(좌하단): 이름(힘 줌) + 출처(힘 뺌) */
+.mf-caption {
+  position: absolute; left: 16px; right: 16px; bottom: 15px;
+  z-index: 2;
+  text-align: left;
+}
+.mf-name {
+  font-size: 34px;
   font-weight: 800;
-  letter-spacing: -.045em;
-  line-height: 1.2;
-  color: var(--text-darkest);
-  margin: 0 0 6px;
+  color: #fff;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .4);
 }
-.wf-desc {
-  font-size: 13.5px;
-  font-weight: 400;
-  line-height: 1.6;
-  letter-spacing: -.02em;
-  color: #6E5D55;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.mf-source {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .72);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+}
+.mf-source .src-ic { width: 13px; height: 13px; flex: none; fill: currentColor; }
+
+/* 인디케이터(막대형) — 캐러셀 뷰포트 우상단에 "고정"(카드와 안 움직임). 스크롤 시 활성 점만 JS가 갱신 */
+.mf-dots {
+  position: absolute; right: 34px; top: 14px;
+  z-index: 3;
+  display: flex; gap: 5px;
+  pointer-events: none;
+}
+.mf-dots[hidden] { display: none; }
+.mf-dots i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255, 255, 255, .5);
+  display: block;
+}
+.mf-dots i.on {
+  width: 16px; border-radius: 3px;
+  background: #fff;
 }
 
 .recipe-grid {

@@ -582,46 +582,65 @@
   // 매번 새로 만들면 <img>가 재디코딩되어 썸네일이 깜빡이고 늦게 뜸(탭 이동 시 딜레이의 원인).
   const cardCache = new Map();
 
-  // ── 이 주의 소스(주간 피처) ── 매주 월요일 자동 교체, 서버 없이 날짜 계산이라 모든 방문자가 같은 주에 같은 소스를 봄
-  const weeklyFeatureEl = document.getElementById('weeklyFeature');
-  const wfHero = document.getElementById('wfHero');
-  const wfImg = document.getElementById('wfImg');
-  const wfSrc = document.getElementById('wfSrc');
-  const wfName = document.getElementById('wfName');
-  const wfDesc = document.getElementById('wfDesc');
+  // ── 이 달의 레시피(월간 히어로 카레셀) ── 매월 자동 교체(서버 없이 월 계산). 큰 이미지 히어로 3-5개를 가로 스와이프.
+  const monthlyFeatureEl = document.getElementById('monthlyFeature');
+  const mfScroll = document.getElementById('mfScroll');
+  const mfDots = document.getElementById('mfDots');
+  const MONTHLY_COUNT = 4;
 
-  function pickWeeklyFeature() {
-    const pool = RECIPES.filter((r) => r.img); // 피처는 큰 이미지가 필요해 img 있는 레시피만
-    if (!pool.length) return null;
-    // 2026-01-05(월) 기준 경과 주 수 → 월요일마다 1씩 증가
-    const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-    const week = Math.floor((Date.now() - new Date(2026, 0, 5).getTime()) / WEEK_MS);
-    // 배열 순서 그대로 돌면 같은 카테고리가 몇 주 연속 나옴 → 13칸씩 건너뛰며 순회(13·33은 서로소라 전부 한 번씩 돎)
-    const idx = (((week * 13) % pool.length) + pool.length) % pool.length;
-    return pool[idx];
-  }
-
-  function initWeeklyFeature() {
-    const r = pickWeeklyFeature();
-    if (!r) return;
-    wfImg.src = r.img;
-    wfImg.alt = r.name;
-    wfName.textContent = r.name;
-    wfDesc.innerHTML = r.desc || ''; // desc엔 <b> 강조가 들어있음 — 모달(descEl.innerHTML)과 동일 처리
-    if (r.source) {
-      wfSrc.textContent = 'ⓒ ' + r.source;
-      wfSrc.hidden = false;
+  // 👉 나중에 "이 달의 레시피"를 직접 고르려면 아래 함수를 특정 레시피 배열 반환으로 바꾸면 됨
+  //    (예: return ['건희소스','마라훠궈탕',...].map(n => RECIPES.find(r => r.name === n)).filter(Boolean);)
+  function pickMonthlyFeatures() {
+    const pool = RECIPES.filter((r) => r.img); // 히어로는 큰 이미지 필요
+    if (!pool.length) return [];
+    // 2026-01 기준 경과 월 → 매월 시작점 이동. step으로 골고루 뽑아 중복 없이 N개.
+    const now = new Date();
+    const monthIdx = (now.getFullYear() - 2026) * 12 + now.getMonth();
+    const start = (((monthIdx * 13) % pool.length) + pool.length) % pool.length;
+    const step = Math.max(1, Math.floor(pool.length / MONTHLY_COUNT));
+    const out = [];
+    for (let i = 0; i < Math.min(MONTHLY_COUNT, pool.length); i++) {
+      out.push(pool[(start + i * step) % pool.length]);
     }
-    wfHero.addEventListener('click', () => openModal(r));
+    return out;
   }
 
-  function syncWeeklyFeature() {
+  let monthlyList = [];
+  function initMonthlyFeature() {
+    monthlyList = pickMonthlyFeatures();
+    if (!monthlyList.length) { monthlyFeatureEl.hidden = true; return; }
+    const total = monthlyList.length;
+    mfScroll.innerHTML = monthlyList.map((r) => {
+      const src = r.source ? '<div class="mf-source">' + sourceHtml(r.source) + '</div>' : '';
+      return '<button class="mf-hero" type="button" aria-label="' + r.name + ' 자세히 보기">'
+        + '<img src="' + r.img + '" alt="' + r.name + '" draggable="false">'
+        + '<div class="mf-caption"><div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + src + '</div>'
+        + '</button>';
+    }).join('');
+    // 뷰포트 고정 인디케이터(카드와 안 움직임) — 점 N개, 스크롤 위치로 활성만 갱신
+    mfDots.innerHTML = monthlyList.map((_, i) => '<i' + (i === 0 ? ' class="on"' : '') + '></i>').join('');
+    mfDots.hidden = total <= 1;
+    const heroes = [...mfScroll.querySelectorAll('.mf-hero')];
+    heroes.forEach((el, i) => el.addEventListener('click', () => openModal(monthlyList[i])));
+    // 스크롤 → 활성 점만 바꿈(카드 한 칸 폭 기준 반올림)
+    let dotRaf = 0;
+    mfScroll.addEventListener('scroll', () => {
+      cancelAnimationFrame(dotRaf);
+      dotRaf = requestAnimationFrame(() => {
+        const step = (heroes[1] ? heroes[1].offsetLeft - heroes[0].offsetLeft : heroes[0].offsetWidth) || 1;
+        const idx = Math.max(0, Math.min(total - 1, Math.round(mfScroll.scrollLeft / step)));
+        [...mfDots.children].forEach((d, i) => d.classList.toggle('on', i === idx));
+      });
+    }, { passive: true });
+  }
+
+  function syncMonthlyFeature() {
     // 기본 화면(전체 탭·검색 없음·즐겨찾기 아님)에서만 노출 — 필터 중엔 결과에 집중
-    weeklyFeatureEl.hidden = !(activeCat === '전체' && !query.trim() && !showFavoritesOnly);
+    monthlyFeatureEl.hidden = !(activeCat === '전체' && !query.trim() && !showFavoritesOnly);
   }
 
   function renderGrid() {
-    syncWeeklyFeature();
+    syncMonthlyFeature();
     const filtered = getFiltered();
     countEl.textContent = filtered.length;
     gridEl.innerHTML = '';
@@ -2151,7 +2170,7 @@
   });
 
   renderTabs();
-  initWeeklyFeature();
+  initMonthlyFeature();
   renderGrid();
   renderStoreTabs();
   renderStores();
