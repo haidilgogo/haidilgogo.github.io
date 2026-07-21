@@ -677,7 +677,7 @@ img {
 .monthly-feature { margin-bottom: 30px; }
 
 .mf-kicker {
-  font-size: 19px;               /* "이 달의 레시피" 타이틀 격상(2026-07-21, 이전 15px) */
+  font-size: 17px;               /* 로고(19px)보다 한 단계 아래 — 15는 작고 19는 로고와 동급이라 중간(2026-07-21) */
   font-weight: 500;              /* 볼드 제거 — 크기(19px)로만 존재감, 얇게(2026-07-21 사용자 요청) */
   line-height: 1.5;              /* iOS 사파리에서 line-height:normal이 한글 받침 클리핑 → 명시적으로(2026-07-21) */
   letter-spacing: -.02em;
