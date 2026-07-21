@@ -3548,7 +3548,7 @@ img {
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  margin: 0 -20px;
+  margin: 12px -20px 0; /* 부제 제거(2026-07-21) 후 제목과의 간격 확보 — 셀럽 레일과 동일 */
   padding: 0 20px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
