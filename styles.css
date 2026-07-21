@@ -815,11 +815,9 @@ img {
 /* 카테고리 색 세트 — 카드(그리드·가챠)와 상세가 공유.
    프레임(밴드·테두리)은 크림 고정, 카테고리 색은 배지·본체 틴트로만 표현.
    색 조정은 여기 한 곳만 고치면 배지·본체 틴트가 전부 연동됨. */
-[data-cat="소스"] { --frame-line: #C98B7D; --badge-bg: #F6DDD5; --badge-ink: #8F4536; --card-bg: #FBF0EC; }
-[data-cat="육수"] { --frame-line: #C4A163; --badge-bg: #F6EAD0; --badge-ink: #7A5A1F; --card-bg: #FBF4E6; }
-[data-cat="밥"]   { --frame-line: #9BA983; --badge-bg: #E9EEDD; --badge-ink: #55663D; --card-bg: #F3F6EB; }
-[data-cat="면"]   { --frame-line: #8FA8B4; --badge-bg: #E3EDF1; --badge-ink: #44606D; --card-bg: #F0F5F7; }
-[data-cat="기타"] { --frame-line: #B3A79D; --badge-bg: #EFEAE5; --badge-ink: #6E635A; --card-bg: #F6F3EF; }
+[data-cat="소스"]   { --frame-line: #C98B7D; --badge-bg: #F6DDD5; --badge-ink: #8F4536; --card-bg: #FBF0EC; }
+[data-cat="탕"]     { --frame-line: #C4A163; --badge-bg: #F6EAD0; --badge-ink: #7A5A1F; --card-bg: #FBF4E6; } /* 구 육수 골드 유지 */
+[data-cat="히든메뉴"] { --frame-line: #9BA983; --badge-bg: #E9EEDD; --badge-ink: #55663D; --card-bg: #F3F6EB; } /* 구 밥·면·기타 통합 → 초록 */
 
 /* 넓은 밴드는 크림 고정 — 메인 카드·상세 공통. 밴드와 본체 사이 얇은 선(--frame-line)은 카테고리색 */
 .recipe-card, .modal { --frame: #E6D4BA; }

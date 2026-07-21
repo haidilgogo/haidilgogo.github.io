@@ -1,5 +1,5 @@
 (() => {
-  const CATS = ['전체', '소스', '육수', '밥', '면', '기타'];
+  const CATS = ['전체', '소스', '탕', '히든메뉴'];
 
   // ── 정식 재료·단위 목록 (하이디라오 소스바 — 지점별 포함 실제로 있는 것만) ──
   // 레시피의 ings/order/단위는 아래 목록 안에서만 써야 이름이 어긋나지 않아요.
@@ -162,7 +162,7 @@
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['고추기름', '0.5', '스푼'], ['매운소고기소스', '0.5', '스푼'], ['굴소스', '0.5', '스푼'], ['태국고추', '0.5', '스푼'], ['땅콩가루', '0.5', '스푼'], ['참깨', '0.5', '스푼']],
       steps: [],
       tip: '' },
-    { id: 'b3', cat: '육수', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', source: 'Gemini AI', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
+    { id: 'b3', cat: '탕', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', source: 'Gemini AI', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
       order: [['맑은 탕/물', '', '']],
       ings: [['굴소스', '3', '스푼'], ['간장소스', '1', '그릇'], ['오향우육/다진 고기', '2', '스푼'], ['다진 마늘', '0.5', '스푼'], ['다진 파', '0.5', '그릇'], ['설탕', '2', '스푼'], ['소금', '3', '스푼']],
       steps: [
@@ -171,7 +171,7 @@
         '소스 그릇에 덜어둔 물로 취향에 맞게 간을 맞춘다',
       ],
       tip: '' },
-    { id: 'b4', cat: '육수', emoji: '🍲', img: 'assets/cards/토마토탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토탕', source: 'Gemini AI', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 토마토탕이다.',
+    { id: 'b4', cat: '탕', emoji: '🍲', img: 'assets/cards/토마토탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토탕', source: 'Gemini AI', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 토마토탕이다.',
       order: [['맑은 탕/물', '', ''], ['우유/청유 마라훠궈', '1~2', '국자']],
       ings: [['방울토마토', '2', '접시'], ['굴소스', '2', '그릇']],
       steps: [
@@ -182,7 +182,7 @@
         '마라훠궈 국물 1~2국자를 토마토탕에 넣고 섞어준다',
       ],
       tip: '굴소스는 취향에 맞게 조절해서 넣기' },
-    { id: 'b5', cat: '육수', emoji: '🍲', img: 'assets/cards/마라훠궈탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '마라훠궈탕', source: 'Gemini AI', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라훠궈탕이다.',
+    { id: 'b5', cat: '탕', emoji: '🍲', img: 'assets/cards/마라훠궈탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '마라훠궈탕', source: 'Gemini AI', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라훠궈탕이다.',
       order: [['맑은 탕/물', '', '']],
       ings: [['청유훠궈소스', '6', '스푼'], ['산초기름', '6', '스푼'], ['굴소스', '5', '스푼'], ['고추기름', '6', '스푼'], ['땅콩참깨소스', '5', '스푼'], ['다진 마늘', '5', '스푼'], ['간장소스', '4', '스푼'], ['참기름', '4', '스푼'], ['소금', '', '한 꼬집'], ['매운소고기소스', '2', '스푼']],
       steps: [
@@ -190,14 +190,14 @@
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
       ],
       tip: '' },
-    { id: 'b6', date: '2025-02-05', cat: '육수', emoji: '🍲', img: 'assets/cards/혼자햐탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '혼자햐탕', source: 'YouTube 혼자햐', desc: '유튜버 <b>혼자햐</b>가 혼자 하이디라오에 가서 맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라탕이다.',
+    { id: 'b6', date: '2025-02-05', cat: '탕', emoji: '🍲', img: 'assets/cards/혼자햐탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '혼자햐탕', source: 'YouTube 혼자햐', desc: '유튜버 <b>혼자햐</b>가 혼자 하이디라오에 가서 맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라탕이다.',
       order: [['맑은 탕/물', '', '']],
       ings: [['땅콩참깨소스', '6', '스푼'], ['참기름', '3', '스푼'], ['산초기름', '3', '스푼'], ['고추기름', '3', '스푼'], ['청유훠궈소스', '3', '스푼'], ['다진 마늘', '3', '스푼'], ['굴소스', '3', '스푼'], ['간장소스', '3', '스푼'], ['참깨', '', '적당히'], ['소금', '', '적당히']],
       steps: [
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
       ],
       tip: '화한 맛이 부족하면 산초기름 더 넣기\n매운맛이 부족하면 청유훠궈소스 더 넣기\n국물에 깊이가 없으면 땅콩참깨소스 더 넣기' },
-    { id: 'b7', date: '2026-06-10', cat: '육수', emoji: '🍲', img: 'assets/cards/지새기탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBEBD0,#EFCB94)', name: '지새기탕', source: 'YouTube 지새기의 인간극장', desc: '유튜버 <b>지새기</b>가 마라탕을 셀프로 만들기 위해 레시피를 미리 공부까지 해갔으나, 정작 소스바 앞에서 본인 마음대로 조합하다가 맛이 애매해졌다. 이를 가엽게 여긴 <s>천사가</s> 직원이 나타나 만들어준 비법 레시피이다.',
+    { id: 'b7', date: '2026-06-10', cat: '탕', emoji: '🍲', img: 'assets/cards/지새기탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBEBD0,#EFCB94)', name: '지새기탕', source: 'YouTube 지새기의 인간극장', desc: '유튜버 <b>지새기</b>가 마라탕을 셀프로 만들기 위해 레시피를 미리 공부까지 해갔으나, 정작 소스바 앞에서 본인 마음대로 조합하다가 맛이 애매해졌다. 이를 가엽게 여긴 <s>천사가</s> 직원이 나타나 만들어준 비법 레시피이다.',
       order: [['맑은 탕/물', '', '']],
       ings: [['땅콩참깨소스', '1', '그릇'], ['땅콩참깨소스', '1', '스푼'], ['산초기름', '6', '스푼'], ['소금', '2', '스푼'], ['설탕', '6', '스푼'], ['굴소스', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['간장소스', '1', '스푼'], ['참기름', '1', '스푼'], ['태국고추', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['매운소고기소스', '1', '스푼'], ['청유훠궈소스', '1', '스푼']],
       steps: [
@@ -205,7 +205,7 @@
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
       ],
       tip: '' },
-    { id: 'r1', date: '2025-01-16', cat: '밥', emoji: '🍚', img: 'assets/cards/메기살덮밥.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', source: 'X @dduuuu__', desc: '홍탕에 익힌 메기살을 특제소스에 비빈 밥에 얹어 먹는 히든 메뉴이다.',
+    { id: 'r1', date: '2025-01-16', cat: '히든메뉴', emoji: '🍚', img: 'assets/cards/메기살덮밥.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', source: 'X @dduuuu__', desc: '홍탕에 익힌 메기살을 특제소스에 비빈 밥에 얹어 먹는 히든 메뉴이다.',
       order: [['우유/청유 마라훠궈', '', ''], ['팡가시우메기', '1', '인분'], ['공깃밥', '1', '공기']],
       ings: [['참기름', '1', '스푼'], ['간장소스', '1', '스푼'], ['굴소스', '0.5', '스푼'], ['중국식초', '0.5', '스푼'], ['다진 파', '1', '스푼']],
       steps: [
@@ -214,7 +214,7 @@
         '충분히 익힌 메기살을 밥에 얹어 으깨 먹는다',
       ],
       tip: '느끼한 것 같으면 홍탕 국물 1숟가락을 밥에 추가하기' },
-    { id: 'r2', cat: '밥', emoji: '🍚', img: 'assets/cards/토마토달걀밥.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토달걀밥', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀어, 밥에 끼얹어 비벼 먹는 히든 메뉴이다.',
+    { id: 'r2', cat: '히든메뉴', emoji: '🍚', img: 'assets/cards/토마토달걀밥.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토달걀밥', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀어, 밥에 끼얹어 비벼 먹는 히든 메뉴이다.',
       order: [['토마토탕훠궈', '', ''], ['날계란', '1', '개'], ['공깃밥', '1', '공기']],
       ings: [['참기름', '0.5', '스푼'], ['오향우육/다진 고기', '2', '스푼'], ['다진 파', '2', '스푼']],
       steps: [
@@ -225,7 +225,7 @@
         '소스가 담긴 밥에 토마토계란탕을 끼얹어 비벼 먹는다',
       ],
       tip: '토마토탕훠궈 국물 안의 토마토를 국자로 으깨주기' },
-    { id: 'r3', date: '2024-09-22', cat: '밥', emoji: '🍚', img: 'assets/cards/희수국밥.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE0,#E5D6B8)', name: '희수국밥', source: 'X @snowdoesnot', desc: '메뉴 이름에서도 알 수 있듯이 창시자는 <b>희수</b>라는 인물이며, 유튜브 <b>햅삐찌링</b>에 본인등판하여 <u>버섯탕이 너무너무 맛있는데 국물에 밥을 말아 먹지 않는 게 이해가 되지 않아서 그때부터 밥을 말아 국밥처럼 먹었다</u>고 한다.',
+    { id: 'r3', date: '2024-09-22', cat: '히든메뉴', emoji: '🍚', img: 'assets/cards/희수국밥.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE0,#E5D6B8)', name: '희수국밥', source: 'X @snowdoesnot', desc: '메뉴 이름에서도 알 수 있듯이 창시자는 <b>희수</b>라는 인물이며, 유튜브 <b>햅삐찌링</b>에 본인등판하여 <u>버섯탕이 너무너무 맛있는데 국물에 밥을 말아 먹지 않는 게 이해가 되지 않아서 그때부터 밥을 말아 국밥처럼 먹었다</u>고 한다.',
       order: [['버섯탕훠궈', '', ''], ['공깃밥', '1', '공기']],
       ings: [['오향우육/다진 고기', '', '적당히'], ['다진 파', '', '적당히']],
       steps: [
@@ -234,7 +234,7 @@
         '소스 그릇에 밥을 넣고 푹 우러난 버섯탕 국물을 붓고 잘 섞어 먹는다',
       ],
       tip: '반드시 식사를 거의 끝마쳐 가는 후반부에 먹기' },
-    { id: 'e2', cat: '기타', emoji: '🥟', img: 'assets/cards/토마토달걀만두.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토달걀만두', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀고 만두를 익혀 먹는 히든 메뉴이다.',
+    { id: 'e2', cat: '히든메뉴', emoji: '🥟', img: 'assets/cards/토마토달걀만두.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토달걀만두', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀고 만두를 익혀 먹는 히든 메뉴이다.',
       order: [['토마토탕훠궈', '', ''], ['날계란', '1', '개'], ['만두', '1', '인분']],
       ings: [['청유훠궈소스', '1', '티스푼'], ['오향우육/다진 고기', '2', '스푼'], ['다진 파', '2', '스푼']],
       steps: [
@@ -246,7 +246,7 @@
         '만두가 다 익으면 소스 그릇에 토마토계란탕을 끼얹고 만두를 건져 먹는다',
       ],
       tip: '토마토탕훠궈 국물 안의 토마토를 국자로 으깨주기' },
-    { id: 'e1', cat: '기타', emoji: '🍢', img: 'assets/cards/유부 새우완자.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE4,#DCD2C0)', name: '유부 새우완자', source: 'Gemini AI', desc: '유부에 새우완자를 채워 넣어 국물에 익혀 먹는 히든 메뉴이다.',
+    { id: 'e1', cat: '히든메뉴', emoji: '🍢', img: 'assets/cards/유부 새우완자.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE4,#DCD2C0)', name: '유부 새우완자', source: 'Gemini AI', desc: '유부에 새우완자를 채워 넣어 국물에 익혀 먹는 히든 메뉴이다.',
       order: [['새우완자', '1', '인분'], ['유부', '1', '인분']],
       ings: [],
       steps: [
@@ -254,7 +254,7 @@
         '국물에 넣어 익혀 먹는다',
       ],
       tip: '새우완자는 취향에 따라 날치알 새우완자로 바꾸거나 둘 다 넣기' },
-    { id: 'e3', cat: '기타', emoji: '🍢', img: 'assets/cards/유부 새우완자(업그레이드).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE4,#DCD2C0)', name: '유부 새우완자', ver: '업그레이드', source: 'YouTube 풍류천재 조서형', desc: '새우완자에 소스바 재료를 첨가하여 유부에 채워 넣고 국물에 익혀 먹는 히든 메뉴이다.',
+    { id: 'e3', cat: '히든메뉴', emoji: '🍢', img: 'assets/cards/유부 새우완자(업그레이드).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE4,#DCD2C0)', name: '유부 새우완자', ver: '업그레이드', source: 'YouTube 풍류천재 조서형', desc: '새우완자에 소스바 재료를 첨가하여 유부에 채워 넣고 국물에 익혀 먹는 히든 메뉴이다.',
       order: [['새우완자', '1', '인분'], ['유부', '1', '인분']],
       ings: [['참기름', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고수', '1', '스푼']],
       steps: [
@@ -263,7 +263,7 @@
         '국물에 넣어 익혀 먹는다',
       ],
       tip: '' },
-    { id: 'n2', cat: '면', emoji: '🍜', img: 'assets/cards/탄탄면.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7E6CE,#E5C08C)', name: '탄탄면', source: 'Gemini AI', desc: '마라훠궈 국물에 익힌 생면을 특제소스에 비벼 먹는 히든 메뉴이다.',
+    { id: 'n2', cat: '히든메뉴', emoji: '🍜', img: 'assets/cards/탄탄면.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7E6CE,#E5C08C)', name: '탄탄면', source: 'Gemini AI', desc: '마라훠궈 국물에 익힌 생면을 특제소스에 비벼 먹는 히든 메뉴이다.',
       order: [['우유/청유 마라훠궈', '', ''], ['생면', '1', '인분']],
       ings: [['땅콩참깨소스', '1', '스푼'], ['버섯소스', '1', '스푼'], ['굴소스', '1', '스푼'], ['오향우육/다진 고기', '1', '스푼'], ['튀긴대두', '1', '스푼'], ['다진 파', '1', '스푼'], ['땅콩가루', '1', '스푼']],
       steps: [
@@ -272,7 +272,7 @@
         '면이 다 익으면 소스 그릇에 덜어 비벼 먹는다',
       ],
       tip: '' },
-    { id: 'n1', cat: '면', emoji: '🍜', img: 'assets/cards/토마토에그누들.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFECDD,#FFC2A6)', name: '토마토에그누들', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀고 생면을 익혀 먹는 히든 메뉴이다.',
+    { id: 'n1', cat: '히든메뉴', emoji: '🍜', img: 'assets/cards/토마토에그누들.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFECDD,#FFC2A6)', name: '토마토에그누들', source: 'Gemini AI', desc: '녹진하게 끓인 토마토탕에 달걀물을 풀고 생면을 익혀 먹는 히든 메뉴이다.',
       order: [['토마토탕훠궈', '', ''], ['날계란', '1', '개'], ['생면', '1', '인분']],
       ings: [['오향우육/다진 고기', '2', '스푼'], ['다진 파', '2', '스푼']],
       steps: [
