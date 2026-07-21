@@ -702,6 +702,17 @@ img {
   scrollbar-width: none;
 }
 .mf-scroll::-webkit-scrollbar { display: none; }
+/* 데스크탑: 끌 수 있다는 grab 커서. 드래그 중엔 스냅 끄고(부드럽게 끌림) 선택 방지 */
+@media (hover: hover) and (pointer: fine) {
+  .mf-scroll { cursor: grab; }
+}
+.mf-scroll.mf-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+  scroll-behavior: auto;
+}
+.mf-scroll.mf-dragging .mf-hero { cursor: grabbing; }
 
 /* 히어로 카드 (1:1, 원본 이미지 안 잘림) */
 .mf-hero {
