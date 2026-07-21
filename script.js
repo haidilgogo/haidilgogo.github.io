@@ -683,16 +683,6 @@
     mfScroll.addEventListener('click', (e) => {
       if (dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; }
     }, true);
-    // 인디케이터 클릭 → 가장 가까운 점의 히어로로 이동(점이 작으니 영역 아무 데나 눌러도 됨)
-    mfDots.addEventListener('click', (e) => {
-      let best = 0, bestD = Infinity;
-      dotEls.forEach((d, i) => {
-        const r = d.getBoundingClientRect();
-        const dist = Math.abs(e.clientX - (r.left + r.width / 2));
-        if (dist < bestD) { bestD = dist; best = i; }
-      });
-      snapTo(best);
-    });
   }
 
   function syncMonthlyFeature() {

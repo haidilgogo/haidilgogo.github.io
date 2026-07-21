@@ -789,10 +789,7 @@ img {
   position: absolute; right: 34px; top: 14px;
   z-index: 3;
   display: flex; gap: 5px;
-  pointer-events: auto;      /* 인디케이터 클릭 가능 */
-  cursor: pointer;
-  padding: 10px 8px;         /* 작은 점 클릭 쉽게 히트 영역 확대 */
-  margin: -10px -8px;        /* 시각 위치(right/top)는 그대로 유지 */
+  pointer-events: none;
 }
 .mf-dots[hidden] { display: none; }
 .mf-dots i {
