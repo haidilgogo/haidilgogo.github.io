@@ -109,6 +109,7 @@ img {
 
 .topbar-inner {
   box-sizing: border-box;
+  position: relative; /* 검색창(absolute 오버레이) 기준점 */
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
@@ -272,8 +273,7 @@ img {
    입력창은 비어 있을 때 포커스가 빠지면 다시 아이콘으로 접힘 — script.js openSearch/collapseSearch */
 .search-toggle {
   cursor: pointer;
-  flex: none;
-  margin-left: auto; /* 접힘 상태에서 줄 오른쪽 끝으로 (펼치면 search-box의 margin-auto가 대신함) */
+  flex: none; /* 검색박스 안 맨 앞(앞머리) 아이콘 = 펼치면 왼쪽으로 이동 */
   width: 40px;
   height: 40px;
   border: none;
@@ -286,20 +286,38 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 .search-toggle:active { background: var(--bg-cream); }
-.page:not([data-section="recipe"]) .search-toggle { display: none; } /* 검색은 레시피 섹션 전용 */
+.page:not([data-section="recipe"]) .search-box { display: none; } /* 검색은 레시피 섹션 전용(🔍 포함 통째로) */
 
+/* 검색창(2026-07-21): 흐름에서 뺀 absolute 오버레이 → flex 줄바꿈 원천 차단(기기별 wrap 버그 해결).
+   🔍(맨 앞 자식)가 검색바의 앞머리. 접힘=박스가 🔍폭(40px)으로 우측에 붙음 → 펼침=오른쪽 고정한 채
+   폭이 왼쪽으로 커지며 맨 앞 🔍가 왼쪽으로 스르르 이동, 그 뒤로 입력창이 열림. 로고는 왼쪽에 유지. */
 .search-box {
-  display: none; /* 기본 접힘 — 아이콘(.search-toggle)만 노출 */
+  position: absolute;
+  top: 0;
+  right: clamp(20px, 5vw, 40px);   /* 접힘 시 🔍 = 지금 우측 자리(좌우 패딩 안쪽) */
+  height: 40px;
+  width: 40px;                     /* 접힘: 🔍만 (크림 필드는 클립됨) */
+  display: flex;
+  align-items: center;
+  overflow: hidden;                /* 접힘 땐 크림 필드를 가림 */
+  white-space: nowrap;
+  z-index: 2;
+  transition: width .32s cubic-bezier(.4, 0, .2, 1);
+}
+.search-box.open {
+  width: calc(100% - clamp(20px, 5vw, 40px) - 120px); /* 🔍가 왼쪽(~120px)까지 이동, 그 오른쪽으로 크림 필드 열림 */
+}
+/* 크림 배경은 입력창 부분에만 → 🔍는 밖(투명)에 따로 있는 것처럼 보임 */
+.search-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  display: flex;
   align-items: center;
   background: var(--bg-cream);
-  border: none;
   border-radius: 12px;
   overflow: hidden;
-  height: 40px;
-  width: min(220px, 85vw);
-  flex: none;
 }
-.search-box.open { display: flex; }
 
 .tab-btn {
   cursor: pointer;
@@ -382,11 +400,7 @@ img {
     display: none;
   }
 
-  .search-box {
-    order: 2;
-    flex: 1;
-    width: auto;
-  }
+  /* .search-box absolute 오버레이 — 옛 flex 규칙 제거(2026-07-21) */
 
   #topInstallBtn {
     order: 2;
@@ -419,28 +433,11 @@ img {
     margin-left: auto;
   }
 
-  .search-box {
-    order: 0;
-    flex: 0 1 220px;
-    width: auto;
-    min-width: 0;
-    margin-left: auto;
-  }
+  /* .search-box는 absolute 오버레이(위 정의)로 전환 — 옛 flex 레이아웃 규칙 제거(2026-07-21) */
 
   #topInstallBtn {
     display: none !important;
   }
-}
-
-.search-icon {
-  flex: none;
-  width: 38px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  cursor: pointer;
 }
 
 /* 데스크탑 공유·설치 아이콘 — 박스(원형 배경) 없이 아이콘만(즐겨찾기 알약과 구별, 사용자 요청).
@@ -483,6 +480,7 @@ img {
   font-size: 14px;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   color: var(--text-dark);
+  padding-left: 14px;  /* 🔍가 필드 밖으로 나가서 필드 자체 왼쪽 여백 필요 */
   padding-right: 8px;
 }
 
