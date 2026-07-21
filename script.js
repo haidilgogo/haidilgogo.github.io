@@ -644,15 +644,22 @@
     window.addEventListener('resize', updatePill);
     updatePill();
 
-    // ── 데스크탑 마우스 드래그 스크롤 ──
+    // ── 데스크탑 마우스 드래그 스크롤 (한 번에 한 칸씩) ──
     // 터치는 브라우저가 스와이프를 기본 지원하지만, 마우스는 가로 오버플로를 드래그로
     // 못 끈다. mouse 이벤트로만 붙여(포인터/터치 이벤트는 네이티브 스와이프와 충돌) 직접 구현.
-    // 드래그 중엔 scroll-snap을 꺼서 손 따라 부드럽게 끌리고, 놓으면 다시 켜 가까운 칸으로 스냅.
-    let dragging = false, startX = 0, startScroll = 0, dragMoved = false;
+    // 드래그 중엔 scroll-snap을 꺼서 손 따라 끌리되, 시작 칸 기준 ±1칸으로 범위를 묶어
+    // 아무리 멀리 끌어도 한 번에 한 칸씩만 넘어가게 한다. 놓으면 가까운 칸으로 스냅.
+    const stepSize = () => (heroes[1] ? heroes[1].offsetLeft - heroes[0].offsetLeft : heroes[0].offsetWidth) || 1;
+    const snapTo = (i) => {
+      const t = Math.max(0, Math.min(total - 1, i));
+      heroes[t].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    };
+    let dragging = false, startX = 0, startIdx = 0, dragMoved = false;
     mfScroll.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
       dragging = true; dragMoved = false;
-      startX = e.pageX; startScroll = mfScroll.scrollLeft;
+      startX = e.pageX;
+      startIdx = Math.round(mfScroll.scrollLeft / stepSize());
       mfScroll.classList.add('mf-dragging');
       e.preventDefault(); // 이미지 고스트 드래그·텍스트 선택 방지
     });
@@ -660,18 +667,32 @@
       if (!dragging) return;
       const dx = e.pageX - startX;
       if (Math.abs(dx) > 4) dragMoved = true;
-      mfScroll.scrollLeft = startScroll - dx;
+      const step = stepSize();
+      const lo = Math.max(0, startIdx - 1) * step; // 시작 칸 기준 ±1칸으로 제한
+      const hi = Math.min(total - 1, startIdx + 1) * step;
+      mfScroll.scrollLeft = Math.max(lo, Math.min(hi, startIdx * step - dx));
     });
     function endDrag() {
       if (!dragging) return;
       dragging = false;
-      mfScroll.classList.remove('mf-dragging'); // 스냅 다시 켜짐 → 가까운 히어로로 정렬
+      mfScroll.classList.remove('mf-dragging'); // 스냅 다시 켜짐
+      snapTo(Math.round(mfScroll.scrollLeft / stepSize())); // 가까운 칸(시작±1 내)으로 정렬
     }
     window.addEventListener('mouseup', endDrag);
     // 드래그로 끝난 경우엔 히어로 클릭(모달 열기)을 무효화 — 캡처 단계에서 가로챔
     mfScroll.addEventListener('click', (e) => {
       if (dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; }
     }, true);
+    // 인디케이터 클릭 → 가장 가까운 점의 히어로로 이동(점이 작으니 영역 아무 데나 눌러도 됨)
+    mfDots.addEventListener('click', (e) => {
+      let best = 0, bestD = Infinity;
+      dotEls.forEach((d, i) => {
+        const r = d.getBoundingClientRect();
+        const dist = Math.abs(e.clientX - (r.left + r.width / 2));
+        if (dist < bestD) { bestD = dist; best = i; }
+      });
+      snapTo(best);
+    });
   }
 
   function syncMonthlyFeature() {
