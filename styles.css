@@ -3448,6 +3448,9 @@ img {
   color: var(--text-dark);
 }
 .home-sec-cnt { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+/* 셀럽 레시피 등 인물 섹션용 변형 — 볼드 빼고(500) '레시피'만 빨강(구 킥커 투톤, 2026-07-21) */
+.home-sec-title--light { font-weight: 500; }
+.home-sec-title .t-red { color: var(--brand-red); }
 .home-sec-more {
   background: none;
   border: none;
