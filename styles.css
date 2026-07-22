@@ -3666,8 +3666,8 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 24px;
+  justify-content: flex-start; /* 위 기준 정렬 → 설명 길이 달라져도 이미지 위치 고정(중앙정렬은 덩어리가 밀려 이미지가 움직였음) */
+  padding: 48px 16px 0;
   text-align: center;
   min-height: 0;
   position: relative;
@@ -3675,7 +3675,7 @@ img {
 }
 .story-img {
   width: 100%;
-  max-width: 320px;
+  max-width: 388px;
   aspect-ratio: 1 / 1;
   border-radius: 16px;
   object-fit: cover;
