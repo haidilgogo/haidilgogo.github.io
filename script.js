@@ -746,7 +746,8 @@
   const popularRailEl = document.getElementById('popularRail');
   const tangGridEl = document.getElementById('tangGrid');
   const hiddenGridEl = document.getElementById('hiddenGrid');
-  const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#5F5E5A', '#A3612E', '#3E7C8A', '#8A5FB0'];
+  // 회색(#5F5E5A) 제외 — 'seen=회색 링'과 헷갈려서 안 본 셀럽이 꺼져 보이는 착시 방지(2026-07-22). 대신 베리로즈.
+  const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#B85575', '#A3612E', '#3E7C8A', '#8A5FB0'];
 
   // 셀럽 레일 정렬 기준 = 인스타 팔로워 수(2026-07 웹 조사 대략치). 화면엔 숫자 안 보이고 순서만 결정.
   // 🔴 월 1회 정도 갱신. 대부분 개인계정 기준. 장하오는 개인계정이 없어 소속그룹 앤더블(@and2ble) 공식 기준.
@@ -760,6 +761,14 @@
     '박은영': 175000,
     '건희': 122000
   };
+
+  // 본(터치한) 셀럽 = 회색 링 + 맨 뒤. 앱 내부 ‹ 뒤로가기 동안만 유지(메모리 Set).
+  //  - 새로고침·재진입 → 스크립트 새로 실행돼 빈 Set → 그라데이션·팔로워순 원복.
+  //  - 사파리 하단 뒤로가기는 bfcache로 옛 화면을 복원해 이전 seen이 되살아나므로 → pageshow(persisted)에서 초기화.
+  let seenCelebs = new Set();
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) { seenCelebs.clear(); renderCelebRail(); }
+  });
 
   function renderCelebRail() {
     const people = [];
@@ -776,18 +785,27 @@
     });
     // 셀럽 레일은 연예인(star)만 노출 — 유튜버/크리에이터(쑨디·라젤·수코 등)는 제외(2026-07-22).
     // 레시피는 그대로 남아 전체보기·검색으로 접근 가능. 추후 크리에이터 별도 레일 분리 예정.
-    const celebs = people.filter((p) => p.star)
+    // 팔로워 기준 기본 순서 → 그 순서로 색 고정(순서가 바뀌어도 사람별 색 유지)
+    const base = people.filter((p) => p.star)
       .sort((a, b) => (CELEB_FOLLOWERS[b.name] || 0) - (CELEB_FOLLOWERS[a.name] || 0) || b.count - a.count);
-    celebRailEl.innerHTML = celebs.map((p, i) => {
-      const color = CELEB_COLORS[i % CELEB_COLORS.length];
-      return '<button class="celeb" type="button" data-person="' + p.name + '">'
-        + '<span class="celeb-img" style="background:' + color + '">' + p.name.charAt(0)
+    base.forEach((p, idx) => { p.color = CELEB_COLORS[idx % CELEB_COLORS.length]; });
+    // 본(터치한) 셀럽은 맨 뒤로. sort가 안정정렬이라 그룹 내부는 팔로워순 유지.
+    const celebs = base.slice().sort((a, b) =>
+      (seenCelebs.has(a.name) ? 1 : 0) - (seenCelebs.has(b.name) ? 1 : 0));
+    celebRailEl.innerHTML = celebs.map((p) => {
+      const seenCls = seenCelebs.has(p.name) ? ' celeb--seen' : '';
+      return '<button class="celeb' + seenCls + '" type="button" data-person="' + p.name + '">'
+        + '<span class="celeb-img"><span class="celeb-face" style="background:' + p.color + '">' + p.name.charAt(0)
         + '<img src="assets/people/' + p.name + '.jpg" alt="" loading="lazy" draggable="false" onerror="this.remove()">'
-        + '</span>'
+        + '</span></span>'
         + '<span class="celeb-name">' + p.name + '</span></button>';
     }).join('');
     celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
-      btn.addEventListener('click', () => enterBrowse('전체', btn.dataset.person));
+      btn.addEventListener('click', () => {
+        seenCelebs.add(btn.dataset.person); // 본 것으로 표시 → 회색+맨뒤 (앱 내부 뒤로가기 동안만)
+        enterBrowse('전체', btn.dataset.person);
+        renderCelebRail(); // 갔다 왔을 때 반영돼 있게 지금 다시 그림
+      });
     });
   }
 
