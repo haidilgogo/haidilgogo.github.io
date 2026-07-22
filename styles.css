@@ -3733,6 +3733,10 @@ img {
   box-shadow: 0 4px 18px rgba(0, 0, 0, .4);
 }
 .story-cta:active { transform: scale(.96); }
+/* 스토리 위에서 연 레시피 모달은 모바일에서도 상단바 자리까지 꽉 덮어 스토리 헤더가 안 비치게 */
+@media (max-width: 640px) {
+  .modal-overlay.from-story { top: 0; }
+}
 
 /* ── ③ 인기 소스 캐러셀 (클린 카드) ── */
 .hp-rail {

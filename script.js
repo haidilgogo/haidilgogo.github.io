@@ -922,7 +922,11 @@
   document.getElementById('storyClose').addEventListener('click', closeStory);
   // CTA → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움. 모달 동안 자동재생 정지(closeModal에서 재개)
   document.getElementById('storyCta').addEventListener('click', () => {
-    if (currentStoryRecipe) { storyViewer.classList.add('paused'); openModal(currentStoryRecipe); }
+    if (currentStoryRecipe) {
+      storyViewer.classList.add('paused');
+      modalOverlay.classList.add('from-story'); // 모바일에서 모달이 상단까지 꽉 덮어 스토리 헤더가 안 비치게
+      openModal(currentStoryRecipe);
+    }
   });
   // 키보드: ← → 이동, Esc 닫기
   document.addEventListener('keydown', (e) => {
@@ -1117,7 +1121,7 @@
   }
 
   function closeModal() {
-    modalOverlay.classList.remove('open');
+    modalOverlay.classList.remove('open', 'from-story');
     // 스토리 위에서 열렸던 모달이면: 스크롤 잠금 유지 + 스토리 자동재생 재개. 아니면 잠금 해제
     if (storyViewer.classList.contains('open')) {
       storyViewer.classList.remove('paused');
