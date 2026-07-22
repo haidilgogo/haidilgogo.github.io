@@ -841,7 +841,7 @@
     });
   }
 
-  // ── 셀럽 인스타 스토리 뷰어 ── (탭 수동넘김, 마지막에서 다음=닫기. CTA=기존 레시피 모달 재사용)
+  // ── 셀럽 인스타 스토리 뷰어 ── (7초 자동재생 + 탭 수동넘김. 누르면 정지, 마지막서 다음=닫기. CTA=기존 레시피 모달 재사용)
   const storyViewer = document.getElementById('storyViewer');
   const storyProgress = document.getElementById('storyProgress');
   const storyAvatarEl = document.getElementById('storyAvatar');
@@ -860,7 +860,9 @@
     storyIdx = 0;
     storyAvatarEl.innerHTML = '<img src="assets/people/' + personName + '.jpg" alt="" draggable="false" onerror="this.remove()">';
     storyNameEl.textContent = personName;
-    storyProgress.innerHTML = storyList.map(() => '<span class="story-seg"></span>').join('');
+    // 각 세그먼트에 안쪽 채움 바(.story-seg-fill) — 현재 칸만 CSS 애니메이션으로 차오름
+    storyProgress.innerHTML = storyList.map(() => '<span class="story-seg"><i class="story-seg-fill"></i></span>').join('');
+    storyViewer.classList.remove('paused');
     renderStorySlide();
     document.documentElement.style.overflow = 'hidden';
     storyViewer.classList.add('open');
@@ -870,7 +872,13 @@
   function renderStorySlide() {
     const r = storyList[storyIdx];
     currentStoryRecipe = r;
-    Array.from(storyProgress.children).forEach((seg, i) => seg.classList.toggle('filled', i <= storyIdx));
+    // 지난 칸=꽉(filled), 현재 칸=애니메이션(current). 애니메이션 재시작을 위해 current를 잠깐 뗐다 다시 붙임
+    Array.from(storyProgress.children).forEach((seg, i) => {
+      seg.classList.remove('current');
+      seg.classList.toggle('filled', i < storyIdx);
+    });
+    const cur = storyProgress.children[storyIdx];
+    if (cur) { void cur.offsetWidth; cur.classList.add('current'); } // reflow로 애니메이션 확실히 재시작
     const thumb = r.img
       ? '<img class="story-img" src="' + r.img + '" alt="' + r.name + '" draggable="false">'
       : '<span class="story-img story-img--emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
@@ -888,17 +896,33 @@
     if (storyIdx > 0) { storyIdx--; renderStorySlide(); }
   }
   function closeStory() {
-    storyViewer.classList.remove('open');
+    storyViewer.classList.remove('open', 'paused');
     storyViewer.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
   }
 
-  document.getElementById('storyNext').addEventListener('click', storyNext);
-  document.getElementById('storyPrev').addEventListener('click', storyPrev);
+  // 자동재생: 현재 진행바가 다 차면(animationend) 다음 칸으로
+  storyProgress.addEventListener('animationend', (e) => {
+    if (e.animationName === 'storyFill' && storyViewer.classList.contains('open')) storyNext();
+  });
+  // 누르고 있으면 정지, 떼면 재개. 200ms 넘게 눌렀으면 '홀드'로 보고 그 탭 이동은 무효
+  let storyPressT = 0, storyWasHold = false;
+  storyViewer.addEventListener('pointerdown', () => {
+    storyPressT = Date.now(); storyWasHold = false;
+    storyViewer.classList.add('paused');
+  });
+  storyViewer.addEventListener('pointerup', () => {
+    if (Date.now() - storyPressT > 200) storyWasHold = true;
+    storyViewer.classList.remove('paused');
+  });
+  storyViewer.addEventListener('pointercancel', () => { storyViewer.classList.remove('paused'); });
+
+  document.getElementById('storyNext').addEventListener('click', () => { if (storyWasHold) { storyWasHold = false; return; } storyNext(); });
+  document.getElementById('storyPrev').addEventListener('click', () => { if (storyWasHold) { storyWasHold = false; return; } storyPrev(); });
   document.getElementById('storyClose').addEventListener('click', closeStory);
-  // CTA → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움
+  // CTA → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움. 모달 동안 자동재생 정지(closeModal에서 재개)
   document.getElementById('storyCta').addEventListener('click', () => {
-    if (currentStoryRecipe) openModal(currentStoryRecipe);
+    if (currentStoryRecipe) { storyViewer.classList.add('paused'); openModal(currentStoryRecipe); }
   });
   // 키보드: ← → 이동, Esc 닫기
   document.addEventListener('keydown', (e) => {
@@ -1093,8 +1117,13 @@
   }
 
   function closeModal() {
-    document.documentElement.style.overflow = '';
     modalOverlay.classList.remove('open');
+    // 스토리 위에서 열렸던 모달이면: 스크롤 잠금 유지 + 스토리 자동재생 재개. 아니면 잠금 해제
+    if (storyViewer.classList.contains('open')) {
+      storyViewer.classList.remove('paused');
+    } else {
+      document.documentElement.style.overflow = '';
+    }
   }
 
   modalOverlay.addEventListener('click', closeModal);

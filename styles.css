@@ -3594,6 +3594,7 @@ img {
   overscroll-behavior: contain;
 }
 .story-viewer.open { display: flex; }
+.story-viewer { --story-dur: 7s; } /* 진행바 자동재생 1칸 시간 */
 .story-phone {
   position: relative; /* 탭 존·CTA의 기준 */
   width: 100%;
@@ -3615,8 +3616,20 @@ img {
   height: 3px;
   border-radius: 2px;
   background: rgba(255, 255, 255, .3);
+  overflow: hidden;
 }
-.story-seg.filled { background: #fff; }
+/* 안쪽 채움 바: 지난 칸=꽉(scaleX 1), 현재 칸=7초에 걸쳐 0→1 애니메이션(누르면 정지) */
+.story-seg-fill {
+  display: block;
+  height: 100%;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.story-seg.filled .story-seg-fill { transform: scaleX(1); }
+.story-seg.current .story-seg-fill { animation: storyFill var(--story-dur, 7s) linear forwards; }
+.story-viewer.paused .story-seg.current .story-seg-fill { animation-play-state: paused; }
+@keyframes storyFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .story-head {
   display: flex;
   align-items: center;
