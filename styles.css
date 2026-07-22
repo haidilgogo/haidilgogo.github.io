@@ -4009,7 +4009,7 @@ img {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.hc-row + .hc-row { border-top: 1px solid #EAEAEA; } /* 29cm식 뉴트럴 라이트 그레이(크림톤 X) */
+.hc-row + .hc-row { border-top: 1px solid #E2E2E2; } /* 뉴트럴 그레이(크림톤 X), 살짝 진하게 */
 .hc-row-thumb {
   width: 80px;
   height: 80px;
