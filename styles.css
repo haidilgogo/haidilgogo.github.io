@@ -3581,6 +3581,7 @@ img {
 /* ── ③ 인기 소스 캐러셀 (클린 카드) ── */
 .hp-rail {
   display: flex;
+  align-items: flex-start; /* 카드가 최대높이로 늘어나 검정칸이 커지는 것 방지 */
   gap: 12px;
   overflow-x: auto;
   margin: 12px -20px 0; /* 부제 제거(2026-07-21) 후 제목과의 간격 확보 — 셀럽 레일과 동일 */
@@ -3596,12 +3597,14 @@ img {
   /* 2장 온전 + 3번째는 순위 배지만(≈44px) 빼꼼 → 가로 스크롤 힌트. 레일 폭(=앱폭) 기준이라 기기 무관 */
   width: calc(50% - 24px);
   scroll-snap-align: start;
-  background: none;
+  background: #141414;
   border: none;
   padding: 0;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
+  border-radius: 14px;
+  overflow: hidden;
 }
 .hp-thumb, .hc-thumb {
   position: relative;
@@ -3611,10 +3614,26 @@ img {
   overflow: hidden;
   background: #EADFD6;
 }
-/* 인기 카드는 세로 3:4(쿠팡이츠식) — 이름·출처는 이미지 안 하단 오버레이(.hp-over) */
+/* 인기 카드(쿠팡이츠식): 1:1 사진(온전히 보임) + 아래 검정 푸터(.hp-foot). 코너는 카드가 클립하므로 thumb는 각지게 */
 .hp-thumb {
-  aspect-ratio: 3 / 4;
-  border-radius: 14px;
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+}
+.hp-thumb::after { /* 사진 하단→푸터 검정까지, 이징 다단계로 단차 없이 부드럽게 */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(to top,
+    #141414 0%,
+    rgba(20, 20, 20, .82) 14%,
+    rgba(20, 20, 20, .48) 34%,
+    rgba(20, 20, 20, .2) 56%,
+    rgba(20, 20, 20, .06) 78%,
+    rgba(20, 20, 20, 0) 100%);
+  pointer-events: none;
 }
 .hp-thumb img, .hc-thumb img {
   width: 100%;
@@ -3661,43 +3680,46 @@ img {
   padding-top: 3px;
 }
 .hp-crown svg { width: 20px; height: 20px; }
+/* 좋아요 — 검정 푸터 안, 알약 없이 흰 하트+숫자. 푸터는 상단정렬이지만 좋아요만 세로 가운데 */
 .hp-like {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  z-index: 2;
+  flex-shrink: 0;
+  align-self: center;
   display: flex;
   align-items: center;
   gap: 3px;
-  background: rgba(0, 0, 0, .45);
-  border-radius: 20px;
-  padding: 3px 8px;
-  color: #fff;
-  font-size: 11px;
+  color: rgba(255, 255, 255, .85);
+  font-size: 12px;
   font-weight: 700;
   font-style: normal;
 }
-.hp-like svg { width: 11px; height: 11px; fill: #fff; }
-/* 인기 카드 하단 오버레이(이미지 안, 이름·출처를 흰 글씨로) */
-.hp-over {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  padding: 30px 12px 12px;
-  background: linear-gradient(to top, rgba(0,0,0,.82) 12%, rgba(0,0,0,.42) 55%, transparent);
+.hp-like svg { width: 13px; height: 13px; fill: #fff; flex-shrink: 0; }
+/* 인기 카드 검정 푸터: 이름/부제(왼) + 좋아요(오른) */
+.hp-foot {
+  display: flex;
+  align-items: flex-start; /* 이름을 항상 상단 같은 위치에 → 부제 유무와 상관없이 이름 높이 일치 */
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 60px; /* 부제 2줄 높이에 맞춤 → 부제 유무와 상관없이 푸터·카드 크기 동일 */
+  padding: 10px 11px 11px;
+  background: #141414;
 }
-.hp-over .hp-name {
-  margin-top: 0;
+.hp-foot-txt { min-width: 0; }
+.hp-foot .hp-name {
+  display: block;
+  margin: 0;
   color: #fff;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.hp-over .hp-ver { color: rgba(255,255,255,.72); }
-.hp-over .hp-src {
-  margin-top: 3px;
-  color: rgba(255,255,255,.82);
+.hp-foot .hp-sub {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, .6);
+  font-size: 12px;
+  font-weight: 400;
 }
 .hp-name {
   display: block;

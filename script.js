@@ -816,9 +816,14 @@
       : '<span class="hc-emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
     return thumb;
   }
-  function homeCardMeta(r) {
+  // 이름(+버전)만 — 인기소스 카드용(출처는 상세 모달에서만 노출)
+  function homeCardName(r) {
     return '<span class="hp-name">' + (r.nameHtml || r.name)
-      + (r.ver ? '<span class="hp-ver">' + r.ver + '</span>' : '') + '</span>'
+      + (r.ver ? '<span class="hp-ver">' + r.ver + '</span>' : '') + '</span>';
+  }
+  // 이름 + 출처 — 탕·히든 그리드용
+  function homeCardMeta(r) {
+    return homeCardName(r)
       + (r.source ? '<span class="hp-src">' + r.source + '</span>' : '');
   }
   function bindHomeCards(container) {
@@ -844,9 +849,11 @@
     const top = sauces.slice(0, 5);
     popularRailEl.innerHTML = top.map((r, i) =>
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
-      + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r)
-      + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
-      + '<span class="hp-over">' + homeCardMeta(r) + '</span></span>'
+      + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r) + '</span>'
+      + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
+      + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
+      + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
+      + '</span>'
       + '</button>'
     ).join('');
     bindHomeCards(popularRailEl);
