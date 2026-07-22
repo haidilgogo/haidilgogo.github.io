@@ -311,6 +311,7 @@ img {
   margin: 0;
   pointer-events: none;
 }
+.search-box.search-box--hidden { display: none; } /* 홈(메인)에선 숨김 — 전체보기 등 브라우즈에서만 노출 */
 .search-box {
   position: relative;
   flex: 0 1 auto;

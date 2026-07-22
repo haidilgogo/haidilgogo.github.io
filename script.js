@@ -669,7 +669,11 @@
     return activeCat === '전체' && !personFilter && !query.trim() && !showFavoritesOnly;
   }
   function syncHome() {
-    viewRecipeEl.classList.toggle('is-home', isHome());
+    const home = isHome();
+    viewRecipeEl.classList.toggle('is-home', home);
+    // 검색은 메인(홈)에선 숨기고 전체보기 등 브라우즈 화면에서만 노출(2026-07-22 결정)
+    searchBox.classList.toggle('search-box--hidden', home);
+    if (home) searchBox.classList.remove('open'); // 숨길 때 펼침 상태도 접기
   }
   function browseTitle() {
     if (query.trim()) return '검색 결과';
