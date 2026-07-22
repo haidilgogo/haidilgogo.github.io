@@ -746,6 +746,7 @@
   const popularRailEl = document.getElementById('popularRail');
   const tangGridEl = document.getElementById('tangGrid');
   const hiddenGridEl = document.getElementById('hiddenGrid');
+  const sauceGridEl = document.getElementById('sauceGrid');
 
   // 가로 레일 마우스 드래그 스크롤(데스크탑용). 트랙패드·휠로만 되던 걸 손으로 끌 수 있게.
   //  - 컨테이너에 한 번만 붙임(레일은 innerHTML만 다시 그려도 컨테이너 자체는 유지됨).
@@ -997,8 +998,8 @@
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)
   function renderHomeCatGrid(cat, gridElement, cntId) {
     const list = RECIPES.filter((r) => r.cat === cat);
-    document.getElementById(cntId).textContent = list.length;
-    gridElement.innerHTML = list.map((r) =>
+    document.getElementById(cntId).textContent = list.length; // 배지엔 전체 개수(홈엔 4개만 노출)
+    gridElement.innerHTML = list.slice(0, 4).map((r) => // 홈은 4개만, 나머지는 '전체보기'로
       '<button class="hc-card" type="button" data-id="' + r.id + '">'
       + '<span class="hc-thumb">' + homeCardBody(r) + '</span>'
       + homeCardMeta(r) + '</button>'
@@ -1010,6 +1011,7 @@
     renderHomePopular();
     renderHomeCatGrid('탕', tangGridEl, 'tangCnt');
     renderHomeCatGrid('히든메뉴', hiddenGridEl, 'hiddenCnt');
+    renderHomeCatGrid('소스', sauceGridEl, 'sauceCnt');
   }
 
   function renderIngList(el, items) {
@@ -2524,7 +2526,10 @@
 
   // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
   document.getElementById('browseBack').addEventListener('click', goHome);
-  document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
+  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 그리드 뷰 (인기소스의 구 전체보기 버튼은 소스 섹션으로 이관·제거됨)
+  document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
+  document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
+  document.getElementById('sauceMore').addEventListener('click', () => enterBrowse('소스'));
 
   renderHomeSections();
   initMonthlyFeature();
