@@ -3994,19 +3994,14 @@ img {
   text-align: left;
   cursor: pointer;
 }
-/* 컴팩트 리스트(탕·히든) — 한 카드 안에 사진+이름+좋아요 행, 구분선으로 나눔 */
-.home-list {
-  background: #fff;
-  border-radius: 14px;
-  border: 1px solid var(--card-border);
-  overflow: hidden;
-}
+/* 컴팩트 리스트(탕·히든) — 감싸는 박스 없이 행만, 구분선으로 나눔 */
+.home-list { background: none; }
 .hc-row {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   width: 100%;
-  padding: 10px 13px;
+  padding: 11px 0;
   background: none;
   border: none;
   text-align: left;
@@ -4014,8 +4009,7 @@ img {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.hc-row + .hc-row { border-top: 1px solid #F1EBDF; }
-.hc-row:active { background: #FAF6EF; }
+.hc-row + .hc-row { border-top: 1px solid var(--card-border); }
 .hc-row-thumb {
   width: 46px;
   height: 46px;

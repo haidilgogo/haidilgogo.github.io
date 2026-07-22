@@ -1000,9 +1000,8 @@
   }
 
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)
-  function renderHomeCatGrid(cat, gridElement, cntId) {
+  function renderHomeCatGrid(cat, gridElement) {
     const list = RECIPES.filter((r) => r.cat === cat);
-    document.getElementById(cntId).textContent = list.length; // 배지엔 전체 개수(홈엔 4개만 노출)
     gridElement.innerHTML = list.slice(0, 4).map((r) => // 홈은 4개만, 나머지는 '전체보기'로
       '<button class="hc-card" type="button" data-id="' + r.id + '">'
       + '<span class="hc-thumb">' + homeCardBody(r) + '</span>'
@@ -1011,9 +1010,8 @@
     bindHomeCards(gridElement);
   }
   // 컴팩트 리스트(탕·히든): 사진 + 이름 + 좋아요 행. 소스는 그리드 유지(주인공=비주얼).
-  function renderHomeCatList(cat, listElement, cntId) {
+  function renderHomeCatList(cat, listElement) {
     const list = RECIPES.filter((r) => r.cat === cat);
-    document.getElementById(cntId).textContent = list.length; // 배지엔 전체 개수
     listElement.innerHTML = list.slice(0, 4).map((r) =>
       '<button class="hc-row" type="button" data-id="' + r.id + '">'
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
@@ -1026,9 +1024,9 @@
   function renderHomeSections() {
     renderCelebRail();
     renderHomePopular();
-    renderHomeCatList('탕', tangGridEl, 'tangCnt');
-    renderHomeCatList('히든메뉴', hiddenGridEl, 'hiddenCnt');
-    renderHomeCatGrid('소스', sauceGridEl, 'sauceCnt');
+    renderHomeCatList('탕', tangGridEl);
+    renderHomeCatList('히든메뉴', hiddenGridEl);
+    renderHomeCatGrid('소스', sauceGridEl);
   }
 
   function renderIngList(el, items) {
