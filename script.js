@@ -748,24 +748,42 @@
   const hiddenGridEl = document.getElementById('hiddenGrid');
   const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#5F5E5A', '#A3612E', '#3E7C8A', '#8A5FB0'];
 
+  // 셀럽 레일 정렬 기준 = 인스타 팔로워 수(2026-07 웹 조사 대략치). 화면엔 숫자 안 보이고 순서만 결정.
+  // 🔴 월 1회 정도 갱신. 대부분 개인계정 기준. 장하오는 개인계정이 없어 소속그룹 앤더블(@and2ble) 공식 기준.
+  const CELEB_FOLLOWERS = {
+    '세훈': 22000000,
+    '마크': 13000000,
+    '우기': 9000000,
+    '이영지': 6000000,
+    '장하오': 840000,
+    '김풍': 290000,
+    '박은영': 175000,
+    '건희': 122000
+  };
+
   function renderCelebRail() {
     const people = [];
     const byName = new Map();
     RECIPES.forEach((r) => {
       if (!r.person) return;
       if (!byName.has(r.person)) {
-        byName.set(r.person, { name: r.person, count: 0 });
+        byName.set(r.person, { name: r.person, count: 0, star: false });
         people.push(byName.get(r.person));
       }
-      byName.get(r.person).count++;
+      const p = byName.get(r.person);
+      p.count++;
+      if (r.star) p.star = true;
     });
-    people.sort((a, b) => b.count - a.count);
-    celebRailEl.innerHTML = people.map((p, i) => {
+    // 셀럽 레일은 연예인(star)만 노출 — 유튜버/크리에이터(쑨디·라젤·수코 등)는 제외(2026-07-22).
+    // 레시피는 그대로 남아 전체보기·검색으로 접근 가능. 추후 크리에이터 별도 레일 분리 예정.
+    const celebs = people.filter((p) => p.star)
+      .sort((a, b) => (CELEB_FOLLOWERS[b.name] || 0) - (CELEB_FOLLOWERS[a.name] || 0) || b.count - a.count);
+    celebRailEl.innerHTML = celebs.map((p, i) => {
       const color = CELEB_COLORS[i % CELEB_COLORS.length];
       return '<button class="celeb" type="button" data-person="' + p.name + '">'
         + '<span class="celeb-img" style="background:' + color + '">' + p.name.charAt(0)
         + '<img src="assets/people/' + p.name + '.jpg" alt="" loading="lazy" draggable="false" onerror="this.remove()">'
-        + '<i class="celeb-cnt">' + p.count + '</i></span>'
+        + '</span>'
         + '<span class="celeb-name">' + p.name + '</span></button>';
     }).join('');
     celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
@@ -792,6 +810,14 @@
     });
   }
 
+  // 인기소스 순위 배지: 1위 = 빨강 북마크 리본 + 심플 왕관(글자 없음), 2~5위 = 검정 알약 'N위'
+  function homeRankBadge(i) {
+    if (i === 0) {
+      return '<span class="hp-crown"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l4 4 5-6 5 6 4-4v11H3z" fill="#F4C948"/></svg></span>';
+    }
+    return '<i class="hp-rank">' + (i + 1) + '위</i>';
+  }
+
   // ③ 인기 소스: 좋아요순 상위 5개 캐러셀. 순서는 렌더 시점 고정(좋아요 눌러도 즉시 재정렬 안 함 —
   //    카드가 눈앞에서 튀지 않게. 숫자만 refreshLikeCounts로 갱신, 순서는 다음 방문 때 반영).
   function renderHomePopular() {
@@ -800,13 +826,12 @@
     const top = sauces.slice(0, 5);
     popularRailEl.innerHTML = top.map((r, i) =>
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
-      + '<span class="hp-thumb"><i class="hp-rank">' + (i + 1) + '</i>' + homeCardBody(r)
-      + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i></span>'
-      + homeCardMeta(r) + '</button>'
-    ).join('')
-      + '<button class="hp-more" id="hpMore" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>소스<br>전체보기</button>';
+      + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r)
+      + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
+      + '<span class="hp-over">' + homeCardMeta(r) + '</span></span>'
+      + '</button>'
+    ).join('');
     bindHomeCards(popularRailEl);
-    document.getElementById('hpMore').addEventListener('click', () => enterBrowse('소스'));
   }
 
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)

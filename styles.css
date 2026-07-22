@@ -3565,7 +3565,8 @@ img {
 .hp-rail::-webkit-scrollbar { display: none; }
 .hp-card {
   flex: none;
-  width: 148px;
+  /* 2장 온전 + 3번째는 순위 배지만(≈44px) 빼꼼 → 가로 스크롤 힌트. 레일 폭(=앱폭) 기준이라 기기 무관 */
+  width: calc(50% - 24px);
   scroll-snap-align: start;
   background: none;
   border: none;
@@ -3582,6 +3583,11 @@ img {
   overflow: hidden;
   background: #EADFD6;
 }
+/* 인기 카드는 세로 3:4(쿠팡이츠식) — 이름·출처는 이미지 안 하단 오버레이(.hp-over) */
+.hp-thumb {
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+}
 .hp-thumb img, .hc-thumb img {
   width: 100%;
   height: 100%;
@@ -3596,27 +3602,41 @@ img {
   justify-content: center;
   font-size: 40px;
 }
+/* 2~5위: 검정 알약 배지 'N위' */
 .hp-rank {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 7px;
+  top: 7px;
   z-index: 2;
-  width: 26px;
-  height: 26px;
-  border-radius: 12px 0 8px 0;
-  background: rgba(0, 0, 0, .55);
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, .58);
   color: #fff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   font-style: normal;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 1.25;
 }
+/* 1위: 빨강 북마크 리본 + 심플 왕관(글자 없음) */
+.hp-crown {
+  position: absolute;
+  left: 11px;
+  top: 0;
+  z-index: 2;
+  width: 28px;
+  height: 34px;
+  background: var(--brand-red);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 3px;
+}
+.hp-crown svg { width: 20px; height: 20px; }
 .hp-like {
   position: absolute;
   right: 8px;
-  bottom: 8px;
+  top: 8px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -3630,6 +3650,27 @@ img {
   font-style: normal;
 }
 .hp-like svg { width: 11px; height: 11px; fill: #fff; }
+/* 인기 카드 하단 오버레이(이미지 안, 이름·출처를 흰 글씨로) */
+.hp-over {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 30px 12px 12px;
+  background: linear-gradient(to top, rgba(0,0,0,.82) 12%, rgba(0,0,0,.42) 55%, transparent);
+}
+.hp-over .hp-name {
+  margin-top: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+.hp-over .hp-ver { color: rgba(255,255,255,.72); }
+.hp-over .hp-src {
+  margin-top: 3px;
+  color: rgba(255,255,255,.82);
+}
 .hp-name {
   display: block;
   margin-top: 9px;
