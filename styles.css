@@ -3504,13 +3504,16 @@ img {
   height: 84px;
   padding: 3px;
   border-radius: 50%;
-  /* 인스타식 각도(conic) 그라데이션 — 아래=노랑, 우상단(≈40°)에 제일 진한 마젠타/보라 오게 배치 */
-  background: conic-gradient(from 210deg, #FEDA75, #F58529, #DD2A7B, #8134AF, #DD2A7B, #F58529, #FEDA75);
+  /* 인스타식 각도(conic) 그라데이션 — 아래=노랑, 우상단(≈40°)에 쨍한 핫핑크/마젠타. 어두운 보라 제외해 화사하게 */
+  background: conic-gradient(from 210deg, #FEE181, #FB8B2E, #F5257E, #D521A6, #F5257E, #FB8B2E, #FEE181);
   box-shadow: 0 2px 8px rgba(80, 40, 20, .12);
-  transition: transform .18s cubic-bezier(.34, 1.56, .64, 1); /* 떼면 살짝 통통 튀며 복귀 */
+  transition: transform .24s cubic-bezier(.34, 1.5, .64, 1); /* 뗄 때: 살짝 통통 튀며 복귀 */
 }
-/* 터치 피드백: 누르면 원이 움푹 줄었다가, 떼면 원래 크기로 톡 */
-.celeb:active .celeb-img { transform: scale(.88); }
+/* 터치 피드백: 누를 땐 부드럽게 살짝 작아지고, 떼면 통통 복귀 */
+.celeb:active .celeb-img {
+  transform: scale(.9);
+  transition: transform .16s ease-out; /* 누를 때: 부드럽게 쑥 */
+}
 /* 본(터치한) 셀럽 = 인스타식 회색 테두리(세션 한정, 새로고침하면 그라데이션 복귀) */
 .celeb--seen .celeb-img { background: #D3CEC4; }
 .celeb-face {
@@ -3567,7 +3570,7 @@ img {
   display: block;
   margin-top: 7px;
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -.02em;
   color: var(--text-dark);
   white-space: nowrap;
