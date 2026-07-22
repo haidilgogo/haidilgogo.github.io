@@ -746,6 +746,39 @@
   const popularRailEl = document.getElementById('popularRail');
   const tangGridEl = document.getElementById('tangGrid');
   const hiddenGridEl = document.getElementById('hiddenGrid');
+
+  // 가로 레일 마우스 드래그 스크롤(데스크탑용). 트랙패드·휠로만 되던 걸 손으로 끌 수 있게.
+  //  - 컨테이너에 한 번만 붙임(레일은 innerHTML만 다시 그려도 컨테이너 자체는 유지됨).
+  //  - 4px 넘게 끌면 dragMoved → 캡처 단계에서 자식 카드 클릭(이동)을 무효화.
+  function enableDragScroll(el) {
+    if (!el) return;
+    el.classList.add('drag-scroll');
+    let down = false, startX = 0, startScroll = 0, moved = false;
+    el.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      down = true; moved = false;
+      startX = e.pageX;
+      startScroll = el.scrollLeft;
+      el.classList.add('is-dragging');
+      e.preventDefault(); // 이미지 고스트 드래그·텍스트 선택 방지
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!down) return;
+      const dx = e.pageX - startX;
+      if (Math.abs(dx) > 4) moved = true;
+      el.scrollLeft = startScroll - dx;
+    });
+    window.addEventListener('mouseup', () => {
+      if (!down) return;
+      down = false;
+      el.classList.remove('is-dragging');
+    });
+    el.addEventListener('click', (e) => {
+      if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
+    }, true);
+  }
+  enableDragScroll(celebRailEl);
+  enableDragScroll(popularRailEl);
   // 회색(#5F5E5A) 제외 — 'seen=회색 링'과 헷갈려서 안 본 셀럽이 꺼져 보이는 착시 방지(2026-07-22). 대신 베리로즈.
   const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#B85575', '#A3612E', '#3E7C8A', '#8A5FB0'];
 

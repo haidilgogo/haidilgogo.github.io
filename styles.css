@@ -3486,6 +3486,10 @@ img {
   scrollbar-width: none;
 }
 .celeb-rail::-webkit-scrollbar { display: none; }
+/* 데스크탑 마우스 드래그 스크롤 커서(가로 레일 공통) */
+.drag-scroll { cursor: grab; }
+/* 드래그 중엔 grabbing 커서 + scroll-snap 끔(스냅과 충돌해 뚝뚝 끊기는 것 방지). 놓으면 다시 스냅 */
+.drag-scroll.is-dragging { cursor: grabbing; scroll-snap-type: none; }
 .celeb {
   flex: none;
   width: 84px;
