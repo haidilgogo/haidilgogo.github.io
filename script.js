@@ -1009,10 +1009,10 @@
     ).join('');
     bindHomeCards(gridElement);
   }
-  // 컴팩트 리스트(탕·히든): 사진 + 이름 + 좋아요 행. 소스는 그리드 유지(주인공=비주얼).
+  // 컴팩트 리스트(탕·히든): 사진 + 이름 + 좋아요 행. 홈엔 3개만(나머지는 전체보기). 소스는 그리드 유지(주인공=비주얼).
   function renderHomeCatList(cat, listElement) {
     const list = RECIPES.filter((r) => r.cat === cat);
-    listElement.innerHTML = list.slice(0, 4).map((r) =>
+    listElement.innerHTML = list.slice(0, 3).map((r) =>
       '<button class="hc-row" type="button" data-id="' + r.id + '">'
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
       + '<span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
