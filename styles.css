@@ -4009,7 +4009,7 @@ img {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.hc-row + .hc-row { border-top: 1px solid #EDE7DC; } /* 옅은 뉴트럴 hairline(구 크림 테두리는 진하고 노랬음) */
+.hc-row + .hc-row { border-top: 1px solid #EAEAEA; } /* 29cm식 뉴트럴 라이트 그레이(크림톤 X) */
 .hc-row-thumb {
   width: 80px;
   height: 80px;
