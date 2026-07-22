@@ -3582,6 +3582,145 @@ img {
   text-overflow: ellipsis;
 }
 
+/* ── 셀럽 인스타 스토리 뷰어 (항상 다크. z 190 = 레시피 모달 200 아래라 CTA로 모달이 위에 겹침) ── */
+/* .story-viewer = 전체화면 배경(데스크탑 양옆 여백), .story-phone = 사이트 본문과 같은 440px 폰 컬럼 */
+.story-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  background: #1c1c1e; /* 폰 컬럼 바깥 배경(데스크탑에서만 보임) */
+  display: none;
+  justify-content: center;
+  overscroll-behavior: contain;
+}
+.story-viewer.open { display: flex; }
+.story-phone {
+  position: relative; /* 탭 존·CTA의 기준 */
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.story-progress {
+  display: flex;
+  gap: 4px;
+  padding: 10px 10px 0;
+  flex: none;
+}
+.story-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .3);
+}
+.story-seg.filled { background: #fff; }
+.story-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 4px;
+  flex: none;
+  position: relative;
+  z-index: 3; /* 탭 존 위 */
+}
+.story-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: none;
+  background: #333;
+}
+.story-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.story-name { color: #fff; font-weight: 700; font-size: 15px; }
+.story-close {
+  margin-left: auto;
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+.story-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  text-align: center;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+.story-img {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 10px 44px rgba(0, 0, 0, .55);
+}
+.story-img--emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 96px;
+}
+.story-rname { color: #fff; font-size: 22px; font-weight: 800; margin-top: 20px; letter-spacing: -.02em; }
+.story-rver { color: rgba(255, 255, 255, .65); font-size: 14px; margin-top: 4px; }
+.story-desc {
+  color: rgba(255, 255, 255, .85);
+  font-size: 13.5px;
+  line-height: 1.65;
+  margin-top: 14px;
+  max-width: 360px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.story-desc b { color: #fff; font-weight: 700; }
+/* 좌/우 탭 존 — 헤더(위)·CTA(아래) 영역은 비워 겹침 방지 */
+.story-tap {
+  position: absolute;
+  top: 64px;
+  bottom: 104px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+.story-tap--prev { left: 0; width: 32%; }
+.story-tap--next { right: 0; width: 68%; }
+.story-cta {
+  flex: none;
+  margin: 0 auto 26px;
+  position: relative;
+  z-index: 3;
+  padding: 13px 30px;
+  border-radius: 999px;
+  border: none;
+  background: #fff;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .4);
+}
+.story-cta:active { transform: scale(.96); }
+
 /* ── ③ 인기 소스 캐러셀 (클린 카드) ── */
 .hp-rail {
   display: flex;

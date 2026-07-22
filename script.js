@@ -835,11 +835,86 @@
     celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
       btn.addEventListener('click', () => {
         seenCelebs.add(btn.dataset.person); // 본 것으로 표시 → 회색 링 (앱 내부 뒤로가기 동안만, 순서는 유지)
-        enterBrowse('전체', btn.dataset.person);
-        renderCelebRail(); // 갔다 왔을 때 반영돼 있게 지금 다시 그림
+        openStory(btn.dataset.person);       // 인스타 스토리 뷰어 열기(구 인물 그리드 대체)
+        renderCelebRail();                   // 회색 링이 반영되게 지금 다시 그림
       });
     });
   }
+
+  // ── 셀럽 인스타 스토리 뷰어 ── (탭 수동넘김, 마지막에서 다음=닫기. CTA=기존 레시피 모달 재사용)
+  const storyViewer = document.getElementById('storyViewer');
+  const storyProgress = document.getElementById('storyProgress');
+  const storyAvatarEl = document.getElementById('storyAvatar');
+  const storyNameEl = document.getElementById('storyName');
+  const storyBody = document.getElementById('storyBody');
+  let storyList = [];
+  let storyIdx = 0;
+  let currentStoryRecipe = null;
+
+  function openStory(personName) {
+    // 그 인물 레시피를 오래된→최신 순으로(스토리는 시간순이 자연스러움)
+    storyList = RECIPES.filter((r) => r.person === personName)
+      .slice()
+      .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    if (!storyList.length) return;
+    storyIdx = 0;
+    storyAvatarEl.innerHTML = '<img src="assets/people/' + personName + '.jpg" alt="" draggable="false" onerror="this.remove()">';
+    storyNameEl.textContent = personName;
+    storyProgress.innerHTML = storyList.map(() => '<span class="story-seg"></span>').join('');
+    renderStorySlide();
+    document.documentElement.style.overflow = 'hidden';
+    storyViewer.classList.add('open');
+    storyViewer.setAttribute('aria-hidden', 'false');
+  }
+
+  function renderStorySlide() {
+    const r = storyList[storyIdx];
+    currentStoryRecipe = r;
+    Array.from(storyProgress.children).forEach((seg, i) => seg.classList.toggle('filled', i <= storyIdx));
+    const thumb = r.img
+      ? '<img class="story-img" src="' + r.img + '" alt="' + r.name + '" draggable="false">'
+      : '<span class="story-img story-img--emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
+    storyBody.innerHTML = thumb
+      + '<div class="story-rname">' + (r.nameHtml || r.name) + '</div>'
+      + (r.ver ? '<div class="story-rver">' + r.ver + '</div>' : '')
+      + (r.desc ? '<div class="story-desc">' + r.desc + '</div>' : '');
+  }
+
+  function storyNext() {
+    if (storyIdx >= storyList.length - 1) closeStory();
+    else { storyIdx++; renderStorySlide(); }
+  }
+  function storyPrev() {
+    if (storyIdx > 0) { storyIdx--; renderStorySlide(); }
+  }
+  function closeStory() {
+    storyViewer.classList.remove('open');
+    storyViewer.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+  }
+
+  document.getElementById('storyNext').addEventListener('click', storyNext);
+  document.getElementById('storyPrev').addEventListener('click', storyPrev);
+  document.getElementById('storyClose').addEventListener('click', closeStory);
+  // CTA → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움
+  document.getElementById('storyCta').addEventListener('click', () => {
+    if (currentStoryRecipe) openModal(currentStoryRecipe);
+  });
+  // 키보드: ← → 이동, Esc 닫기
+  document.addEventListener('keydown', (e) => {
+    if (!storyViewer.classList.contains('open')) return;
+    if (e.key === 'Escape') closeStory();
+    else if (e.key === 'ArrowRight') storyNext();
+    else if (e.key === 'ArrowLeft') storyPrev();
+  });
+  // 아래로 스와이프 → 닫기(모바일)
+  let storyTouchY = null;
+  storyViewer.addEventListener('touchstart', (e) => { storyTouchY = e.touches[0].clientY; }, { passive: true });
+  storyViewer.addEventListener('touchend', (e) => {
+    if (storyTouchY == null) return;
+    if (e.changedTouches[0].clientY - storyTouchY > 70) closeStory();
+    storyTouchY = null;
+  }, { passive: true });
 
   // 홈 카드(클린 스타일) 공통 마크업 — 캐러셀·그리드가 함께 씀. 클릭은 컨테이너에서 data-id로 위임.
   function homeCardBody(r) {
