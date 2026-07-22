@@ -822,9 +822,8 @@
     const base = people.filter((p) => p.star)
       .sort((a, b) => (CELEB_FOLLOWERS[b.name] || 0) - (CELEB_FOLLOWERS[a.name] || 0) || b.count - a.count);
     base.forEach((p, idx) => { p.color = CELEB_COLORS[idx % CELEB_COLORS.length]; });
-    // 본(터치한) 셀럽은 맨 뒤로. sort가 안정정렬이라 그룹 내부는 팔로워순 유지.
-    const celebs = base.slice().sort((a, b) =>
-      (seenCelebs.has(a.name) ? 1 : 0) - (seenCelebs.has(b.name) ? 1 : 0));
+    // 본(터치한) 셀럽은 회색 링(seen)만 표시하고 순서는 그대로 — 항상 팔로워순 고정(2026-07-22).
+    const celebs = base;
     celebRailEl.innerHTML = celebs.map((p) => {
       const seenCls = seenCelebs.has(p.name) ? ' celeb--seen' : '';
       return '<button class="celeb' + seenCls + '" type="button" data-person="' + p.name + '">'
@@ -835,7 +834,7 @@
     }).join('');
     celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
       btn.addEventListener('click', () => {
-        seenCelebs.add(btn.dataset.person); // 본 것으로 표시 → 회색+맨뒤 (앱 내부 뒤로가기 동안만)
+        seenCelebs.add(btn.dataset.person); // 본 것으로 표시 → 회색 링 (앱 내부 뒤로가기 동안만, 순서는 유지)
         enterBrowse('전체', btn.dataset.person);
         renderCelebRail(); // 갔다 왔을 때 반영돼 있게 지금 다시 그림
       });
