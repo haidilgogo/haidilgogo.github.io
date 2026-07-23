@@ -1169,7 +1169,8 @@
       + (r.source ? '<span class="hp-src">' + r.source + '</span>' : '');
   }
   function bindHomeCards(container) {
-    container.querySelectorAll('[data-id]').forEach((btn) => {
+    // 직속 카드만 바인딩(:scope >) — 인기소스 카드 안에 중첩된 하트(data-id)까지 모달 열리는 것 방지
+    container.querySelectorAll(':scope > [data-id]').forEach((btn) => {
       const r = RECIPES.find((x) => x.id === btn.dataset.id);
       if (r) btn.addEventListener('click', () => openModal(r));
     });
@@ -1194,11 +1195,22 @@
       + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r) + '</span>'
       + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
       + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
-      + '<i class="hp-like" data-id="' + r.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
+      + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
       + '</span>'
       + '</button>'
     ).join('');
     bindHomeCards(popularRailEl);
+    // 하트 = 홈에서 바로 좋아요(카드 모달과 겹치지 않게 stopPropagation). 누르면 빨강 채움 + 팝 애니메이션
+    popularRailEl.querySelectorAll('.hp-like').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = el.dataset.id;
+        toggleLike(id);
+        el.classList.toggle('active', likedByMe.has(id));
+        el.querySelector('.like-count').textContent = getLikeCount(id);
+        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); // 팝 재시작
+      });
+    });
   }
 
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)

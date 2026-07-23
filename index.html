@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=441">
+<link rel="stylesheet" href="styles.css?v=448">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -139,10 +139,8 @@
         </button>
       </div>
       <!-- 매장 섹션: 지역 탭(레시피 카테고리 탭과 동일 형태, 매장에서만 표시) -->
+      <!-- 지역 탭(#storeTabs)은 상단바 아래(매장 뷰 안, 전국 N곳 위)로 이동함(2026-07-23). 공유·설치 버튼만 여기 유지(숨김) -->
       <div class="tabs-group tabs-group--store" id="storeTabsGroup">
-        <div class="tabs" id="storeTabs">
-          <span class="tabs-underline" id="storeTabsUnderline"></span>
-        </div>
         <button class="tabs-share-btn" id="storeShareBtn" type="button" aria-label="친구에게 공유">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
@@ -322,6 +320,12 @@
 
     <!-- 매장 섹션 -->
     <div class="view" id="view-store" hidden>
+      <!-- 지역 탭: 상단바에서 이동(2026-07-23). 전국 N곳 위에 표시 -->
+      <div class="store-region-tabs">
+        <div class="tabs" id="storeTabs">
+          <span class="tabs-underline" id="storeTabsUnderline"></span>
+        </div>
+      </div>
       <div class="stores-head">
         <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
         <p class="stores-note">영업시간은 매장 사정에 따라 다를 수 있어요</p>
@@ -676,7 +680,7 @@
   </div>
 </div>
 
-<script src="script.js?v=338"></script>
+<script src="script.js?v=339"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
