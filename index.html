@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=469">
+<link rel="stylesheet" href="styles.css?v=479">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -234,19 +234,19 @@
         </span>
         <svg class="home-guide-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <section class="home-sec" id="homeTang">
-        <div class="home-sec-head">
-          <h2 class="home-sec-title">탕</h2>
-          <button class="home-sec-more" id="tangMore" type="button">전체보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
-        <div class="home-list" id="tangGrid"></div>
-      </section>
       <section class="home-sec" id="homeHidden">
         <div class="home-sec-head">
           <h2 class="home-sec-title">히든메뉴</h2>
           <button class="home-sec-more" id="hiddenMore" type="button">전체보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
-        <div class="home-grid" id="hiddenGrid"></div>
+        <div class="home-list" id="hiddenGrid"></div>
+      </section>
+      <section class="home-sec" id="homeTang">
+        <div class="home-sec-head">
+          <h2 class="home-sec-title">탕</h2>
+          <button class="home-sec-more" id="tangMore" type="button">전체보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="home-grid" id="tangGrid"></div>
       </section>
       <section class="home-sec home-random" id="homeRandom">
         <span class="home-random-dice">🎲</span>
@@ -396,7 +396,7 @@
     </div>
     <!-- "직접 입력" 선택 시에만 나타나는 자유 입력 칸 -->
     <div class="stamp-fields" id="stampWithCustomWrap" hidden>
-      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">입력</span><input type="text" id="stampWith" maxlength="20" placeholder="자유롭게 입력해주세요" autocomplete="off"></label>
+      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">입력</span><input type="text" id="stampWith" maxlength="20" placeholder="자유롭게 입력해주세요(최대 20자)" autocomplete="off"></label>
     </div>
     <p class="stamp-q">기억하고 싶은 게 있나요?</p>
     <div class="stamp-fields">
@@ -661,7 +661,7 @@
   </div>
 </div>
 
-<script src="script.js?v=360"></script>
+<script src="script.js?v=364"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

@@ -1160,8 +1160,8 @@
   }
   // 이름(+버전)만 — 인기소스 카드용(출처는 상세 모달에서만 노출)
   function homeCardName(r) {
-    return '<span class="hp-name">' + (r.nameHtml || r.name)
-      + (r.ver ? '<span class="hp-ver">' + r.ver + '</span>' : '') + '</span>';
+    return '<span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
+      + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '');  // 부제 = 버전(연도·업그레이드 등)
   }
   // 이름 + 출처 — 탕·히든 그리드용
   function homeCardMeta(r) {
@@ -1223,7 +1223,7 @@
     gridElement.innerHTML = list.slice(0, 4).map((r) => // 소스(주인공)는 최신순 4개=2×2 그리드, 나머지는 '전체보기'로
       '<button class="hc-card" type="button" data-id="' + r.id + '">'
       + '<span class="hc-thumb">' + homeCardBody(r) + '</span>'
-      + homeCardMeta(r) + '</button>'
+      + homeCardName(r) + '</button>'  // 홈 그리드는 이름만(출처는 상세 모달에서만, 2026-07-24)
     ).join('');
     bindHomeCards(gridElement);
   }
@@ -1233,7 +1233,8 @@
     listElement.innerHTML = list.slice(0, 3).map((r) =>
       '<button class="hc-row" type="button" data-id="' + r.id + '">'
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
-      + '<span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
+      + '<span class="hc-row-txt"><span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
+      + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
       + '<span class="hc-row-like"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span class="hc-row-like-n">' + getLikeCount(r.id) + '</span></span>'
       + '</button>'
     ).join('');
@@ -1242,8 +1243,8 @@
   function renderHomeSections() {
     renderCelebRail();
     renderHomePopular();
-    renderHomeCatList('탕', tangGridEl);
-    renderHomeCatGrid('히든메뉴', hiddenGridEl); // 히든메뉴 = 그리드(2026-07-23, 구 소스 그리드 대체)
+    renderHomeCatList('히든메뉴', hiddenGridEl); // 히든메뉴 = 리스트(위), 탕 = 그리드(아래)로 스왑(2026-07-24)
+    renderHomeCatGrid('탕', tangGridEl);
   }
 
   function renderIngList(el, items) {
@@ -2152,7 +2153,7 @@
         const addr = s.addr.replace(/,\s*/g, ' '); // 주소에서 쉼표 제거(표시·복사 공통)
         const a = document.createElement('div');
         a.className = 'store-info store-info--addr';
-        a.innerHTML = '<span class="store-i">📍</span><span class="store-addr">' + addr + '</span>';
+        a.innerHTML = '<span class="store-i store-i--pin"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.686-6-10a6 6 0 0 1 12 0c0 4.314-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><span class="store-addr">' + addr + '</span>';
         // 주소 복사 버튼 — 주소 줄 오른쪽 끝
         const copy = document.createElement('button');
         copy.type = 'button';
@@ -2168,7 +2169,7 @@
       if (s.hours) {
         const h = document.createElement('div');
         h.className = 'store-info';
-        h.innerHTML = '<span class="store-i">🕐</span><span>' + s.hours + '</span>';
+        h.innerHTML = '<span class="store-i"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></span><span>' + s.hours + '</span>';
         card.appendChild(h);
       }
       if (s.soon && !s.addr) {
