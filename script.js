@@ -639,7 +639,7 @@
     title: '어서와~ 하이디라오는 처음이지?',            // 접근성(aria)·비상용 한 줄
     titleHtml: '어서와~<br>하이디라오는 처음이지?',       // 배너 표시용(두 줄)
     heroDesc: '주문법부터 소스바 사용법까지 · 3분 가이드',
-    bannerImg: '',                 // TODO: 실제 배너 사진 경로 넣기
+    bannerImg: 'assets/columns/guide.jpg?v=1',
     bannerBg: 'linear-gradient(150deg,#C6402E 0%,#E5704A 55%,#F2A878 100%)',
     emoji: '📖',
   };
