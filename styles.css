@@ -739,35 +739,30 @@ img {
   -webkit-user-drag: none; user-select: none;
 }
 .mf-hero:active img { transform: scale(.99); }
-/* 오버레이 — 하단(캡션 영역)을 진하게 깔아 글씨를 살림. 위는 옅게(이미지 밝게 유지).
-   상단에도 살짝 어둠을 줘 '이 달의 소스' 라벨 가독 확보(2026-07-23) */
+/* 오버레이 — 하단(캡션 영역)만 어둡게 깔아 글씨(kicker+제목+설명)를 살림.
+   상단 딤드 없음 = 이미지 위쪽 밝게 유지, 전 배너 동일(2026-07-23, kicker 이관 후 통일) */
 .mf-hero::after {
   content: '';
   position: absolute; inset: 0;
   background:
     linear-gradient(to top,
       rgba(8, 4, 2, .88) 0%,
-      rgba(8, 4, 2, .60) 16%,
-      rgba(8, 4, 2, .05) 40%,
-      rgba(8, 4, 2, .07) 58%,
-      rgba(8, 4, 2, .13) 72%,
-      rgba(8, 4, 2, .24) 82%,
-      rgba(8, 4, 2, .42) 91%,
-      rgba(8, 4, 2, .62) 100%);
+      rgba(8, 4, 2, .60) 20%,
+      rgba(8, 4, 2, .16) 42%,
+      rgba(8, 4, 2, 0) 60%,
+      rgba(8, 4, 2, 0) 100%);
   pointer-events: none;
 }
 
-/* 첫 배너 좌측 위 '이 달의 소스' 라벨 — 얇은 글씨, '소스'만 빨강 */
-.mf-badge {
-  position: absolute; left: 16px; top: 15px;
-  z-index: 2;
-  font-size: 15px;                /* 살짝 키움 */
-  font-weight: 700;               /* 볼드 */
-  letter-spacing: -.03em;         /* 라벨답게 살짝 조임 */
-  word-spacing: -1px;             /* 띄어쓰기 공백도 살짝 조여 균일하게 */
+/* 첫 배너 제목 위 '이달의 소스' kicker(에디토리얼 라벨) — 작게, '소스'만 빨강 */
+.mf-kicker {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  word-spacing: -1px;
   color: #fff;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, .55);  /* 위쪽 딤드에 기대 텍스트만 */
-  pointer-events: none;
+  margin-bottom: 5px;             /* 제목과의 간격 */
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
 }
 .mf-badge-em {
   color: #FF6A57;                 /* 어두운 배너 위 가독성용 밝은 빨강 */
@@ -833,7 +828,7 @@ img {
 
 /* 인디케이터(막대형) — 캐러셀 뷰포트 우상단에 "고정"(카드와 안 움직임). 스크롤 시 활성 점만 JS가 갱신 */
 .mf-dots {
-  position: absolute; right: 34px; top: 14px; /* full-bleed 기준: 카드 인셋 20px + 카드 안쪽 14px — 모든 슬라이드 동일(2026-07-21) */
+  position: absolute; right: 34px; bottom: 10px; /* 우하단, 캡션 desc 아래로 충분히 띄움(딤드 위=흰 점 가독, 2026-07-23) */
   z-index: 3;
   display: flex; gap: 10px; /* 알약(16px)이 옆 점을 안 덮도록 간격을 알약 길이에 맞춰 확보(2026-07-21) */
   pointer-events: none;

@@ -125,7 +125,7 @@
       ings: [['땅콩참깨소스', '3', '스푼'], ['다진 파', '3', '스푼'], ['양파', '2', '스푼'], ['고수', '1', '스푼'], ['다진 마늘', '0.5', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's19', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(참기름).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7EFD8,#EBDBB0)', name: '박은영소스', ver: '참기름', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '하얼빈 정통파, 중식 여신 박은영 셰프의 참기름 소스', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스이다.',
+    { id: 's19', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(참기름).jpg?v=1', heroImg: 'assets/monthly-sauce/s19.jpg?v=5', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7EFD8,#EBDBB0)', name: '박은영소스', ver: '참기름', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '하얼빈 정통파, 중식 여신 박은영 셰프의 참기름 소스', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스이다.',
       ings: [['참기름', '4', '스푼'], ['중국식초', '1', '스푼'], ['다진 마늘', '2', '스푼'], ['소금', '', '한 꼬집']],
       steps: [],
       tip: '' },
@@ -601,7 +601,7 @@
     isColumn: true,
     title: '고수 빼주세요!',
     heroDesc: '고수는 왜 비누 맛이 날까?',
-    bannerImg: '',                 // TODO: 실제 배너 사진 경로 넣기(넣으면 임시배경 대신 사용)
+    bannerImg: 'assets/columns/cilantro.jpg?v=2',
     bannerBg: 'linear-gradient(150deg,#3E7D4E 0%,#6FAE5C 55%,#AFD589 100%)',
     emoji: '🌿',
     ingFilter: '고수',             // 이 재료가 든 항목을 칼럼 하단에 자동 나열
@@ -687,18 +687,17 @@
         const aria = r.isColumn ? ' 칼럼 열기' : r.isGuide ? ' 가이드 열기' : '';
         const kind = r.isGuide ? ' mf-hero--guide' : r.isSoon ? ' mf-hero--soon' : '';
         return '<button class="mf-hero mf-hero--column' + kind + '" type="button" aria-label="' + r.title + aria + '">'
-          + '<div class="mf-colbg" style="' + bg + '"><span class="mf-colemoji">' + (r.emoji || '') + '</span></div>'
+          + '<div class="mf-colbg" style="' + bg + '">' + (r.bannerImg ? '' : '<span class="mf-colemoji">' + (r.emoji || '') + '</span>') + '</div>'
           + '<div class="mf-caption"><div class="mf-name">' + (r.titleHtml || r.title) + '</div>' + desc + '</div>'
           + '</button>';
       }
       // 히어로 전용 이미지(heroImg) 있으면 그걸, 없으면 카드 썸네일(img)로 폴백(2026-07-21)
       const heroImg = r.heroImg || r.img;
-      // 첫 배너(i===0)에만 좌측 위 '이 달의 소스' 라벨 — '소스'만 빨강(.mf-badge-em)
-      const badge = i === 0 ? '<div class="mf-badge">이달의 <span class="mf-badge-em">소스</span></div>' : '';
+      // 첫 배너(i===0)에만 제목 위 '이달의 소스' kicker — '소스'만 빨강(.mf-badge-em)
+      const kicker = i === 0 ? '<div class="mf-kicker">이달의 <span class="mf-badge-em">소스</span></div>' : '';
       return '<button class="mf-hero" type="button" aria-label="' + r.name + ' 자세히 보기">'
         + '<img src="' + heroImg + '" alt="' + r.name + '" draggable="false">'
-        + badge
-        + '<div class="mf-caption"><div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + desc + '</div>'
+        + '<div class="mf-caption">' + kicker + '<div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + desc + '</div>'
         + '</button>';
     }).join('');
     // 뷰포트 고정 인디케이터: 작은 점 N개 + 스크롤에 실시간 연동해 미끄러지는 활성 막대(pill)
