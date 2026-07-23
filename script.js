@@ -254,7 +254,7 @@
         '국물에 넣어 익혀 먹는다',
       ],
       tip: '새우완자는 취향에 따라 날치알 새우완자로 바꾸거나 둘 다 넣기' },
-    { id: 'e3', cat: '히든메뉴', emoji: '🍢', img: 'assets/cards/유부 새우완자(업그레이드).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE4,#DCD2C0)', name: '유부 새우완자', ver: '업그레이드', source: 'YouTube 풍류천재 조서형', desc: '새우완자에 소스바 재료를 첨가하여 유부에 채워 넣고 국물에 익혀 먹는 히든 메뉴이다.',
+    { id: 'e3', date: '2026-07-09', cat: '히든메뉴', emoji: '🍢', img: 'assets/cards/유부 새우완자(업그레이드).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5EFE4,#DCD2C0)', name: '유부 새우완자', ver: '업그레이드', source: 'YouTube 풍류천재 조서형', desc: '새우완자에 소스바 재료를 첨가하여 유부에 채워 넣고 국물에 익혀 먹는 히든 메뉴이다.',
       order: [['새우완자', '1', '인분'], ['유부', '1', '인분']],
       ings: [['참기름', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고수', '1', '스푼']],
       steps: [
@@ -981,6 +981,8 @@
   function renderStorySlide() {
     const r = storyList[storyIdx];
     currentStoryRecipe = r;
+    const rt = document.getElementById('storyRecipeToggle');
+    if (rt) rt.hidden = true; // 슬라이드 바뀌면 열려있던 토글 닫기
     // 지난 칸=꽉(filled), 현재 칸=애니메이션(current). 애니메이션 재시작을 위해 current를 잠깐 뗐다 다시 붙임
     Array.from(storyProgress.children).forEach((seg, i) => {
       seg.classList.remove('current');
@@ -988,6 +990,16 @@
     });
     const cur = storyProgress.children[storyIdx];
     if (cur) { void cur.offsetWidth; cur.classList.add('current'); } // reflow로 애니메이션 확실히 재시작
+    // 풀블리드 배경: 사진 있으면 블러 확대본, 없으면 tint 색으로 채움
+    const storyBg = document.getElementById('storyBg');
+    if (r.img) {
+      storyBg.style.backgroundImage = 'url("' + r.img + '")'; // 따옴표 필수 — 괄호 든 파일명(세훈소스(간장) 등) 깨짐 방지
+      storyBg.classList.remove('story-bg--tint');
+    } else {
+      storyBg.style.backgroundImage = 'none';
+      storyBg.style.background = r.tint;
+      storyBg.classList.add('story-bg--tint');
+    }
     const thumb = r.img
       ? '<img class="story-img" src="' + r.img + '" alt="' + r.name + '" draggable="false">'
       : '<span class="story-img story-img--emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
@@ -1008,6 +1020,8 @@
     storyViewer.classList.remove('open', 'paused');
     storyViewer.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
+    const rt = document.getElementById('storyRecipeToggle');
+    if (rt) rt.hidden = true; // 닫을 때 토글도 정리
   }
 
   // 자동재생: 현재 진행바가 다 차면(animationend) 다음 칸으로
@@ -1026,11 +1040,42 @@
   });
   storyViewer.addEventListener('pointercancel', () => { storyViewer.classList.remove('paused'); });
 
-  document.getElementById('storyNext').addEventListener('click', () => { if (storyWasHold) { storyWasHold = false; return; } storyNext(); });
-  document.getElementById('storyPrev').addEventListener('click', () => { if (storyWasHold) { storyWasHold = false; return; } storyPrev(); });
   document.getElementById('storyClose').addEventListener('click', closeStory);
-  // CTA → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움. 모달 동안 자동재생 정지(closeModal에서 재개)
-  document.getElementById('storyCta').addEventListener('click', () => {
+  // ── 탭 로직: 이미지 안 탭 = '레시피 보기' 토글 / 이미지 밖 탭 = 이전·다음 넘김 ──
+  // z-index로 이미지를 탭존 위에 못 올림(story-body 스택 컨텍스트) → 탭 좌표가 이미지 안인지로 판정.
+  const storyRecipeToggle = document.getElementById('storyRecipeToggle');
+  function hideRecipeToggle() { storyRecipeToggle.hidden = true; }
+  function showRecipeToggle(clientX, clientY) {
+    const rect = storyPhoneEl.getBoundingClientRect();
+    storyRecipeToggle.style.left = (clientX - rect.left) + 'px';
+    storyRecipeToggle.style.top = (clientY - rect.top) + 'px';
+    storyRecipeToggle.hidden = false;
+    storyViewer.classList.add('paused'); // 토글 떠 있는 동안 자동재생 정지
+  }
+  function tapInImage(e) {
+    const img = storyBody.querySelector('.story-img');
+    if (!img) return false;
+    const r = img.getBoundingClientRect();
+    return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+  }
+  function onZoneTap(advanceFn) {
+    return (e) => {
+      if (storyWasHold) { storyWasHold = false; return; }   // 홀드·드래그였으면 무시
+      if (!storyRecipeToggle.hidden) {                       // 토글 떠 있으면: 닫기
+        hideRecipeToggle();
+        if (tapInImage(e)) showRecipeToggle(e.clientX, e.clientY); // 이미지 다시 탭 → 위치만 이동
+        return;                                              // 이 탭은 넘김 안 함
+      }
+      if (tapInImage(e)) { showRecipeToggle(e.clientX, e.clientY); return; } // 이미지 탭 → 토글
+      advanceFn();                                           // 이미지 밖 탭 → 넘김
+    };
+  }
+  document.getElementById('storyNext').addEventListener('click', onZoneTap(storyNext));
+  document.getElementById('storyPrev').addEventListener('click', onZoneTap(storyPrev));
+  // 토글 탭 → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움
+  storyRecipeToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideRecipeToggle();
     if (currentStoryRecipe) {
       storyViewer.classList.add('paused');
       modalOverlay.classList.add('from-story'); // 모바일에서 모달이 상단까지 꽉 덮어 스토리 헤더가 안 비치게
@@ -1044,13 +1089,44 @@
     else if (e.key === 'ArrowRight') storyNext();
     else if (e.key === 'ArrowLeft') storyPrev();
   });
-  // 아래로 스와이프 → 닫기(모바일)
-  let storyTouchY = null;
-  storyViewer.addEventListener('touchstart', (e) => { storyTouchY = e.touches[0].clientY; }, { passive: true });
+  // 아래로 드래그 → 스토리 화면이 손 따라 내려가며 닫힘(인스타식). 조금만 내리면 스프링백.
+  const storyPhoneEl = storyViewer.querySelector('.story-phone');
+  let stDragY = 0, stDragX = 0, stDragging = false;
+  function stClearDrag(animate) {
+    storyPhoneEl.style.transition = animate ? 'transform .34s cubic-bezier(.33,.9,.3,1)' : 'none';
+    storyPhoneEl.style.transform = '';
+    storyViewer.style.transition = animate ? 'background-color .3s' : 'none';
+    storyViewer.style.backgroundColor = '';
+  }
+  storyViewer.addEventListener('touchstart', (e) => {
+    stDragY = e.touches[0].clientY; stDragX = e.touches[0].clientX; stDragging = false;
+    storyPhoneEl.style.transition = 'none';
+  }, { passive: true });
+  storyViewer.addEventListener('touchmove', (e) => {
+    const dy = e.touches[0].clientY - stDragY;
+    const dx = e.touches[0].clientX - stDragX;
+    if (!stDragging) {
+      if (dy > 8 && dy > Math.abs(dx)) { stDragging = true; storyWasHold = true; } // 세로 아래 드래그 확정 → 탭 무효
+      else return;
+    }
+    if (dy <= 0) { storyPhoneEl.style.transform = ''; return; }
+    e.preventDefault();
+    const moved = dy * 0.6; // 손보다 덜 움직이게 감쇠 → 묵직한 저항감(폭은 유지, 스케일 없음)
+    storyPhoneEl.style.transform = 'translateY(' + moved + 'px)';
+    storyViewer.style.backgroundColor = 'rgba(20,20,22,' + Math.max(0, 1 - dy / 480) + ')'; // 뒤 배경 서서히 걷힘
+  }, { passive: false });
   storyViewer.addEventListener('touchend', (e) => {
-    if (storyTouchY == null) return;
-    if (e.changedTouches[0].clientY - storyTouchY > 70) closeStory();
-    storyTouchY = null;
+    if (!stDragging) return;
+    stDragging = false;
+    const dy = e.changedTouches[0].clientY - stDragY;
+    if (dy > 90) { // 충분히 내렸으면 계속 미끄러져 닫힘
+      storyPhoneEl.style.transition = 'transform .26s ease-in';
+      storyViewer.style.transition = 'background-color .26s';
+      storyPhoneEl.style.transform = 'translateY(100vh)';
+      storyViewer.style.backgroundColor = 'rgba(20,20,22,0)';
+      const done = () => { storyPhoneEl.removeEventListener('transitionend', done); closeStory(); stClearDrag(false); };
+      storyPhoneEl.addEventListener('transitionend', done);
+    } else { stClearDrag(true); } // 스프링백
   }, { passive: true });
 
   // 홈 카드(클린 스타일) 공통 마크업 — 캐러셀·그리드가 함께 씀. 클릭은 컨테이너에서 data-id로 위임.
@@ -1104,19 +1180,21 @@
   }
 
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)
+  // 최신순 정렬(홈 노출 기준, 2026-07-23) — date 내림차순, date 없는 항목은 뒤로. filter 결과라 원본 RECIPES는 안 바뀜
+  function byNewest(a, b) { return (b.date || '').localeCompare(a.date || ''); }
   function renderHomeCatGrid(cat, gridElement) {
-    const list = RECIPES.filter((r) => r.cat === cat);
-    gridElement.innerHTML = list.slice(0, 4).map((r) => // 홈은 4개만, 나머지는 '전체보기'로
+    const list = RECIPES.filter((r) => r.cat === cat).sort(byNewest);
+    gridElement.innerHTML = list.slice(0, 4).map((r) => // 소스(주인공)는 최신순 4개=2×2 그리드, 나머지는 '전체보기'로
       '<button class="hc-card" type="button" data-id="' + r.id + '">'
       + '<span class="hc-thumb">' + homeCardBody(r) + '</span>'
       + homeCardMeta(r) + '</button>'
     ).join('');
     bindHomeCards(gridElement);
   }
-  // 컴팩트 리스트(탕·히든): 사진 + 이름 + 좋아요 행. 홈엔 3개만(나머지는 전체보기). 소스는 그리드 유지(주인공=비주얼).
+  // 컴팩트 리스트(탕·히든): 사진 + 이름 + 좋아요 행. 홈엔 최신순 2개만(나머지는 전체보기). 소스는 그리드 유지(주인공=비주얼).
   function renderHomeCatList(cat, listElement) {
-    const list = RECIPES.filter((r) => r.cat === cat);
-    listElement.innerHTML = list.slice(0, 3).map((r) =>
+    const list = RECIPES.filter((r) => r.cat === cat).sort(byNewest);
+    listElement.innerHTML = list.slice(0, 2).map((r) =>
       '<button class="hc-row" type="button" data-id="' + r.id + '">'
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
       + '<span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
