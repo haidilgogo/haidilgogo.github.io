@@ -2408,7 +2408,7 @@ img {
 .store-region-tabs::-webkit-scrollbar { display: none; }
 .store-region-tabs .tabs {
   flex-wrap: nowrap;
-  gap: 28px;                        /* 지역 탭 간격 넓힘(20→28) */
+  gap: 22px;                        /* 지역 탭 간격 */
   justify-content: flex-start;      /* 왼쪽 정렬 — 전국이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
 }
 .stores-head {
@@ -2648,18 +2648,10 @@ img {
 }
 /* 매장 지역 탭 제거(2026-07-23 사용자 요청) — 상단바는 로고 줄만. 항상 숨김(모든 지점 노출) */
 .tabs-group--store { display: none; }
-/* 발도장 지역 탭(매장 지역 탭과 동일 형태): 발도장에서만 */
-.tabs-group--stamp { display: none; }
-.page[data-section="stamp"] .tabs-group--stamp { display: flex; }
-/* 발도장 기록하기 버튼(오늘의 소스 스타일): 발도장에서만 */
-.stamp-write-btn { display: none; }
-.page[data-section="stamp"] .stamp-write-btn { display: inline-flex; }
-@media all {
-  /* 모바일·태블릿: 로고 줄 오른쪽 끝으로(탭 줄은 wrap으로 아랫줄) — 데스크탑은 spacer가 밀어줌 */
-  .stamp-write-btn { margin-left: auto; }
-}
-/* 섹션 제목: 탭이 없는 섹션(메뉴)에서만 — 발도장은 지역 탭이 생겨 제목 대신 탭 표시 */
-.page:not([data-section="recipe"]):not([data-section="store"]):not([data-section="stamp"]) .topbar-section-title {
+/* 발도장 기록하기 버튼 — 뷰 안 '다녀온 매장 N곳' 줄 오른쪽 끝에 배치(2026-07-23) */
+.stamp-write-btn { flex: none; gap: 5px; } /* 연필 SVG 아이콘 ↔ 글자 간격 */
+/* 섹션 제목: 어느 섹션에도 상단바에 표시 안 함(로고만) — 메뉴 '메뉴' 글자도 제거(2026-07-24) */
+.page:not([data-section="recipe"]):not([data-section="store"]):not([data-section="stamp"]):not([data-section="menu"]) .topbar-section-title {
   display: inline-block;
 }
 
@@ -2848,11 +2840,14 @@ img {
    600×1034 라운드 다이컷으로 재조립 → 카드마다 크기·틀 동일. 앱은 drop-shadow만.
    ============================================================ */
 .stamps-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 14px;
 }
 .stamps-count {
   margin: 0;
-  padding-top: 9px; /* 매장 개수와 같은 세로 위치 보정(툴바 36px 가운데 정렬 값) */
 }
 
 /* 기록 카드 그리드 — 가로 카드라 minmax를 넓게: 모바일 1칸, 데스크탑 2칸(3칸 안 나옴) */
@@ -2932,18 +2927,25 @@ img {
 /* 빈 상태 — 전체(첫 기록 유도) / 지역(그 지역만 없음) 공용 */
 .stamp-empty {
   grid-column: 1 / -1;
-  padding: 56px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52vh;               /* 메뉴 빈화면(.view-empty)과 동일하게 세로 가운데정렬(2026-07-24) */
+  padding: 40px 20px;
   text-align: center;
   color: var(--text-muted);
   font-size: 14px;
   line-height: 1.7;
 }
+.stamp-empty-text { margin: 0; }
 .stamp-empty .stamp-empty-paw {
   display: block;
   font-size: 36px;
   margin-bottom: 10px;
   opacity: .45;
 }
+.stamp-empty .stamp-empty-pen { vertical-align: -2px; margin-right: 3px; } /* 문구 속 연필 SVG 정렬 */
 /* 스티커 = 투명 배경 라운드 다이컷 PNG. 앱은 그림자만 얹음(다이컷·테두리는 에셋에 구움).
    그래서 사용자가 픽셀메이터로 만든 사각 카드도, 처리 스크립트가 흰 외곽선+라운드+투명을
    입혀 '스티커'로 만들어줌 → 앱은 drop-shadow로 떠 있는 느낌만. */
@@ -3077,17 +3079,19 @@ img {
   right: 14px;
   width: 34px;
   height: 34px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
+  background: none;
   border: none;
-  color: #9A8A83;
+  color: #4D4139;                 /* 원 배경 제거 + 상단바 아이콘색 통일 */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: color .15s, transform .08s ease;
   -webkit-tap-highlight-color: transparent;
   z-index: 2;
 }
+.stamp-view-close:hover { color: var(--brand-red); }
+.stamp-view-close:active { color: var(--brand-red); transform: scale(.9); }
 /* 스티커+정보 = 가운데(빈 공간 자연스럽게), 버튼은 맨 아래 */
 .stamp-view-body {
   flex: 1;
@@ -3131,8 +3135,10 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 .stamp-view-edit { background: var(--brand-red); color: #fff; }
-.stamp-view-delete { background: #F3EDE7; color: #B0554A; transition: background .15s, color .15s; }
+.stamp-view-delete { background: #F3EDE7; color: #B0554A; transition: background .15s, color .15s; white-space: nowrap; }
 .stamp-view-delete.armed { background: var(--brand-red); color: #fff; } /* 두 번 눌러 삭제 — 확인 상태 */
+/* 확인 상태면 '수정'은 글자폭만큼 줄고 '삭제'가 넓어져 "한 번 더 누르면 삭제돼요"가 한 줄에(2026-07-23) */
+.stamp-view-btns:has(.stamp-view-delete.armed) .stamp-view-edit { flex: 0 0 auto; }
 
 /* 모바일: 상단바 아래 전체화면 (레시피 상세·입력 시트와 동일) */
 @media all {
@@ -3158,16 +3164,17 @@ img {
   width: 34px;
   height: 34px;
   border: none;
-  border-radius: 50%;
-  background: rgba(43, 18, 13, 0.06);
-  color: var(--text-muted);
+  background: none;
+  color: #4D4139;                 /* 원 배경 제거 + 상단바 아이콘색 통일 */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: color .15s, transform .08s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.stamp-sheet-close:active { transform: scale(0.9); }
+.stamp-sheet-close:hover { color: var(--brand-red); }
+.stamp-sheet-close:active { color: var(--brand-red); transform: scale(0.9); }
 
 /* 점선 슬롯 — 스티커가 붙을 자리 */
 .stamp-slot {
@@ -3409,6 +3416,18 @@ img {
   width: 100%;
   height: 100%;
   opacity: 0; /* 기능(탭→기기 달력)만 남기고 시스템 글자·아이콘은 숨김 */
+  cursor: pointer;
+}
+/* 데스크탑 버그 수정(2026-07-24): 캘린더 인디케이터를 칸 전체로 확장해 어디를 눌러도 달력이 뜨게.
+   (모바일은 원래 아무 데나 탭하면 떴고, 데스크탑만 오른쪽 인디케이터를 눌러야 했음) */
+.stamp-field--date input[type='date']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
   cursor: pointer;
 }
 .stamp-date-text {

@@ -2445,9 +2445,9 @@
       const empty = document.createElement('div');
       empty.className = 'stamp-empty';
       const anyAtAll = stampData.records.length > 0;
-      empty.innerHTML = '<span class="stamp-empty-paw">🐾</span>' + (anyAtAll
+      empty.innerHTML = '<p class="stamp-empty-text">' + (anyAtAll
         ? '아직 ' + activeStampRegion + '엔 발도장이 없어요'
-        : '아직 발도장이 없어요<br>✏️ 기록하기로 첫 방문을 남겨보세요');
+        : '아직 발도장이 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요') + '</p>';
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
