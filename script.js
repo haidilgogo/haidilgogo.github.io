@@ -318,6 +318,7 @@
   let personFilter = null;      // 셀럽 레일에서 인물을 고르면 그 사람 레시피만(그리드 뷰)
   let query = '';
   let showFavoritesOnly = false;
+  let browseListMode = false;   // 전체보기 결과를 세로 리스트(랭킹 행)로 표시(인기소스 전체보기 전용, 2026-07-23)
   let sortMode = 'popular'; // 'popular'(좋아요) | 'recent'(날짜) | 'name'(가나다)
   const FAVORITES_KEY = 'haidilao_favorites';
   let favorites;
@@ -643,6 +644,15 @@
     emoji: '📖',
   };
 
+  // ── 준비중 배너(3번 자리, 2026-07-23) ── 무지 배경 + 공사 이모지. 클릭 동작 없음.
+  const SOON_BANNER = {
+    id: 'banner-soon',
+    isSoon: true,
+    title: '준비중이에요',
+    emoji: '🚧',
+    bannerBg: '#B7B1A7',           // 무지(플레인) 배경
+  };
+
   function pickMonthlyFeatures() {
     const pool = RECIPES.filter((r) => r.img); // 히어로는 큰 이미지 필요
     if (!pool.length) return [];
@@ -653,14 +663,8 @@
     if (monthlySauce) out.push(monthlySauce);
     // 2) 두 번째 배너 = 기획 칼럼(고정).
     out.push(GOSU_COLUMN);
-    // 3) 중간 칸 = 자동 로테이션(마지막 한 칸은 가이드 배너로 예약하므로 MONTHLY_COUNT-1까지만).
-    const monthIdx = (now.getFullYear() - 2026) * 12 + now.getMonth();
-    const start = (((monthIdx * 13) % pool.length) + pool.length) % pool.length;
-    const step = Math.max(1, Math.floor(pool.length / MONTHLY_COUNT));
-    for (let i = 0; out.length < MONTHLY_COUNT - 1 && i < pool.length; i++) {
-      const cand = pool[(start + i * step) % pool.length];
-      if (!out.includes(cand)) out.push(cand); // 이 달의 소스와 중복 방지
-    }
+    // 3) 세 번째 배너 = 준비중 플레이스홀더(2026-07-23, 기존 자동 로테이션 대신).
+    out.push(SOON_BANNER);
     // 4) 마지막 배너 = 가이드 배너(항상 끝에 고정).
     out.push(GUIDE_BANNER);
     return out;
@@ -675,13 +679,13 @@
     mfScroll.innerHTML = monthlyList.map((r, i) => {
       const tagline = r.heroDesc || r.desc;
       const desc = tagline ? '<div class="mf-desc">' + tagline + '</div>' : '';
-      // 특수 배너(기획 칼럼 / 가이드): 이미지 대신 임시 배경(bannerImg 있으면 그 사진) + 큰 이모지
-      if (r.isColumn || r.isGuide) {
+      // 특수 배너(기획 칼럼 / 가이드 / 준비중): 이미지 대신 임시 배경(bannerImg 있으면 그 사진) + 큰 이모지
+      if (r.isColumn || r.isGuide || r.isSoon) {
         const bg = r.bannerImg
           ? 'background-image:url(' + r.bannerImg + ');background-size:cover;background-position:center;'
           : 'background:' + r.bannerBg + ';';
-        const aria = r.isColumn ? ' 칼럼 열기' : ' 가이드 열기';
-        const kind = r.isGuide ? ' mf-hero--guide' : '';
+        const aria = r.isColumn ? ' 칼럼 열기' : r.isGuide ? ' 가이드 열기' : '';
+        const kind = r.isGuide ? ' mf-hero--guide' : r.isSoon ? ' mf-hero--soon' : '';
         return '<button class="mf-hero mf-hero--column' + kind + '" type="button" aria-label="' + r.title + aria + '">'
           + '<div class="mf-colbg" style="' + bg + '"><span class="mf-colemoji">' + (r.emoji || '') + '</span></div>'
           + '<div class="mf-caption"><div class="mf-name">' + (r.titleHtml || r.title) + '</div>' + desc + '</div>'
@@ -703,6 +707,7 @@
     const heroes = [...mfScroll.querySelectorAll('.mf-hero')];
     heroes.forEach((el, i) => el.addEventListener('click', () => {
       const item = monthlyList[i];
+      if (item.isSoon) return;                         // 준비중 배너는 클릭 무반응
       if (item.isColumn) openColumn(item);
       else if (item.isGuide) document.getElementById('guideOverlay').hidden = false;
       else openModal(item);
@@ -788,6 +793,7 @@
   }
   // 홈 섹션(전체 ›·아바타)에서 그리드 뷰로 들어가거나(cat/person), 초기화해 홈으로 돌아옴
   function enterBrowse(cat, person) {
+    browseListMode = false;       // 기본은 그리드(인기소스 전체보기만 이후에 리스트로 켬)
     activeCat = cat || '전체';
     personFilter = person || null;
     if (showFavoritesOnly) {
@@ -817,6 +823,7 @@
     const filtered = getFiltered();
     listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
+    gridEl.classList.toggle('is-list', browseListMode); // 리스트형(인기소스 전체보기) ↔ 그리드
     gridEl.innerHTML = '';
     if (filtered.length === 0) {
       const empty = document.createElement('p');
@@ -829,6 +836,22 @@
         empty.textContent = '아직 등록된 레시피가 없어요';
       }
       gridEl.appendChild(empty);
+      return;
+    }
+    // 리스트형: 랭킹 행(순위 숫자 + 썸네일 + 이름 + 좋아요). 클릭 시 상세.
+    if (browseListMode) {
+      gridEl.innerHTML = filtered.map((r, i) =>
+        '<button class="hc-row hp-rank-row" type="button" data-id="' + r.id + '">'
+        + '<span class="hp-rank-num">' + (i + 1) + '</span>'
+        + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
+        + '<span class="hc-row-name">' + (r.nameHtml || r.name) + (r.ver ? '<span class="hp-ver">' + r.ver + '</span>' : '') + '</span>'
+        + '<span class="hc-row-like"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span class="hc-row-like-n like-count" data-id="' + r.id + '">' + getLikeCount(r.id) + '</span></span>'
+        + '</button>'
+      ).join('');
+      gridEl.querySelectorAll('[data-id]').forEach((btn) => {
+        const r = RECIPES.find((x) => x.id === btn.dataset.id);
+        if (r) btn.addEventListener('click', () => openModal(r));
+      });
       return;
     }
     filtered.forEach((r) => {
@@ -854,7 +877,6 @@
   const popularRailEl = document.getElementById('popularRail');
   const tangGridEl = document.getElementById('tangGrid');
   const hiddenGridEl = document.getElementById('hiddenGrid');
-  const sauceGridEl = document.getElementById('sauceGrid');
 
   // 가로 레일 마우스 드래그 스크롤(데스크탑용). 트랙패드·휠로만 되던 걸 손으로 끌 수 있게.
   //  - 컨테이너에 한 번만 붙임(레일은 innerHTML만 다시 그려도 컨테이너 자체는 유지됨).
@@ -1180,10 +1202,12 @@
   }
 
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)
-  // 최신순 정렬(홈 노출 기준, 2026-07-23) — date 내림차순, date 없는 항목은 뒤로. filter 결과라 원본 RECIPES는 안 바뀜
+  // 정렬 기준(홈 노출) — filter 결과라 원본 RECIPES는 안 바뀜
   function byNewest(a, b) { return (b.date || '').localeCompare(a.date || ''); }
+  // 인기순: 좋아요 많은 순, 동점이면 최신순(2026-07-23, 탕·히든도 인기순 — baseLikes 넣기 전엔 0동점이라 최신순처럼 보임)
+  function byPopular(a, b) { return getLikeCount(b.id) - getLikeCount(a.id) || byNewest(a, b); }
   function renderHomeCatGrid(cat, gridElement) {
-    const list = RECIPES.filter((r) => r.cat === cat).sort(byNewest);
+    const list = RECIPES.filter((r) => r.cat === cat).sort(byPopular);
     gridElement.innerHTML = list.slice(0, 4).map((r) => // 소스(주인공)는 최신순 4개=2×2 그리드, 나머지는 '전체보기'로
       '<button class="hc-card" type="button" data-id="' + r.id + '">'
       + '<span class="hc-thumb">' + homeCardBody(r) + '</span>'
@@ -1191,10 +1215,10 @@
     ).join('');
     bindHomeCards(gridElement);
   }
-  // 컴팩트 리스트(탕·히든): 사진 + 이름 + 좋아요 행. 홈엔 최신순 2개만(나머지는 전체보기). 소스는 그리드 유지(주인공=비주얼).
+  // 컴팩트 리스트(탕): 사진 + 이름 + 좋아요 행. 홈엔 최신순 3개(2026-07-23, 그리드와 무게 맞춤). 나머지는 전체보기.
   function renderHomeCatList(cat, listElement) {
-    const list = RECIPES.filter((r) => r.cat === cat).sort(byNewest);
-    listElement.innerHTML = list.slice(0, 2).map((r) =>
+    const list = RECIPES.filter((r) => r.cat === cat).sort(byPopular);
+    listElement.innerHTML = list.slice(0, 3).map((r) =>
       '<button class="hc-row" type="button" data-id="' + r.id + '">'
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
       + '<span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
@@ -1207,8 +1231,7 @@
     renderCelebRail();
     renderHomePopular();
     renderHomeCatList('탕', tangGridEl);
-    renderHomeCatList('히든메뉴', hiddenGridEl);
-    renderHomeCatGrid('소스', sauceGridEl);
+    renderHomeCatGrid('히든메뉴', hiddenGridEl); // 히든메뉴 = 그리드(2026-07-23, 구 소스 그리드 대체)
   }
 
   function renderIngList(el, items) {
@@ -1386,6 +1409,7 @@
 
   searchInput.addEventListener('input', (e) => {
     query = e.target.value;
+    browseListMode = false;       // 검색은 그리드로
     searchBox.classList.toggle('has-value', query.length > 0);
     // 검색은 카테고리·인물과 독립 — 검색 시작하면 전체보기·인물 보기에서 빠져나옴
     if (query.trim() && (activeCat !== '전체' || personFilter)) {
@@ -1404,6 +1428,7 @@
   }
   function closeSearch() { // 돋보기 다시 탭 = 명시적 닫기(검색어 리셋 후 접힘)
     query = '';
+    browseListMode = false;
     searchInput.value = '';
     searchBox.classList.remove('open', 'has-value');
     searchToggle.setAttribute('aria-label', '검색 열기');
@@ -1425,6 +1450,7 @@
   searchInput.addEventListener('blur', () => setTimeout(collapseSearch, 150));
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
+    browseListMode = false;       // 즐겨찾기는 그리드로
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
     // 즐겨찾기도 카테고리·인물과 독립 — 켤 때 전체보기·인물 보기에서 빠져나옴
     if (showFavoritesOnly && (activeCat !== '전체' || personFilter)) {
@@ -2775,7 +2801,12 @@
   // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 그리드 뷰 (인기소스의 구 전체보기 버튼은 소스 섹션으로 이관·제거됨)
   document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
-  document.getElementById('sauceMore').addEventListener('click', () => enterBrowse('소스'));
+  // 인기 소스 전체보기 = 소스 전체를 인기순(좋아요)으로, 리스트형(랭킹 행)으로 표시
+  document.getElementById('popularMore').addEventListener('click', () => {
+    enterBrowse('소스');          // 그리드 리셋 + 소스 카테고리
+    browseListMode = true;        // 이 화면만 리스트형
+    setSort('popular');           // 인기순 + 재렌더(리스트로)
+  });
 
   renderHomeSections();
   initMonthlyFeature();

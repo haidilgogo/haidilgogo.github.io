@@ -789,6 +789,8 @@ img {
 .mf-hero--column .mf-name { font-size: 30px; line-height: 1.2; }
 /* 가이드 배너는 제목이 길어 한 단계 더 작게(두 줄 여백 확보) */
 .mf-hero--guide .mf-name { font-size: 26px; }
+/* 준비중 배너 — 클릭 안 되니 기본 커서 */
+.mf-hero--soon { cursor: default; }
 
 /* 사진 안 캡션(좌하단): 이름(힘 줌) + 출처(힘 뺌) */
 .mf-caption {
@@ -856,6 +858,12 @@ img {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   column-gap: 24px;
   row-gap: 28px;
+}
+/* 리스트형 전체보기(인기소스): 그리드 대신 세로 랭킹 행 */
+.recipe-grid.is-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 560px;
 }
 
 /* 카테고리 색 세트 — 카드(그리드·가챠)와 상세가 공유.
@@ -4092,6 +4100,7 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px 12px;
+  margin-top: 17px;   /* 헤더와 간격 — 탕 리스트 간격(헤더2px+행padding15px=17px)과 동일하게(2026-07-23) */
 }
 .hc-card {
   background: none;
@@ -4147,6 +4156,20 @@ img {
   color: var(--text-muted);
 }
 .hc-row-like-n { font-size: 12.5px; line-height: 1; }
+
+/* 인기 소스 = 세로 랭킹 리스트(차트형, 2026-07-23) — hc-row 재사용 + 왼쪽 순위 숫자, 1위 강조 */
+.hp-chart { display: flex; flex-direction: column; }
+.hp-rank-num {
+  flex: none;
+  width: 18px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--text-dark);
+  font-variant-numeric: tabular-nums;
+}
+.hp-rank-row:first-child .hp-rank-num { color: var(--brand-red); } /* 1위만 브랜드 빨강 */
 
 /* ── ⑦ 랜덤 뽑기 ── */
 .home-random {
