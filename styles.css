@@ -738,7 +738,7 @@ img {
   display: block;
   -webkit-user-drag: none; user-select: none;
 }
-.mf-hero:active img { transform: scale(.99); }
+/* 첫 배너(이달의 소스=img)도 고수·가이드(배경이미지)처럼 눌림 반응 없앰 — 사진이 안 움직이게(2026-07-23) */
 /* 오버레이 — 하단(캡션 영역)만 어둡게 깔아 글씨(kicker+제목+설명)를 살림.
    상단 딤드 없음 = 이미지 위쪽 밝게 유지, 전 배너 동일(2026-07-23, kicker 이관 후 통일) */
 .mf-hero::after {
@@ -804,6 +804,7 @@ img {
 /* 이름 밑 한 줄 설명(29CM식) — 한 줄 넘으면 …로 자름 */
 .mf-desc {
   margin-top: 7px;
+  margin-left: 4px;               /* 제목보다 살짝 들여쓰기 */
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
@@ -2407,8 +2408,8 @@ img {
 .store-region-tabs::-webkit-scrollbar { display: none; }
 .store-region-tabs .tabs {
   flex-wrap: nowrap;
-  gap: 20px;
-  justify-content: center;   /* 지역 탭 가운데정렬(2026-07-23) */
+  gap: 28px;                        /* 지역 탭 간격 넓힘(20→28) */
+  justify-content: flex-start;      /* 왼쪽 정렬 — 전국이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
 }
 .stores-head {
   display: flex;
@@ -3599,6 +3600,7 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background-color: inherit;  /* 로딩 중엔 뒤 이니셜 대신 같은 색 원으로 덮음(늦게 뜰 때 글자 안 비침) */
 }
 /* 안쪽 원 경계용 초박(hairline) 테두리 — 밝은 아바타에서 원이 배경에 묻히지 않게 살짝만 */
 .celeb-face::after {
@@ -4309,34 +4311,39 @@ img {
   z-index: 3;
   width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(0, 0, 0, .35);
-  border: none; border-radius: 999px;
-  color: #fff; font-size: 24px; line-height: 1;
+  background: none;
+  border: none;
+  color: #4D4139; font-size: 26px; line-height: 1;  /* 원 배경 제거 + 상단바 아이콘색 통일 */
   cursor: pointer;
-  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  transition: color .15s, transform .08s ease;
+  -webkit-tap-highlight-color: transparent; /* 기본 검정 탭 음영 제거, 아래 :active로 눌림 반응 */
 }
+.column-close:hover { color: var(--brand-red); }
+.column-close:active { color: var(--brand-red); transform: scale(.9); }
 /* 상단 히어로(배너와 같은 임시 배경) */
 .column-hero {
   position: relative;
-  padding: 44px 22px 26px;
-  text-align: center;
+  aspect-ratio: 1 / 1;            /* 사진 1:1 전체 노출(잘림 없음) */
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 22px;
+  text-align: left;
   color: #fff;
+  background-size: cover; background-position: center;  /* 1:1 컨테이너 + 1:1 이미지 = 꽉 참 */
 }
-.column-hero::after {           /* 하단 살짝 어둡게 — 제목 가독 */
+.column-hero::after {           /* 하단 어둡게 — 제목 가독(밝은 크림 사진 위) */
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.28));
+  background: linear-gradient(to top, rgba(0,0,0,.6) 0%, rgba(0,0,0,.18) 32%, rgba(0,0,0,0) 60%);
   pointer-events: none;
 }
-.column-hero-emoji { position: relative; z-index: 1; font-size: 46px; line-height: 1; display: block; }
 .column-title {
   position: relative; z-index: 1;
-  margin: 12px 0 0;
+  margin: 0;
   font-size: 24px; font-weight: 800; letter-spacing: -.03em;
   text-shadow: 0 1px 10px rgba(0, 0, 0, .35);
 }
 .column-sub {
   position: relative; z-index: 1;
-  margin: 7px 0 0;
+  margin: 7px 0 0 4px;            /* 제목보다 살짝 들여쓰기 */
   font-size: 13px; font-weight: 500;
   color: rgba(255, 255, 255, .92);
   text-shadow: 0 1px 6px rgba(0, 0, 0, .3);

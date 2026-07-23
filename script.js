@@ -958,7 +958,7 @@
       const seenCls = seenCelebs.has(p.name) ? ' celeb--seen' : '';
       return '<button class="celeb' + seenCls + '" type="button" data-person="' + p.name + '">'
         + '<span class="celeb-img"><span class="celeb-face" style="background:' + p.color + '">' + p.name.charAt(0)
-        + '<img src="assets/people/' + p.name + '.jpg" alt="" loading="lazy" draggable="false" onerror="this.remove()">'
+        + '<img src="assets/people/' + p.name + '.jpg" alt="" draggable="false" onerror="this.remove()">'
         + '</span></span>'
         + '<span class="celeb-name">' + p.name + '</span></button>';
     }).join('');
@@ -1151,9 +1151,10 @@
   }, { passive: true });
 
   // 홈 카드(클린 스타일) 공통 마크업 — 캐러셀·그리드가 함께 씀. 클릭은 컨테이너에서 data-id로 위임.
-  function homeCardBody(r) {
+  // eager=true면 즉시 로드(인기소스=첫 화면에 바로 보임). 탕·히든은 스크롤해야 보여 lazy 유지.
+  function homeCardBody(r, eager) {
     const thumb = r.img
-      ? '<img src="' + r.img + '" alt="' + r.name + '" loading="lazy" draggable="false">'
+      ? '<img src="' + r.img + '" alt="' + r.name + '"' + (eager ? '' : ' loading="lazy"') + ' draggable="false">'
       : '<span class="hc-emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
     return thumb;
   }
@@ -1191,7 +1192,7 @@
     const top = sauces.slice(0, 5);
     popularRailEl.innerHTML = top.map((r, i) =>
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
-      + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r) + '</span>'
+      + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r, true) + '</span>'
       + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
       + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
       + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
@@ -1722,7 +1723,6 @@
     hero.style.cssText = col.bannerImg
       ? 'background-image:url(' + col.bannerImg + ');background-size:cover;background-position:center;'
       : 'background:' + col.bannerBg + ';';
-    document.getElementById('columnEmoji').textContent = col.emoji || '';
     document.getElementById('columnTitle').textContent = col.title;
     document.getElementById('columnSub').textContent = col.heroDesc || '';
     document.getElementById('columnBody').innerHTML = col.body || '';
