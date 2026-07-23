@@ -739,13 +739,56 @@ img {
   -webkit-user-drag: none; user-select: none;
 }
 .mf-hero:active img { transform: scale(.99); }
-/* 균일 검정 오버레이 — 위·아래 대비 동일(점·글씨 어디서나 또렷) */
+/* 오버레이 — 하단(캡션 영역)을 진하게 깔아 글씨를 살림. 위는 옅게(이미지 밝게 유지).
+   상단에도 살짝 어둠을 줘 '이 달의 소스' 라벨 가독 확보(2026-07-23) */
 .mf-hero::after {
   content: '';
   position: absolute; inset: 0;
-  background: rgba(20, 10, 6, .42);
+  background:
+    linear-gradient(to top,
+      rgba(8, 4, 2, .88) 0%,
+      rgba(8, 4, 2, .60) 16%,
+      rgba(8, 4, 2, .05) 40%,
+      rgba(8, 4, 2, .07) 58%,
+      rgba(8, 4, 2, .13) 72%,
+      rgba(8, 4, 2, .24) 82%,
+      rgba(8, 4, 2, .42) 91%,
+      rgba(8, 4, 2, .62) 100%);
   pointer-events: none;
 }
+
+/* 첫 배너 좌측 위 '이 달의 소스' 라벨 — 얇은 글씨, '소스'만 빨강 */
+.mf-badge {
+  position: absolute; left: 16px; top: 15px;
+  z-index: 2;
+  font-size: 15px;                /* 살짝 키움 */
+  font-weight: 700;               /* 볼드 */
+  letter-spacing: -.03em;         /* 라벨답게 살짝 조임 */
+  word-spacing: -1px;             /* 띄어쓰기 공백도 살짝 조여 균일하게 */
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .55);  /* 위쪽 딤드에 기대 텍스트만 */
+  pointer-events: none;
+}
+.mf-badge-em {
+  color: #FF6A57;                 /* 어두운 배너 위 가독성용 밝은 빨강 */
+  font-weight: 700;               /* '소스'도 볼드 통일 */
+}
+
+/* 기획 칼럼 배너 — 사진 대신 임시 배경(bannerBg) + 큰 이모지 */
+.mf-colbg {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.mf-colemoji {
+  font-size: 92px; line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .25));
+  transform: translateY(-14px);   /* 캡션과 겹치지 않게 살짝 위로 */
+}
+.mf-hero--column .mf-badge-em { color: #fff; }  /* '기획' 라벨은 흰색 */
+/* 특수 배너 제목은 두 줄(예: 어서와~ / 하이디라오는 처음이지?)이 들어가므로 살짝 작게 */
+.mf-hero--column .mf-name { font-size: 30px; line-height: 1.2; }
+/* 가이드 배너는 제목이 길어 한 단계 더 작게(두 줄 여백 확보) */
+.mf-hero--guide .mf-name { font-size: 26px; }
 
 /* 사진 안 캡션(좌하단): 이름(힘 줌) + 출처(힘 뺌) */
 .mf-caption {
@@ -3509,8 +3552,8 @@ img {
   height: 84px;
   padding: 3px;
   border-radius: 50%;
-  /* 인스타식 각도(conic) 그라데이션 — 아래=노랑, 우상단(≈40°)에 쨍한 핫핑크/마젠타. 어두운 보라 제외해 화사하게 */
-  background: conic-gradient(from 210deg, #FEE181, #FB8B2E, #F5257E, #D521A6, #F5257E, #FB8B2E, #FEE181);
+  /* 대각선(225°) 노을 그라데이션 — 우상단=브랜드 빨강 → 주황 → 골드 → 좌하단=노랑 */
+  background: linear-gradient(225deg, var(--brand-red) 0%, #F5642A 46%, #FFA838 72%, #FEE181 100%);
   box-shadow: 0 2px 8px rgba(80, 40, 20, .12);
   transition: transform .24s cubic-bezier(.34, 1.5, .64, 1); /* 뗄 때: 살짝 통통 튀며 복귀 */
 }
@@ -4137,3 +4180,130 @@ img {
   font-weight: 700;
   color: var(--brand-red);
 }
+
+/* ── 기획 칼럼 패널(고수 빼주세요! 등) ───────────────────────── */
+.column-overlay {
+  position: fixed; inset: 0;
+  z-index: 70;
+  background: rgba(20, 10, 6, .5);
+  display: flex; justify-content: center; align-items: flex-start;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.column-overlay[hidden] { display: none; }
+.column-sheet {
+  position: relative;
+  width: 100%; max-width: 440px;
+  min-height: 100%;
+  background: var(--bg-card);
+}
+@media (min-width: 641px) {
+  .column-overlay { padding: 24px; align-items: flex-start; }
+  .column-sheet { min-height: auto; border-radius: 18px; overflow: hidden; margin: auto; }
+}
+.column-close {
+  position: absolute; top: 12px; right: 14px;
+  z-index: 3;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .35);
+  border: none; border-radius: 999px;
+  color: #fff; font-size: 24px; line-height: 1;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+/* 상단 히어로(배너와 같은 임시 배경) */
+.column-hero {
+  position: relative;
+  padding: 44px 22px 26px;
+  text-align: center;
+  color: #fff;
+}
+.column-hero::after {           /* 하단 살짝 어둡게 — 제목 가독 */
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.28));
+  pointer-events: none;
+}
+.column-hero-emoji { position: relative; z-index: 1; font-size: 46px; line-height: 1; display: block; }
+.column-title {
+  position: relative; z-index: 1;
+  margin: 12px 0 0;
+  font-size: 24px; font-weight: 800; letter-spacing: -.03em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .35);
+}
+.column-sub {
+  position: relative; z-index: 1;
+  margin: 7px 0 0;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255, 255, 255, .92);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .3);
+}
+/* 본문 */
+.column-body { padding: 24px 22px 8px; }
+.column-body h3 {
+  margin: 24px 0 8px;
+  font-size: 16px; font-weight: 800; letter-spacing: -.02em;
+  color: var(--text-dark);
+}
+.column-body p {
+  margin: 0 0 4px;
+  font-size: 14px; line-height: 1.75;
+  color: var(--text-dark);
+}
+.column-body .col-lead { font-size: 15px; color: var(--text-muted); }
+.column-body .col-outro {
+  margin-top: 20px;
+  font-weight: 700; color: var(--brand-red); line-height: 1.7;
+}
+.column-body ul { margin: 6px 0 0; padding: 0; list-style: none; }
+.column-body li {
+  position: relative;
+  margin: 0 0 8px; padding-left: 16px;
+  font-size: 14px; line-height: 1.7; color: var(--text-dark);
+}
+.column-body li::before {
+  content: '🌿'; position: absolute; left: 0; top: 0; font-size: 11px;
+}
+.column-body li b { font-weight: 700; }
+/* 하단: 관련 소스 목록 */
+.column-sauces { padding: 8px 22px 32px; }
+.column-sauces-title {
+  margin: 18px 0 12px;
+  font-size: 15px; font-weight: 800; letter-spacing: -.02em;
+  color: var(--text-dark);
+}
+.column-sauces-count {
+  display: inline-block; margin-left: 4px;
+  color: var(--brand-red); font-weight: 800;
+}
+.column-sauce-list { display: flex; flex-direction: column; gap: 8px; }
+.col-sauce {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 8px;
+  background: var(--bg-soft, #f7f4f1);
+  border: 1px solid #ececec; border-radius: 12px;
+  cursor: pointer; text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.col-sauce:active { background: #efeae6; }
+.col-sauce-thumb {
+  width: 52px; height: 52px; flex: 0 0 52px;
+  border-radius: 9px; object-fit: cover; display: block;
+}
+.col-sauce-thumb--emoji {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; background: #efe7dd;
+}
+.col-sauce-meta { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.col-sauce-name {
+  font-size: 14px; font-weight: 700; color: var(--text-dark);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.col-sauce-ver {
+  margin-left: 5px; padding: 1px 6px;
+  font-size: 11px; font-weight: 600;
+  color: var(--brand-red); background: rgba(224, 48, 30, .1);
+  border-radius: 999px; vertical-align: middle;
+}
+.col-sauce-amt { font-size: 12px; color: var(--text-muted); }
+.col-sauce-arrow { width: 18px; height: 18px; flex: 0 0 18px; color: #c3bbb3; }

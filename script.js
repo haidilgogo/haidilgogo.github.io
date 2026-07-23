@@ -125,7 +125,7 @@
       ings: [['땅콩참깨소스', '3', '스푼'], ['다진 파', '3', '스푼'], ['양파', '2', '스푼'], ['고수', '1', '스푼'], ['다진 마늘', '0.5', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's19', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(참기름).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7EFD8,#EBDBB0)', name: '박은영소스', ver: '참기름', source: 'YouTube 밥은영', star: true, person: '박은영', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스이다.',
+    { id: 's19', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(참기름).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7EFD8,#EBDBB0)', name: '박은영소스', ver: '참기름', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '하얼빈 정통파, 중식 여신 박은영 셰프의 참기름 소스', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스이다.',
       ings: [['참기름', '4', '스푼'], ['중국식초', '1', '스푼'], ['다진 마늘', '2', '스푼'], ['소금', '', '한 꼬집']],
       steps: [],
       tip: '' },
@@ -565,18 +565,104 @@
 
   // 👉 나중에 "이 달의 레시피"를 직접 고르려면 아래 함수를 특정 레시피 배열 반환으로 바꾸면 됨
   //    (예: return ['건희소스','마라훠궈탕',...].map(n => RECIPES.find(r => r.name === n)).filter(Boolean);)
+  // ── 이 달의 소스 (첫 배너) ──────────────────────────────────
+  // 규칙: 매월 1일에 소스 카테고리에서 하나로 자동 변경.
+  // 특정 달을 손으로 지정하려면 아래 MONTHLY_SAUCE_PINS에 '연-월': 레시피id 를 추가하면
+  // 그 달엔 그게 우선한다(자동선택 무시). 지정 없는 달은 monthIdx로 자동 순환.
+  // 2026-07·08 = 박은영소스(참기름, s19) 고정 — 이번 달이 짧아 8월까지 유지(사용자 지정, 2026-07-23).
+  const MONTHLY_SAUCE_PINS = {
+    '2026-07': 's19',
+    '2026-08': 's19',
+  };
+  function monthKey(now) {
+    return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  }
+  function pickMonthlySauce(now) {
+    const saucePool = RECIPES.filter((r) => r.cat === '소스' && r.img);
+    if (!saucePool.length) return null;
+    const pinId = MONTHLY_SAUCE_PINS[monthKey(now)];
+    if (pinId) {
+      const pinned = saucePool.find((r) => r.id === pinId);
+      if (pinned) return pinned;
+    }
+    // 지정 없으면: 2026-01 기준 경과 월로 소스풀을 매월 한 칸씩 순환.
+    const monthIdx = (now.getFullYear() - 2026) * 12 + now.getMonth();
+    const idx = ((monthIdx % saucePool.length) + saucePool.length) % saucePool.length;
+    return saucePool[idx];
+  }
+
+  // ── 기획 칼럼(배너 2번 고정) ─────────────────────────────────
+  // 레시피가 아닌 '읽을거리' 배너. 클릭 시 칼럼 패널이 열리고 하단에 관련 소스 자동 목록.
+  // 배너 사진은 임시(초록 그라데이션+🌿) — 실제 사진 생기면 bannerImg에 경로만 넣으면 그걸 씀.
+  // 하단 소스 목록은 ingFilter 재료가 ings에 든 레시피를 자동 수집(수동 관리 불필요).
+  const GOSU_COLUMN = {
+    id: 'col-gosu',
+    isColumn: true,
+    title: '고수 빼주세요!',
+    heroDesc: '고수는 왜 비누 맛이 날까?',
+    bannerImg: '',                 // TODO: 실제 배너 사진 경로 넣기(넣으면 임시배경 대신 사용)
+    bannerBg: 'linear-gradient(150deg,#3E7D4E 0%,#6FAE5C 55%,#AFD589 100%)',
+    emoji: '🌿',
+    ingFilter: '고수',             // 이 재료가 든 항목을 칼럼 하단에 자동 나열
+    catFilter: '소스',             // 그중 이 카테고리만(요리·히든메뉴 제외, '소스'만)
+    body:
+      '<p class="col-lead">훠궈 소스바 앞, 초록빛 고수 앞에서 손이 멈칫한 적 있으신가요? ' +
+      '“고수 빼주세요”가 입버릇이 된 분들께, 오늘은 딱 한 번만 다르게 권해봅니다.</p>' +
+      '<h3>그 향, 사실은 ‘상쾌함’이에요</h3>' +
+      '<p>호불호를 가르는 고수 특유의 향은 레몬·라임을 스치는 듯한 시트러스 계열 향이에요. ' +
+      '처음엔 낯설어도 익숙해지면 ‘비누 맛’이 아니라 ‘싱그러움’으로 바뀝니다. ' +
+      '전 세계 미식가들이 고수에 빠지는 이유죠.</p>' +
+      '<h3>기름진 훠궈에 딱 필요한 한 끗</h3>' +
+      '<p>얼얼한 마라 국물, 고소한 참깨·땅콩 소스… 훠궈는 기본적으로 진하고 묵직해요. ' +
+      '여기에 고수 한 꼬집이 들어가면 느끼함을 싹 정리하고 뒷맛을 개운하게 잡아줍니다. ' +
+      '중식·태국·베트남 요리가 고수를 사랑하는 데는 이유가 있어요.</p>' +
+      '<h3>덤으로, 몸에도 반가운 허브</h3>' +
+      '<p>고수는 비타민과 항산화 성분이 풍부한 허브로 알려져 있어요. ' +
+      '향만 즐기는 게 아니라 소소한 영양까지 곁들이는 셈이죠.</p>' +
+      '<h3>고수가 처음이라면, 이렇게</h3>' +
+      '<ul>' +
+      '<li><b>잎보다 줄기부터.</b> 줄기는 향이 부드럽고 아삭한 식감이 좋아요.</li>' +
+      '<li><b>한 꼬집씩.</b> 소스에 조금만 섞어 향을 입혀보세요.</li>' +
+      '<li><b>진한 소스와 특히 잘 맞아요.</b> 마라·땅콩처럼 묵직한 소스에 넣으면 밸런스가 살아요.</li>' +
+      '</ul>' +
+      '<p class="col-outro">오늘은 “빼주세요” 대신 “조금만 넣어주세요”. ' +
+      '훠궈의 마지막 퍼즐이 채워질지도 몰라요. 🌿</p>',
+  };
+
+  // ── 가이드 배너(항상 마지막 고정) ────────────────────────────
+  // 홈 아래쪽 '하이디라오가 처음인 당신에게' 가이드를 놓치는 사람이 많아, 히어로 마지막 칸에도
+  // 한 번 더 노출. 클릭 시 같은 가이드 패널(#guideOverlay)이 열림(내용 공유).
+  const GUIDE_BANNER = {
+    id: 'banner-guide',
+    isGuide: true,
+    title: '어서와~ 하이디라오는 처음이지?',            // 접근성(aria)·비상용 한 줄
+    titleHtml: '어서와~<br>하이디라오는 처음이지?',       // 배너 표시용(두 줄)
+    heroDesc: '주문법부터 소스바 사용법까지 · 3분 가이드',
+    bannerImg: '',                 // TODO: 실제 배너 사진 경로 넣기
+    bannerBg: 'linear-gradient(150deg,#C6402E 0%,#E5704A 55%,#F2A878 100%)',
+    emoji: '📖',
+  };
+
   function pickMonthlyFeatures() {
     const pool = RECIPES.filter((r) => r.img); // 히어로는 큰 이미지 필요
     if (!pool.length) return [];
-    // 2026-01 기준 경과 월 → 매월 시작점 이동. step으로 골고루 뽑아 중복 없이 N개.
     const now = new Date();
+    const out = [];
+    // 1) 첫 배너 = 이 달의 소스(고정/자동). out[0]이 항상 '이 달의 소스'.
+    const monthlySauce = pickMonthlySauce(now);
+    if (monthlySauce) out.push(monthlySauce);
+    // 2) 두 번째 배너 = 기획 칼럼(고정).
+    out.push(GOSU_COLUMN);
+    // 3) 중간 칸 = 자동 로테이션(마지막 한 칸은 가이드 배너로 예약하므로 MONTHLY_COUNT-1까지만).
     const monthIdx = (now.getFullYear() - 2026) * 12 + now.getMonth();
     const start = (((monthIdx * 13) % pool.length) + pool.length) % pool.length;
     const step = Math.max(1, Math.floor(pool.length / MONTHLY_COUNT));
-    const out = [];
-    for (let i = 0; i < Math.min(MONTHLY_COUNT, pool.length); i++) {
-      out.push(pool[(start + i * step) % pool.length]);
+    for (let i = 0; out.length < MONTHLY_COUNT - 1 && i < pool.length; i++) {
+      const cand = pool[(start + i * step) % pool.length];
+      if (!out.includes(cand)) out.push(cand); // 이 달의 소스와 중복 방지
     }
+    // 4) 마지막 배너 = 가이드 배너(항상 끝에 고정).
+    out.push(GUIDE_BANNER);
     return out;
   }
 
@@ -586,15 +672,28 @@
     monthlyList = pickMonthlyFeatures();
     if (!monthlyList.length) { monthlyFeatureEl.hidden = true; return; }
     const total = monthlyList.length;
-    mfScroll.innerHTML = monthlyList.map((r) => {
-      // 히어로 전용 이미지(heroImg) 있으면 그걸, 없으면 카드 썸네일(img)로 폴백(2026-07-21)
-      const heroImg = r.heroImg || r.img;
-      // 이름 밑 부제(29CM식): 히어로용 짧은 카피 heroDesc 우선, 없으면 desc로 폴백(CSS가 1줄로 자름).
-      // 👉 깔끔하려면 레시피마다 heroDesc를 짧게(예: "언제 어디로든 달릴 준비" 처럼) 써두면 됨.
+    mfScroll.innerHTML = monthlyList.map((r, i) => {
       const tagline = r.heroDesc || r.desc;
       const desc = tagline ? '<div class="mf-desc">' + tagline + '</div>' : '';
+      // 특수 배너(기획 칼럼 / 가이드): 이미지 대신 임시 배경(bannerImg 있으면 그 사진) + 큰 이모지
+      if (r.isColumn || r.isGuide) {
+        const bg = r.bannerImg
+          ? 'background-image:url(' + r.bannerImg + ');background-size:cover;background-position:center;'
+          : 'background:' + r.bannerBg + ';';
+        const aria = r.isColumn ? ' 칼럼 열기' : ' 가이드 열기';
+        const kind = r.isGuide ? ' mf-hero--guide' : '';
+        return '<button class="mf-hero mf-hero--column' + kind + '" type="button" aria-label="' + r.title + aria + '">'
+          + '<div class="mf-colbg" style="' + bg + '"><span class="mf-colemoji">' + (r.emoji || '') + '</span></div>'
+          + '<div class="mf-caption"><div class="mf-name">' + (r.titleHtml || r.title) + '</div>' + desc + '</div>'
+          + '</button>';
+      }
+      // 히어로 전용 이미지(heroImg) 있으면 그걸, 없으면 카드 썸네일(img)로 폴백(2026-07-21)
+      const heroImg = r.heroImg || r.img;
+      // 첫 배너(i===0)에만 좌측 위 '이 달의 소스' 라벨 — '소스'만 빨강(.mf-badge-em)
+      const badge = i === 0 ? '<div class="mf-badge">이달의 <span class="mf-badge-em">소스</span></div>' : '';
       return '<button class="mf-hero" type="button" aria-label="' + r.name + ' 자세히 보기">'
         + '<img src="' + heroImg + '" alt="' + r.name + '" draggable="false">'
+        + badge
         + '<div class="mf-caption"><div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + desc + '</div>'
         + '</button>';
     }).join('');
@@ -602,7 +701,12 @@
     mfDots.innerHTML = monthlyList.map(() => '<i></i>').join('') + '<b class="mf-dots-pill"></b>';
     mfDots.hidden = total <= 1;
     const heroes = [...mfScroll.querySelectorAll('.mf-hero')];
-    heroes.forEach((el, i) => el.addEventListener('click', () => openModal(monthlyList[i])));
+    heroes.forEach((el, i) => el.addEventListener('click', () => {
+      const item = monthlyList[i];
+      if (item.isColumn) openColumn(item);
+      else if (item.isGuide) document.getElementById('guideOverlay').hidden = false;
+      else openModal(item);
+    }));
     const pill = mfDots.querySelector('.mf-dots-pill');
     const dotEls = [...mfDots.querySelectorAll('i')];
     // 스크롤 위치(소수 인덱스)로 막대를 점 위에 실시간 배치 → 손가락 따라 스르륵.
@@ -1488,6 +1592,55 @@
   document.getElementById('homeGuide').addEventListener('click', () => { guideOverlay.hidden = false; });
   document.getElementById('guideClose').addEventListener('click', () => { guideOverlay.hidden = true; });
   guideOverlay.addEventListener('click', (e) => { if (e.target === guideOverlay) guideOverlay.hidden = true; });
+
+  // ── 기획 칼럼 패널 ──────────────────────────────────────────
+  const columnOverlay = document.getElementById('columnOverlay');
+  const columnSheet = document.getElementById('columnSheet');
+  // ingFilter 재료가 ings에 든 레시피 자동 수집(고수 든 소스 등)
+  function getColumnSauces(col) {
+    return RECIPES.filter((r) =>
+      (!col.catFilter || r.cat === col.catFilter) &&
+      r.ings && r.ings.some((ing) => ing[0] === col.ingFilter));
+  }
+  function openColumn(col) {
+    const hero = document.getElementById('columnHero');
+    hero.style.cssText = col.bannerImg
+      ? 'background-image:url(' + col.bannerImg + ');background-size:cover;background-position:center;'
+      : 'background:' + col.bannerBg + ';';
+    document.getElementById('columnEmoji').textContent = col.emoji || '';
+    document.getElementById('columnTitle').textContent = col.title;
+    document.getElementById('columnSub').textContent = col.heroDesc || '';
+    document.getElementById('columnBody').innerHTML = col.body || '';
+    // 하단: 관련 소스 자동 목록(각 항목 클릭 → 칼럼 닫고 해당 레시피 열기)
+    const sauces = getColumnSauces(col);
+    document.getElementById('columnSauceCount').textContent = sauces.length;
+    const listEl = document.getElementById('columnSauceList');
+    listEl.innerHTML = sauces.map((r) => {
+      const amt = (r.ings.find((ing) => ing[0] === col.ingFilter) || []);
+      const amtTxt = [amt[1], amt[2]].filter(Boolean).join(' ');
+      const ver = r.ver ? '<span class="col-sauce-ver">' + r.ver + '</span>' : '';
+      const thumb = r.img
+        ? '<img class="col-sauce-thumb" src="' + r.img + '" alt="" draggable="false">'
+        : '<span class="col-sauce-thumb col-sauce-thumb--emoji">' + (r.emoji || '🥣') + '</span>';
+      return '<button class="col-sauce" type="button" data-rid="' + r.id + '">'
+        + thumb
+        + '<span class="col-sauce-meta"><span class="col-sauce-name">' + r.name + ver + '</span>'
+        + '<span class="col-sauce-amt">' + col.ingFilter + ' ' + amtTxt + '</span></span>'
+        + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        + '</button>';
+    }).join('');
+    [...listEl.querySelectorAll('.col-sauce')].forEach((el) => {
+      el.addEventListener('click', () => {
+        const r = RECIPES.find((x) => x.id === el.dataset.rid);
+        if (r) { closeColumn(); openModal(r); }
+      });
+    });
+    columnOverlay.hidden = false;
+    if (columnSheet) columnSheet.scrollTop = 0;
+  }
+  function closeColumn() { columnOverlay.hidden = true; }
+  document.getElementById('columnClose').addEventListener('click', closeColumn);
+  columnOverlay.addEventListener('click', (e) => { if (e.target === columnOverlay) closeColumn(); });
   gachaPull.addEventListener('click', gachaPullOnce);
   gachaAgain.addEventListener('click', gachaPullOnce);
   gachaClose.addEventListener('click', closeGacha);

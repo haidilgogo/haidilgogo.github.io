@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=397">
+<link rel="stylesheet" href="styles.css?v=420">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -449,6 +449,23 @@
   </div>
 </div>
 
+<!-- 기획 칼럼 패널(고수 빼주세요! 등) — 홈 배너에서 열림. 스크롤되는 전체화면 시트 -->
+<div class="column-overlay" id="columnOverlay" hidden>
+  <div class="column-sheet" id="columnSheet" role="dialog" aria-label="칼럼">
+    <button class="column-close" id="columnClose" type="button" aria-label="닫기">&times;</button>
+    <div class="column-hero" id="columnHero">
+      <span class="column-hero-emoji" id="columnEmoji">🌿</span>
+      <h2 class="column-title" id="columnTitle"></h2>
+      <p class="column-sub" id="columnSub"></p>
+    </div>
+    <div class="column-body" id="columnBody"></div>
+    <div class="column-sauces">
+      <h3 class="column-sauces-title">고수가 들어간 소스 <span class="column-sauces-count" id="columnSauceCount">0</span></h3>
+      <div class="column-sauce-list" id="columnSauceList"></div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="recipe-modal-scroll">
@@ -662,7 +679,7 @@
   </div>
 </div>
 
-<script src="script.js?v=312"></script>
+<script src="script.js?v=322"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
