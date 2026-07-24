@@ -1735,10 +1735,13 @@ img {
 
 .gacha-result {
   position: absolute;
-  /* 제목(위)·버튼(아래) 사이 밴드에만 카드를 배치해 어느 쪽과도 겹치지 않게 한다. */
-  top: 44px;
+  /* 그릇 스테이지(높이 220px) 영역에만 겹쳐 배치한다.
+     top/height를 스테이지에 맞춰 고정 → 아래 버튼·문구 높이가 바뀌어도 카드가 버튼을 침범하지 않는다.
+     (top 67px = 패딩+제목+gap 아래 = .gacha-stage 상단, height 220px = .gacha-stage 높이) */
+  top: 67px;
+  height: 220px;
   right: 0;
-  bottom: 62px;
+  bottom: auto;
   left: 0;
   display: flex;
   align-items: center;
@@ -1801,34 +1804,51 @@ img {
 
 .gacha-actions {
   display: none;
-  gap: 9px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;                  /* 버튼 ↔ '내일 또 만나요' 문구: 좁게 묶어 한 덩어리로 */
   width: 100%;
+  margin-top: 16px;          /* 카드 ↔ 버튼: 넓게 띄움 */
 }
 
-.gacha-view, .gacha-again {
-  flex: 1;
-  min-width: 0;
+/* '레시피 보기' = 로즈 소프트필 버튼. 카드가 주인공(카드 자체도 탭되어 상세 열림)이라
+   솔리드 빨강 대신 은근한 보조 CTA로. 델리케이트한 로즈 카드 톤과 맞춤(사용자 확정 2026-07-24). */
+.gacha-view {
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
-  font-size: 14px;
-  padding: 12px 10px;
-  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 13px 32px;        /* 폭 auto — 내용만큼만(전체폭 X) */
+  border-radius: 14px;       /* 둥근 사각(뽑기 버튼과 통일) */
   cursor: pointer;
-  text-align: center;
   white-space: nowrap;
-  transition: transform .15s ease, background-color .15s ease, border-color .15s ease;
+  border: none;
+  background: #F6E4DE;       /* 로즈 소프트필(카드 프레임 #E0A294 계열의 옅은 톤) */
+  color: #C0392B;            /* 짙은 브랜드 빨강 글자 */
+  box-shadow: 0 8px 18px rgba(110, 40, 30, .45); /* 깊은 브라운레드 그림자로 바닥에 앉힘(사용자 확정) */
+  transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.gacha-view { border: none; background: var(--brand-red); color: #fff; font-weight: 800; }
-.gacha-again { border: 1px solid var(--brand-red); background: #fff; color: var(--brand-red); font-weight: 700; }
+/* 재뽑기 없음 안내(하루 한 번) — 버튼 아님, 닫기는 X·바깥클릭이 처리 */
+.gacha-again-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: -.2px;
+  transform: translateX(-11.5px); /* 👋(18px)+gap(5px)의 절반 — 이모지 때문에 오른쪽으로 밀린 '내일 또 만나요' 텍스트를 버튼 중앙과 정렬 */
+}
+.gacha-note-ic { width: 18px; height: 18px; flex: none; display: inline-block; } /* Noto 손흔들기 정지 PNG(👋) — 기기 통일(텍스트 이모지 대신), 주사위와 동일 원칙 */
 
 @media (hover: hover) {
-  .gacha-pull:hover, .gacha-view:hover { background: var(--brand-red-hover); }
-  .gacha-again:hover { background: #FBEAE7; }
+  .gacha-pull:hover { background: var(--brand-red-hover); }
+  .gacha-view:hover { background: #F0D6CD; box-shadow: 0 11px 24px rgba(110, 40, 30, .48); } /* 살짝 진해지고 그림자 뜸 */
 }
 
-.gacha-pull:active, .gacha-view:active { transform: scale(.95); background: var(--brand-red-active); }
-.gacha-again:active { transform: scale(.95); background: #F5D7D1; }
+.gacha-pull:active { transform: scale(.95); background: var(--brand-red-active); }
+.gacha-view:active { transform: scale(.96); background: #EAC7BD; box-shadow: 0 3px 9px rgba(110, 40, 30, .40); } /* 눌리면 진해지고 그림자 낮아져 바닥에 눌림 */
 
 /* 데스크톱에서 가챠 팝업 크게 */
 @media (min-width: 100000px) {
@@ -1837,7 +1857,7 @@ img {
   .gacha-close { font-size: 30px; }
   .gacha-stage { transform: scale(1.36); margin: 36px 0; }
   .gacha-pull { font-size: 18px; padding: 16px 50px; }
-  .gacha-view, .gacha-again { font-size: 15px; padding: 14px 10px; }
+  .gacha-view { font-size: 17px; padding: 14px 36px; }
 }
 
 .modal-fav-btn {

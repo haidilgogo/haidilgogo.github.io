@@ -1563,7 +1563,6 @@
   const gachaPull = document.getElementById('gachaPull');
   const gachaActions = document.getElementById('gachaActions');
   const gachaView = document.getElementById('gachaView');
-  const gachaAgain = document.getElementById('gachaAgain');
   const GACHA_POOL = RECIPES.filter((r) => r.cat === '소스');
   const GACHA_CONFETTI = ['#E0301E', '#F8B888', '#FCE4AE', '#F5B8A8', '#E8C9A0', '#FFB07A', '#EF9F27'];
   // 그릇에 떨어지는 재료들(SVG, 필터 금지). x = 그릇 중앙 기준 가로 위치(px)
@@ -1663,7 +1662,6 @@
   function gachaPullOnce() {
     gachaResetBowl();
     gachaPull.style.pointerEvents = 'none';
-    gachaAgain.style.pointerEvents = 'none';
     // 결과를 미리 뽑아 이미지를 먼저 로드해둔다(카드가 흰 네모로 잠깐 보이는 현상 방지)
     let i;
     do { i = Math.floor(Math.random() * GACHA_POOL.length); } while (i === gachaLast && GACHA_POOL.length > 1);
@@ -1716,7 +1714,6 @@
         gachaConfetti();
         gachaPull.style.display = 'none';
         gachaActions.style.display = 'flex';
-        gachaAgain.style.pointerEvents = 'auto';
       };
       const cardImg = gachaResult.querySelector('.recipe-thumb-img');
       if (cardImg && cardImg.complete && cardImg.naturalWidth > 0) {
@@ -1760,7 +1757,6 @@
     gachaMat.style.opacity = '0';
     gachaBowlShadow.style.opacity = '0';
     gachaActions.style.display = 'flex';
-    gachaAgain.style.pointerEvents = 'auto';
   }
 
   let gachaPreloaded = false;
@@ -1842,7 +1838,6 @@
   document.getElementById('columnClose').addEventListener('click', closeColumn);
   columnOverlay.addEventListener('click', (e) => { if (e.target === columnOverlay) closeColumn(); });
   gachaPull.addEventListener('click', gachaPullOnce);
-  gachaAgain.addEventListener('click', closeGacha); // 하루 한 번 — '내일 또 만나요'는 재뽑기 없이 닫기만(2026-07-24)
   gachaClose.addEventListener('click', closeGacha);
   gachaOverlay.addEventListener('click', closeGacha);
   gachaModal.addEventListener('click', (e) => e.stopPropagation());
