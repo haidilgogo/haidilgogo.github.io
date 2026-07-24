@@ -1271,11 +1271,7 @@ img {
   }
 
   .recipe-name {
-    font-size: 15px;
-  }
-
-  .recipe-name--long {
-    font-size: 13px;
+    font-size: 15px; /* 긴 이름은 script.js의 fitCardTitle()이 실제 폭을 재서 이 크기에서 줄인다 */
   }
 
   .recipe-cat-label {
@@ -1743,7 +1739,6 @@ img {
    데스크톱 타이포(24px 등)를 쓰면 제목이 잘림 → 모바일 카드와 같은 크기를 항상 적용 */
 .gacha-result .recipe-body { padding: 9px 11px 10px; column-gap: 8px; }
 .gacha-result .recipe-name { font-size: 15px; }
-.gacha-result .recipe-name--long { font-size: 13px; }
 .gacha-result .recipe-ver { font-size: 12px; }
 
 /* 가챠 결과 카드: 좋아요·책갈피·카테고리 배지 모두 숨김(소스만 나와 배지는 정보 중복).
@@ -2874,7 +2869,10 @@ img {
 @media all {
   /* 모바일 = 한 줄에 2개(사용자 확정) — 컴팩트 가로 카드라 2칸이어도 날짜·매장명이 들어감 */
   .stamps {
-    grid-template-columns: repeat(2, 1fr);
+    /* minmax(0,·)가 핵심: 그냥 1fr이면 최소값이 auto라, 긴 동행("회사 사람들이랑…") 한 줄이
+       칸을 넓혀 2칸이 250px/166px로 짝짝이가 된다. 0을 최소로 박아야 칸이 반반 유지되고
+       넘치는 글자는 .stamp-rec-with의 …로 넘어간다. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 10px;
     row-gap: 10px;
   }
@@ -2893,6 +2891,7 @@ img {
 .stamp-rec {
   display: flex;
   align-items: center;
+  min-width: 0; /* 그리드 칸(minmax(0,1fr))보다 커지지 않게 — 긴 글자는 카드를 넓히지 말고 … 처리 */
   gap: 14px;
   background: var(--bg-cream);
   border: 1px solid var(--card-border);
@@ -2934,6 +2933,9 @@ img {
   font-size: 13.5px;
   color: var(--text-muted);
   white-space: nowrap;
+  /* 직접 입력은 길이 제한이 없어 카드를 밀어낼 수 있다 → 넘치면 …로 자른다(전체는 카드 탭 → 보기 모달에). */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 빈 상태 — 전체(첫 기록 유도) / 지역(그 지역만 없음) 공용 */
@@ -2970,7 +2972,9 @@ img {
   height: 100%;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 3px 5px rgba(80, 30, 20, 0.24));
+  /* 두 겹 그림자(2026-07-24) — 한 겹이면 흐림이 내림보다 커서 위쪽으로도 번져 '떠 있는' 인상이 된다.
+     닿는 면(짧고 진하게) + 확산(넓고 연하게)으로 나누면 종이가 놓인 것처럼 보인다. 세 곳 모두 같은 방식. */
+  filter: drop-shadow(0 0.5px 1px rgba(80, 30, 20, 0.22)) drop-shadow(0 2px 3.5px rgba(80, 30, 20, 0.13));
 }
 /* 아직 그림 없는 지점의 자리표시 카드 — 스티커 톤에 맞춘 라운드 카드 */
 .stamp-ph {
@@ -3119,7 +3123,7 @@ img {
 .stamp-view-sticker img {
   width: 100%;
   display: block;
-  filter: drop-shadow(0 10px 16px rgba(80, 30, 20, 0.28));
+  filter: drop-shadow(0 1px 2px rgba(80, 30, 20, 0.22)) drop-shadow(0 5px 9px rgba(80, 30, 20, 0.13));
 }
 .stamp-view-sticker .stamp-ph { aspect-ratio: 0.58; } /* 그림 없는 지점 자리표시 */
 .stamp-view-info {
@@ -3192,14 +3196,18 @@ img {
 .stamp-slot {
   width: 158px;
   aspect-ratio: 0.58;
-  margin: 4px auto 16px;
+  /* 점선 자리가 아래 inset:-12px로 슬롯 밖까지 나오므로 위아래 여백을 그만큼 더 준다
+     (예전 4px/16px 그대로면 점선이 메모칸·붙이기 버튼에 바짝 붙는다) */
+  margin: 26px auto 36px;
   position: relative;
 }
 .stamp-slot-empty {
   position: absolute;
-  inset: 0;
+  /* 스티커보다 한 겹 크게 — 스티커가 -3.5° 비스듬히 붙어도 점선이 사방에 고르게 남아 액자처럼 감싼다.
+     inset:0이던 시절엔 똑바른 점선의 한쪽 모서리만 삐져나와 '그림자 낀 것처럼' 보였다(2026-07-24). */
+  inset: -12px;
   border: 2.5px dashed #D6C6BA;
-  border-radius: 14px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.5);
   display: flex;
   flex-direction: column;
@@ -3226,7 +3234,7 @@ img {
   height: 100%;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 6px 11px rgba(80, 30, 20, 0.3));
+  filter: drop-shadow(0 1px 1.5px rgba(80, 30, 20, 0.22)) drop-shadow(0 4px 7px rgba(80, 30, 20, 0.13));
 }
 .stamp-slot-card.pop {
   animation: stampPop 0.55s cubic-bezier(.2, .8, .3, 1) both;
@@ -3236,6 +3244,22 @@ img {
   55%  { transform: scale(0.93) rotate(-2deg); opacity: 1; }
   78%  { transform: scale(1.045) rotate(-5deg); }
   100% { transform: scale(1) rotate(-3.5deg); }
+}
+
+/* 붙는 동안의 그림자 — 착지(55%)에 맞춰 그림자도 '탁' 확정시킨다.
+   img에 고정 filter만 두면 그림자가 부모 scale(2.1→0.93→1.045→1)에 딸려 다녀서,
+   스티커는 0.30초에 붙었는데 그림자만 0.55초까지 출렁여 한 박자 늦어 보였다(2026-07-24).
+   ⚠️ 각 구간의 drop-shadow 개수를 2개로 맞춰야 브라우저가 부드럽게 보간한다(개수가 다르면 뚝 끊김). */
+.stamp-slot-card.pop img {
+  animation: stampShadowDrop 0.55s cubic-bezier(.2, .8, .3, 1) both;
+}
+@keyframes stampShadowDrop {
+  /* 공중 — 아직 안 닿았으니 거의 안 보이게(부모 scale 2.1배라 값이 커 보이는 것도 감안) */
+  0%, 45% { filter: drop-shadow(0 1px 1.5px rgba(80, 30, 20, 0.05)) drop-shadow(0 3px 6px rgba(80, 30, 20, 0.06)); }
+  /* 닿는 순간 — 살짝 더 진하게 눌러 붙는 맛을 준다 */
+  55%     { filter: drop-shadow(0 1px 1.5px rgba(80, 30, 20, 0.26)) drop-shadow(0 3px 6px rgba(80, 30, 20, 0.16)); }
+  /* 최종 = 평상시 값(.stamp-slot-card img)과 동일해야 연출이 끝나도 안 튄다 */
+  100%    { filter: drop-shadow(0 1px 1.5px rgba(80, 30, 20, 0.22)) drop-shadow(0 4px 7px rgba(80, 30, 20, 0.13)); }
 }
 
 .stamp-q {

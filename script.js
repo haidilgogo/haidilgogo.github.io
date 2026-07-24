@@ -509,6 +509,34 @@
   // 연예인 "스타 표시" — 제목 첫 글자 왼쪽 위 골드 별 (그라데이션 def는 index.html)
   const STAR_SVG = '<svg class="star-accent" viewBox="0 0 24 24" fill="url(#starGold)" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
 
+  // ── 카드 제목 자동 맞춤 ──────────────────────────────────
+  // 예전엔 "이름 10글자 이상이면 작게(recipe-name--long)"로 쟀는데, 글자마다 폭이 달라서
+  // (한글 vs 영문/숫자, 괄호 수식어 .name-sub는 0.5em) 9글자인데 잘리거나 11글자인데 여유가
+  // 남는 카드가 생겼다. 그래서 글자수 대신 **실제 렌더 폭**을 재서 들어갈 만큼만 줄인다.
+  // 텍스트 폭은 폰트 크기에 거의 비례하므로 한 번에 필요한 크기를 계산하고, 반올림 오차만
+  // 0.5px씩 마저 줄인다(카드 33장 × 매번 while 루프는 리플로우가 아까움).
+  const TITLE_MIN_RATIO = 0.72; // 기준 크기의 72%가 하한 — 그보다 길면 나머지는 CSS ellipsis(…)에 맡긴다
+  function fitCardTitle(el) {
+    // 폭 0 = 숨겨진 탭. 이땐 아무것도 건드리지 않는다(리셋해두면 다시 보일 때까지 잘린 채로 남음)
+    if (!el.clientWidth) return;
+    el.style.fontSize = ''; // CSS 기준 크기로 되돌리고 다시 잰다(캐시된 카드는 지난번 값이 남아 있음)
+    const avail = el.clientWidth;
+    if (el.scrollWidth <= avail) return;
+    const base = parseFloat(getComputedStyle(el).fontSize);
+    const min = base * TITLE_MIN_RATIO;
+    let size = Math.max(min, base * (avail / el.scrollWidth));
+    el.style.fontSize = size + 'px';
+    for (let i = 0; i < 4 && size > min && el.scrollWidth > avail; i++) {
+      size = Math.max(min, size - 0.5);
+      el.style.fontSize = size + 'px';
+    }
+  }
+  function fitCardTitles(root) {
+    (root || document).querySelectorAll('.recipe-name').forEach(fitCardTitle);
+  }
+  // 웹폰트(Pretendard)가 늦게 오면 fallback 폰트 폭으로 잰 결과라 틀림 → 도착하면 전부 다시 잰다
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitCardTitles());
+
   // 카드 1장(그리드·가챠 결과 공용) — 완전히 같은 마크업/핸들러를 쓰므로 스타일이 항상 동일하다.
   function buildCard(r, opts) {
     opts = opts || {};
@@ -522,7 +550,7 @@
         <div class="recipe-card-inner">
           <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}" draggable="false" loading="${opts.eager ? 'eager' : 'lazy'}"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${showSource ? `<div class="recipe-thumb-source">${sourceHtml(r.source)}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}</div>
           <div class="recipe-body">
-            <h3 class="recipe-name${r.name.length >= 10 ? ' recipe-name--long' : ''}${r.star ? ' has-star' : ''}">${r.star ? STAR_SVG : ''}${r.nameHtml || r.name}</h3>
+            <h3 class="recipe-name${r.star ? ' has-star' : ''}">${r.star ? STAR_SVG : ''}${r.nameHtml || r.name}</h3>
             <span class="recipe-ver">${r.ver || ''}</span>
             <button class="like-btn${likedByMe.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="좋아요"><svg width="17" height="17" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="like-count">${getLikeCount(r.id)}</span></button>
           </div>
@@ -867,7 +895,10 @@
       }
       gridEl.appendChild(el);
     });
+    fitCardTitles(gridEl); // 붙인 뒤라야 실제 폭을 잴 수 있다
   }
+  // 화면 폭이 바뀌면(회전·창 크기·탭 전환으로 그리드가 다시 보일 때) 기준 폰트도 바뀌므로 다시 잰다
+  if (window.ResizeObserver) new ResizeObserver(() => fitCardTitles(gridEl)).observe(gridEl);
 
   // ── 홈 섹션 렌더링(2026-07-21 7단 구조) ──
   // ② 셀럽 레일: person 필드로 그룹핑. 사진(assets/people/<이름>.jpg)이 없으면 이니셜 원으로 표시
@@ -1655,6 +1686,7 @@
       gachaResult.innerHTML = '';
       // eager: 결과 카드는 바로 보여야 하므로 지연 로딩 없이 즉시 로드(딜레이 방지, 이미지는 openGacha 때 프리로드됨)
       gachaResult.appendChild(buildCard(r, { hideSource: true, eager: true, onOpen: () => { closeGacha(); openModal(r); } }));
+      fitCardTitles(gachaResult);
       let revealed = false;
       const reveal = () => {
         if (revealed) return;
@@ -2414,11 +2446,12 @@
     nm.className = 'stamp-rec-name';
     nm.textContent = rec.name;
     info.appendChild(nm);
-    // 동행 — 있을 때만. 카드엔 프리셋이면 그 값, 직접 입력(프리셋에 없는 값)이면 '기타'(상세는 보기 모달에 실제 값).
+    // 동행 — 있을 때만. 카드엔 문장형('가족'→'가족과 함께'), 직접 입력은 적은 그대로.
+    // 저장값은 프리셋 원본('가족')이고 문장은 표시용이라, 수정 시트·보기 모달은 종전대로 원본을 쓴다.
     if (rec.with) {
       const w = document.createElement('div');
       w.className = 'stamp-rec-with';
-      w.textContent = COMPANIONS.includes(rec.with) ? rec.with : '기타';
+      w.textContent = WITH_CARD_LABELS[rec.with] || rec.with; // 프리셋에 없으면 = 직접 입력 → 적은 그대로(길면 CSS가 …)
       info.appendChild(w);
     }
     card.appendChild(info);
@@ -2573,6 +2606,16 @@
   // ── 누구랑(동행) — 드롭다운(프리셋) + "직접 입력" 선택 시 자유 입력 칸. 선택 항목(비워도 됨). ──
   const COMPANIONS = ['혼자', '가족', '친구', '연인', '동료', '지인'];
   const WITH_CUSTOM = '직접 입력';
+  // 스티커 카드에만 쓰는 문장형 표기(일기 말투). 드롭다운·수정·보기 모달은 짧은 원본을 그대로 쓴다.
+  // 조사가 받침에 따라 갈리므로('가족과' vs '친구와') 규칙 대신 표로 적어둠 — 프리셋 추가 시 여기도 한 줄 추가.
+  const WITH_CARD_LABELS = {
+    '혼자': '나 혼자',
+    '가족': '가족과 함께',
+    '친구': '친구와 함께',
+    '연인': '연인과 함께',
+    '동료': '동료와 함께',
+    '지인': '지인과 함께',
+  };
   const stampWithEl = document.getElementById('stampWith'); // 직접 입력 칸(직접 입력 선택 때만 보임)
   const stampWithDdEl = document.getElementById('stampWithDd');
   const stampWithDdBtn = document.getElementById('stampWithDdBtn');
