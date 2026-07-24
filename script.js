@@ -319,12 +319,14 @@
     }
   })();
 
-  let activeCat = '전체';       // '전체'가 아니면 카테고리 전체보기(그리드 뷰) 상태
-  let personFilter = null;      // 셀럽 레일에서 인물을 고르면 그 사람 레시피만(그리드 뷰)
+  // 2026-07-25 확정: 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 필터(AND) — 홈/브라우즈 구분은
+  // activeCat 등 필터값으로 유추하지 않고 이 browsing 플래그로 직접 관리한다(전체 탭 선택 상태와 홈이 값만으로는
+  // 구분 안 되기 때문). 브라우즈 진입 = enterBrowse/즐겨찾기버튼, 탈출 = 헤더 X(닫기) 버튼뿐.
+  let browsing = false;
+  let activeCat = '전체';       // 브라우즈 중 선택된 카테고리 탭('전체' 포함)
+  let personFilter = null;      // 셀럽 레일에서 인물을 고르면 그 사람 레시피만(다른 필터와 겹침)
   let query = '';
   let showFavoritesOnly = false;
-  let browseListMode = false;   // 전체보기 결과를 세로 리스트(랭킹 행)로 표시(인기소스 전체보기 전용, 2026-07-23)
-  let sortMode = 'popular'; // 'popular'(좋아요) | 'recent'(날짜) | 'name'(가나다)
   const FAVORITES_KEY = 'haidilao_favorites';
   let favorites;
   try {
@@ -395,14 +397,14 @@
       // 집계가 바뀔 때마다(내가/남이 눌렀든) 실시간으로 화면 숫자 갱신.
       // 🐛 첫 로드 땐 좋아요가 아직 도착 전이라 인기순이 전부 0으로 정렬돼 어긋남(사실상 가나다순).
       //    Firebase에서 좋아요가 처음 오면, 인기순일 때 딱 한 번 재정렬해 바로잡는다.
-      //    (cardCache 재사용이라 깜빡임 없음. 이후엔 숫자만 갱신 — 사용자가 좋아요 눌렀을 때 카드가 튀지 않게.)
+      //    (browseCardCache 재사용이라 깜빡임 없음. 이후엔 숫자만 갱신 — 사용자가 좋아요 눌렀을 때 카드가 튀지 않게.)
       let likesInitialSorted = false;
       likesRef.on('value', (snapshot) => {
         likeCounts = snapshot.val() || {};
         saveLikes();
         if (!likesInitialSorted) {
           // 첫 도착: 인기순 그리드 재정렬 + 홈 인기소스 순위도 실데이터로 다시 그림
-          if (sortMode === 'popular') renderGrid();
+          renderGrid();
           if (typeof renderHomePopular === 'function') renderHomePopular();
           refreshLikeCounts();
         } else {
@@ -438,10 +440,6 @@
   const searchBox = document.querySelector('.search-box');
   const favToggleBtn = document.getElementById('favToggleBtn');
   const favToggleIcon = document.getElementById('favToggleIcon');
-  const sortDd = document.getElementById('sortDd');
-  const sortDdBtn = document.getElementById('sortDdBtn');
-  const sortDdMenu = document.getElementById('sortDdMenu');
-  const sortDdCurrent = document.getElementById('sortDdCurrent');
   const homeBtn = document.getElementById('homeBtn');
   const modalOverlay = document.getElementById('modalOverlay');
   const modalScroll = document.getElementById('recipe-modal-scroll');
@@ -450,10 +448,10 @@
 
   function getFiltered() {
     const q = query.trim();
-    // 검색·즐겨찾기는 카테고리·인물과 독립 — 둘 중 하나라도 켜지면 전체에서 필터함
-    const ignoreCat = showFavoritesOnly || q;
-    let filtered = RECIPES.filter((r) => ignoreCat || activeCat === '전체' || r.cat === activeCat);
-    if (!ignoreCat && personFilter) {
+    // 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 이중 필터(AND)다(2026-07-25 확정) —
+    // 예: 즐겨찾기 켠 채 '탕' 탭 → 즐겨찾기한 것 중 탕만. 검색 중 '소스' 탭 → 검색 결과 중 소스만.
+    let filtered = RECIPES.filter((r) => activeCat === '전체' || r.cat === activeCat);
+    if (personFilter) {
       filtered = filtered.filter((r) => r.person === personFilter);
     }
     if (showFavoritesOnly) {
@@ -464,26 +462,10 @@
         r.name.includes(q) || (r.ings || []).some((i) => i[0].includes(q))
       );
     }
-    // 정렬: 동점은 가나다순
+    // 정렬은 인기순 고정(좋아요 많은 순, 동점은 가나다순, 2026-07-24 정렬 드롭다운 삭제 결정)
     const byName = (a, b) => a.name.localeCompare(b.name, 'ko');
     const sorted = filtered.slice();
-    if (sortMode === 'popular') {
-      // 좋아요(하트) 많은 순, 동점은 가나다순
-      sorted.sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || byName(a, b));
-    } else if (sortMode === 'recent') {
-      // 최신순: 날짜(YYYY-MM-DD 문자열) 내림차순, 동점은 가나다순. 날짜 없는 건 맨 아래에 가나다순
-      sorted.sort((a, b) => {
-        const da = a.date || '';
-        const db = b.date || '';
-        if (da && db) return db.localeCompare(da) || byName(a, b);
-        if (da) return -1;
-        if (db) return 1;
-        return byName(a, b);
-      });
-    } else if (sortMode === 'name') {
-      // 가나다순: 한글 정렬
-      sorted.sort(byName);
-    }
+    sorted.sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || byName(a, b));
     return sorted;
   }
 
@@ -586,10 +568,6 @@
     });
     return card;
   }
-
-  // 카드 DOM 캐시 — 레시피당 한 번만 생성하고 탭·정렬·검색 때는 같은 노드를 재배치만 한다.
-  // 매번 새로 만들면 <img>가 재디코딩되어 썸네일이 깜빡이고 늦게 뜸(탭 이동 시 딜레이의 원인).
-  const cardCache = new Map();
 
   // ── 이 달의 레시피(월간 히어로 카레셀) ── 매월 자동 교체(서버 없이 월 계산). 큰 이미지 히어로 3-5개를 가로 스와이프.
   const monthlyFeatureEl = document.getElementById('monthlyFeature');
@@ -807,14 +785,13 @@
   const listTitleEl = document.getElementById('listTitle');
 
   function isHome() {
-    return activeCat === '전체' && !personFilter && !query.trim() && !showFavoritesOnly;
+    return !browsing;
   }
   function syncHome() {
     const home = isHome();
     viewRecipeEl.classList.toggle('is-home', home);
-    // 검색은 메인(홈)에선 숨기고 전체보기 등 브라우즈 화면에서만 노출(2026-07-22 결정)
-    searchBox.classList.toggle('search-box--hidden', home);
-    if (home) searchBox.classList.remove('open'); // 숨길 때 펼침 상태도 접기
+    // 검색창·카테고리탭·닫기버튼이 전부 list-head 안(개수 옆·윗줄)에 있어 홈에서는 list-head 자체가
+    // 숨겨지며 함께 숨음(2026-07-25) — 개별 요소 hidden 토글 불필요
   }
   function browseTitle() {
     if (query.trim()) return '검색 결과';
@@ -823,9 +800,10 @@
     if (activeCat !== '전체') return activeCat;
     return '레시피';
   }
-  // 홈 섹션(전체 ›·아바타)에서 그리드 뷰로 들어가거나(cat/person), 초기화해 홈으로 돌아옴
+  // 홈 섹션(전체 ›·아바타)에서 브라우즈로 들어감(cat/person) — 항상 홈에서만 호출되므로
+  // 즐겨찾기·검색은 이미 꺼져 있는 게 보장되지만 방어적으로 한 번 더 초기화
   function enterBrowse(cat, person) {
-    browseListMode = false;       // 기본은 그리드(인기소스 전체보기만 이후에 리스트로 켬)
+    browsing = true;
     activeCat = cat || '전체';
     personFilter = person || null;
     if (showFavoritesOnly) {
@@ -840,7 +818,23 @@
     renderGrid();
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
-  function goHome() { enterBrowse('전체', null); }
+  // 헤더 X(닫기) — 브라우즈의 유일한 탈출구. 탭·즐겨찾기·검색을 전부 리셋하고 홈으로.
+  function goHome() {
+    browsing = false;
+    activeCat = '전체';
+    personFilter = null;
+    if (showFavoritesOnly) {
+      showFavoritesOnly = false;
+      favToggleBtn.classList.remove('active');
+    }
+    if (query) {
+      query = '';
+      searchInput.value = '';
+      searchBox.classList.remove('has-value');
+    }
+    renderGrid();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
 
   function syncMonthlyFeature() {
     // 홈에서만 노출 — 필터 중엔 결과에 집중
@@ -849,13 +843,113 @@
     if (!monthlyFeatureEl.hidden && monthlyUpdatePill) monthlyUpdatePill();
   }
 
+  // ── 전체보기(브라우즈) 화면 — 전체/소스/히든메뉴/탕 카테고리 탭 (2026-07-24 개편, 2026-07-25 이중 필터로 재구조화) ──
+  // 탭은 브라우즈 중 항상 표시(전체 포함)되고, 즐겨찾기·검색·인물과 서로 겹치는 필터로 동작한다(getFiltered 참고).
+  // 소스 탭에서만 상위 5개 썸네일에 순위 배지(homeRankBadge) 표시. 구 TCG 카드는 gacha 결과에만 남음.
+  const BROWSE_TABS = ['전체', '소스', '히든메뉴', '탕'];
+  const browseCatTabsEl = document.getElementById('browseCatTabs');
+  const browseCatUnderlineEl = document.getElementById('browseCatUnderline');
+  const browseCardCache = new Map(); // 브라우즈 그리드 카드(clean card) 캐시
+  const browseCloseEl = document.getElementById('browseClose');
+
+  function updateBrowseCatUnderline() {
+    const active = browseCatTabsEl.querySelector('.tab-btn.active');
+    if (active && active.offsetWidth) {
+      browseCatUnderlineEl.style.width = active.offsetWidth + 'px';
+      browseCatUnderlineEl.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    }
+  }
+  // list-head가 홈에서는 통째로 숨겨지므로 브라우즈 중일 때만 다시 그리면 충분
+  function renderBrowseCatTabs() {
+    if (!browsing) return;
+    browseCatTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    BROWSE_TABS.forEach((cat) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (cat === activeCat ? ' active' : '');
+      btn.textContent = cat;
+      btn.addEventListener('click', () => {
+        if (activeCat === cat) return;
+        activeCat = cat;
+        renderGrid();
+      });
+      browseCatTabsEl.appendChild(btn);
+    });
+    updateBrowseCatUnderline();
+  }
+
+  // 즐겨찾기(북마크) — 브라우즈 카드 이미지 위 오버레이. 흰 아이콘+그림자(어떤 사진 위에서도 보이게, Q2 확정).
+  const FAV_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+  // span(버튼 아님) — hc-row-like와 같은 이유: 이 카드 자체가 <button>이라 그 안에 진짜 <button>을 중첩하면
+  // 브라우저가 파싱 중 바깥 버튼을 조기 종료시켜 DOM이 깨짐(실측 확인, 2026-07-24).
+  function browseFavHtml(r) {
+    return '<span class="browse-fav' + (favorites.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="즐겨찾기">' + FAV_SVG + '</span>';
+  }
+  function bindBrowseFav(container) {
+    container.querySelectorAll('.browse-fav').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+        saveFavorites();
+        btn.classList.toggle('active', favorites.has(id));
+      });
+    });
+  }
+  function browseLikeHtml(r) {
+    return '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>';
+  }
+  function bindBrowseLike(container) {
+    container.querySelectorAll('.hc-row-like').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = el.dataset.id;
+        toggleLike(id);
+        el.classList.toggle('active', likedByMe.has(id));
+        el.querySelector('.like-count').textContent = getLikeCount(id);
+        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+      });
+    });
+  }
+  // 그리드 카드(소스/히든메뉴/탕 공통) — 이미지 우상단 즐겨찾기. 아래는 이름(위)+부제(아래) 텍스트 칼럼과
+  // 좋아요(오른쪽, 세로 가운데)를 감싸는 박스(.hc-card-foot)로 — 썸네일이 제각각이라 이름이 묻히는 문제 해결(2026-07-25).
+  // 박스 높이는 부제 있는 카드 기준으로 고정(.hc-card-txt min-height)해 부제 유무와 무관하게 카드 높이 통일.
+  // 순위 배지는 빈 슬롯(.hc-badge-slot)만 만들어두고, 실제 배지는 syncBrowseGridCard가 매 렌더마다 채운다
+  // (좋아요 수가 바뀌어 순위가 달라질 수 있어 캐시된 카드도 배지를 다시 계산해야 함).
+  function buildBrowseGridCard(r) {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'hc-card hc-card--browse';
+    el.dataset.id = r.id;
+    el.innerHTML = '<span class="hc-thumb"><span class="hc-badge-slot"></span>' + browseFavHtml(r) + homeCardBody(r) + '</span>'
+      + '<span class="hc-card-foot">'
+      + '<span class="hc-card-txt"><span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
+      + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
+      + browseLikeHtml(r)
+      + '</span>';
+    el.addEventListener('click', () => openModal(r));
+    bindBrowseFav(el);
+    bindBrowseLike(el);
+    return el;
+  }
+  // rankIdx: 0-based 순위(배지 표시), null이면 배지 없음. 캐시 히트여도 매번 호출해 배지·즐겨찾기·좋아요를 최신화.
+  function syncBrowseGridCard(el, r, rankIdx) {
+    el.querySelector('.hc-badge-slot').innerHTML = rankIdx != null ? homeRankBadge(rankIdx) : '';
+    el.querySelector('.browse-fav').classList.toggle('active', favorites.has(r.id));
+    const lb = el.querySelector('.hc-row-like');
+    lb.classList.toggle('active', likedByMe.has(r.id));
+    lb.querySelector('.like-count').textContent = getLikeCount(r.id);
+  }
+
   function renderGrid() {
     syncHome();
     syncMonthlyFeature();
     const filtered = getFiltered();
     listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
-    gridEl.classList.toggle('is-list', browseListMode); // 리스트형(인기소스 전체보기) ↔ 그리드
+    renderBrowseCatTabs();
+    // 즐겨찾기 켜져 있는 동안엔 닫기(X) 숨김 — 나가는 길은 즐겨찾기 버튼 하나로 통일(2026-07-25)
+    browseCloseEl.hidden = showFavoritesOnly;
     gridEl.innerHTML = '';
     if (filtered.length === 0) {
       const empty = document.createElement('p');
@@ -870,40 +964,18 @@
       gridEl.appendChild(empty);
       return;
     }
-    // 리스트형: 랭킹 행(순위 숫자 + 썸네일 + 이름 + 좋아요). 클릭 시 상세.
-    if (browseListMode) {
-      gridEl.innerHTML = filtered.map((r, i) =>
-        '<button class="hc-row hp-rank-row" type="button" data-id="' + r.id + '">'
-        + '<span class="hp-rank-num">' + (i + 1) + '</span>'
-        + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
-        + '<span class="hc-row-name">' + (r.nameHtml || r.name) + (r.ver ? '<span class="hp-ver">' + r.ver + '</span>' : '') + '</span>'
-        + '<span class="hc-row-like"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span class="hc-row-like-n like-count" data-id="' + r.id + '">' + getLikeCount(r.id) + '</span></span>'
-        + '</button>'
-      ).join('');
-      gridEl.querySelectorAll('[data-id]').forEach((btn) => {
-        const r = RECIPES.find((x) => x.id === btn.dataset.id);
-        if (r) btn.addEventListener('click', () => openModal(r));
-      });
-      return;
-    }
-    filtered.forEach((r) => {
-      let el = cardCache.get(r.id);
+    // 소스 탭일 때만 상위 5개에 순위 배지(검색·즐겨찾기와 겹쳐 있어도 동일). 그 외엔 배지 없는 동일한 클린 카드(2026-07-25).
+    const showBadge = activeCat === '소스';
+    filtered.forEach((r, i) => {
+      let el = browseCardCache.get(r.id);
       if (!el) {
-        el = buildCard(r);
-        cardCache.set(r.id, el);
-      } else {
-        // 캐시된 카드가 그리드 밖에 있는 동안 모달 등에서 상태가 바뀌었을 수 있어 다시 동기화
-        el.querySelector('.fav-star').classList.toggle('active', favorites.has(r.id));
-        const lb = el.querySelector('.like-btn');
-        lb.classList.toggle('active', likedByMe.has(r.id));
-        lb.querySelector('.like-count').textContent = getLikeCount(r.id);
+        el = buildBrowseGridCard(r);
+        browseCardCache.set(r.id, el);
       }
+      syncBrowseGridCard(el, r, (showBadge && i < 5) ? i : null);
       gridEl.appendChild(el);
     });
-    fitCardTitles(gridEl); // 붙인 뒤라야 실제 폭을 잴 수 있다
   }
-  // 화면 폭이 바뀌면(회전·창 크기·탭 전환으로 그리드가 다시 보일 때) 기준 폰트도 바뀌므로 다시 잰다
-  if (window.ResizeObserver) new ResizeObserver(() => fitCardTitles(gridEl)).observe(gridEl);
 
   // ── 홈 섹션 렌더링(2026-07-21 7단 구조) ──
   // ② 셀럽 레일: person 필드로 그룹핑. 사진(assets/people/<이름>.jpg)이 없으면 이니셜 원으로 표시
@@ -1467,88 +1539,30 @@
     renderGrid();
   });
 
+  // 검색은 카테고리 탭과 겹치는 필터(AND, 2026-07-25 확정) — activeCat을 건드리지 않는다.
+  // 홈에서는 검색창 자체가 안 보이므로(list-head가 숨김) 검색은 항상 이미 브라우즈 중일 때만 일어난다.
   searchInput.addEventListener('input', (e) => {
     query = e.target.value;
-    browseListMode = false;       // 검색은 그리드로
     searchBox.classList.toggle('has-value', query.length > 0);
-    // 검색은 카테고리·인물과 독립 — 검색 시작하면 전체보기·인물 보기에서 빠져나옴
-    if (query.trim() && (activeCat !== '전체' || personFilter)) {
-      activeCat = '전체';
-      personFilter = null;
-    }
     renderGrid();
   });
-  // ── 검색 토글(2026-07-21) ── 돋보기(searchToggle)는 박스 밖에 상시 표시 = "다시 누르면 접히는 버튼"임을 인지시킴.
-  // 열기=박스 펼침+포커스 / 닫기=돋보기 다시 탭(검색어도 리셋). blur 자동접힘은 비어있고 포커스도 없을 때만.
-  const searchToggle = document.getElementById('searchToggle');
-  function openSearch() {
-    searchBox.classList.add('open');
-    searchToggle.setAttribute('aria-label', '검색 닫기');
-    searchInput.focus();
-  }
-  function closeSearch() { // 돋보기 다시 탭 = 명시적 닫기(검색어 리셋 후 접힘)
-    query = '';
-    browseListMode = false;
-    searchInput.value = '';
-    searchBox.classList.remove('open', 'has-value');
-    searchToggle.setAttribute('aria-label', '검색 열기');
-    searchInput.blur();
-    renderGrid();
-  }
-  function collapseSearch() {
-    // blur 자동 접힘: 비어 있고 포커스도 없을 때만 → X(지우기)로 지운 직후엔 재포커스 상태라 안 접힘(글씨만 지워짐)
-    if (query.trim()) return;
-    if (document.activeElement === searchInput) return;
-    searchBox.classList.remove('open');
-    searchToggle.setAttribute('aria-label', '검색 열기');
-  }
-  searchToggle.addEventListener('click', () => {
-    if (searchBox.classList.contains('open')) closeSearch();
-    else openSearch();
-  });
-  // blur 직후 ✕(지우기) 클릭이 씹히지 않게 살짝 늦춰 접음
-  searchInput.addEventListener('blur', () => setTimeout(collapseSearch, 150));
+  // 즐겨찾기도 카테고리 탭과 겹치는 필터 — 홈에서 켜면 브라우즈 진입, 브라우즈 중 켜면 현재 탭 유지.
+  // 끌 때는 "켰던 자리"로: 홈에서 켰으면 꺼질 때 홈으로, 브라우즈 중 켰으면 꺼져도 그 브라우즈에 남음(2026-07-25 수정).
+  let favEnteredFromHome = false;
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
-    browseListMode = false;       // 즐겨찾기는 그리드로
     favToggleBtn.classList.toggle('active', showFavoritesOnly);
-    // 즐겨찾기도 카테고리·인물과 독립 — 켤 때 전체보기·인물 보기에서 빠져나옴
-    if (showFavoritesOnly && (activeCat !== '전체' || personFilter)) {
-      activeCat = '전체';
-      personFilter = null;
+    if (showFavoritesOnly) {
+      favEnteredFromHome = !browsing;
+      browsing = true;
+    } else if (favEnteredFromHome) {
+      browsing = false;
+      favEnteredFromHome = false;
     }
     renderGrid();
-  });
-  const SORT_LABELS = { popular: '♥️ 인기순', recent: '🕐 최신순', name: '🔤 가나다순' };
-  function openSortMenu(open) {
-    sortDd.classList.toggle('open', open);
-    sortDdBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  function setSort(mode) {
-    sortMode = mode;
-    sortDdCurrent.textContent = SORT_LABELS[mode];
-    sortDdMenu.querySelectorAll('.sort-dd-item').forEach((it) => {
-      it.classList.toggle('active', it.dataset.sort === mode);
-    });
-    renderGrid();
-  }
-  sortDdBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openSortMenu(!sortDd.classList.contains('open'));
-  });
-  sortDdMenu.querySelectorAll('.sort-dd-item').forEach((it) => {
-    it.addEventListener('click', () => {
-      setSort(it.dataset.sort);
-      openSortMenu(false);
-    });
-  });
-  // 바깥 클릭 시 닫기
-  document.addEventListener('click', (e) => {
-    if (!sortDd.contains(e.target)) openSortMenu(false);
   });
 
   // ===== 오늘의 소스 가챠 =====
-  const gachaBtn = document.getElementById('gachaBtn');
   const gachaOverlay = document.getElementById('gachaOverlay');
   const gachaModal = document.getElementById('gachaModal');
   const gachaClose = document.getElementById('gachaClose');
@@ -1779,8 +1793,7 @@
     gachaOverlay.classList.remove('open');
   }
 
-  gachaBtn.addEventListener('click', openGacha);
-  // 홈 맨 아래 '운명의 소스 뽑기'도 같은 가챠를 연다
+  // 홈 맨 아래 '운명의 소스 뽑기'도 같은 가챠를 연다(헤더의 옛 '오늘의 소스' 버튼은 2026-07-24 삭제)
   const homeRandomBtn = document.getElementById('homeRandomBtn');
   if (homeRandomBtn) homeRandomBtn.addEventListener('click', openGacha);
 
@@ -2444,7 +2457,7 @@
   // 기록은 지역 구분 없이 항상 전체가 최신순으로 보인다. 되살릴 일이 생기면 매장 탭 지역탭을 참고할 것.
 
   // 기록 카드 노드 캐시(id→카드 DOM). 지역 탭 전환·삭제 때 카드를 새로 안 만들고 재사용해
-  // 스티커 <img>가 매번 재생성돼 재디코딩·깜빡이던 것 방지(레시피 그리드 cardCache와 같은 원리).
+  // 스티커 <img>가 매번 재생성돼 재디코딩·깜빡이던 것 방지(레시피 그리드 browseCardCache와 같은 원리).
   // 수정으로 내용이 바뀐 카드는 저장 시 이 캐시에서 지워 새로 그림.
   const stampCardCache = new Map();
   function buildStampRecCard(rec) {
@@ -2882,16 +2895,11 @@
   });
 
   // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
-  document.getElementById('browseBack').addEventListener('click', goHome);
-  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 그리드 뷰 (인기소스의 구 전체보기 버튼은 소스 섹션으로 이관·제거됨)
+  browseCloseEl.addEventListener('click', goHome);
+  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderGrid에서 자동 적용됨)
   document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
-  // 인기 소스 전체보기 = 소스 전체를 인기순(좋아요)으로, 리스트형(랭킹 행)으로 표시
-  document.getElementById('popularMore').addEventListener('click', () => {
-    enterBrowse('소스');          // 그리드 리셋 + 소스 카테고리
-    browseListMode = true;        // 이 화면만 리스트형
-    setSort('popular');           // 인기순 + 재렌더(리스트로)
-  });
+  document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
 
   renderHomeSections();
   initMonthlyFeature();
