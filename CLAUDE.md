@@ -20,6 +20,15 @@
 - 스티커 규격(고정): **0.58 비율(600×1034), 배민 주아체, 빨간 밴드 `#D0402E` + 크림 글자 `#FBF5EA`, 흰 다이컷 테두리(앱은 CSS drop-shadow만).** 이름은 카드에 구워져 있으므로 앱 오버레이 안 함(`buildStampCard`: STAMP_IMGS 있으면 밴드 X).
 - 자세한 배경·진행현황은 유저 메모리 `[[haidilgogo-nav-features-plan]]` 참고.
 
+## 🔴 스크롤바 규칙 (절대 — 2026-07-24 사용자 확정)
+**이 사이트는 어느 화면에서도 스크롤바를 보이지 않는다.** 스크롤 기능은 정상이고 **막대만** 안 보인다.
+
+- 구현은 `styles.css` 최상단 `*` 규칙 **한 곳뿐**이다: `scrollbar-width: none`(Firefox) + `-ms-overflow-style: none`(구 Edge) + `*::-webkit-scrollbar { display: none }`(Safari·Chrome).
+- **새 스크롤 영역(모달·시트·가로 레일 등)을 만들 때 스크롤바 CSS를 따로 쓰지 말 것.** 전역 규칙이 이미 덮는다. 개별 요소에 `scrollbar-width`나 `::-webkit-scrollbar`를 다시 선언하면 규칙이 또 흩어진다.
+- 전역 규칙 도입 때 개별 요소에 흩어져 있던 옛 선언 6곳(`.tabs` / `.mf-scroll` / `.modal-card` / `.store-region-tabs` / `.celeb-rail` / `.hp-rail`)을 **전부 제거**했다. 되살리지 말 것.
+- **`html`은 `overflow-y: auto`여야 한다. `scroll`로 되돌리지 말 것.** 예전의 `overflow-y: scroll` + `scrollbar-gutter: stable`은 "막대가 생겼다 사라지며 15px씩 폭이 밀리는 것" 방지용이었는데, 막대 폭이 늘 0이 된 지금은 목적이 사라졌고 부작용만 남았다 — `scroll`은 내용이 화면에 다 들어와도 html을 스크롤 영역으로 만들어서, 발도장·메뉴 **빈 화면처럼 내릴 게 없는 탭에서도 폰이 고무줄처럼 딸려 움직인다**. `auto`로 바꾼 뒤 상단바 sticky 정상·탭 전환 시 폭 흔들림 없음을 확인했다(2026-07-24).
+- 참고: 막대가 안 보이면 "더 내릴 수 있다"는 힌트도 사라진다. 스크롤이 긴 화면을 새로 만들 땐 다른 신호(잘린 카드 빼꼼, 하단 고정 버튼 등)로 알 수 있게 할 것.
+
 ## 폴더/파일 구조
 ```
 Haidilgogo/

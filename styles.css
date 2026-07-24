@@ -13,6 +13,14 @@
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;   /* 터치 시 검정 음영 전역 제거(2026-07-24) — 앱은 자체 눌림 피드백 사용 */
+  /* 🔴 절대 규칙(2026-07-24, 사용자 확정): 이 사이트는 어디서도 스크롤바를 보이지 않는다.
+     스크롤 기능은 그대로고 막대만 안 보인다. 새 스크롤 영역을 만들 때 따로 처리할 필요 없음(전역 상속).
+     ⚠️ 개별 요소에 scrollbar-width/::-webkit-scrollbar를 다시 쓰지 말 것 — 여기서 이미 끝났다. */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* 구 Edge */
+}
+*::-webkit-scrollbar {          /* Safari·Chrome */
+  display: none;
 }
 
 /* 로고("하딜고고")에 쓰이는 3글자만 자체 호스팅 — 외부 CDN(fonts-archive) 의존 제거 */
@@ -56,16 +64,24 @@ html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
   background-color: var(--bg-card);
-  /* 데스크탑에서 세로 스크롤바 자리를 항상 확보 → 카드 적은 카테고리(스크롤 없음)와
-     많은 카테고리(스크롤 생김) 사이를 오갈 때 15px 폭 변화로 레이아웃이 밀리던 것 방지.
-     ⚠️ overflow-y:scroll로 스크롤바 트랙을 항상 켜서 폭 고정(모바일은 오버레이라 폭 0=영향 없음).
+  /* overflow-y는 auto여야 한다(2026-07-24). 예전엔 scroll이었는데, 그건 "스크롤바가 생겼다 사라지며
+     15px씩 폭이 밀리는 것"을 막으려던 장치였다. 전역 스크롤바 숨김(맨 위 * 규칙) 이후 막대 폭이 늘 0이라
+     그 목적이 사라졌고, scroll은 내용이 화면에 다 들어와도 html을 스크롤 영역으로 만들어서
+     발도장·메뉴 빈 화면처럼 내릴 게 없는 탭에서도 폰이 고무줄처럼 딸려 움직였다.
      ⚠️ 가로 클리핑(overflow-x:hidden)은 body가 아니라 여기(html)에 둠 — body에 두면 body가
      중간 스크롤 컨테이너가 되어 상단바 position:sticky가 붙을 기준을 잃고 같이 밀려 올라감.
-     html이 유일한 스크롤 컨테이너여야 sticky 상단바가 정상 동작함. */
+     html이 유일한 스크롤 컨테이너여야 sticky 상단바가 정상 동작함(auto로 바꿔도 sticky는 정상 확인). */
   overflow-x: hidden;
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
+  overflow-y: auto;
 }
+
+/* 발도장 시트·기록보기 모달이 열린 동안 뒤 화면 스크롤 잠금(JS가 붙였다 뗌).
+   body가 아니라 html에 거는 이유는 위 주석과 같다 — html이 유일한 스크롤 컨테이너.
+   scrollbar-gutter:stable 덕에 스크롤바 트랙이 꺼져도 폭이 안 흔들린다. */
+html.is-locked {
+  overflow-y: hidden;
+}
+
 
 body {
   margin: 0;
@@ -92,7 +108,13 @@ img {
 }
 
 .page {
+  /* 🔴 100vh 쓰지 말 것(2026-07-24). iOS Safari의 100vh는 "주소창이 숨겨진 상태"의 큰 높이라,
+     주소창이 떠 있는 동안 페이지가 화면보다 ~100px 커져서 발도장·메뉴처럼 내용이 짧은 탭도
+     그만큼 스크롤됐다(데스크탑에선 100vh=창높이라 재현 안 됨 → 폰에서만 보이던 버그).
+     svh = 주소창이 보이는 상태 기준(가장 작은 뷰포트)이라 어떤 경우에도 넘치지 않는다.
+     위 100vh 줄은 svh를 모르는 구형 브라우저용 폴백이므로 남겨둔다. */
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   background: var(--bg-card);
@@ -389,11 +411,6 @@ img {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .tabs::-webkit-scrollbar {
-    display: none;
   }
 
   .tab-btn {
@@ -702,9 +719,7 @@ img {
   scroll-snap-type: x mandatory;
   padding: 0 20px;         /* 양쪽 대칭 인셋 — 첫 카드부터 좌우 여백, 모든 카드가 가운데 고정(2026-07-21) */
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
 }
-.mf-scroll::-webkit-scrollbar { display: none; }
 /* 데스크탑: 끌 수 있다는 grab 커서. 드래그 중엔 스냅 끄고(부드럽게 끌림) 선택 방지 */
 @media (hover: hover) and (pointer: fine) {
   .mf-scroll { cursor: grab; }
@@ -1395,13 +1410,6 @@ img {
   border-radius: 10px;
   overflow-y: auto;
   overscroll-behavior-y: contain; /* 맨 위에서 당겨도 브라우저 새로고침으로 안 번지게 */
-  /* 스크롤바는 전 환경 숨김 — 콘텐츠가 짧고 휠·터치 스크롤이 기본이라 위치 표시줄 불필요,
-     모달 밖으로 삐져나오는 문제·닫을 때 잔상도 원천 차단 */
-  scrollbar-width: none;
-}
-
-.modal-card::-webkit-scrollbar {
-  display: none;
 }
 
 /* 원본 썸네일 — 프레임 안의 "아트 창"(인셋 + 라운드 + 얇은 테두리), 이름 행 아래 */
@@ -2369,7 +2377,8 @@ img {
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 52vh;
+  min-height: 52vh;   /* 폴백 */
+  min-height: 52svh;  /* .page와 같은 이유로 svh — 위 .page 주석 참고 */
   padding: 40px 20px;
 }
 .view-empty-emoji {
@@ -2401,7 +2410,6 @@ img {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-.store-region-tabs::-webkit-scrollbar { display: none; }
 .store-region-tabs .tabs {
   flex-wrap: nowrap;
   gap: 22px;                        /* 지역 탭 간격 */
@@ -2531,6 +2539,15 @@ img {
   color: #fff;
   background: #FF3D00;
   border-color: #FF3D00;
+}
+/* 오픈 예정 지점의 전화 — 번호가 아직 없거나 걸어도 소용없어 누를 수 없게. 크림 보조버튼을 바래게
+   (book--soon과 같은 원리: 어둡게 하면 눌린 활성처럼 보이므로 연하게) */
+.store-btn.tel--soon {
+  color: #c3b7ad;
+  background: #f6f1ec;
+  border-color: #e8ded1;
+  cursor: default;
+  pointer-events: none;
 }
 /* 오픈 예정(캐치테이블 아직 안 열린 지점) — 캐치테이블 주황을 연하게 바랜 비활성 버튼
    (어둡게 X → 눌린 활성처럼 보임. 연하게 desaturate O → 곧 캐치테이블 될 자리 힌트 + 비활성) */
@@ -2945,7 +2962,8 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 52vh;               /* 메뉴 빈화면(.view-empty)과 동일하게 세로 가운데정렬(2026-07-24) */
+  min-height: 52vh;               /* 메뉴 빈화면(.view-empty)과 동일하게 세로 가운데정렬(2026-07-24). 폴백 */
+  min-height: 52svh;              /* .page와 같은 이유로 svh — 위 .page 주석 참고 */
   padding: 40px 20px;
   text-align: center;
   color: var(--text-muted);
@@ -3118,8 +3136,22 @@ img {
   justify-content: center;
   padding: 8px 0;
 }
-.stamp-view-sticker { width: 168px; margin: 0 auto 22px; }
-.stamp-view-sticker > * { width: 100%; }
+/* 스티커를 아래 정보 박스와 같은 폭으로(사용자 요청) + 붙이기 시트와 같은 점선 자리를 두른다.
+   점선은 ::before로 깔고 스티커에 z-index를 줘 위로 올린다(inset -12px만큼 위아래 여백도 확보). */
+/* 크기 기준 = "동행 직접입력 20자 + 메모 40자(둘 다 최대)일 때도 스크롤이 안 생기는 최대"로 실측(구 168px).
+   정보 박스와 같은 폭(295px)까지 키워봤으나 0.58 세로비라 높이가 508px이 되어 닫기 X를 덮고
+   스크롤이 51px 생겼고, 230px도 메모 2줄이면 38px 넘쳤음 → 185px로 확정(2026-07-24).
+   min()은 좁은 기기 대비 — 점선이 사방 12px 나오므로 100%에서 24px을 뺀다. */
+.stamp-view-sticker { width: min(185px, 100% - 24px); margin: 54px auto 34px; position: relative; }
+.stamp-view-sticker::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border: 2.5px dashed #D6C6BA;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.5);
+}
+.stamp-view-sticker > * { width: 100%; position: relative; z-index: 1; }
 .stamp-view-sticker img {
   width: 100%;
   display: block;
@@ -3600,9 +3632,7 @@ img {
   margin: 12px -20px 0; /* 부제 제거(2026-07-21) 후 제목과의 간격 확보 */
   padding: 2px 20px 4px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
 }
-.celeb-rail::-webkit-scrollbar { display: none; }
 /* 데스크탑 마우스 드래그 스크롤 커서(가로 레일 공통) */
 .drag-scroll { cursor: grab; }
 /* 드래그 중엔 grabbing 커서 + scroll-snap 끔(스냅과 충돌해 뚝뚝 끊기는 것 방지). 놓으면 다시 스냅 */
@@ -3929,11 +3959,9 @@ img {
   margin: 12px -20px 0; /* 부제 제거(2026-07-21) 후 제목과의 간격 확보 — 셀럽 레일과 동일 */
   padding: 0 20px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
   scroll-snap-type: x proximity;
   scroll-padding: 0 20px; /* 🔴 필수: 스냅이 안쪽 패딩 무시하고 첫 카드를 화면 끝에 붙이는 것 방지 */
 }
-.hp-rail::-webkit-scrollbar { display: none; }
 .hp-card {
   flex: none;
   /* 2장 온전 + 3번째는 순위 배지만(≈44px) 빼꼼 → 가로 스크롤 힌트. 레일 폭(=앱폭) 기준이라 기기 무관 */

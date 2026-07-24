@@ -44,6 +44,10 @@
     { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 03:00', tel: '032-666-0118' },
     { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 현대타워랜드 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
     { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
+    // 오픈 예정(2026-07-24 추가) — 안산점과 같은 방식으로 STORE_CATCH만 'soon'을 둔다(제목 옆 배지는 사용자가 뺐음).
+    // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 발도장 매장 선택 비활성이 동시에 걸린다.
+    // 🔴 주소는 도로명까지만 확정 — 건물명은 오픈 확정 후 사용자가 알려주면 채운다. 영업시간·전화도 그때.
+    { region: '부산', name: '부산점',    addr: '부산 부산진구 중앙대로 654',                     hours: '미정' },
     { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
     { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
@@ -64,6 +68,7 @@
     '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
     '안산점': 'soon', // 2026-07-25 오픈 예정 — 캐치테이블 아직 안 열림. 열리면 'soon'을 실제 URL로 교체.
+    '부산점': 'soon', // 오픈 예정(서면) — 이 값이 발도장 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
   };
 
   // 재료 표시 순서: SAUCE_BAR 배열 순서를 기준으로 자동 정렬(렌더 시에만 정렬, 원본 데이터는 그대로).
@@ -2271,7 +2276,14 @@
           dd.appendChild(menu);
           acts.appendChild(dd);
         }
-        if (s.tel) {
+        // 전화 — 오픈 예정 지점은 아직 걸어도 소용없으므로 번호 유무와 무관하게 비활성으로 자리만 지킨다
+        // (버튼 개수가 지점마다 달라 카드 폭이 들쭉날쭉해지는 것도 함께 막힘).
+        if (catchUrl === 'soon') {
+          const tel = document.createElement('span');
+          tel.className = 'store-btn tel tel--soon';
+          tel.textContent = '전화';
+          acts.appendChild(tel);
+        } else if (s.tel) {
           const tel = document.createElement('a');
           tel.className = 'store-btn tel';
           tel.textContent = '전화';
@@ -2785,6 +2797,18 @@
   let stampViewId = null;         // 보고 있는 기록 id
   let stampViewDeleteArmed = false; // 삭제 두 번 눌러 확인용
 
+  // 시트·모달이 열려 있는 동안 뒤 화면 스크롤 잠금(html.is-locked).
+  // 닫는 지점이 6곳으로 흩어져 있어(X·바깥클릭·Esc·저장 후·연출 종료 등) 호출부마다 넣는 대신
+  // .open 클래스 변화를 관찰해 자동 동기화한다 — 나중에 닫는 경로가 늘어도 빠뜨릴 일이 없다.
+  const SCROLL_LOCK_OVERLAYS = [stampSheetOverlay, stampViewOverlay];
+  function syncScrollLock() {
+    const anyOpen = SCROLL_LOCK_OVERLAYS.some((el) => el.classList.contains('open'));
+    document.documentElement.classList.toggle('is-locked', anyOpen);
+  }
+  SCROLL_LOCK_OVERLAYS.forEach((el) => {
+    new MutationObserver(syncScrollLock).observe(el, { attributes: true, attributeFilter: ['class'] });
+  });
+
   function resetStampViewDelete() {
     stampViewDeleteArmed = false;
     stampViewDelete.textContent = '삭제';
@@ -2802,7 +2826,7 @@
     stampViewSticker.appendChild(sticker);
     // 정보 — 날짜·매장은 항상, 동행·메모는 입력했을 때만
     const rows = [['날짜', fmtStampDateKr(rec.date)], ['매장', rec.name]];
-    if (rec.with) rows.push(['동행', rec.with]);
+    if (rec.with) rows.push(['동행', WITH_CARD_LABELS[rec.with] || rec.with]); // 목록 카드와 같은 문장형('가족'→'가족과 함께')
     if (rec.memo) rows.push(['메모', rec.memo]);
     stampViewInfo.innerHTML = rows
       .map((r) => '<div class="stamp-view-row"><span class="stamp-view-label">' + r[0] + '</span><span class="stamp-view-val"></span></div>')
