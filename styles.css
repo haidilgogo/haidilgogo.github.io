@@ -1312,7 +1312,7 @@ img {
 
 /* FOOTER */
 .footer {
-  margin-top: 16px; /* 마지막 카드와 붙어(겹쳐) 보이던 것 방지 — 카드↔푸터 구분선 위 여백 */
+  margin-top: 36px; /* 카드/주사위 섹션↔푸터 구분선 위 여백(2026-07-24 16→36으로 넓힘) */
   padding: 16px 20px;
   padding-bottom: 16px;
   display: flex;
@@ -1332,6 +1332,12 @@ img {
   text-align: center;
   white-space: nowrap;
 }
+.footer-brand { /* 푸터 문구 속 '하딜고고' = 로고와 동일하게 Paperlogy + 로고 색(2026-07-24) */
+  font-family: 'Paperlogy', 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+  font-weight: 500; /* Paperlogy는 5Medium 서브셋만 있음 — 로고와 동일 굵기 */
+  color: var(--brand-red);
+  letter-spacing: -.01em;
+}
 
 .footer-report {
   display: inline-block;
@@ -1350,6 +1356,12 @@ img {
 .footer-report:hover {
   color: var(--brand-red-dark);
   text-decoration-color: var(--brand-red-dark);
+}
+.footer-report-ic { /* 💌 대체 봉투 아이콘 — currentColor로 링크 색·호버 빨강 자동 추종(2026-07-24) */
+  width: 13px;
+  height: 13px;
+  vertical-align: -2px;
+  margin-right: 5px;
 }
 
 .footer-break-mobile {
@@ -4012,6 +4024,9 @@ img {
 .hp-thumb {
   aspect-ratio: 1 / 1;
   border-radius: 0;
+  /* 배경을 푸터와 같은 검정으로 — 호버/클릭 scale 변형 시 사진 아래로 새던 크림색 1px 경계선 제거(2026-07-24).
+     기본 .hp-thumb/.hc-thumb 배경(#EADFD6)은 크림 페이지 위의 탕·히든엔 안 보이지만, 검정 푸터 위 인기소스에선 선으로 보였음. */
+  background: #141414;
 }
 .hp-thumb::after { /* 사진 하단→푸터 검정까지, 이징 다단계로 단차 없이 부드럽게 */
   content: "";
@@ -4091,6 +4106,9 @@ img {
 .hp-like svg { width: 20px; height: 20px; flex-shrink: 0; }
 /* 안 누름 = 흰 테두리 하트 / 누름 = 브랜드 빨강 꽉 찬 하트(+숫자도 빨강) */
 .hp-like svg path { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+@media (hover: hover) {
+  .hp-like:not(.active):hover { color: var(--brand-red); } /* 호버 시 아이콘·숫자 빨강(2026-07-24, 히든 하트와 동일) */
+}
 .hp-like.active { color: var(--brand-red); }
 .hp-like.active svg path { fill: currentColor; stroke: currentColor; }
 /* 누를 때 통통 팝 */
@@ -4103,6 +4121,7 @@ img {
   justify-content: space-between;
   gap: 8px;
   min-height: 60px; /* 부제 2줄 높이에 맞춤 → 부제 유무와 상관없이 푸터·카드 크기 동일 */
+  margin-top: -1px; /* 썸네일 바닥과 겹쳐 소수점 경계 안티앨리어싱 선을 덮음 — scale 변형 시 사진↔검정 사이 밝은 1px 선 제거(2026-07-24) */
   padding: 10px 11px 11px;
   background: #141414;
 }
@@ -4247,6 +4266,9 @@ img {
   margin-top: 17px;   /* 헤더와 간격 — 탕 리스트 간격(헤더2px+행padding15px=17px)과 동일하게(2026-07-23) */
 }
 .hc-card {
+  display: flex;            /* 콘텐츠 상단 정렬 — 버전 유무로 카드 높이가 달라도 썸네일·이름이 같은 행에서 안 어긋나게(2026-07-24) */
+  flex-direction: column;
+  justify-content: flex-start;
   background: none;
   border: none;
   padding: 0;
@@ -4273,8 +4295,8 @@ img {
 .hc-row + .hc-row { border-top: 1px solid #E2E2E2; } /* 뉴트럴 그레이(크림톤 X), 살짝 진하게 */
 .hc-row:last-child { border-bottom: 1px solid #E2E2E2; } /* 마지막 행 아래도 닫는 선(2026-07-23) */
 .hc-row-thumb {
-  width: 80px;
-  height: 80px;
+  width: 112px;
+  height: 112px;
   border-radius: 12px;
   overflow: hidden;
   flex: none;
@@ -4288,9 +4310,10 @@ img {
   flex-direction: column;
   justify-content: center;
 }
+.hc-card .hp-name { font-size: 16px; } /* 탕 그리드 이름만 15→16(2026-07-24) — 인기소스 카드(.hp-name)는 그대로 */
 .hc-row-name {
   min-width: 0;
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-dark);
   letter-spacing: -.02em;
@@ -4302,7 +4325,7 @@ img {
 .card-sub {
   display: block;
   margin-top: 3px;
-  font-size: 12.5px;
+  font-size: 13px; /* 탕·히든 부제 공통 13px(2026-07-24) */
   font-weight: 400;
   line-height: 1.3;
   color: var(--text-muted);
@@ -4312,13 +4335,56 @@ img {
 }
 .hc-row-like {
   flex: none;
+  align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.hc-row-like-n { font-size: 12.5px; line-height: 1; }
+.hc-row-like svg { width: 20px; height: 20px; } /* 인기소스 하트(.hp-like svg 20px)와 동일 크기(2026-07-24) */
+/* 안 누름 = 회색 테두리 하트 / 누름 = 브랜드 빨강 꽉 찬 하트(+숫자도 빨강) */
+.hc-row-like svg path { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+@media (hover: hover) {
+  .hc-row-like:not(.active):hover { color: var(--brand-red); } /* 호버 시 아이콘·숫자 빨강(currentColor)로(2026-07-24) */
+}
+.hc-row-like.active { color: var(--brand-red); }
+.hc-row-like.active svg path { fill: currentColor; stroke: currentColor; }
+.hc-row-like.pop svg { animation: hpLikePop .32s ease; } /* 누를 때 통통 팝(인기소스와 공유) */
+.hc-row-like-n { font-size: 14px; font-weight: 700; line-height: 1; } /* 인기소스 좋아요 숫자(.like-count)와 동일 크기(2026-07-24) */
+
+/* ── 홈 인터랙션(2026-07-24) ──
+   호버 = '안쪽 이미지(썸네일)만' 확대(프레임·글씨 고정). 컨테이너 overflow:hidden이 넘치는 부분을 잘라 줌인 효과.
+   배너 캡션·카드 이름은 형제라 안 움직인다. 배너 첫장=img, 가이드/칼럼=.mf-colbg(배경이미지) 두 경우 모두 처리.
+   클릭/터치 눌림 = 배너·인기소스·히든·탕(프레임 살짝 축소). 배너는 과거(2026-07-23) press를 뺐었으나 2026-07-24 사용자 요청으로 다시 넣음(준비중 배너는 제외).
+   셀럽 press(0.9 바운스)는 .celeb-img에 이미 있음. */
+.hc-thumb img, .hc-row-thumb img,
+.mf-hero > img, .mf-colbg, .celeb-face img { transition: transform .2s ease; }
+@media (hover: hover) {
+  .mf-hero:not(.mf-hero--soon):hover > img,
+  .mf-hero:not(.mf-hero--soon):hover .mf-colbg { transform: scale(1.04); }
+  .celeb:hover  .celeb-face img   { transform: scale(1.08); }
+  .hc-card:hover .hc-thumb img    { transform: scale(1.05); }
+  .hc-row:hover  .hc-row-thumb img { transform: scale(1.06); }
+}
+/* 인기소스(검정 푸터) 카드만: transform이 아니라 '크기 변경'으로 줌.
+   transform은 이미지를 별도 GPU 레이어로 승격시켜, 잘린 아래 가장자리가 검정 푸터/그라데이션과 1px 어긋나 밝은 경계선이 생김(2026-07-24).
+   width/height 방식이 레이어 분리를 없애 선을 많이 줄여주지만, scale 변형(클릭 눌림 등)이 걸리면 소수점 픽셀 안티앨리어싱으로 아주 옅은 1px 선이 남는 건 여전함 — 브라우저 합성 한계라 완전 제거는 보류(사용자 확인, 2026-07-24 넘어감).
+   밝은 배경의 탕·히든은 이 선이 안 보여서 그대로 transform 유지. */
+.hp-thumb img { transition: width .2s ease, height .2s ease, margin .2s ease; }
+@media (hover: hover) {
+  .hp-card:hover .hp-thumb img { width: 106%; height: 106%; margin: -3%; }
+}
+/* 클릭/터치 눌림 — 배너·인기소스 = 프레임 전체 축소 / 탕·히든 = 이미지만(2026-07-24 사용자 요청).
+   탕·히든은 이미지를 '축소'하면 컨테이너 배경이 가장자리에 드러나 테두리처럼 보임 → 대신 살짝 '확대(줌인)'해서
+   항상 컨테이너를 덮게 함(테두리 없음). :active는 :hover보다 소스 순서상 뒤라 누르는 동안 이 값이 이김. */
+.mf-hero, .hp-card { transition: transform .18s ease; }
+.mf-hero:not(.mf-hero--soon):active { transform: scale(.985); } /* 큰 요소라 살짝만 */
+.hp-card:active { transform: scale(.97); }
+.hc-card:active .hc-thumb img    { transform: scale(1.09); }
+.hc-row:active  .hc-row-thumb img { transform: scale(1.09); }
 
 /* 인기 소스 = 세로 랭킹 리스트(차트형, 2026-07-23) — hc-row 재사용 + 왼쪽 순위 숫자, 1위 강조 */
 .hp-chart { display: flex; flex-direction: column; }

@@ -370,8 +370,8 @@
 
   // 화면에 그려진 하트 숫자들을 현재 likeCounts로 갱신 (active 상태는 기기별이라 건드리지 않음)
   function refreshLikeCounts() {
-    // 그리드 카드(.like-btn)와 홈 인기소스 칩(.hp-like) 모두 갱신
-    document.querySelectorAll('.like-btn, .hp-like').forEach((btn) => {
+    // 그리드 카드(.like-btn)·홈 인기소스 칩(.hp-like)·홈 히든 리스트 하트(.hc-row-like) 모두 갱신
+    document.querySelectorAll('.like-btn, .hp-like, .hc-row-like').forEach((btn) => {
       const countEl = btn.querySelector('.like-count');
       if (countEl) countEl.textContent = getLikeCount(btn.dataset.id);
     });
@@ -671,7 +671,7 @@
     isGuide: true,
     title: '어서와~ 하이디라오는 처음이지?',            // 접근성(aria)·비상용 한 줄
     titleHtml: '어서와~<br>하이디라오는 처음이지?',       // 배너 표시용(두 줄)
-    heroDesc: '주문법부터 소스바 사용법까지 · 3분 가이드',
+    heroDesc: '주문부터 소스바 사용까지 · 가이드',
     bannerImg: 'assets/columns/guide.jpg?v=1',
     bannerBg: 'linear-gradient(150deg,#C6402E 0%,#E5704A 55%,#F2A878 100%)',
     emoji: '📖',
@@ -1271,10 +1271,21 @@
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
       + '<span class="hc-row-txt"><span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
-      + '<span class="hc-row-like"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span class="hc-row-like-n">' + getLikeCount(r.id) + '</span></span>'
+      + '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>'
       + '</button>'
     ).join('');
     bindHomeCards(listElement);
+    // 하트 = 홈 리스트에서 바로 좋아요(카드 모달과 안 겹치게 stopPropagation). 인기소스와 동일 동작
+    listElement.querySelectorAll('.hc-row-like').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = el.dataset.id;
+        toggleLike(id);
+        el.classList.toggle('active', likedByMe.has(id));
+        el.querySelector('.like-count').textContent = getLikeCount(id);
+        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); // 팝 재시작
+      });
+    });
   }
   function renderHomeSections() {
     renderCelebRail();
