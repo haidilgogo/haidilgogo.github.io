@@ -1656,7 +1656,7 @@
   function gachaToStart() {
     gachaResetBowl();
     gachaActions.style.display = 'none';
-    gachaPull.style.display = 'inline-block';
+    gachaPull.style.display = 'inline-flex'; // CSS의 아이콘 정렬(inline-flex) 유지 — 'inline-block'이면 주사위·글자 baseline으로 어긋남(2026-07-24)
     gachaPull.style.pointerEvents = 'auto';
   }
 
@@ -1670,6 +1670,7 @@
     gachaLast = i;
     const r = GACHA_POOL[i];
     gachaPicked = r;
+    saveGachaToday(r.id); // 하루 한 번: 오늘 뽑은 결과 기억(기기 저장)
     const preload = new Image();
     preload.src = r.img;
     // 재료를 하나씩 그릇에 떨어뜨린다: 착지마다 그릇 출렁 + 소스 차오름/색 변화 + 스플래시
@@ -1730,6 +1731,38 @@
     }, 1480); // 마지막 재료 착지(~1110ms)와 잠김 연출이 끝난 뒤 카드 공개
   }
 
+  // ===== 하루 한 번 제한 (기기 localStorage, 로그인 없어 소프트 제한) =====
+  const GACHA_DAILY_KEY = 'haidilao_gacha_daily';
+  function gachaTodayStr() {
+    const d = new Date(); // 기기 로컬 날짜(자정 지나면 새로 뽑힘)
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function getGachaTodayId() {
+    try { const o = JSON.parse(localStorage.getItem(GACHA_DAILY_KEY)); if (o && o.date === gachaTodayStr()) return o.id; } catch (e) {}
+    return null;
+  }
+  function saveGachaToday(id) {
+    try { localStorage.setItem(GACHA_DAILY_KEY, JSON.stringify({ date: gachaTodayStr(), id: id })); } catch (e) {}
+  }
+  // 오늘 이미 뽑았으면 뽑기 연출 없이 그 소스를 바로 결과 카드로(그릇/뽑기 버튼 숨김)
+  function gachaShowSaved(r) {
+    gachaResetBowl();
+    gachaPull.style.display = 'none';
+    gachaResult.innerHTML = '';
+    gachaResult.appendChild(buildCard(r, { hideSource: true, eager: true, onOpen: () => { closeGacha(); openModal(r); } }));
+    fitCardTitles(gachaResult);
+    gachaResult.style.transition = 'none';
+    gachaResult.style.opacity = '1';
+    gachaResult.style.transform = 'scale(1)';
+    void gachaResult.offsetWidth;
+    gachaResult.style.transition = '';
+    gachaBowl.style.opacity = '0';
+    gachaMat.style.opacity = '0';
+    gachaBowlShadow.style.opacity = '0';
+    gachaActions.style.display = 'flex';
+    gachaAgain.style.pointerEvents = 'auto';
+  }
+
   let gachaPreloaded = false;
   function openGacha() {
     document.documentElement.style.overflow = 'hidden'; // body 아닌 html에 — 상단바 sticky 유지 (openModal 주석 참고)
@@ -1738,7 +1771,10 @@
       gachaPreloaded = true;
       GACHA_POOL.forEach((r) => { const im = new Image(); im.src = r.img; });
     }
-    gachaToStart();
+    const savedId = getGachaTodayId();
+    const savedR = savedId ? GACHA_POOL.find((x) => x.id === savedId) : null;
+    if (savedR) { gachaPicked = savedR; gachaShowSaved(savedR); } // 오늘 이미 뽑음 → 결과 바로
+    else { gachaToStart(); }                                       // 아직 안 뽑음 → 뽑기 버튼
     gachaOverlay.classList.add('open');
   }
 
@@ -1806,7 +1842,7 @@
   document.getElementById('columnClose').addEventListener('click', closeColumn);
   columnOverlay.addEventListener('click', (e) => { if (e.target === columnOverlay) closeColumn(); });
   gachaPull.addEventListener('click', gachaPullOnce);
-  gachaAgain.addEventListener('click', gachaPullOnce);
+  gachaAgain.addEventListener('click', closeGacha); // 하루 한 번 — '내일 또 만나요'는 재뽑기 없이 닫기만(2026-07-24)
   gachaClose.addEventListener('click', closeGacha);
   gachaOverlay.addEventListener('click', closeGacha);
   gachaModal.addEventListener('click', (e) => e.stopPropagation());

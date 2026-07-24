@@ -1782,18 +1782,22 @@ img {
 }
 
 .gacha-pull {
+  display: inline-flex;      /* 평면 주사위 아이콘 + '뽑기' 정렬(2026-07-24) */
+  align-items: center;
+  gap: 8px;
   border: none;
   background: var(--brand-red);
   color: #fff;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 800;
-  padding: 13px 40px;
-  border-radius: 999px;
+  padding: 13px 34px;
+  border-radius: 14px;       /* 알약 → 둥근 사각(홈 버튼과 통일, 2026-07-24) */
   cursor: pointer;
   transition: transform .15s ease, background-color .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
+.gacha-pull-ic { width: 24px; height: 24px; flex: none; }
 
 .gacha-actions {
   display: none;
@@ -4409,7 +4413,8 @@ img {
   text-align: center;
   color: #fff;
 }
-.home-random-dice { font-size: 34px; line-height: 1; }
+.home-random-dice { font-size: 34px; line-height: 0; }
+.home-random-dice img { width: 76px; height: 76px; display: inline-block; } /* Noto 주사위 정지 PNG(c48 포즈, 228px, ~20KB) — 모든 기기 동일. 애니(GIF/APNG=잔끊김·iOS설정, 비디오=iOS 알파 깜빡임) 다 시도 후 정지본으로 확정(2026-07-24) */
 .home-random-title {
   margin: 10px 0 0;
   font-size: 17px;
@@ -4425,16 +4430,20 @@ img {
 }
 .home-random-btn {
   margin-top: 16px;
+  display: inline-flex;      /* 평면 주사위 아이콘 + 글자 정렬(2026-07-24) */
+  align-items: center;
+  gap: 7px;
   background: var(--brand-red);
   color: #fff;
   border: none;
   font-family: inherit;
   font-size: 14.5px;
   font-weight: 700;
-  padding: 12px 26px;
-  border-radius: 24px;
+  padding: 12px 24px;
+  border-radius: 14px;       /* 알약 → 둥근 사각(2026-07-24) */
   cursor: pointer;
 }
+.home-random-btn-ic { width: 18px; height: 18px; flex: none; }
 .home-random-btn:active { background: var(--brand-red-active); }
 
 /* 탭 제거 후 레시피용 탭줄 그룹은 항상 숨김(내용물은 script 참조용으로만 DOM 유지) */
