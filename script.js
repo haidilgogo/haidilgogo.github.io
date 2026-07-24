@@ -1973,7 +1973,6 @@
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
-    if (name === 'stamp') { updateStampUnderline(); requestAnimationFrame(updateStampUnderline); }
     syncTopbarH();
   }
 
@@ -2398,42 +2397,9 @@
     return card;
   }
 
-  // ── 발도장 지역 탭 — 매장 지역 탭과 동일 형태·같은 고정 목록(방문 여부와 무관하게 항상 전부 표시) ──
-  let activeStampRegion = '전국';
-  const stampTabsEl = document.getElementById('stampTabs');
-  const stampUnderline = document.getElementById('stampTabsUnderline');
-  const STAMP_REGION_OF = {}; // 지점명 → 지역 (필터용)
-  STORES.forEach((s) => { STAMP_REGION_OF[s.name] = s.region; });
-  function updateStampUnderline() {
-    if (!stampTabsEl || !stampUnderline) return;
-    const active = stampTabsEl.querySelector('.tab-btn.active');
-    // 발도장 섹션이 숨겨져 있으면 offsetWidth=0 → 위치 못 잡으므로, 보일 때(switchSection) 다시 호출됨
-    if (active && active.offsetWidth) {
-      stampUnderline.style.width = active.offsetWidth + 'px';
-      stampUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
-    }
-  }
-  function renderStampTabs() {
-    if (!stampTabsEl) return;
-    stampTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
-    ['전국'].concat(storeRegions()).forEach((reg) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tab-btn' + (reg === activeStampRegion ? ' active' : '');
-      btn.textContent = reg;
-      btn.addEventListener('click', () => {
-        // 입력 시트가 열려 있으면 지역 탭 무시 — 작성 중 목록이 뒤에서 바뀌어
-        // "저장했는데 안 보임"(다른 지역 필터) 같은 혼란 방지. 시트 닫고 나서 이동.
-        if (stampSheetOverlay.classList.contains('open')) return;
-        if (activeStampRegion === reg) return;
-        activeStampRegion = reg;
-        renderStampTabs();
-        renderStamps();
-      });
-      stampTabsEl.appendChild(btn);
-    });
-    updateStampUnderline();
-  }
+  // 발도장 지역 탭은 쓰지 않는다(2026-07-24 사용자 확정). 상단바에서 UI를 뺀 뒤 남아 있던
+  // 필터 코드(activeStampRegion·STAMP_REGION_OF·renderStampTabs·밑줄 계산)를 전부 제거했다.
+  // 기록은 지역 구분 없이 항상 전체가 최신순으로 보인다. 되살릴 일이 생기면 매장 탭 지역탭을 참고할 것.
 
   // 기록 카드 노드 캐시(id→카드 DOM). 지역 탭 전환·삭제 때 카드를 새로 안 만들고 재사용해
   // 스티커 <img>가 매번 재생성돼 재디코딩·깜빡이던 것 방지(레시피 그리드 cardCache와 같은 원리).
@@ -2474,10 +2440,7 @@
   function renderStamps() {
     const grid = document.getElementById('stampGrid');
     if (!grid) return;
-    const showAll = activeStampRegion === '전국';
-    const list = stampData.records
-      .filter((r) => showAll || STAMP_REGION_OF[r.name] === activeStampRegion)
-      .slice();
+    const list = stampData.records.slice(); // 지역 필터 없음 — 항상 전체(위 주석 참고)
     // "다녀온 매장 N곳" = 고유 매장 수(같은 매장 여러 번 기록해도 1곳으로 셈 — 라벨과 의미 일치)
     document.getElementById('stampCountNum').textContent = new Set(list.map((r) => r.name)).size;
     // 일기라 최신이 먼저: 날짜 최근순, 같은 날짜면 나중에 기록한 것(addedAt)이 위.
@@ -2486,14 +2449,11 @@
       if ((a.date || '') !== (b.date || '')) return (a.date || '') < (b.date || '') ? 1 : -1;
       return (b.addedAt || 0) - (a.addedAt || 0);
     });
-    // 빈 상태 — 기록이 아예 없으면 첫 기록 유도, 지역 필터만 비면 그 지역 안내
+    // 빈 상태 — 지역 필터가 없어졌으므로 "기록이 하나도 없음" 한 가지뿐이다(첫 기록 유도).
     if (!list.length) {
       const empty = document.createElement('div');
       empty.className = 'stamp-empty';
-      const anyAtAll = stampData.records.length > 0;
-      empty.innerHTML = '<p class="stamp-empty-text">' + (anyAtAll
-        ? '아직 ' + activeStampRegion + '엔 발도장이 없어요'
-        : '아직 발도장이 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요') + '</p>';
+      empty.innerHTML = '<p class="stamp-empty-text">아직 스티커가 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요</p>';
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
@@ -2892,10 +2852,8 @@
   renderGrid();
   renderStoreTabs();
   renderStores();
-  renderStampTabs();
   renderStamps();
   window.addEventListener('resize', updateStoreUnderline);
-  window.addEventListener('resize', updateStampUnderline);
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
   requestAnimationFrame(placeIndicator);

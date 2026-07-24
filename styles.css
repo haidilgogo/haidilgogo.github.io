@@ -2932,7 +2932,9 @@ img {
 }
 .stamp-rec-date {
   font-size: 12px;
-  color: var(--text-muted);
+  /* 매장명과 같은 진한 색(2026-07-24 사용자 확정 = 날짜·매장 검정 / 동행만 회색).
+     크기 차이(11px vs 16px)로 위계를 주고, 색은 '기록의 사실'끼리 묶는 쪽을 택함. */
+  color: var(--text-darkest);
   /* 날짜는 한 줄 유지 — 2칸 배치에서 "…21"/"일"로 CJK 줄바꿈되던 것 방지.
      모바일 폭은 아래 `.stamps .stamp-rec-date`(11px)로 맞춤(특이성 높여 확실히 적용). */
   white-space: nowrap;
@@ -3181,12 +3183,21 @@ img {
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* 누름 반응은 '스티커 붙이기'(.stamp-submit)와 같은 값으로 통일 — 살짝 눌리고 색이 진해진다(2026-07-24) */
+  transition: background .12s, color .12s, transform .08s;
 }
+.stamp-view-btn:active { transform: scale(0.98); }
 .stamp-view-edit { background: var(--brand-red); color: #fff; }
-.stamp-view-delete { background: #F3EDE7; color: #B0554A; transition: background .15s, color .15s; white-space: nowrap; }
-.stamp-view-delete.armed { background: var(--brand-red); color: #fff; } /* 두 번 눌러 삭제 — 확인 상태 */
-/* 확인 상태면 '수정'은 글자폭만큼 줄고 '삭제'가 넓어져 "한 번 더 누르면 삭제돼요"가 한 줄에(2026-07-23) */
-.stamp-view-btns:has(.stamp-view-delete.armed) .stamp-view-edit { flex: 0 0 auto; }
+.stamp-view-edit:active { background: var(--brand-red-active); }
+.stamp-view-delete { background: #F3EDE7; color: #B0554A; white-space: nowrap; }
+.stamp-view-delete:active { background: #E7DCD3; }                         /* 크림 버튼은 한 톤 진하게 */
+.stamp-view-delete.armed { background: var(--brand-red); color: #fff; }    /* 두 번 눌러 삭제 — 확인 상태 */
+.stamp-view-delete.armed:active { background: var(--brand-red-active); }   /* 확인 상태는 빨강 눌림색 */
+/* 확인 상태면 '수정'이 줄고 '삭제'가 넓어져 "한 번 더 누르면 삭제돼요"가 한 줄에 들어간다(2026-07-23).
+   flex-basis 100px = 글자폭(0 0 auto)이면 56px까지 쪼그라들어 눌러야 할 버튼으로 안 보였던 것 보완(2026-07-24).
+   삭제 문구는 패딩 포함 182px이면 한 줄에 들어가므로 319px 행에서 209px이 남아 넉넉하다.
+   `0 1`(줄어들 수는 있음)이라 더 좁은 기기에선 수정이 먼저 양보해 문구 줄바꿈을 막는다. */
+.stamp-view-btns:has(.stamp-view-delete.armed) .stamp-view-edit { flex: 0 1 100px; }
 
 /* 모바일: 상단바 아래 전체화면 (레시피 상세·입력 시트와 동일) */
 @media all {
@@ -3512,7 +3523,13 @@ img {
 }
 /* 발도장 찍기 버튼 */
 .stamp-submit {
-  width: 100%;
+  /* 폭 = 바로 위 스티커 자리의 점선 바깥선과 동일(.stamp-slot 158px + 점선 inset 12px × 2 = 182px).
+     입력칸처럼 꽉 채우지 않고 점선에 맞춰 세로로 정렬 → "이 자리에 붙는다"가 한 덩어리로 읽힌다(사용자 제안 2026-07-24).
+     ⚠️ .stamp-slot 폭이나 점선 inset을 바꾸면 이 값도 같이 고칠 것. min()은 아주 좁은 기기 대비. */
+  width: min(182px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
   border: none;
   border-radius: 13px;
   background: var(--brand-red);
