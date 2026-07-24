@@ -4172,54 +4172,71 @@ img {
 .hp-more svg { width: 22px; height: 22px; }
 
 /* ── ④ 초심자 가이드 배너 ── */
+/* 하이디라오 앱 아이콘 느낌으로(2026-07-24 사용자 확정). 빨간 박스는 위→아래 세로 그라데이션,
+   로고·글씨는 흰색이되 아래로 갈수록 분홍이 배어나오게(로고 png에 이미 구움 + 글씨는 아래 clip:text).
+   박스 폭은 다른 섹션처럼 꽉 채우되(좌우 여백 통일), 내용(로고+글씨+화살표)만 가운데로 모음(사용자 확정). */
 .home-guide {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;   /* 내용을 가로 가운데로 */
+  gap: 16px;
   width: 100%;
   border: none;
-  background: #FBF1E2;
+  background: linear-gradient(#F0313A, #C4121A);
   border-radius: 14px;
-  padding: 18px 16px;
+  padding: 18px;
   font-family: inherit;
-  text-align: left;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, filter .15s, box-shadow .15s;
+}
+/* 누름 = 살짝 들어가고 어두워짐(사이트 공통 scale .98). 데스크탑 hover = 살짝 밝아지고 그림자 뜸 */
+.home-guide:active { transform: scale(.98); filter: brightness(.96); }
+@media (hover: hover) {
+  .home-guide:hover { filter: brightness(1.05); box-shadow: 0 4px 14px rgba(224, 48, 30, .28); }
 }
 .home-guide-ic {
   flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: #F3E1C6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
+  width: 46px;
+  height: 46px;
+  display: block;   /* 로고가 이미 원형이라 별도 배경 칸 없음 — 사각형에 또 넣으면 답답함 */
 }
 .home-guide-txt {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
+  flex: 0 1 auto;   /* 폭을 다 차지하지 않고 내용만큼만 → 가운데 모임(꽉 채우던 flex:1에서 변경) */
+  text-align: center;
 }
+/* 제목 = 흰→분홍 세로 그라데이션. background-clip:text라 색은 배경으로 넣고 글자만 비워 통과시킴 */
 .home-guide-title {
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 800;
   letter-spacing: -.02em;
   line-height: 1.4;
-  color: #5C4318;
+  background: linear-gradient(#fff 20%, #FBD3CF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .home-guide-sub {
-  font-size: 12.5px;
+  font-size: 11px;   /* 로고가 커져 좁아진 폭에 한 줄로 들어가는 크기(2026-07-24 실측) */
   line-height: 1.4;
-  color: #96794A;
+  color: rgba(255, 225, 222, .9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .home-guide-arrow {
-  margin-left: auto;
+  margin-left: 8px;   /* 내용 가운데 정렬이라 맨 오른쪽으로 밀지 않고 글씨 옆에 붙임 */
   flex: none;
   width: 20px;
   height: 20px;
-  color: #B99A66;
+  color: rgba(255, 255, 255, .85);
 }
 
 /* ── ⑤⑥ 탕·히든메뉴 2열 그리드 (클린 카드) ── */

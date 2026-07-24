@@ -1821,7 +1821,7 @@
   const sectionTitleEl = document.getElementById('sectionTitle');
   const tabbarEl = document.getElementById('tabbar');
   const tabbarIndicator = document.getElementById('tabbarIndicator');
-  const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '발도장' };
+  const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '스티커' };
   let activeSection = 'recipe';
 
   // 인디케이터 2상태(배민식): 정지=불투명 필(활성 버튼에 딱 맞음) / 이동=유리구슬(원형 76px).
@@ -2471,6 +2471,7 @@
 
   // ── 발도장 입력 시트: 점선 슬롯 → 지점 선택 → "발도장 찍기" → 스티커 탁!(stampPop) ──
   const stampSheetOverlay = document.getElementById('stampSheetOverlay');
+  const stampSheetEl = stampSheetOverlay.querySelector('.stamp-sheet'); // 시트 안쪽 스크롤 컨테이너
   const stampSlot = document.getElementById('stampSlot');
   const stampSlotEmpty = document.getElementById('stampSlotEmpty');
   const stampSlotHint = document.getElementById('stampSlotHint');
@@ -2557,6 +2558,9 @@
     }
     syncStampDateText(); // 새로 찍기(오늘)·수정(기존 날짜) 모두 값 세팅 후 표시 글자 갱신
     stampSheetOverlay.classList.add('open');
+    // 오버레이가 opacity로만 여닫혀 시트가 늘 레이아웃에 남는다 → 지난번 스크롤 위치가 그대로 유지됨.
+    // 다시 열 땐 항상 맨 위(날짜부터)에서 시작하도록 되돌린다(2026-07-24 버그 수정).
+    if (stampSheetEl) stampSheetEl.scrollTop = 0;
   }
   function closeStampSheet() {
     if (stampAnimating) return; // 찍히는 중엔 닫기 무시(연출 보장)
