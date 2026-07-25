@@ -1858,7 +1858,7 @@ img {
 }
 
 .modal-cat {
-  font-size: 14px; /* 13→14(2026-07-25) — 옆 즐겨찾기·닫기 아이콘(20px)에 비해 작아 보임 */
+  font-size: 16px;
   font-weight: 700;
   color: #4D4139;
   letter-spacing: .01em;
@@ -4048,8 +4048,8 @@ img {
   display: block;
   margin: 0;
   color: #fff;
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4072,7 +4072,7 @@ img {
   display: block;
   margin-top: 2px;
   color: rgba(255, 255, 255, .6);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
 }
 .hp-name {

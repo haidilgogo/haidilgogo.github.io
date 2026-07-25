@@ -618,9 +618,9 @@
   function fitCardTitles(root) {
     (root || document).querySelectorAll('.recipe-name').forEach(fitCardTitle);
   }
-  // 인기 소스는 한 줄을 유지하되, 넘치는 이름만 최대 17px→14px 범위에서 필요한 만큼 줄인다.
+  // 인기 소스는 한 줄을 유지하되, 넘치는 이름만 최대 16px→14px 범위에서 필요한 만큼 줄인다.
   // 짧은 이름은 CSS 기본 크기 그대로이며, 14px에서도 안 들어가는 극단적인 이름만 말줄임표를 유지한다.
-  const POPULAR_TITLE_MIN_RATIO = 14 / 17;
+  const POPULAR_TITLE_MIN_RATIO = 14 / 16;
   function fitPopularTitles(root) {
     (root || document).querySelectorAll('.hp-foot .hp-name')
       .forEach((el) => fitCardTitle(el, POPULAR_TITLE_MIN_RATIO));
