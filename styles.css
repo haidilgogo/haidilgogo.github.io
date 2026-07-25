@@ -1641,14 +1641,10 @@ img {
 
 .gacha-result {
   position: absolute;
-  /* 그릇 스테이지(높이 220px) 영역에만 겹쳐 배치한다.
-     top/height를 스테이지에 맞춰 고정 → 아래 버튼·문구 높이가 바뀌어도 카드가 버튼을 침범하지 않는다.
-     (top 67px = 패딩+제목+gap 아래 = .gacha-stage 상단, height 220px = .gacha-stage 높이) */
-  top: 67px;
-  height: 220px;
-  right: 0;
-  bottom: auto;
-  left: 0;
+  /* 🔴 .gacha-stage 안에 두고 inset:0으로 붙인다. 예전엔 모달 직속 + top:67px 하드코딩이었는데,
+     제목·여백이 바뀌자 실제 스테이지(94px)와 27px 어긋나 카드가 제목을 덮었다(2026-07-25).
+     스테이지에 붙여두면 위아래 어떤 요소가 바뀌어도 그릇 자리를 그대로 따라간다. */
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1656,7 +1652,7 @@ img {
   transform: scale(.35);
   transition: opacity .35s, transform .4s cubic-bezier(.2, .9, .3, 1.5);
   pointer-events: none;
-  z-index: 4;
+  z-index: 5; /* 그릇 앞면(.gacha-bowl-front, 4)보다 위 — 스테이지 안으로 들어오면서 필요해짐 */
 }
 
 /* 가챠 결과 카드 = 메인 그리드 카드(.recipe-card)와 동일. 폭만 모달에 맞게 고정.
