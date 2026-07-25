@@ -600,14 +600,14 @@
   // 텍스트 폭은 폰트 크기에 거의 비례하므로 한 번에 필요한 크기를 계산하고, 반올림 오차만
   // 0.5px씩 마저 줄인다(카드 33장 × 매번 while 루프는 리플로우가 아까움).
   const TITLE_MIN_RATIO = 0.72; // 기준 크기의 72%가 하한 — 그보다 길면 나머지는 CSS ellipsis(…)에 맡긴다
-  function fitCardTitle(el) {
+  function fitCardTitle(el, minRatio) {
     // 폭 0 = 숨겨진 탭. 이땐 아무것도 건드리지 않는다(리셋해두면 다시 보일 때까지 잘린 채로 남음)
     if (!el.clientWidth) return;
     el.style.fontSize = ''; // CSS 기준 크기로 되돌리고 다시 잰다(캐시된 카드는 지난번 값이 남아 있음)
     const avail = el.clientWidth;
     if (el.scrollWidth <= avail) return;
     const base = parseFloat(getComputedStyle(el).fontSize);
-    const min = base * TITLE_MIN_RATIO;
+    const min = base * (minRatio || TITLE_MIN_RATIO);
     let size = Math.max(min, base * (avail / el.scrollWidth));
     el.style.fontSize = size + 'px';
     for (let i = 0; i < 4 && size > min && el.scrollWidth > avail; i++) {
@@ -622,25 +622,21 @@
   // 짧은 이름은 CSS 기본 크기 그대로이며, 14px에서도 안 들어가는 극단적인 이름만 말줄임표를 유지한다.
   const POPULAR_TITLE_MIN_RATIO = 14 / 17;
   function fitPopularTitles(root) {
-    (root || document).querySelectorAll('.hp-foot .hp-name').forEach((el) => {
-      if (!el.clientWidth) return;
-      el.style.fontSize = '';
-      if (el.scrollWidth <= el.clientWidth) return;
-      const base = parseFloat(getComputedStyle(el).fontSize);
-      const min = base * POPULAR_TITLE_MIN_RATIO;
-      let size = Math.max(min, base * (el.clientWidth / el.scrollWidth));
-      el.style.fontSize = size + 'px';
-      for (let i = 0; i < 4 && size > min && el.scrollWidth > el.clientWidth; i++) {
-        size = Math.max(min, size - 0.5);
-        el.style.fontSize = size + 'px';
-      }
-    });
+    (root || document).querySelectorAll('.hp-foot .hp-name')
+      .forEach((el) => fitCardTitle(el, POPULAR_TITLE_MIN_RATIO));
+  }
+  // 전체보기 2열 카드: 기본 16px, 긴 이름만 줄이며 13px 아래로는 내려가지 않는다.
+  const BROWSE_TITLE_MIN_RATIO = 13 / 16;
+  function fitBrowseTitles(root) {
+    (root || document).querySelectorAll('.hc-card--browse .hc-row-name')
+      .forEach((el) => fitCardTitle(el, BROWSE_TITLE_MIN_RATIO));
   }
   // 웹폰트(Pretendard)가 늦게 오면 fallback 폰트 폭으로 잰 결과라 틀림 → 도착하면 전부 다시 잰다
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       fitCardTitles();
       fitPopularTitles();
+      fitBrowseTitles();
     });
   }
 
@@ -1122,6 +1118,7 @@
       syncBrowseGridCard(el, r, (rank != null && rank < 5) ? rank : null, isMonthly);
       gridEl.appendChild(el);
     });
+    requestAnimationFrame(() => fitBrowseTitles(gridEl));
   }
 
   // ── 홈 섹션 렌더링(2026-07-21 7단 구조) ──
@@ -3259,6 +3256,7 @@
   window.addEventListener('resize', updateStoreUnderline);
   window.addEventListener('resize', () => {
     requestAnimationFrame(() => fitPopularTitles(popularRailEl));
+    requestAnimationFrame(() => fitBrowseTitles(gridEl));
   });
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
