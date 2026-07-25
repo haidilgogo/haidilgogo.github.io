@@ -1389,7 +1389,8 @@ img {
 }
 
 /* 닫기·즐겨찾기 — 원 배경 없는 아이콘 버튼, 터치 타겟만 padding/margin으로 확보(시각 위치는 그대로).
-   아이콘 20px + padding 12px×2 = 44px(2026-07-25 확대, 예전 6px/-6px는 33px밖에 안 됐음). */
+   아이콘 18px + padding 13px×2 = 44px(2026-07-25 아이콘 18px 통일 — 20px 시절 12px 패딩에서
+   1px씩 늘려 44px 유지. 예전 6px/-6px는 33px밖에 안 됐음). */
 .modal-close,
 .modal-fav-btn {
   cursor: pointer;
@@ -1401,8 +1402,8 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
-  margin: -12px;
+  padding: 13px;
+  margin: -13px;
   color: #4D4139;
   transition: color .15s;
   -webkit-tap-highlight-color: transparent;
