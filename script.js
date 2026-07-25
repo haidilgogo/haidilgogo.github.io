@@ -358,13 +358,25 @@
   } catch (err) {
     likeCounts = {};
   }
-  function saveLikes() {
+  // 🔴 집계(숫자)와 "내가 누른 것"은 반드시 따로 저장할 것.
+  //    Firebase에서 숫자가 올 때마다 saveLikes()로 둘 다 쓰고 있었는데, 그러면 그 페이지 메모리의
+  //    likedByMe가 localStorage를 덮어쓴다. 같은 사이트를 여러 창에 열어두거나 뒤로가기로 되돌아오면
+  //    "좋아요는 그대로인데 하트만 흰색으로 초기화"되는 원인이었다(2026-07-25).
+  //    숫자 갱신에는 saveLikeCounts()만 쓸 것.
+  function saveLikeCounts() {
     try {
-      localStorage.setItem(LIKED_KEY, JSON.stringify([...likedByMe]));
       localStorage.setItem(LIKE_COUNTS_KEY, JSON.stringify(likeCounts));
     } catch (err) {
       // 무시
     }
+  }
+  function saveLikes() {
+    try {
+      localStorage.setItem(LIKED_KEY, JSON.stringify([...likedByMe]));
+    } catch (err) {
+      // 무시
+    }
+    saveLikeCounts();
   }
   function getLikeCount(id) {
     return likeCounts[id] || 0;
@@ -429,7 +441,7 @@
       let likesInitialSorted = false;
       likesRef.on('value', (snapshot) => {
         likeCounts = snapshot.val() || {};
-        saveLikes();
+        saveLikeCounts(); // ⚠️ saveLikes()를 쓰면 안 된다 — 위 주석 참고(하트 초기화 버그)
         if (!likesInitialSorted) {
           // 첫 도착: 인기순 그리드 재정렬 + 홈 인기소스 순위도 실데이터로 다시 그림
           renderGrid();
