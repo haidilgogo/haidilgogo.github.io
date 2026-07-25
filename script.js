@@ -413,6 +413,23 @@
     }
   }
 
+  // 모달을 연 입력 방식에 따라 첫 초점 표시를 구분한다.
+  // 손가락/마우스로 열었을 땐 iOS의 파란 네모만 숨기고, 키보드로 열었을 땐 초점 표시를 유지한다.
+  let lastDialogInputWasKeyboard = false;
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ') {
+      lastDialogInputWasKeyboard = true;
+    }
+  }, true);
+  document.addEventListener('pointerdown', () => {
+    lastDialogInputWasKeyboard = false;
+  }, true);
+  function focusDialogClose(btn) {
+    btn.classList.toggle('focus-silent', !lastDialogInputWasKeyboard);
+    btn.addEventListener('blur', () => btn.classList.remove('focus-silent'), { once: true });
+    btn.focus({ preventScroll: true });
+  }
+
   // 같은 레시피의 하트가 여러 곳에 동시에 그려져 있다(홈 인기소스 .hp-like / 홈 리스트·브라우즈 .hc-row-like).
   // 어디서 눌렀든 '숫자 + 내가 누름(active)' 상태를 전부 같게 맞춘다.
   // 🔴 아래 refreshLikeCounts()는 숫자만 맞추므로 이걸 대신할 수 없다. 새 하트 UI를 추가하면
@@ -1617,7 +1634,7 @@
     syncPageBackgroundA11y();
     modalScroll.scrollTop = 0; // 데스크톱 스크롤 컨테이너
     document.getElementById('modalCard').scrollTop = 0; // 모바일 스크롤 컨테이너(카드 본체)
-    requestAnimationFrame(() => modalClose.focus());
+    requestAnimationFrame(() => focusDialogClose(modalClose));
 
     // 상세를 새 화면처럼 history에 한 칸 쌓아, 안드로이드 뒤로가기·iOS 엣지 스와이프가
     // 사이트를 떠나는 대신 상세만 닫게 한다. 스토리 위에서 연 경우에도 한 칸만 빠져 스토리는 남는다.
@@ -2803,7 +2820,7 @@
     // 오버레이가 opacity로만 여닫혀 시트가 늘 레이아웃에 남는다 → 지난번 스크롤 위치가 그대로 유지됨.
     // 다시 열 땐 항상 맨 위(날짜부터)에서 시작하도록 되돌린다(2026-07-24 버그 수정).
     if (stampSheetEl) stampSheetEl.scrollTop = 0;
-    requestAnimationFrame(() => stampSheetClose.focus());
+    requestAnimationFrame(() => focusDialogClose(stampSheetClose));
   }
   function closeStampSheet() {
     if (stampAnimating) return; // 찍히는 중엔 닫기 무시(연출 보장)
@@ -3072,7 +3089,7 @@
     stampViewInfo.querySelectorAll('.stamp-view-val').forEach((el, i) => { el.textContent = rows[i][1]; });
     resetStampViewDelete();
     stampViewOverlay.classList.add('open');
-    requestAnimationFrame(() => stampViewClose.focus());
+    requestAnimationFrame(() => focusDialogClose(stampViewClose));
   }
   function closeStampView() {
     stampViewOverlay.classList.remove('open');

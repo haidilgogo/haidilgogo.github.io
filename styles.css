@@ -1436,6 +1436,14 @@ img {
   color: var(--brand-red);
 }
 
+/* 손가락으로 연 모달의 자동 초점에만 iOS 파란 네모를 숨긴다.
+   키보드로 연 경우엔 focus-silent가 붙지 않아 기본 초점 표시가 그대로 보인다. */
+.modal-close.focus-silent:focus,
+.stamp-sheet-close.focus-silent:focus,
+.stamp-view-close.focus-silent:focus {
+  outline: none;
+}
+
 #modalCat {
   margin-right: auto;
 }
