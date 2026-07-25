@@ -1314,9 +1314,11 @@
     const sauces = RECIPES.filter((r) => r.cat === '소스').slice().sort(byPopular);
     const top = sauces.slice(0, 5);
     popularRailEl.innerHTML = top.map((r, i) =>
+      // 이름 앞 별(연예인 표시) 미노출(2026-07-25) — 이 레일은 "인기 소스" 랭킹이 목적이라
+      // 별(셀럽) 여부와 섞이면 랭킹 카드에 배지가 두 종류(메달+별) 겹쳐 산만해짐. 브라우즈·모달 별은 유지.
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
       + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r, true) + '</span>'
-      + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
+      + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
       + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
       + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
       + '</span>'

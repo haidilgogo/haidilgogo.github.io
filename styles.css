@@ -1364,10 +1364,13 @@ img {
 .modal-topline {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px; /* 16→20(2026-07-25) — 즐겨찾기·닫기 44px 터치 타겟끼리 너무 붙어 보여 간격 확대 */
   /* 상하 여백 확대(2026-07-25) — 즐겨찾기·닫기 터치가 너무 좁았음.
-     오른쪽만 20px — 브라우즈 닫기(.browse-close, .main 패딩 20px 기준)와 오른쪽 끝 x좌표를 맞춤(2026-07-25). */
-  padding: 16px 20px 14px 18px;
+     오른쪽 24px(20+4, 2026-07-25 재조정) — 브라우즈 닫기(.browse-close, .main 패딩 20px 기준)와
+     오른쪽 끝 x좌표를 맞추려면 20px이 기준이지만, 아래 .modal-close가 오른쪽(바깥쪽) 패딩을
+     13→16px로 늘리며 3px 더 튀어나왔고 원래도 1px 차이가 있었음(실측) → 20+3+1=24px로 보정해
+     getBoundingClientRect() 기준 두 닫기 버튼의 오른쪽 끝 x좌표를 정확히 일치시킴(367px, 2026-07-25). */
+  padding: 16px 24px 14px 18px;
   color: #4D4139;
 }
 
@@ -1390,7 +1393,10 @@ img {
 
 /* 닫기·즐겨찾기 — 원 배경 없는 아이콘 버튼, 터치 타겟만 padding/margin으로 확보(시각 위치는 그대로).
    아이콘 18px + padding 13px×2 = 44px(2026-07-25 아이콘 18px 통일 — 20px 시절 12px 패딩에서
-   1px씩 늘려 44px 유지. 예전 6px/-6px는 33px밖에 안 됐음). */
+   1px씩 늘려 44px 유지. 예전 6px/-6px는 33px밖에 안 됐음).
+   좌우 패딩은 비대칭(2026-07-25 재조정): gap을 16→20px로 늘려도 마주보는 안쪽 패딩(13+13=26px)이
+   gap(20px)보다 커서 44px 터치 타겟끼리 6px 겹쳤음(실측, getBoundingClientRect). 바깥쪽 16px·
+   안쪽 10px로 나눠(합 26=기존과 동일, 터치 타겟은 여전히 44px, 아이콘 시각 위치는 그대로) 겹침을 0으로. */
 .modal-close,
 .modal-fav-btn {
   cursor: pointer;
@@ -1407,6 +1413,18 @@ img {
   color: #4D4139;
   transition: color .15s;
   -webkit-tap-highlight-color: transparent;
+}
+.modal-fav-btn {
+  padding-left: 16px;
+  padding-right: 10px;
+  margin-left: -16px;
+  margin-right: -10px;
+}
+.modal-close {
+  padding-left: 10px;
+  padding-right: 16px;
+  margin-left: -10px;
+  margin-right: -16px;
 }
 
 @media (hover: hover) {
@@ -1762,14 +1780,15 @@ img {
   fill: currentColor;
 }
 
-/* 모달 제목의 연예인 별 — 옛 TCG 카드처럼 이름 좌측 위 대각선으로 겹침(2026-07-25 원복,
+/* 모달 제목의 연예인 별 — 옛 TCG 카드처럼 이름 좌측 위 대각선으로 겹침(2026-07-25 재조정,
    그리드 카드 .recipe-name .star-accent와 같은 방식). .modal-name이 position:relative를 잡아준다.
-   left -10px는 별 오른쪽 끝이 이름 첫 글자와 8px 겹쳤음(실측) → -20px로 더 밀어 겹침 0 + 2px 여백 확보,
-   화면 왼쪽엔 안 잘리게 .modal-header 왼쪽 padding을 22px로 늘림(위 참고, 2026-07-25). */
+   -20px/-9px는 별 오른쪽 끝~첫 글자 사이 gapX 2px는 좁았지만 gapY(별 위~글자 위) 10px로 너무 떠
+   보였음(실측, Range.getBoundingClientRect 기준) → -19px/-3px로 당겨 gapX 1px·gapY 4px로 밀착
+   (겹침은 없음: gapX>0 확인). 화면 왼쪽엔 안 잘리게 .modal-header 왼쪽 padding 22px 유지(위 참고). */
 .modal-name .star-accent {
   position: absolute;
-  left: -20px;
-  top: -9px;
+  left: -19px;
+  top: -3px;
   width: 18px;
   height: 18px;
 }
@@ -3503,6 +3522,21 @@ img {
 /* 셀럽 레시피 등 인물 섹션용 변형 — 볼드 빼고(500) '레시피'만 빨강(구 킥커 투톤, 2026-07-21) */
 .home-sec-title--light { font-weight: 500; }
 .home-sec-title .t-red { color: var(--brand-red); }
+
+/* "셀럽 레시피" 제목의 별 = 범례(2026-07-25) — 카드/모달의 별이 "셀럽 소스"를 뜻한다는 걸
+   여기서 학습하게 함. 제목을 침범하지 않고 '셀' 좌측 위 대각선에 붙게 실측 배치
+   (.recipe-name .star-accent와 동일 비율감으로, 제목 19px에 맞춰 살짝 키움). */
+.celeb-sec-title { position: relative; }
+/* 실측(Range.getBoundingClientRect 기준) — 처음 값(-12/-7)은 gapX -4px로 '셀' 글자를 4px 침범했음
+   → -16px/-3px로 조정해 gapX 0px·gapY 5px(침범 없이 밀착). 화면 좌측 4px 여백 남아 안 잘림 확인. */
+.celeb-sec-title .star-accent {
+  position: absolute;
+  left: -16px;
+  top: -3px;
+  width: 16px;
+  height: 16px;
+  z-index: 2;
+}
 .home-sec-more {
   background: none;
   border: none;
@@ -4207,16 +4241,18 @@ img {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* 연예인 별(2026-07-25) — 브라우즈 그리드(.hc-card--browse)·홈 히든메뉴 리스트(.hc-row) 공용.
-   overflow:visible로 덮어써야 별이 안 잘림(별 붙는 이름은 전부 짧아 ellipsis 없어도 문제 없음). */
+/* 연예인 별(2026-07-25 재조정) — 브라우즈 그리드(.hc-card--browse)·홈 히든메뉴 리스트(.hc-row) 공용.
+   overflow:visible로 덮어써야 별이 안 잘림(별 붙는 이름은 전부 짧아 ellipsis 없어도 문제 없음).
+   -13px/-6px는 gapX 2px·gapY 6px(실측, Range.getBoundingClientRect 기준)로 살짝 떠 보여
+   -11px/-4px로 당김(gapX 0px·gapY 4px, 겹침 없이 밀착 — 모달 별과 같은 비율감). */
 .hc-row-name.has-star {
   position: relative;
   overflow: visible;
 }
 .hc-row-name.has-star .star-accent {
   position: absolute;
-  left: -13px;
-  top: -6px;
+  left: -11px;
+  top: -4px;
   width: 11px;
   height: 11px;
   z-index: 2;
