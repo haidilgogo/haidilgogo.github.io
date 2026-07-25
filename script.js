@@ -1295,10 +1295,11 @@
     });
   }
 
-  // 인기소스 순위 배지: 1위 = 빨강 북마크 리본 + 심플 왕관(글자 없음), 2~5위 = 검정 알약 'N위'
+  // 인기소스 순위 배지: 2~5위와 완전히 같은 검정 알약 모양, 1위만 금색 알약(왕관 아이콘+'1위')으로
+  // 색만 구별(2026-07-25 — 예전 빨강 리본 모양이 상단바 즐겨찾기 아이콘과 헷갈린다는 지적으로 알약 통일)
   function homeRankBadge(i) {
     if (i === 0) {
-      return '<span class="hp-crown"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l4 4 5-6 5 6 4-4v11H3z" fill="#F4C948"/></svg></span>';
+      return '<i class="hp-rank hp-rank-gold"><svg class="hp-rank-crown" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l4 4 5-6 5 6 4-4v11H3z"/></svg>1위</i>';
     }
     return '<i class="hp-rank">' + (i + 1) + '위</i>';
   }

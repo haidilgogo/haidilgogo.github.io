@@ -1313,9 +1313,9 @@ img {
   line-height: 1;
 }
 
-/* 모달 썸네일 좌상단 배지 줄(2026-07-25) — 순위 배지(homeRankBadge, 홈 인기소스와 같은 .hp-rank/.hp-crown
-   마크업 재사용)와 '이달의 소스' 배지를 가로로 나란히. .hp-rank/.hp-crown은 원래 카드 썸네일 기준 절대
-   위치라, 이 줄 안에서는 flex로 흐르도록 static으로 되돌린다. */
+/* 모달 썸네일 좌상단 배지 줄(2026-07-25) — 순위 배지(homeRankBadge, 홈 인기소스와 같은 .hp-rank
+   마크업 재사용, 1위는 .hp-rank-gold 색만 다름)와 '이달의 소스' 배지를 가로로 나란히. .hp-rank는
+   원래 카드 썸네일 기준 절대 위치라, 이 줄 안에서는 flex로 흐르도록 static으로 되돌린다. */
 .modal-badge-row {
   position: absolute;
   left: 11px;
@@ -1325,8 +1325,7 @@ img {
   align-items: center;
   gap: 6px;
 }
-.modal-badge-row .hp-rank,
-.modal-badge-row .hp-crown {
+.modal-badge-row .hp-rank {
   position: static;
 }
 /* '이달의 소스' — 순위 알약(.hp-rank)과 같은 크기·모서리, 브랜드 빨강 배경 + 흰 글자 */
@@ -1966,7 +1965,7 @@ img {
   background: rgba(224, 48, 30, .06);
   border: 1px solid rgba(224, 48, 30, .22);
   border-radius: 14px;
-  padding: 15px 18px;
+  padding: 15px 14px; /* 좌우 14px = 재료 박스(.ing-box)와 같은 좌우 여백(2026-07-25, 💡 아이콘 제거로 18px→14px) */
   font-size: 14px;
   line-height: 1.6;
   color: #7a3b33;
@@ -2165,22 +2164,17 @@ img {
   text-underline-offset: 3px;
 }
 
-/* 팁: "나만의 팁" 제목 없이 박스 안 문장 앞에 💡만 (박스 자체가 이미 눈에 띄어 제목 중복).
+/* 팁: "나만의 팁" 제목 없이 박스 안 문장만 (박스 자체가 이미 눈에 띄어 제목 중복).
    박스는 주문·재료·설명과 같은 흰 박스 문법으로 통일 */
 #modalTipWrap .modal-section-title { display: none; }
 
-/* 💡는 만드는 법 숫자처럼 별도 열 — 줄바꿈된 문장이 이모지 아래를 침범하지 않음.
-   팁 박스만 로즈 톤(주문·소스바·만드는 법은 흰 박스 유지)  */
+/* 팁 박스만 로즈 톤(주문·소스바·만드는 법은 흰 박스 유지). 💡 아이콘은 로즈 배경 자체가 이미
+   "팁"임을 나타내 중복이라 제거함(2026-07-25) — 아이콘 열이 없어져 flex/gap도 함께 정리. */
 .tip-box {
   background: #FDF1EE;
   border: 1px solid #F1D5CD;
   border-radius: 8px;
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
 }
-
-.tip-box::before { content: '💡'; }
 
 /* 긴 문장은 어절 단위로만 줄바꿈 (단어 중간에서 안 끊기게)
    — 설명(.modal-desc)은 제외: 어절 단위가 오히려 어색해지는 문장이 있어 사용자가 직접 관리 */
@@ -3949,22 +3943,22 @@ img {
   font-style: normal;
   line-height: 1.25;
 }
-/* 1위: 빨강 북마크 리본 + 심플 왕관(글자 없음) */
-.hp-crown {
-  position: absolute;
-  left: 11px;
-  top: 0;
-  z-index: 2;
-  width: 28px;
-  height: 34px;
-  background: var(--brand-red);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 3px;
+/* 1위: 2~5위와 완전히 같은 알약(크기·padding·radius·좌상단 위치)에 색만 금색으로 구별.
+   왕관 아이콘 + '1위' 글자를 함께 넣음(2026-07-25 — 예전 빨강 리본 모양이 상단바 즐겨찾기
+   아이콘과 헷갈린다는 지적으로 알약 통일, 리본 마크업 제거) */
+.hp-rank-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: #F4C948;
+  color: #4A3410;
 }
-.hp-crown svg { width: 20px; height: 20px; }
+.hp-rank-crown {
+  width: 11px;
+  height: 11px;
+  display: block;
+  fill: #4A3410;
+}
 /* 좋아요 — 검정 푸터 안, 알약 없이 흰 하트+숫자. 푸터는 상단정렬이지만 좋아요만 세로 가운데 */
 .hp-like {
   flex-shrink: 0;
