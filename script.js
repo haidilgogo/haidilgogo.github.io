@@ -618,8 +618,31 @@
   function fitCardTitles(root) {
     (root || document).querySelectorAll('.recipe-name').forEach(fitCardTitle);
   }
+  // 인기 소스는 한 줄을 유지하되, 넘치는 이름만 최대 17px→14px 범위에서 필요한 만큼 줄인다.
+  // 짧은 이름은 CSS 기본 크기 그대로이며, 14px에서도 안 들어가는 극단적인 이름만 말줄임표를 유지한다.
+  const POPULAR_TITLE_MIN_RATIO = 14 / 17;
+  function fitPopularTitles(root) {
+    (root || document).querySelectorAll('.hp-foot .hp-name').forEach((el) => {
+      if (!el.clientWidth) return;
+      el.style.fontSize = '';
+      if (el.scrollWidth <= el.clientWidth) return;
+      const base = parseFloat(getComputedStyle(el).fontSize);
+      const min = base * POPULAR_TITLE_MIN_RATIO;
+      let size = Math.max(min, base * (el.clientWidth / el.scrollWidth));
+      el.style.fontSize = size + 'px';
+      for (let i = 0; i < 4 && size > min && el.scrollWidth > el.clientWidth; i++) {
+        size = Math.max(min, size - 0.5);
+        el.style.fontSize = size + 'px';
+      }
+    });
+  }
   // 웹폰트(Pretendard)가 늦게 오면 fallback 폰트 폭으로 잰 결과라 틀림 → 도착하면 전부 다시 잰다
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitCardTitles());
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      fitCardTitles();
+      fitPopularTitles();
+    });
+  }
 
   // 카드 1장(그리드·가챠 결과 공용) — 완전히 같은 마크업/핸들러를 쓰므로 스타일이 항상 동일하다.
   function buildCard(r, opts) {
@@ -889,6 +912,7 @@
   function syncHome() {
     const home = isHome();
     viewRecipeEl.classList.toggle('is-home', home);
+    if (home) requestAnimationFrame(() => fitPopularTitles(popularRailEl));
     // 검색창·카테고리탭·닫기버튼이 전부 list-head 안(개수 옆·윗줄)에 있어 홈에서는 list-head 자체가
     // 숨겨지며 함께 숨음(2026-07-25) — 개별 요소 hidden 토글 불필요
   }
@@ -1452,6 +1476,7 @@
       });
       bindRoleButtonKeyboard(el);
     });
+    requestAnimationFrame(() => fitPopularTitles(popularRailEl));
   }
 
   // ⑤⑥ 탕·히든메뉴: 몇 개 안 되니 전부 2열 그리드로(전체보기 버튼 없음)
@@ -3232,6 +3257,9 @@
   renderStores();
   renderStamps();
   window.addEventListener('resize', updateStoreUnderline);
+  window.addEventListener('resize', () => {
+    requestAnimationFrame(() => fitPopularTitles(popularRailEl));
+  });
 
   // 초기 빨간 원 위치 잡기(레이아웃·폰트 로드 후 다시 한 번)
   requestAnimationFrame(placeIndicator);
