@@ -1528,6 +1528,10 @@
   let modalReturnFocus = null;
   let modalClosingViaHistory = false;
   const MODAL_HISTORY_KEY = 'haidilgogoRecipeModal';
+  function modalHistoryRecipeId() {
+    const id = history.state?.[MODAL_HISTORY_KEY];
+    return typeof id === 'string' ? id : null;
+  }
 
   function openModal(r) {
     // 카드는 레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
@@ -1639,9 +1643,10 @@
 
     // 상세를 새 화면처럼 history에 한 칸 쌓아, 안드로이드 뒤로가기·iOS 엣지 스와이프가
     // 사이트를 떠나는 대신 상세만 닫게 한다. 스토리 위에서 연 경우에도 한 칸만 빠져 스토리는 남는다.
-    if (!wasOpen && history.state?.[MODAL_HISTORY_KEY] !== true) {
+    if (!wasOpen && modalHistoryRecipeId() !== r.id) {
       try {
-        history.pushState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: true }, '', location.href);
+        // 레시피 id도 함께 기록해야 X로 닫은 뒤 '앞으로 가기' 했을 때 같은 상세를 복원할 수 있다.
+        history.pushState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: r.id }, '', location.href);
       } catch (err) {
         // pushState를 막는 환경에서도 X·Esc 닫기는 정상 동작
       }
@@ -1669,7 +1674,7 @@
 
   function closeModal(options) {
     if (!modalOverlay.classList.contains('open')) return;
-    if (!options?.fromHistory && history.state?.[MODAL_HISTORY_KEY] === true) {
+    if (!options?.fromHistory && modalHistoryRecipeId()) {
       if (modalClosingViaHistory) return;
       modalClosingViaHistory = true;
       history.back();
@@ -1684,7 +1689,18 @@
   modalScroll.addEventListener('keydown', (e) => trapFocusWithin(modalScroll, e));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
   window.addEventListener('popstate', () => {
-    if (modalOverlay.classList.contains('open')) closeModal({ fromHistory: true });
+    const historyRecipeId = modalHistoryRecipeId();
+    if (modalOverlay.classList.contains('open')) {
+      // 왼쪽 가장자리 뒤로가기: 모달 기록에서 기본 화면 기록으로 이동했으므로 상세를 닫는다.
+      if (!historyRecipeId) closeModal({ fromHistory: true });
+      return;
+    }
+    // X로 닫은 뒤 오른쪽 가장자리 앞으로가기: Safari가 보여준 상세 미리보기가 다시
+    // 사라지지 않도록, 기록에 들어 있는 같은 레시피를 실제 상세창으로 복원한다.
+    if (historyRecipeId) {
+      const historyRecipe = RECIPES.find((r) => r.id === historyRecipeId);
+      if (historyRecipe) openModal(historyRecipe);
+    }
   });
 
   // 모달 하단 좋아요 — 그리드 카드의 하트 숫자도 재렌더 없이 동기화(이미지 깜빡임 방지)
