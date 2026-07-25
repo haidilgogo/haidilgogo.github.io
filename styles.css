@@ -1508,18 +1508,31 @@ img {
   text-align: center;
 }
 
+/* .modal-close의 position:static이 .gacha-close의 top/right를 무효화해 닫기가 모달 가운데로
+   흘러가던 회귀(2026-07-25) — position:absolute로 다시 이긴다. padding/margin은 .modal-close
+   상속값(13px/-13px)이 absolute 좌표 계산과 얽혀 어긋나므로 0으로 재정의하고 width/height로
+   직접 44px 터치 타겟을 만든다(아이콘은 SVG 자체 크기 18px로 flex 중앙정렬, 상속). */
 .gacha-close {
+  position: absolute;
   top: 16px;
   right: 16px;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
   border: none;
   background: transparent;
-  font-size: 24px;
+  color: #4D4139;
+}
+
+/* 다른 닫기 버튼(.modal-close/.browse-close)과 동일: 배경 없이 색만 브랜드 빨강으로(2026-07-25,
+   눌렀을 때 생기던 #EDE4DF 음영 제거). hover는 터치기기 눌어붙음 방지를 위해 반드시 media 안에. */
+@media (hover: hover) {
+  .gacha-close:hover { color: var(--brand-red); }
 }
 
 .gacha-close:active {
-  background: #EDE4DF;
+  color: var(--brand-red);
 }
 
 .gacha-title {
@@ -1655,35 +1668,16 @@ img {
   z-index: 5; /* 그릇 앞면(.gacha-bowl-front, 4)보다 위 — 스테이지 안으로 들어오면서 필요해짐 */
 }
 
-/* 가챠 결과 카드 = 메인 그리드 카드(.recipe-card)와 동일. 폭만 모달에 맞게 고정.
-   컨테이너는 클릭 통과(pointer-events:none)라 카드만 다시 클릭 가능하게 켠다.
-   모달의 text-align:center가 상속되지 않게 메인 카드처럼 왼쪽 정렬로 되돌린다. */
-/* 가챠는 소스만 나옴(GACHA_POOL=소스 필터) → 배지 항상 "소스"라 정보 중복이므로 숨김.
-   대신 프레임 자체를 소스 카테고리색으로 물들여 "오늘의 소스"임을 색으로 표현.
-   배지·즐겨찾기·좋아요 다 없어 상단 밴드 불필요 → 사방 균일한 얇은 로즈 프레임 */
-.gacha-result .recipe-card { --band-h: 6px; --frame: #E0A294; width: 190px; pointer-events: auto; text-align: left; padding: var(--band-h) 6px 6px; }
-/* 모바일은 실제 그리드 카드 폭(162px)과 동일하게 — 작은 모달에서도 버튼과 안 겹침 */
-@media all {
-  .gacha-result .recipe-card { width: 162px; }
-}
-/* 가챠 카드는 데스크톱에서도 폭이 모바일 그리드 카드(162px)급이므로,
-   데스크톱 타이포(24px 등)를 쓰면 제목이 잘림 → 모바일 카드와 같은 크기를 항상 적용 */
-.gacha-result .recipe-body { padding: 9px 11px 10px; column-gap: 8px; }
-.gacha-result .recipe-name { font-size: 15px; }
-.gacha-result .recipe-ver { font-size: 12px; }
-
-/* 가챠 결과 카드: 좋아요·책갈피·카테고리 배지 모두 숨김(소스만 나와 배지는 정보 중복).
-   카드 클릭 → 레시피 모달은 유지. */
-.gacha-result .fav-star,
-.gacha-result .like-btn,
-.gacha-result .recipe-cat-label { display: none; }
-
-/* 가챠 카드는 터치 반응(썸네일 확대·밴드 색) 제거 — 확대 애니메이션 컨테이너(transform) 안이라
-   :active 변형이 겹치면 iOS에서 별(SVG)이 미세하게 흔들려 보임. 결과 확인용이라 반응 불필요. */
-.gacha-result .recipe-card:active .recipe-thumb-img { transform: none; }
-
-@media (hover: none) {
-  .gacha-result .recipe-card:active { background: var(--frame); }
+/* 가챠 결과 카드 = 브라우즈 그리드 카드(.hc-card--browse)와 동일 스타일 재사용(2026-07-25,
+   옛 TCG 카드 .recipe-card에서 교체 — buildBrowseGridCard(r, {hideLike:true})로 렌더).
+   좋아요는 JS에서 아예 안 그려 넣고, 배지는 syncBrowseGridCard를 호출하지 않아 자연히 빈 채로 둔다.
+   즐겨찾기(북마크)·셀럽 별은 그대로 유지. 컨테이너(.gacha-result)는 클릭 통과(pointer-events:none)라
+   카드만 다시 클릭 가능하게 켠다. 폭은 실제 모바일 그리드 카드와 같은 162px —
+   실측: 162(폭=썸네일 높이) + border 2px + 푸터 min-height 56px - margin-top 겹침 1px ≈ 217px,
+   .gacha-stage(220px) 안에 여유 있게 들어간다(2026-07-25 확인). */
+.gacha-result .hc-card--browse {
+  width: 162px;
+  pointer-events: auto;
 }
 
 .gacha-pull {
@@ -1756,7 +1750,6 @@ img {
 @media (min-width: 100000px) {
   .gacha-modal { width: 440px; padding: 40px 34px 32px; gap: 20px; }
   .gacha-title { font-size: 24px; }
-  .gacha-close { font-size: 30px; }
   .gacha-stage { transform: scale(1.36); margin: 36px 0; }
   .gacha-pull { font-size: 18px; padding: 16px 50px; }
   .gacha-view { font-size: 17px; padding: 14px 36px; }

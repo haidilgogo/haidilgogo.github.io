@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=562">
+<link rel="stylesheet" href="styles.css?v=563">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -597,7 +597,10 @@
 <!-- 오늘의 소스 가챠 -->
 <div class="gacha-overlay" id="gachaOverlay">
   <div class="gacha-modal" id="gachaModal">
-    <button class="modal-close gacha-close" id="gachaClose" type="button" aria-label="닫기">&times;</button>
+    <button class="modal-close gacha-close" id="gachaClose" type="button" aria-label="닫기">
+      <!-- modalClose/browse-close와 동일 X 아이콘(2026-07-25, &times; 글리프 → SVG로 통일) -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.02" stroke-linecap="round"/></g></svg>
+    </button>
     <div class="gacha-title">오늘의 소스</div>
     <div class="gacha-stage" id="gachaStage">
       <!-- 받침 매트: 크림색 그릇이 배경에 묻히지 않게 우드톤 매트를 깔아 대비 확보 -->
@@ -699,7 +702,7 @@
   </div>
 </div>
 
-<script src="script.js?v=396"></script>
+<script src="script.js?v=397"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
