@@ -3914,7 +3914,10 @@ img {
     rgba(20, 20, 20, 0) 100%);
   pointer-events: none;
 }
-.hp-thumb img, .hc-thumb img {
+/* 🔴 자식 선택자(>)를 반드시 유지할 것. 후손 선택자(.hp-thumb img)로 두면 썸네일 안에 있는
+   순위 배지의 메달 <img>까지 잡혀서 썸네일 크기로 부풀어 오른다(2026-07-25 실제 발생).
+   썸네일 위에 새 <img>를 얹을 일이 또 생겨도 이 규칙은 직속 이미지만 건드려야 한다. */
+.hp-thumb > img, .hc-thumb > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -4181,7 +4184,7 @@ img {
   flex: none;
   background: #EADFD6;
 }
-.hc-row-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hc-row-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; } /* > 유지 — 위 3917 주석 참고 */
 .hc-row-txt {   /* 리스트 행 텍스트 칼럼(이름 + 부제 세로 쌓기) */
   flex: 1;
   min-width: 0;
@@ -4257,23 +4260,23 @@ img {
    배너 캡션·카드 이름은 형제라 안 움직인다. 배너 첫장=img, 가이드/칼럼=.mf-colbg(배경이미지) 두 경우 모두 처리.
    클릭/터치 눌림 = 배너·인기소스·히든·탕(프레임 살짝 축소). 배너는 과거(2026-07-23) press를 뺐었으나 2026-07-24 사용자 요청으로 다시 넣음(준비중 배너는 제외).
    셀럽 press(0.9 바운스)는 .celeb-img에 이미 있음. */
-.hc-thumb img, .hc-row-thumb img,
+.hc-thumb > img, .hc-row-thumb > img,
 .mf-hero > img, .mf-colbg, .celeb-face img { transition: transform .2s ease; }
 @media (hover: hover) {
   .mf-hero:not(.mf-hero--soon):hover > img,
   .mf-hero:not(.mf-hero--soon):hover .mf-colbg { transform: scale(1.04); }
   .celeb:hover  .celeb-face img   { transform: scale(1.08); }
   /* 좋아요·즐겨찾기 버튼 위에서 호버 중일 땐 카드 확대 효과 제외(2026-07-25) — 버튼 조작과 카드 인터랙션을 분리 */
-  .hc-card:hover:not(:has(.browse-fav:hover, .hc-row-like:hover)) .hc-thumb img { transform: scale(1.05); }
-  .hc-row:hover:not(:has(.hc-row-like:hover)) .hc-row-thumb img { transform: scale(1.06); }
+  .hc-card:hover:not(:has(.browse-fav:hover, .hc-row-like:hover)) .hc-thumb > img { transform: scale(1.05); }
+  .hc-row:hover:not(:has(.hc-row-like:hover)) .hc-row-thumb > img { transform: scale(1.06); }
 }
 /* 인기소스(검정 푸터) 카드만: transform이 아니라 '크기 변경'으로 줌.
    transform은 이미지를 별도 GPU 레이어로 승격시켜, 잘린 아래 가장자리가 검정 푸터/그라데이션과 1px 어긋나 밝은 경계선이 생김(2026-07-24).
    width/height 방식이 레이어 분리를 없애 선을 많이 줄여주지만, scale 변형(클릭 눌림 등)이 걸리면 소수점 픽셀 안티앨리어싱으로 아주 옅은 1px 선이 남는 건 여전함 — 브라우저 합성 한계라 완전 제거는 보류(사용자 확인, 2026-07-24 넘어감).
    밝은 배경의 탕·히든은 이 선이 안 보여서 그대로 transform 유지. */
-.hp-thumb img { transition: width .2s ease, height .2s ease, margin .2s ease; }
+.hp-thumb > img { transition: width .2s ease, height .2s ease, margin .2s ease; }
 @media (hover: hover) {
-  .hp-card:hover:not(:has(.hp-like:hover)) .hp-thumb img { width: 106%; height: 106%; margin: -3%; }
+  .hp-card:hover:not(:has(.hp-like:hover)) .hp-thumb > img { width: 106%; height: 106%; margin: -3%; }
 }
 /* 클릭/터치 눌림 — 배너·인기소스 = 프레임 전체 축소 / 탕·히든 = 이미지만(2026-07-24 사용자 요청).
    탕·히든은 이미지를 '축소'하면 컨테이너 배경이 가장자리에 드러나 테두리처럼 보임 → 대신 살짝 '확대(줌인)'해서
@@ -4282,8 +4285,8 @@ img {
 .mf-hero, .hp-card { transition: transform .18s ease; }
 .mf-hero:not(.mf-hero--soon):active { transform: scale(.985); } /* 큰 요소라 살짝만 */
 .hp-card:active:not(:has(.hp-like:active)) { transform: scale(.97); }
-.hc-card:active:not(:has(.browse-fav:active, .hc-row-like:active)) .hc-thumb img { transform: scale(1.09); }
-.hc-row:active:not(:has(.hc-row-like:active)) .hc-row-thumb img { transform: scale(1.09); }
+.hc-card:active:not(:has(.browse-fav:active, .hc-row-like:active)) .hc-thumb > img { transform: scale(1.09); }
+.hc-row:active:not(:has(.hc-row-like:active)) .hc-row-thumb > img { transform: scale(1.09); }
 
 /* ═══════════ 전체보기(브라우즈) 화면 — 전체/소스/히든메뉴/탕 카테고리 탭 (2026-07-25 이중 필터로 재구조화) ═══════════
    탭은 브라우즈 중 항상 표시(list-head 자체가 홈에서 통째로 숨음). 소스만 상위 5개에 순위 배지.
