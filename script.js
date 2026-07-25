@@ -1020,13 +1020,14 @@
   // 순위 배지는 빈 슬롯(.hc-badge-slot)만 만들어두고, 실제 배지는 syncBrowseGridCard가 매 렌더마다 채운다
   // (좋아요 수가 바뀌어 순위가 달라질 수 있어 캐시된 카드도 배지를 다시 계산해야 함).
   // opts.hideLike: 좋아요(하트) 숨김(가챠 결과 카드용, 2026-07-25). opts.eager: 이미지 즉시 로드.
-  // opts.onOpen: 클릭 핸들러 교체(기본은 openModal). 기존 브라우즈 그리드 호출(buildBrowseGridCard(r))은
-  // opts 없이 그대로 호출되므로 동작 그대로.
+  // opts.interactive=false: 카드 자체를 버튼이 아닌 정적 div로 렌더(가챠 결과 카드용).
+  // 기존 브라우즈 그리드 호출(buildBrowseGridCard(r))은 opts 없이 그대로 호출되므로 동작 그대로.
   function buildBrowseGridCard(r, opts) {
     opts = opts || {};
-    const el = document.createElement('button');
-    el.type = 'button';
-    el.className = 'hc-card hc-card--browse';
+    const interactive = opts.interactive !== false;
+    const el = document.createElement(interactive ? 'button' : 'div');
+    if (interactive) el.type = 'button';
+    el.className = 'hc-card hc-card--browse' + (interactive ? '' : ' hc-card--static');
     el.dataset.id = r.id;
     el.innerHTML = '<span class="hc-thumb"><span class="hc-badge-slot"></span>' + browseFavHtml(r) + homeCardBody(r, opts.eager) + '</span>'
       + '<span class="hc-card-foot">'
@@ -1034,7 +1035,7 @@
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
       + (opts.hideLike ? '' : browseLikeHtml(r))
       + '</span>';
-    el.addEventListener('click', opts.onOpen || (() => openModal(r)));
+    if (interactive) el.addEventListener('click', () => openModal(r));
     bindBrowseFav(el);
     if (!opts.hideLike) bindBrowseLike(el);
     return el;
@@ -1914,7 +1915,7 @@
       // → 캐시 여부와 무관하게 카드가 흰 네모로 먼저 뜨는 현상 방지.
       gachaResult.innerHTML = '';
       // eager: 결과 카드는 바로 보여야 하므로 지연 로딩 없이 즉시 로드(딜레이 방지, 이미지는 openGacha 때 프리로드됨)
-      gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, eager: true, onOpen: () => { closeGacha(); openModal(r); } }));
+      gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, eager: true, interactive: false }));
       let revealed = false;
       const reveal = () => {
         if (revealed) return;
@@ -1959,7 +1960,7 @@
     gachaResetBowl();
     gachaPull.style.display = 'none';
     gachaResult.innerHTML = '';
-    gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, eager: true, onOpen: () => { closeGacha(); openModal(r); } }));
+    gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, eager: true, interactive: false }));
     gachaResult.style.transition = 'none';
     gachaResult.style.opacity = '1';
     gachaResult.style.transform = 'scale(1)';

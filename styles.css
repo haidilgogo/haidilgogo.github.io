@@ -1690,6 +1690,9 @@ img {
   width: 162px;
   pointer-events: auto;
 }
+.gacha-result .hc-card--static {
+  cursor: default;
+}
 
 .gacha-pull {
   display: inline-flex;      /* 평면 주사위 아이콘 + '뽑기' 정렬(2026-07-24) */
@@ -1718,8 +1721,7 @@ img {
   margin-top: 16px;          /* 카드 ↔ 버튼: 넓게 띄움 */
 }
 
-/* '레시피 보기' = 로즈 소프트필 버튼. 카드가 주인공(카드 자체도 탭되어 상세 열림)이라
-   솔리드 빨강 대신 은근한 보조 CTA로. 델리케이트한 로즈 카드 톤과 맞춤(사용자 확정 2026-07-24). */
+/* '레시피 보기'만 상세 모달을 여는 CTA. 결과 카드는 확인용으로만 두고 직접 열리지 않는다. */
 .gacha-view {
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
@@ -4315,7 +4317,7 @@ img {
   .mf-hero:not(.mf-hero--soon):hover .mf-colbg { transform: scale(1.04); }
   .celeb:hover  .celeb-face img   { transform: scale(1.08); }
   /* 좋아요·즐겨찾기 버튼 위에서 호버 중일 땐 카드 확대 효과 제외(2026-07-25) — 버튼 조작과 카드 인터랙션을 분리 */
-  .hc-card:hover:not(:has(.browse-fav:hover, .hc-row-like:hover)) .hc-thumb > img { transform: scale(1.05); }
+  .hc-card:not(.hc-card--static):hover:not(:has(.browse-fav:hover, .hc-row-like:hover)) .hc-thumb > img { transform: scale(1.05); }
   .hc-row:hover:not(:has(.hc-row-like:hover)) .hc-row-thumb > img { transform: scale(1.06); }
 }
 /* 인기소스(검정 푸터) 카드만: transform이 아니라 '크기 변경'으로 줌.
@@ -4333,7 +4335,7 @@ img {
 .mf-hero, .hp-card { transition: transform .18s ease; }
 .mf-hero:not(.mf-hero--soon):active { transform: scale(.985); } /* 큰 요소라 살짝만 */
 .hp-card:active:not(:has(.hp-like:active)) { transform: scale(.97); }
-.hc-card:active:not(:has(.browse-fav:active, .hc-row-like:active)) .hc-thumb > img { transform: scale(1.09); }
+.hc-card:not(.hc-card--static):active:not(:has(.browse-fav:active, .hc-row-like:active)) .hc-thumb > img { transform: scale(1.09); }
 .hc-row:active:not(:has(.hc-row-like:active)) .hc-row-thumb > img { transform: scale(1.09); }
 
 /* ═══════════ 전체보기(브라우즈) 화면 — 전체/소스/히든메뉴/탕 카테고리 탭 (2026-07-25 이중 필터로 재구조화) ═══════════
