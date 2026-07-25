@@ -370,6 +370,20 @@
     return likeCounts[id] || 0;
   }
 
+  // 같은 레시피의 하트가 여러 곳에 동시에 그려져 있다(홈 인기소스 .hp-like / 홈 리스트·브라우즈 .hc-row-like).
+  // 어디서 눌렀든 '숫자 + 내가 누름(active)' 상태를 전부 같게 맞춘다.
+  // 🔴 아래 refreshLikeCounts()는 숫자만 맞추므로 이걸 대신할 수 없다. 새 하트 UI를 추가하면
+  //    여기 선택자에도 넣을 것 — 예전에 모달이 옛 선택자(.recipe-grid .like-btn)를 찾고 있어서
+  //    모달에서 좋아요를 눌러도 카드 하트가 빨갛게 안 바뀌었다(2026-07-25).
+  function syncLikeUI(id) {
+    const sel = '.hp-like[data-id="' + id + '"], .hc-row-like[data-id="' + id + '"]';
+    document.querySelectorAll(sel).forEach((el) => {
+      el.classList.toggle('active', likedByMe.has(id));
+      const c = el.querySelector('.like-count');
+      if (c) c.textContent = getLikeCount(id);
+    });
+  }
+
   // 화면에 그려진 하트 숫자들을 현재 likeCounts로 갱신 (active 상태는 기기별이라 건드리지 않음)
   function refreshLikeCounts() {
     // 그리드 카드(.like-btn)·홈 인기소스 칩(.hp-like)·홈 히든 리스트 하트(.hc-row-like) 모두 갱신
@@ -913,8 +927,7 @@
         e.stopPropagation();
         const id = el.dataset.id;
         toggleLike(id);
-        el.classList.toggle('active', likedByMe.has(id));
-        el.querySelector('.like-count').textContent = getLikeCount(id);
+        syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
       });
     });
@@ -1345,8 +1358,7 @@
         e.stopPropagation();
         const id = el.dataset.id;
         toggleLike(id);
-        el.classList.toggle('active', likedByMe.has(id));
-        el.querySelector('.like-count').textContent = getLikeCount(id);
+        syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); // 팝 재시작
       });
     });
@@ -1392,8 +1404,7 @@
         e.stopPropagation();
         const id = el.dataset.id;
         toggleLike(id);
-        el.classList.toggle('active', likedByMe.has(id));
-        el.querySelector('.like-count').textContent = getLikeCount(id);
+        syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); // 팝 재시작
       });
     });
@@ -1549,11 +1560,7 @@
     toggleLike(id);
     modalLikeBtn.classList.toggle('active', likedByMe.has(id));
     modalLikeCount.textContent = getLikeCount(id);
-    const gridBtn = document.querySelector('.recipe-grid .like-btn[data-id="' + id + '"]');
-    if (gridBtn) {
-      gridBtn.classList.toggle('active', likedByMe.has(id));
-      gridBtn.querySelector('.like-count').textContent = getLikeCount(id);
-    }
+    syncLikeUI(id); // 뒤에 깔린 카드 하트(숫자+빨강 채움)도 같이 맞춤
   });
 
   // 모바일 전체화면 상세: 오버레이가 상단바 아래에서 시작하도록 실제 높이를 CSS 변수로 전달
