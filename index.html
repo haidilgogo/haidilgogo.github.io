@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=566">
+<link rel="stylesheet" href="styles.css?v=567">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -289,7 +289,9 @@
     <!-- 초심자 가이드 패널(뼈대, 2026-07-21) — 콘텐츠는 추후 채움. 홈 가이드 배너에서 열림 -->
     <div class="guide-overlay" id="guideOverlay" hidden>
       <div class="guide-sheet" role="dialog" aria-label="초심자 가이드">
-        <button class="guide-close" id="guideClose" type="button" aria-label="닫기">&times;</button>
+        <button class="guide-close" id="guideClose" type="button" aria-label="닫기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.02" stroke-linecap="round"/></g></svg>
+        </button>
         <span class="guide-sheet-ic">📖</span>
         <h2 class="guide-sheet-title">하이디라오가 처음인 당신에게</h2>
         <p class="guide-sheet-desc">주문 순서부터 소스바 사용법, 첫 방문 추천 코스까지<br>차근차근 알려주는 가이드를 준비하고 있어요.</p>
@@ -460,7 +462,9 @@
 <!-- 기획 칼럼 패널(고수 빼주세요! 등) — 홈 배너에서 열림. 스크롤되는 전체화면 시트 -->
 <div class="column-overlay" id="columnOverlay" hidden>
   <div class="column-sheet" id="columnSheet" role="dialog" aria-label="칼럼">
-    <button class="column-close" id="columnClose" type="button" aria-label="닫기">&times;</button>
+    <button class="column-close" id="columnClose" type="button" aria-label="닫기">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.02" stroke-linecap="round"/></g></svg>
+    </button>
     <div class="column-hero" id="columnHero">
       <h2 class="column-title" id="columnTitle"></h2>
       <p class="column-sub" id="columnSub"></p>

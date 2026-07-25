@@ -4483,17 +4483,34 @@ img {
   padding: 34px 24px 30px;
   text-align: center;
 }
-.guide-close {
+.guide-close,
+.column-close {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: 9px;
+  right: 9px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  font-size: 26px;
-  line-height: 1;
-  color: var(--text-muted);
+  color: #4D4139;
   cursor: pointer;
-  padding: 4px;
+  padding: 0;
+  transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .guide-close:hover,
+  .column-close:hover {
+    color: var(--brand-red);
+  }
+}
+.guide-close:active,
+.column-close:active {
+  color: var(--brand-red);
 }
 .guide-sheet-ic { font-size: 34px; line-height: 1; display: block; }
 .guide-sheet-title {
@@ -4537,20 +4554,6 @@ img {
   .column-overlay { padding: 24px; align-items: flex-start; }
   .column-sheet { min-height: auto; border-radius: 18px; overflow: hidden; margin: auto; }
 }
-.column-close {
-  position: absolute; top: 12px; right: 14px;
-  z-index: 3;
-  width: 34px; height: 34px;
-  display: flex; align-items: center; justify-content: center;
-  background: none;
-  border: none;
-  color: #4D4139; font-size: 26px; line-height: 1;  /* 원 배경 제거 + 상단바 아이콘색 통일 */
-  cursor: pointer;
-  transition: color .15s, transform .08s ease;
-  -webkit-tap-highlight-color: transparent; /* 기본 검정 탭 음영 제거, 아래 :active로 눌림 반응 */
-}
-.column-close:hover { color: var(--brand-red); }
-.column-close:active { color: var(--brand-red); transform: scale(.9); }
 /* 상단 히어로(배너와 같은 임시 배경) */
 .column-hero {
   position: relative;
