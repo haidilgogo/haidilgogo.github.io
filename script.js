@@ -1610,6 +1610,9 @@
       favEnteredFromHome = false;
     }
     renderGrid();
+    // 화면이 통째로 바뀌므로 맨 위로. enterBrowse()·헤더 X에는 이미 있는데 여기만 빠져 있어서,
+    // 홈에서 스크롤한 뒤 즐겨찾기를 켜면 목록 중간부터 보였다(2026-07-25).
+    window.scrollTo({ top: 0, behavior: 'instant' });
   });
 
   // ===== 오늘의 소스 가챠 =====
