@@ -845,7 +845,8 @@
 
   // ── 전체보기(브라우즈) 화면 — 전체/소스/히든메뉴/탕 카테고리 탭 (2026-07-24 개편, 2026-07-25 이중 필터로 재구조화) ──
   // 탭은 브라우즈 중 항상 표시(전체 포함)되고, 즐겨찾기·검색·인물과 서로 겹치는 필터로 동작한다(getFiltered 참고).
-  // 소스 탭에서만 상위 5개 썸네일에 순위 배지(homeRankBadge) 표시. 구 TCG 카드는 gacha 결과에만 남음.
+  // 소스 카드는 절대 순위 top5(sauceRankMap 기준)면 배지(homeRankBadge) 표시 — 카테고리 탭·즐겨찾기·검색·인물
+  // 어느 필터에서 봐도 값이 같다(2026-07-25 버그 수정: 예전엔 화면에 보이는 목록 안 순번을 썼음).
   const BROWSE_TABS = ['전체', '소스', '히든메뉴', '탕'];
   const browseCatTabsEl = document.getElementById('browseCatTabs');
   const browseCatUnderlineEl = document.getElementById('browseCatUnderline');
@@ -964,15 +965,18 @@
       gridEl.appendChild(empty);
       return;
     }
-    // 소스 탭일 때만 상위 5개에 순위 배지(검색·즐겨찾기와 겹쳐 있어도 동일). 그 외엔 배지 없는 동일한 클린 카드(2026-07-25).
-    const showBadge = activeCat === '소스';
-    filtered.forEach((r, i) => {
+    // 순위 배지 = 소스 카테고리 전체를 인기순 정렬한 절대 인덱스(sauceRankMap). 화면 필터(탭·즐겨찾기·검색·
+    // 인물)와 무관하게 항상 같은 값 — 예전엔 filtered 배열 안에서의 순번(i)을 써서, 즐겨찾기·검색으로 걸러진
+    // 화면에서 실제 4위 소스가 '2위'처럼 잘못 보이는 버그가 있었다(2026-07-25 수정).
+    const rankMap = sauceRankMap();
+    filtered.forEach((r) => {
       let el = browseCardCache.get(r.id);
       if (!el) {
         el = buildBrowseGridCard(r);
         browseCardCache.set(r.id, el);
       }
-      syncBrowseGridCard(el, r, (showBadge && i < 5) ? i : null);
+      const rank = r.cat === '소스' ? rankMap.get(r.id) : undefined;
+      syncBrowseGridCard(el, r, (rank != null && rank < 5) ? rank : null);
       gridEl.appendChild(el);
     });
   }
@@ -1295,8 +1299,9 @@
   // ③ 인기 소스: 좋아요순 상위 5개 캐러셀. 순서는 렌더 시점 고정(좋아요 눌러도 즉시 재정렬 안 함 —
   //    카드가 눈앞에서 튀지 않게. 숫자만 refreshLikeCounts로 갱신, 순서는 다음 방문 때 반영).
   function renderHomePopular() {
-    const sauces = RECIPES.filter((r) => r.cat === '소스').slice()
-      .sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || a.name.localeCompare(b.name, 'ko'));
+    // 정렬은 byPopular로 통일(2026-07-25) — 예전엔 동점 타이브레이크가 이름순이라, 좋아요 수가 같을 때
+    // 이 레일의 순서와 브라우즈/모달 순위 배지(sauceRankMap, byPopular 기준)가 서로 어긋날 수 있었다.
+    const sauces = RECIPES.filter((r) => r.cat === '소스').slice().sort(byPopular);
     const top = sauces.slice(0, 5);
     popularRailEl.innerHTML = top.map((r, i) =>
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
@@ -1326,6 +1331,14 @@
   function byNewest(a, b) { return (b.date || '').localeCompare(a.date || ''); }
   // 인기순: 좋아요 많은 순, 동점이면 최신순(2026-07-23, 탕·히든도 인기순 — baseLikes 넣기 전엔 0동점이라 최신순처럼 보임)
   function byPopular(a, b) { return getLikeCount(b.id) - getLikeCount(a.id) || byNewest(a, b); }
+  // 소스 카테고리 전체를 인기순 정렬했을 때의 절대 순위(0-based) 맵 — 화면 필터·모달 어디서 계산해도 같은
+  // 값이 나오도록 하는 단일 기준(2026-07-25). 좋아요가 바뀌면 순위도 바뀌므로 캐시하지 않고 호출 시마다 재계산.
+  function sauceRankMap() {
+    const ranked = RECIPES.filter((r) => r.cat === '소스').sort(byPopular);
+    const map = new Map();
+    ranked.forEach((r, i) => map.set(r.id, i));
+    return map;
+  }
   function renderHomeCatGrid(cat, gridElement) {
     const list = RECIPES.filter((r) => r.cat === cat).sort(byPopular);
     gridElement.innerHTML = list.slice(0, 4).map((r) => // 소스(주인공)는 최신순 4개=2×2 그리드, 나머지는 '전체보기'로
@@ -1406,6 +1419,18 @@
     } else {
       thumbEl.style.background = r.tint;
       thumbEl.innerHTML = '<span class="modal-thumb-emoji">' + r.emoji + '</span>';
+    }
+    // 순위·이달의 소스 배지(2026-07-25) — 소스 카테고리에서 절대 순위(sauceRankMap) top5면 순위 배지
+    // (homeRankBadge, 홈 인기소스와 동일 마크업/클래스 재사용), 이번 달 소스(pickMonthlySauce)면 '이달의
+    // 소스' 배지. 둘 다 해당하면(예: s19) 좌상단에 가로로 나란히 — 순위 배지 → 이달의 소스 배지 순서.
+    const modalRank = r.cat === '소스' ? sauceRankMap().get(r.id) : undefined;
+    const modalIsMonthly = pickMonthlySauce(new Date())?.id === r.id;
+    if ((modalRank != null && modalRank < 5) || modalIsMonthly) {
+      thumbEl.insertAdjacentHTML('beforeend',
+        '<span class="modal-badge-row">'
+        + (modalRank != null && modalRank < 5 ? homeRankBadge(modalRank) : '')
+        + (modalIsMonthly ? '<span class="modal-monthly-badge">이달의 소스</span>' : '')
+        + '</span>');
     }
 
     const modalNameEl = document.getElementById('modalName');
@@ -1522,7 +1547,10 @@
 
   // 상세/모달이 열린 채 상단바(탭·검색·즐겨찾기 등)를 누르면 닫고 그 동작을 그대로 실행
   // (발도장 보기 모달도 지역 탭 누르면 닫히고 그 지역으로 필터 — 레시피 상세와 동일 규칙)
-  topbarEl.addEventListener('click', () => {
+  // ⚠️ 공유 버튼(#topShareBtn)은 화면/섹션을 바꾸지 않으므로 예외 — 캡처 단계라 이 리스너가 버튼 자체의
+  // 클릭 핸들러보다 먼저 실행돼, 예외 없이는 모달이 열린 채 공유를 눌러도 모달이 먼저 닫혀버렸다(2026-07-25 버그 수정).
+  topbarEl.addEventListener('click', (e) => {
+    if (e.target.closest('#topShareBtn')) return;
     if (modalOverlay.classList.contains('open')) closeModal();
     if (stampViewOverlay.classList.contains('open')) closeStampView();
   }, true);
