@@ -384,6 +384,20 @@
     });
   }
 
+  // 하트 통통 팝 — 누른 그 순간에만 재생한다.
+  // 🔴 애니메이션이 끝나면 .pop을 반드시 떼야 한다. 예전엔 계속 붙어 있어서, 즐겨찾기를 누르는 등
+  //    그리드가 다시 그려질 때 카드가 DOM에 재삽입되며 CSS 애니메이션이 통째로 재생됐다
+  //    ("즐겨찾기를 눌렀는데 하트가 통통 튄다", 2026-07-25).
+  function popHeart(el) {
+    el.classList.remove('pop');
+    void el.offsetWidth; // 재시작을 위한 리플로우
+    el.classList.add('pop');
+    // ⚠️ animationend에만 기대면 안 된다 — 탭이 백그라운드면 애니메이션이 멈춰 이벤트가 영영 안 온다
+    //    (미리보기 창에서 실제로 그랬음). 타이머로 확실히 뗀다(애니 .32s).
+    clearTimeout(el._popT);
+    el._popT = setTimeout(function () { el.classList.remove('pop'); }, 400);
+  }
+
   // 화면에 그려진 하트 숫자들을 현재 likeCounts로 갱신 (active 상태는 기기별이라 건드리지 않음)
   function refreshLikeCounts() {
     // 그리드 카드(.like-btn)·홈 인기소스 칩(.hp-like)·홈 히든 리스트 하트(.hc-row-like) 모두 갱신
@@ -928,7 +942,7 @@
         const id = el.dataset.id;
         toggleLike(id);
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
-        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+        popHeart(el);
       });
     });
   }
@@ -1359,7 +1373,7 @@
         const id = el.dataset.id;
         toggleLike(id);
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
-        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); // 팝 재시작
+        popHeart(el);
       });
     });
   }
@@ -1405,7 +1419,7 @@
         const id = el.dataset.id;
         toggleLike(id);
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
-        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); // 팝 재시작
+        popHeart(el);
       });
     });
   }
