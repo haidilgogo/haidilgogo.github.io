@@ -1785,10 +1785,12 @@ img {
    -20px/-9px는 별 오른쪽 끝~첫 글자 사이 gapX 2px는 좁았지만 gapY(별 위~글자 위) 10px로 너무 떠
    보였음(실측, Range.getBoundingClientRect 기준) → -19px/-3px로 당겨 gapX 1px·gapY 4px로 밀착
    (겹침은 없음: gapX>0 확인). 화면 왼쪽엔 안 잘리게 .modal-header 왼쪽 padding 22px 유지(위 참고). */
+/* 2026-07-25 재조정: -19/-3은 별이 글자 '옆'에 나란히 서서 대각선으로 안 읽혔음(사용자 지적).
+   위로 올리고 오른쪽으로 당겨 첫 글자 좌상단 모서리에 얹히게 함. */
 .modal-name .star-accent {
   position: absolute;
-  left: -19px;
-  top: -3px;
+  left: -14px;
+  top: -9px;
   width: 18px;
   height: 18px;
 }
@@ -3529,10 +3531,11 @@ img {
 .celeb-sec-title { position: relative; }
 /* 실측(Range.getBoundingClientRect 기준) — 처음 값(-12/-7)은 gapX -4px로 '셀' 글자를 4px 침범했음
    → -16px/-3px로 조정해 gapX 0px·gapY 5px(침범 없이 밀착). 화면 좌측 4px 여백 남아 안 잘림 확인. */
+/* 2026-07-25 재조정: -16/-3은 '셀' 옆에 나란히 서 있어 대각선 느낌이 없었음 → 위로 올리고 당김. */
 .celeb-sec-title .star-accent {
   position: absolute;
-  left: -16px;
-  top: -3px;
+  left: -12px;
+  top: -8px;
   width: 16px;
   height: 16px;
   z-index: 2;
@@ -4249,12 +4252,13 @@ img {
   position: relative;
   overflow: visible;
 }
+/* 2026-07-25 재조정: 11px는 작아 보인다는 지적 → 13px로 키우고, 위로 올려 대각선 배치. */
 .hc-row-name.has-star .star-accent {
   position: absolute;
-  left: -11px;
-  top: -4px;
-  width: 11px;
-  height: 11px;
+  left: -10px;
+  top: -7px;
+  width: 13px;
+  height: 13px;
   z-index: 2;
 }
 /* 부제(탕·히든 카드 공통, 선택) — 그리드는 가운데(부모 text-align 상속), 리스트는 왼쪽 */
