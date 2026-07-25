@@ -1295,13 +1295,15 @@
     });
   }
 
-  // 인기소스 순위 배지: 2~5위와 완전히 같은 검정 알약 모양, 1위만 금색 알약(왕관 아이콘+'1위')으로
-  // 색만 구별(2026-07-25 — 예전 빨강 리본 모양이 상단바 즐겨찾기 아이콘과 헷갈린다는 지적으로 알약 통일)
+  // 인기소스 순위 배지: 1~5위 전부 같은 검정 알약(쿠팡이츠 방식, 2026-07-25 — 금색 알약+왕관은
+  // 되돌림). 1~3위는 알약 안에 메달 아이콘(gold/silver/bronze.svg) + 'N위', 4~5위는 글자만.
+  const RANK_MEDALS = ['gold', 'silver', 'bronze'];
   function homeRankBadge(i) {
-    if (i === 0) {
-      return '<i class="hp-rank hp-rank-gold"><svg class="hp-rank-crown" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l4 4 5-6 5 6 4-4v11H3z"/></svg>1위</i>';
-    }
-    return '<i class="hp-rank">' + (i + 1) + '위</i>';
+    const medal = RANK_MEDALS[i];
+    const medalImg = medal
+      ? '<img class="hp-medal" src="assets/icons/medal/' + medal + '.svg" alt="" aria-hidden="true">'
+      : '';
+    return '<i class="hp-rank">' + medalImg + (i + 1) + '위</i>';
   }
 
   // ③ 인기 소스: 좋아요순 상위 5개 캐러셀. 순서는 렌더 시점 고정(좋아요 눌러도 즉시 재정렬 안 함 —

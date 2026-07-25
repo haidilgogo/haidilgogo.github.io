@@ -1314,7 +1314,7 @@ img {
 }
 
 /* 모달 썸네일 좌상단 배지 줄(2026-07-25) — 순위 배지(homeRankBadge, 홈 인기소스와 같은 .hp-rank
-   마크업 재사용, 1위는 .hp-rank-gold 색만 다름)와 '이달의 소스' 배지를 가로로 나란히. .hp-rank는
+   마크업 재사용, 1~5위 전부 같은 색)와 '이달의 소스' 배지를 가로로 나란히. .hp-rank는
    원래 카드 썸네일 기준 절대 위치라, 이 줄 안에서는 flex로 흐르도록 static으로 되돌린다. */
 .modal-badge-row {
   position: absolute;
@@ -3928,12 +3928,18 @@ img {
   justify-content: center;
   font-size: 40px;
 }
-/* 2~5위: 검정 알약 배지 'N위' */
+/* 1~5위 순위 배지: 전부 같은 검정 알약(쿠팡이츠 방식, 2026-07-25 — 1위만 금색+왕관이던 처리는
+   되돌림). 1~3위는 메달 아이콘(.hp-medal)이 앞에 붙어 폭만 넓어지고, 높이는 5개 전부 동일해야
+   하므로 inline-flex + 고정 line-height로 img가 baseline에 영향 주지 않게 막는다. 폭은
+   min-width 없이 내용에 맞게 자동(1~3위 넓고 4~5위 좁은 게 의도된 결과). */
 .hp-rank {
   position: absolute;
   left: 7px;
   top: 7px;
   z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   padding: 2px 7px;
   border-radius: 20px;
   background: rgba(0, 0, 0, .58);
@@ -3943,21 +3949,13 @@ img {
   font-style: normal;
   line-height: 1.25;
 }
-/* 1위: 2~5위와 완전히 같은 알약(크기·padding·radius·좌상단 위치)에 색만 금색으로 구별.
-   왕관 아이콘 + '1위' 글자를 함께 넣음(2026-07-25 — 예전 빨강 리본 모양이 상단바 즐겨찾기
-   아이콘과 헷갈린다는 지적으로 알약 통일, 리본 마크업 제거) */
-.hp-rank-gold {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  background: #F4C948;
-  color: #4A3410;
-}
-.hp-rank-crown {
-  width: 11px;
-  height: 11px;
+/* .hp-thumb img, .hc-thumb img { width:100%; height:100% }가 (0,1,1) 특이도라 .hp-medal
+   단독(0,1,0)보다 세서 메달이 썸네일 크기로 늘어남 — .hp-rank .hp-medal(0,2,0)로 이겨서 고정 */
+.hp-rank .hp-medal {
+  width: 13px;
+  height: 13px;
   display: block;
-  fill: #4A3410;
+  flex: none;
 }
 /* 좋아요 — 검정 푸터 안, 알약 없이 흰 하트+숫자. 푸터는 상단정렬이지만 좋아요만 세로 가운데 */
 .hp-like {
