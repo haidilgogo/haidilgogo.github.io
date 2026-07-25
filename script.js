@@ -462,11 +462,12 @@
         r.name.includes(q) || (r.ings || []).some((i) => i[0].includes(q))
       );
     }
-    // 정렬은 인기순 고정(좋아요 많은 순, 동점은 가나다순, 2026-07-24 정렬 드롭다운 삭제 결정)
-    const byName = (a, b) => a.name.localeCompare(b.name, 'ko');
-    const sorted = filtered.slice();
-    sorted.sort((a, b) => getLikeCount(b.id) - getLikeCount(a.id) || byName(a, b));
-    return sorted;
+    // 정렬은 인기순 고정(2026-07-24 정렬 드롭다운 삭제 결정).
+    // 🔴 반드시 byPopular를 쓸 것 — 동점 타이브레이크가 여기만 가나다순이었던 탓에,
+    // 브라우즈에 4번째로 '보이는' 카드와 4위 배지를 '받는' 카드가 서로 달랐다(2026-07-25 발견).
+    // 배지(sauceRankMap)·홈 인기소스 레일·홈 카테고리 목록이 전부 byPopular(동점=최신순)를 쓰므로
+    // 정렬 기준은 이 한 곳으로 통일한다. 새 목록을 만들 때도 byPopular를 쓸 것.
+    return filtered.slice().sort(byPopular);
   }
 
   // 출처 플랫폼 아이콘 (흰색 단색, 어두운 썸네일 위에 표시). 색은 CSS currentColor(흰색) 상속.
