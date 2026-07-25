@@ -382,6 +382,37 @@
     return likeCounts[id] || 0;
   }
 
+  function setPressedState(el, active) {
+    if (!el) return;
+    el.classList.toggle('active', active);
+    el.setAttribute('aria-pressed', String(active));
+  }
+
+  function bindRoleButtonKeyboard(el) {
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      el.click();
+    });
+  }
+
+  function trapFocusWithin(container, e) {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(container.querySelectorAll(
+      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter((el) => !el.hidden && el.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
   // 같은 레시피의 하트가 여러 곳에 동시에 그려져 있다(홈 인기소스 .hp-like / 홈 리스트·브라우즈 .hc-row-like).
   // 어디서 눌렀든 '숫자 + 내가 누름(active)' 상태를 전부 같게 맞춘다.
   // 🔴 아래 refreshLikeCounts()는 숫자만 맞추므로 이걸 대신할 수 없다. 새 하트 UI를 추가하면
@@ -390,7 +421,7 @@
   function syncLikeUI(id) {
     const sel = '.hp-like[data-id="' + id + '"], .hc-row-like[data-id="' + id + '"]';
     document.querySelectorAll(sel).forEach((el) => {
-      el.classList.toggle('active', likedByMe.has(id));
+      setPressedState(el, likedByMe.has(id));
       const c = el.querySelector('.like-count');
       if (c) c.textContent = getLikeCount(id);
     });
@@ -417,6 +448,10 @@
       const countEl = btn.querySelector('.like-count');
       if (countEl) countEl.textContent = getLikeCount(btn.dataset.id);
     });
+    // 상세창은 카드와 별도 DOM이라 Firebase 갱신 경로에서 직접 맞춘다.
+    if (currentModalRecipe && modalOverlay.classList.contains('open')) {
+      modalLikeCount.textContent = getLikeCount(currentModalRecipe.id);
+    }
   }
 
   // --- Firebase 실시간 DB 연결 ---
@@ -931,7 +966,8 @@
   // span(버튼 아님) — hc-row-like와 같은 이유: 이 카드 자체가 <button>이라 그 안에 진짜 <button>을 중첩하면
   // 브라우저가 파싱 중 바깥 버튼을 조기 종료시켜 DOM이 깨짐(실측 확인, 2026-07-24).
   function browseFavHtml(r) {
-    return '<span class="browse-fav' + (favorites.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="즐겨찾기">' + FAV_SVG + '</span>';
+    const active = favorites.has(r.id);
+    return '<span class="browse-fav' + (active ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="즐겨찾기" aria-pressed="' + active + '">' + FAV_SVG + '</span>';
   }
   function bindBrowseFav(container) {
     container.querySelectorAll('.browse-fav').forEach((btn) => {
@@ -940,12 +976,14 @@
         const id = btn.dataset.id;
         if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
         saveFavorites();
-        btn.classList.toggle('active', favorites.has(id));
+        setPressedState(btn, favorites.has(id));
       });
+      bindRoleButtonKeyboard(btn);
     });
   }
   function browseLikeHtml(r) {
-    return '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>';
+    const active = likedByMe.has(r.id);
+    return '<span class="hc-row-like' + (active ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="좋아요" aria-pressed="' + active + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>';
   }
   function bindBrowseLike(container) {
     container.querySelectorAll('.hc-row-like').forEach((el) => {
@@ -956,6 +994,7 @@
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         popHeart(el);
       });
+      bindRoleButtonKeyboard(el);
     });
   }
   // 그리드 카드(소스/히든메뉴/탕 공통) — 이미지 우상단 즐겨찾기. 아래는 이름(위)+부제(아래) 텍스트 칼럼과
@@ -989,10 +1028,12 @@
   function syncBrowseGridCard(el, r, rankIdx, isMonthly) {
     el.querySelector('.hc-badge-slot').innerHTML =
       (rankIdx != null ? homeRankBadge(rankIdx) : '') + (isMonthly ? MONTHLY_BADGE_HTML : '');
-    el.querySelector('.browse-fav').classList.toggle('active', favorites.has(r.id));
+    setPressedState(el.querySelector('.browse-fav'), favorites.has(r.id));
     const lb = el.querySelector('.hc-row-like');
-    lb.classList.toggle('active', likedByMe.has(r.id));
-    lb.querySelector('.like-count').textContent = getLikeCount(r.id);
+    if (lb) {
+      setPressedState(lb, likedByMe.has(r.id));
+      lb.querySelector('.like-count').textContent = getLikeCount(r.id);
+    }
   }
 
   function renderGrid() {
@@ -1102,7 +1143,11 @@
   //  - 사파리 하단 뒤로가기는 bfcache로 옛 화면을 복원해 이전 seen이 되살아나므로 → pageshow(persisted)에서 초기화.
   let seenCelebs = new Set();
   window.addEventListener('pageshow', (e) => {
-    if (e.persisted) { seenCelebs.clear(); renderCelebRail(); }
+    if (e.persisted) {
+      seenCelebs.clear();
+      renderCelebRail();
+      syncExternalState();
+    }
   });
 
   function renderCelebRail() {
@@ -1373,7 +1418,7 @@
       + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r, true) + '</span>'
       + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
       + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
-      + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
+      + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="좋아요" aria-pressed="' + likedByMe.has(r.id) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
       + '</span>'
       + '</button>'
     ).join('');
@@ -1387,6 +1432,7 @@
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         popHeart(el);
       });
+      bindRoleButtonKeyboard(el);
     });
   }
 
@@ -1420,7 +1466,7 @@
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
       + '<span class="hc-row-txt"><span class="hc-row-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
-      + '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>'
+      + '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="좋아요" aria-pressed="' + likedByMe.has(r.id) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>'
       + '</button>'
     ).join('');
     bindHomeCards(listElement);
@@ -1433,6 +1479,7 @@
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         popHeart(el);
       });
+      bindRoleButtonKeyboard(el);
     });
   }
   function renderHomeSections() {
@@ -1460,12 +1507,19 @@
   }
 
   let currentModalRecipe = null;
+  let modalReturnFocus = null;
+  let modalClosingViaHistory = false;
+  const MODAL_HISTORY_KEY = 'haidilgogoRecipeModal';
 
   function openModal(r) {
     // 카드는 레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
     // "메뉴/매장 위에 레시피 모달이 뜨는" desync(모달·섹션 어긋남)를 원천 차단(2026-07-21).
     if (pageEl.dataset.section !== 'recipe') return;
+    const wasOpen = modalOverlay.classList.contains('open');
     currentModalRecipe = r;
+    if (!wasOpen) {
+      modalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     syncTopbarH(); // 모바일 전체화면 패널이 상단바 바로 아래에서 시작하도록 열 때마다 재측정
     // 배경 스크롤 잠금은 반드시 html(실제 스크롤 컨테이너)에 걸어야 한다. body에 걸면
     // body가 새 스크롤 컨테이너가 되어, sticky 상단바가 "스크롤 0인 body" 기준으로 붙어
@@ -1510,8 +1564,8 @@
     } else {
       descEl.style.display = 'none';
     }
-    modalFavBtn.classList.toggle('active', favorites.has(r.id));
-    modalLikeBtn.classList.toggle('active', likedByMe.has(r.id));
+    setPressedState(modalFavBtn, favorites.has(r.id));
+    setPressedState(modalLikeBtn, likedByMe.has(r.id));
     modalLikeCount.textContent = getLikeCount(r.id);
 
     const orderWrap = document.getElementById('modalOrderWrap');
@@ -1557,25 +1611,63 @@
     }
 
     // 확대 전환 애니메이션은 제거됨(2026-07-12 사용자 결정) — 즉시 열림
+    modalOverlay.inert = false;
     modalOverlay.classList.add('open');
+    modalOverlay.setAttribute('aria-hidden', 'false');
+    syncPageBackgroundA11y();
     modalScroll.scrollTop = 0; // 데스크톱 스크롤 컨테이너
     document.getElementById('modalCard').scrollTop = 0; // 모바일 스크롤 컨테이너(카드 본체)
+    requestAnimationFrame(() => modalClose.focus());
+
+    // 상세를 새 화면처럼 history에 한 칸 쌓아, 안드로이드 뒤로가기·iOS 엣지 스와이프가
+    // 사이트를 떠나는 대신 상세만 닫게 한다. 스토리 위에서 연 경우에도 한 칸만 빠져 스토리는 남는다.
+    if (!wasOpen && history.state?.[MODAL_HISTORY_KEY] !== true) {
+      try {
+        history.pushState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: true }, '', location.href);
+      } catch (err) {
+        // pushState를 막는 환경에서도 X·Esc 닫기는 정상 동작
+      }
+    }
   }
 
-  function closeModal() {
+  function finishCloseModal() {
     modalOverlay.classList.remove('open', 'from-story');
+    modalOverlay.setAttribute('aria-hidden', 'true');
+    modalOverlay.inert = true;
+    modalClosingViaHistory = false;
     // 스토리 위에서 열렸던 모달이면: 스크롤 잠금 유지 + 스토리 자동재생 재개. 아니면 잠금 해제
     if (storyViewer.classList.contains('open')) {
       storyViewer.classList.remove('paused');
     } else {
       document.documentElement.style.overflow = '';
     }
+    syncPageBackgroundA11y();
+    const target = modalReturnFocus && modalReturnFocus.isConnected && !modalReturnFocus.hidden
+      ? modalReturnFocus
+      : (storyViewer.classList.contains('open') ? document.getElementById('storyClose') : null);
+    modalReturnFocus = null;
+    if (target) requestAnimationFrame(() => target.focus());
+  }
+
+  function closeModal(options) {
+    if (!modalOverlay.classList.contains('open')) return;
+    if (!options?.fromHistory && history.state?.[MODAL_HISTORY_KEY] === true) {
+      if (modalClosingViaHistory) return;
+      modalClosingViaHistory = true;
+      history.back();
+      return;
+    }
+    finishCloseModal();
   }
 
   modalOverlay.addEventListener('click', closeModal);
   modalScroll.addEventListener('click', (e) => e.stopPropagation());
   modalClose.addEventListener('click', closeModal);
+  modalScroll.addEventListener('keydown', (e) => trapFocusWithin(modalScroll, e));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+  window.addEventListener('popstate', () => {
+    if (modalOverlay.classList.contains('open')) closeModal({ fromHistory: true });
+  });
 
   // 모달 하단 좋아요 — 그리드 카드의 하트 숫자도 재렌더 없이 동기화(이미지 깜빡임 방지)
   const modalLikeBtn = document.getElementById('modalLikeBtn');
@@ -1584,7 +1676,7 @@
     if (!currentModalRecipe) return;
     const id = currentModalRecipe.id;
     toggleLike(id);
-    modalLikeBtn.classList.toggle('active', likedByMe.has(id));
+    setPressedState(modalLikeBtn, likedByMe.has(id));
     modalLikeCount.textContent = getLikeCount(id);
     syncLikeUI(id); // 뒤에 깔린 카드 하트(숫자+빨강 채움)도 같이 맞춤
   });
@@ -1622,7 +1714,7 @@
       favorites.add(id);
     }
     saveFavorites();
-    modalFavBtn.classList.toggle('active', favorites.has(id));
+    setPressedState(modalFavBtn, favorites.has(id));
     renderGrid();
   });
 
@@ -1638,7 +1730,7 @@
   let favEnteredFromHome = false;
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
-    favToggleBtn.classList.toggle('active', showFavoritesOnly);
+    setPressedState(favToggleBtn, showFavoritesOnly);
     if (showFavoritesOnly) {
       favEnteredFromHome = !browsing;
       browsing = true;
@@ -2554,6 +2646,7 @@
     const card = document.createElement('div');
     card.className = 'stamp-rec';
     card.setAttribute('role', 'button');
+    card.tabIndex = 0;
     card.setAttribute('aria-label', rec.name + ' 기록 보기');
     const tile = buildStampCard(rec.name);
     tile.className = 'stamp-tile';
@@ -2578,6 +2671,7 @@
     }
     card.appendChild(info);
     card.addEventListener('click', () => openStampView(rec.id)); // 탭 → 보기 모달(수정/삭제는 거기서)
+    bindRoleButtonKeyboard(card);
     return card;
   }
 
@@ -2616,6 +2710,9 @@
   // ── 발도장 입력 시트: 점선 슬롯 → 지점 선택 → "발도장 찍기" → 스티커 탁!(stampPop) ──
   const stampSheetOverlay = document.getElementById('stampSheetOverlay');
   const stampSheetEl = stampSheetOverlay.querySelector('.stamp-sheet'); // 시트 안쪽 스크롤 컨테이너
+  const stampSheetClose = document.getElementById('stampSheetClose');
+  let stampSheetReturnFocus = null;
+  stampSheetEl.addEventListener('keydown', (e) => trapFocusWithin(stampSheetEl, e));
   const stampSlot = document.getElementById('stampSlot');
   const stampSlotEmpty = document.getElementById('stampSlotEmpty');
   const stampSlotHint = document.getElementById('stampSlotHint');
@@ -2670,6 +2767,7 @@
 
   // editId 있으면 = 그 기록 수정 모드(매장·날짜·메모·동행 수정 + 삭제), 없으면 새로 찍기
   function openStampSheet(editId) {
+    stampSheetReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const rec = editId ? stampData.records.find((r) => r.id === editId) : null;
     stampMode = rec ? 'edit' : 'add';
     stampEditId = rec ? rec.id : null;
@@ -2705,10 +2803,14 @@
     // 오버레이가 opacity로만 여닫혀 시트가 늘 레이아웃에 남는다 → 지난번 스크롤 위치가 그대로 유지됨.
     // 다시 열 땐 항상 맨 위(날짜부터)에서 시작하도록 되돌린다(2026-07-24 버그 수정).
     if (stampSheetEl) stampSheetEl.scrollTop = 0;
+    requestAnimationFrame(() => stampSheetClose.focus());
   }
   function closeStampSheet() {
     if (stampAnimating) return; // 찍히는 중엔 닫기 무시(연출 보장)
     stampSheetOverlay.classList.remove('open');
+    const target = stampSheetReturnFocus;
+    stampSheetReturnFocus = null;
+    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
   }
   // 매장 드롭다운 열기/닫기 — 정렬 dd와 같은 동작(버튼 토글, 바깥 클릭 시 닫힘)
   function closeStampDd() {
@@ -2829,7 +2931,7 @@
     }
     stampDdMenu.appendChild(item);
   });
-  document.getElementById('stampSheetClose').addEventListener('click', closeStampSheet);
+  stampSheetClose.addEventListener('click', closeStampSheet);
   stampSheetOverlay.addEventListener('click', (e) => { if (e.target === stampSheetOverlay) closeStampSheet(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && stampSheetOverlay.classList.contains('open')) closeStampSheet();
@@ -2902,16 +3004,42 @@
   const stampViewClose = document.getElementById('stampViewClose');
   const stampViewEdit = document.getElementById('stampViewEdit');
   const stampViewDelete = document.getElementById('stampViewDelete');
+  const stampViewEl = stampViewOverlay.querySelector('.stamp-view');
   let stampViewId = null;         // 보고 있는 기록 id
   let stampViewDeleteArmed = false; // 삭제 두 번 눌러 확인용
+  let stampViewReturnFocus = null;
+  stampViewEl.addEventListener('keydown', (e) => trapFocusWithin(stampViewEl, e));
 
   // 시트·모달이 열려 있는 동안 뒤 화면 스크롤 잠금(html.is-locked).
   // 닫는 지점이 6곳으로 흩어져 있어(X·바깥클릭·Esc·저장 후·연출 종료 등) 호출부마다 넣는 대신
   // .open 클래스 변화를 관찰해 자동 동기화한다 — 나중에 닫는 경로가 늘어도 빠뜨릴 일이 없다.
   const SCROLL_LOCK_OVERLAYS = [stampSheetOverlay, stampViewOverlay];
+  function syncPageBackgroundA11y() {
+    const recipeOpen = modalOverlay.classList.contains('open');
+    const stampOpen = SCROLL_LOCK_OVERLAYS.some((el) => el.classList.contains('open'));
+    const anyOpen = recipeOpen || stampOpen;
+    [document.querySelector('.main'), document.getElementById('tabbar')].forEach((el) => {
+      if (!el) return;
+      el.inert = anyOpen;
+      if (anyOpen) el.setAttribute('aria-hidden', 'true');
+      else el.removeAttribute('aria-hidden');
+    });
+    // 스토리 위에 레시피 상세를 띄울 수 있으므로, 상세가 열려 있을 때만 스토리를 배경 처리한다.
+    storyViewer.inert = recipeOpen;
+    storyViewer.setAttribute(
+      'aria-hidden',
+      String(recipeOpen || !storyViewer.classList.contains('open'))
+    );
+  }
   function syncScrollLock() {
     const anyOpen = SCROLL_LOCK_OVERLAYS.some((el) => el.classList.contains('open'));
     document.documentElement.classList.toggle('is-locked', anyOpen);
+    SCROLL_LOCK_OVERLAYS.forEach((el) => {
+      const open = el.classList.contains('open');
+      el.setAttribute('aria-hidden', String(!open));
+      el.inert = !open;
+    });
+    syncPageBackgroundA11y();
   }
   SCROLL_LOCK_OVERLAYS.forEach((el) => {
     new MutationObserver(syncScrollLock).observe(el, { attributes: true, attributeFilter: ['class'] });
@@ -2926,6 +3054,7 @@
   function openStampView(id) {
     const rec = stampData.records.find((r) => r.id === id);
     if (!rec) return;
+    stampViewReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     stampViewId = id;
     // 스티커(크게, 즉시 로드)
     const sticker = buildStampCard(rec.name, { eager: true });
@@ -2943,10 +3072,14 @@
     stampViewInfo.querySelectorAll('.stamp-view-val').forEach((el, i) => { el.textContent = rows[i][1]; });
     resetStampViewDelete();
     stampViewOverlay.classList.add('open');
+    requestAnimationFrame(() => stampViewClose.focus());
   }
   function closeStampView() {
     stampViewOverlay.classList.remove('open');
     resetStampViewDelete();
+    const target = stampViewReturnFocus;
+    stampViewReturnFocus = null;
+    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
   }
   stampViewClose.addEventListener('click', closeStampView);
   stampViewOverlay.addEventListener('click', (e) => { if (e.target === stampViewOverlay) closeStampView(); });
@@ -2990,6 +3123,74 @@
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
   document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
 
+  function readStoredSet(key) {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(key)) || []);
+    } catch (err) {
+      return new Set();
+    }
+  }
+
+  function readStoredObject(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key));
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    } catch (err) {
+      return {};
+    }
+  }
+
+  // 같은 사이트를 여러 창에서 열었거나 iOS가 bfcache 화면을 복원했을 때, 메모리에 남은
+  // 옛 상태가 localStorage의 최신값을 덮지 않도록 저장값을 다시 읽고 필요한 부분만 갱신한다.
+  // 전체 renderGrid()는 즐겨찾기 필터에서 항목이 빠져야 할 때만 호출해 스크롤 위치를 보존한다.
+  function syncExternalState(key) {
+    const syncAll = !key;
+
+    if (syncAll || key === FAVORITES_KEY) {
+      favorites = readStoredSet(FAVORITES_KEY);
+      document.querySelectorAll('.browse-fav[data-id]').forEach((el) => {
+        setPressedState(el, favorites.has(el.dataset.id));
+      });
+      if (currentModalRecipe) {
+        setPressedState(modalFavBtn, favorites.has(currentModalRecipe.id));
+      }
+      if (showFavoritesOnly) renderGrid();
+    }
+
+    if (syncAll || key === LIKED_KEY) {
+      likedByMe = readStoredSet(LIKED_KEY);
+      RECIPES.forEach((r) => syncLikeUI(r.id));
+      if (currentModalRecipe) {
+        setPressedState(modalLikeBtn, likedByMe.has(currentModalRecipe.id));
+      }
+    }
+
+    if (syncAll || key === LIKE_COUNTS_KEY) {
+      likeCounts = readStoredObject(LIKE_COUNTS_KEY);
+      refreshLikeCounts();
+    }
+
+    if (syncAll || key === STAMPS_KEY) {
+      const saved = readStoredObject(STAMPS_KEY);
+      if (Array.isArray(saved.records) || localStorage.getItem(STAMPS_KEY) === null) {
+        stampData = Array.isArray(saved.records) ? saved : { version: 2, records: [] };
+        stampCardCache.clear();
+        renderStamps();
+        if (stampViewId && !stampData.records.some((r) => r.id === stampViewId)) {
+          closeStampView();
+        }
+      }
+    }
+  }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === null) {
+      syncExternalState();
+    } else if ([FAVORITES_KEY, LIKED_KEY, LIKE_COUNTS_KEY, STAMPS_KEY].includes(e.key)) {
+      syncExternalState(e.key);
+    }
+  });
+
   renderHomeSections();
   initMonthlyFeature();
   renderGrid();
@@ -3002,11 +3203,17 @@
   requestAnimationFrame(placeIndicator);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeIndicator);
 
-  // 첫 화면 렌더 후, 브라우저가 한가할 때 나머지 카드 이미지를 "한 장씩 순차" 프리로드.
-  // 스크롤 시 lazy 로딩 딜레이가 안 보이게 미리 받아두되, 한 장씩이라 다른 요청을 막지 않음
-  // (카드가 늘어도 줄만 길어질 뿐 부하 없음. 수백 장 규모가 되면 앞쪽 N장 제한 고려).
+  // 첫 화면 렌더 후 브라우저가 한가할 때, 아직 요청되지 않은 앞쪽 카드 이미지만 제한적으로 프리로드.
+  // 나머지는 카드의 loading="lazy"에 맡겨 홈만 보고 나가는 방문자에게 전체 이미지 비용을 지우지 않는다.
+  const CARD_PRELOAD_LIMIT = 6;
   function preloadCardImages() {
-    const srcs = RECIPES.filter((r) => r.img).map((r) => r.img);
+    const alreadyRequested = new Set(
+      Array.from(document.images, (img) => img.getAttribute('src')).filter(Boolean)
+    );
+    const srcs = RECIPES
+      .filter((r) => r.img && !alreadyRequested.has(r.img))
+      .map((r) => r.img)
+      .slice(0, CARD_PRELOAD_LIMIT);
     let i = 0;
     const next = () => {
       if (i >= srcs.length) return;

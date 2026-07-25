@@ -379,10 +379,11 @@ img {
     padding: 4px 2px;
   }
 
-  /* 배경 제거 + 공유버튼(topShareBtn/.topbar-icon-btn)과 동일한 아이콘 색·크기로(2026-07-24 항목3, 2026-07-25 크기 38px 통일) */
+  /* 배경 제거 + 공유버튼(topShareBtn/.topbar-icon-btn)과 동일한 아이콘 색·크기로.
+     아이콘 크기는 그대로 두고 터치 영역만 44px로 확보한다. */
   .fav-toggle-btn {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     justify-content: center;
     padding: 0;
     background: none;
@@ -441,8 +442,8 @@ img {
    상호작용은 배경 없이 색+살짝 축소로만. */
 .topbar-icon-btn {
   flex: none;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1202,7 +1203,9 @@ img {
 }
 
 .footer-report {
-  display: inline-block;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 500;
@@ -2992,10 +2995,10 @@ img {
 .stamp-view-overlay.open .stamp-view { transform: translateY(0); }
 .stamp-view-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 34px;
-  height: 34px;
+  top: 9px;
+  right: 9px;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   color: #4D4139;                 /* 원 배경 제거 + 상단바 아이콘색 통일 */
@@ -3099,10 +3102,10 @@ img {
 
 .stamp-sheet-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 34px;
-  height: 34px;
+  top: 9px;
+  right: 9px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: none;
   color: #4D4139;                 /* 원 배경 제거 + 상단바 아이콘색 통일 */
@@ -3527,6 +3530,7 @@ img {
   z-index: 2;
 }
 .home-sec-more {
+  position: relative;
   background: none;
   border: none;
   font-family: inherit;
@@ -3534,7 +3538,10 @@ img {
   font-weight: 500;
   color: #4D4139;                     /* 상단바 돋보기·공유 아이콘과 통일(2026-07-22) */
   cursor: pointer;
-  padding: 4px 0 4px 12px;
+  min-height: 44px;
+  padding: 14px 0 14px 12px;
+  margin: -10px 0;
+  box-sizing: border-box;
   transition: color .15s;
 }
 .home-sec-more:hover,
@@ -3987,15 +3994,19 @@ img {
 /* 좋아요 — 검정 푸터 안, 알약 없이 흰 하트+숫자. 푸터는 상단정렬이지만 좋아요만 세로 가운데 */
 .hp-like {
   flex-shrink: 0;
+  min-width: 44px;
   align-self: center;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   color: rgba(255, 255, 255, .9);
   font-size: 14px;
   font-weight: 700;
   font-style: normal;
   cursor: pointer;
+  padding: 12px 4px;
+  margin: -12px -4px;
   -webkit-tap-highlight-color: transparent;
 }
 .hp-like svg { width: 20px; height: 20px; flex-shrink: 0; }
@@ -4269,6 +4280,8 @@ img {
   gap: 5px;
   color: var(--text-muted);
   cursor: pointer;
+  padding: 12px 5px;
+  margin: -12px -5px;
   -webkit-tap-highlight-color: transparent;
 }
 .hc-row-like svg { width: 20px; height: 20px; } /* 인기소스 하트(.hp-like svg 20px)와 동일 크기(2026-07-24) */
@@ -4325,11 +4338,11 @@ img {
    발도장 스티커 drop-shadow와 같은 맥락(정적 아이콘 그림자) — 가챠 애니메이션 그래픽의 필터 금지 규칙과는 별개. */
 .browse-fav {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0;
+  right: 0;
   z-index: 3;
-  width: 26px;
-  height: 26px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;

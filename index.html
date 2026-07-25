@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=563">
+<link rel="stylesheet" href="styles.css?v=564">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2">
@@ -161,7 +161,7 @@
       <!-- 상단 우측 그룹: 즐겨찾기 + 공유 + 설치. 검색창은 2026-07-25부터 개수 옆(list-head)으로 이동, 상시 노출 -->
       <div class="topbar-right">
       <!-- 즐겨찾기(레시피 섹션 전용) -->
-      <button class="fav-toggle-btn" id="favToggleBtn" type="button" aria-label="즐겨찾기">
+      <button class="fav-toggle-btn" id="favToggleBtn" type="button" aria-label="즐겨찾기" aria-pressed="false">
         <svg class="fav-toggle-icon" id="favToggleIcon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <!-- 북마크 글리프가 viewBox를 덜 채워 X·공유 아이콘보다 작아 보임 → 중앙 기준 1.111배 확대,
                확대분만큼 stroke-width를 1.7→1.53으로 보정(2026-07-25, 아이콘 18px 통일) -->
@@ -391,7 +391,7 @@
 </nav>
 
 <!-- 발도장 입력 시트 — ➕에서 열림. 점선 슬롯에 지점 고르고 찍으면 스티커가 탁! 붙음 -->
-<div class="stamp-sheet-overlay" id="stampSheetOverlay">
+<div class="stamp-sheet-overlay" id="stampSheetOverlay" aria-hidden="true" inert>
   <div class="stamp-sheet" role="dialog" aria-modal="true" aria-label="스티커 붙이기">
     <button class="stamp-sheet-close" id="stampSheetClose" type="button" aria-label="닫기">
       <!-- modalClose/browse-close와 동일 X 아이콘 → 같은 1.667배 확대 + stroke 1.02 보정(2026-07-25, 18px 통일) -->
@@ -440,7 +440,7 @@
 </div>
 
 <!-- 발도장 보기 모달 — 카드 탭 시(읽기 전용). 아래 수정/삭제, 수정 누르면 위 입력 시트가 뜸 -->
-<div class="stamp-view-overlay" id="stampViewOverlay">
+<div class="stamp-view-overlay" id="stampViewOverlay" aria-hidden="true" inert>
   <div class="stamp-view" role="dialog" aria-modal="true" aria-label="스티커 기록">
     <button class="stamp-view-close" id="stampViewClose" type="button" aria-label="닫기">
       <!-- modalClose/browse-close와 동일 X 아이콘 → 같은 1.667배 확대 + stroke 1.02 보정(2026-07-25, 18px 통일) -->
@@ -474,14 +474,14 @@
 </div>
 
 <!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="recipe-modal-scroll">
+<div class="modal-overlay" id="modalOverlay" aria-hidden="true" inert>
+  <div class="modal" id="recipe-modal-scroll" role="dialog" aria-modal="true" aria-labelledby="modalName">
     <!-- 액자 없는 클린 레이아웃(2026-07-25 개편): .modal-card가 스크롤 컨테이너 겸 콘텐츠 래퍼.
          상단 한 줄(카테고리·즐겨찾기·닫기) → 썸네일 → 이름/부제 → 설명 → 본문. -->
     <div class="modal-card" id="modalCard">
     <div class="modal-topline">
       <span class="modal-cat" id="modalCat"></span>
-      <button class="modal-fav-btn" id="modalFavBtn" type="button" aria-label="즐겨찾기">
+      <button class="modal-fav-btn" id="modalFavBtn" type="button" aria-label="즐겨찾기" aria-pressed="false">
         <!-- 상단바 favToggleBtn과 동일한 1.111배 확대 + stroke 1.53 보정(2026-07-25, 18px 통일) -->
         <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <g transform="translate(12 12) scale(1.111) translate(-12 -12)">
@@ -522,7 +522,7 @@
         <div class="tip-box" id="modalTip"></div>
       </div>
       <div class="modal-like-wrap">
-        <button class="modal-like-btn" id="modalLikeBtn" type="button" aria-label="좋아요">
+        <button class="modal-like-btn" id="modalLikeBtn" type="button" aria-label="좋아요" aria-pressed="false">
           <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
           <span class="like-count" id="modalLikeCount">0</span>
         </button>
@@ -702,7 +702,7 @@
   </div>
 </div>
 
-<script src="script.js?v=401"></script>
+<script src="script.js?v=402"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
