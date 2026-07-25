@@ -1328,8 +1328,9 @@ img {
 .modal-badge-row .hp-rank {
   position: static;
 }
-/* '이달의 소스' — 순위 알약(.hp-rank)과 같은 크기·모서리, 브랜드 빨강 배경 + 흰 글자 */
-.modal-monthly-badge {
+/* '이달의 소스' — 순위 알약(.hp-rank)과 같은 크기·모서리, 브랜드 빨강 배경 + 흰 글자.
+   모달·브라우즈 그리드 카드(.hc-badge-slot) 공용 클래스(2026-07-25, 그리드 카드에도 노출 추가). */
+.monthly-badge {
   display: inline-flex;
   align-items: center;
   padding: 2px 7px;
@@ -4373,6 +4374,19 @@ img {
   border: 1px solid var(--card-border);
 }
 .hc-card--browse .hc-thumb { border-radius: 0; } /* 카드가 클립하므로 썸네일 자체 라운딩은 끔(hp-thumb와 동일) */
+/* 브라우즈 그리드 카드 좌상단 배지 줄(2026-07-25) — 순위 배지(.hp-rank)와 '이달의 소스'(.monthly-badge)를
+   가로로 나란히(모달 .modal-badge-row와 같은 방식). 순위 배지 단독일 땐 기존 위치(left7/top7)와 동일하게
+   보이도록 슬롯 자체를 그 위치에 두고, 안의 .hp-rank는 absolute를 꺼서 flex 흐름을 따르게 한다. */
+.hc-badge-slot {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hc-badge-slot .hp-rank { position: static; }
 .hc-card-foot {
   display: flex;
   align-items: flex-start; /* 이름을 항상 같은 위치에 → 부제 유무와 무관하게 이름 위치 일치(hp-foot와 동일 원리) */

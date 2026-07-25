@@ -607,6 +607,8 @@
     const idx = ((monthIdx % saucePool.length) + saucePool.length) % saucePool.length;
     return saucePool[idx];
   }
+  // '이달의 소스' 배지 마크업 — 모달(.modal-badge-row)·브라우즈 그리드 카드(.hc-badge-slot) 공용(2026-07-25).
+  const MONTHLY_BADGE_HTML = '<span class="monthly-badge">이달의 소스</span>';
 
   // ── 기획 칼럼(배너 2번 고정) ─────────────────────────────────
   // 레시피가 아닌 '읽을거리' 배너. 클릭 시 칼럼 패널이 열리고 하단에 관련 소스 자동 목록.
@@ -938,9 +940,12 @@
     bindBrowseLike(el);
     return el;
   }
-  // rankIdx: 0-based 순위(배지 표시), null이면 배지 없음. 캐시 히트여도 매번 호출해 배지·즐겨찾기·좋아요를 최신화.
-  function syncBrowseGridCard(el, r, rankIdx) {
-    el.querySelector('.hc-badge-slot').innerHTML = rankIdx != null ? homeRankBadge(rankIdx) : '';
+  // rankIdx: 0-based 순위(배지 표시), null이면 배지 없음. isMonthly: '이달의 소스'면 true.
+  // 순위 배지 옆에 가로로 나란히(순위→이달의 소스 순서, 모달과 동일). 캐시 히트여도 매번 호출해
+  // 배지(월이 바뀌면 이달의 소스도 바뀜)·즐겨찾기·좋아요를 최신화.
+  function syncBrowseGridCard(el, r, rankIdx, isMonthly) {
+    el.querySelector('.hc-badge-slot').innerHTML =
+      (rankIdx != null ? homeRankBadge(rankIdx) : '') + (isMonthly ? MONTHLY_BADGE_HTML : '');
     el.querySelector('.browse-fav').classList.toggle('active', favorites.has(r.id));
     const lb = el.querySelector('.hc-row-like');
     lb.classList.toggle('active', likedByMe.has(r.id));
@@ -977,6 +982,9 @@
     // 즐겨찾기·인물 필터에서는 옆 카드(히든메뉴·탕 등)와 섞여 "무엇의 몇 위"인지 맥락이 사라지므로 숨김.
     const rankMap = sauceRankMap();
     const showRankBadges = activeCat === '소스' && !personFilter && !query.trim() && !showFavoritesOnly;
+    // '이달의 소스' 배지도 순위 배지와 노출 조건이 같다(카테고리가 섞이는 화면에선 둘 다 숨김, 2026-07-25).
+    // 매 렌더 재계산 — 월이 바뀌면 이달의 소스 id도 바뀌므로 캐시된 카드 DOM에 굳어 있으면 안 됨.
+    const monthlySauceId = showRankBadges ? pickMonthlySauce(new Date())?.id : null;
     filtered.forEach((r) => {
       let el = browseCardCache.get(r.id);
       if (!el) {
@@ -984,7 +992,8 @@
         browseCardCache.set(r.id, el);
       }
       const rank = (showRankBadges && r.cat === '소스') ? rankMap.get(r.id) : undefined;
-      syncBrowseGridCard(el, r, (rank != null && rank < 5) ? rank : null);
+      const isMonthly = showRankBadges && r.cat === '소스' && r.id === monthlySauceId;
+      syncBrowseGridCard(el, r, (rank != null && rank < 5) ? rank : null, isMonthly);
       gridEl.appendChild(el);
     });
   }
@@ -1442,7 +1451,7 @@
       thumbEl.insertAdjacentHTML('beforeend',
         '<span class="modal-badge-row">'
         + (modalRank != null && modalRank < 5 ? homeRankBadge(modalRank) : '')
-        + (modalIsMonthly ? '<span class="modal-monthly-badge">이달의 소스</span>' : '')
+        + (modalIsMonthly ? MONTHLY_BADGE_HTML : '')
         + '</span>');
     }
 
