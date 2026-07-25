@@ -495,6 +495,10 @@
 
   // 연예인 "스타 표시" — 제목 첫 글자 왼쪽 위 골드 별 (그라데이션 def는 index.html)
   const STAR_SVG = '<svg class="star-accent" viewBox="0 0 24 24" fill="url(#starGold)" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+  // 별 표시 카드 공용 헬퍼 — 모달에만 있던 별을 브라우즈 그리드·홈 인기소스·홈 히든메뉴 리스트에도 노출(2026-07-25).
+  // 이름 좌측 위치는 별 유무와 무관하게 항상 같아야 하므로, 별은 항상 absolute(레이아웃 폭에 영향 없음)로만 넣는다.
+  function starCls(r) { return r.star ? ' has-star' : ''; }
+  function nameWithStar(r) { return (r.star ? STAR_SVG : '') + (r.nameHtml || r.name); }
 
   // ── 카드 제목 자동 맞춤 ──────────────────────────────────
   // 예전엔 "이름 10글자 이상이면 작게(recipe-name--long)"로 쟀는데, 글자마다 폭이 달라서
@@ -924,7 +928,7 @@
     el.dataset.id = r.id;
     el.innerHTML = '<span class="hc-thumb"><span class="hc-badge-slot"></span>' + browseFavHtml(r) + homeCardBody(r) + '</span>'
       + '<span class="hc-card-foot">'
-      + '<span class="hc-card-txt"><span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
+      + '<span class="hc-card-txt"><span class="hc-row-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
       + browseLikeHtml(r)
       + '</span>';
@@ -965,17 +969,20 @@
       gridEl.appendChild(empty);
       return;
     }
-    // 순위 배지 = 소스 카테고리 전체를 인기순 정렬한 절대 인덱스(sauceRankMap). 화면 필터(탭·즐겨찾기·검색·
-    // 인물)와 무관하게 항상 같은 값 — 예전엔 filtered 배열 안에서의 순번(i)을 써서, 즐겨찾기·검색으로 걸러진
+    // 순위 배지 = 소스 카테고리 전체를 인기순 정렬한 절대 인덱스(sauceRankMap). 값 자체는 화면 필터(탭·즐겨찾기·
+    // 검색·인물)와 무관하게 항상 같다 — 예전엔 filtered 배열 안에서의 순번(i)을 써서, 즐겨찾기·검색으로 걸러진
     // 화면에서 실제 4위 소스가 '2위'처럼 잘못 보이는 버그가 있었다(2026-07-25 수정).
+    // 노출 여부는 별도(2026-07-25 재조정): '소스' 탭으로 카테고리가 좁혀졌을 때만 보여준다. '전체' 탭·검색 중·
+    // 즐겨찾기·인물 필터에서는 옆 카드(히든메뉴·탕 등)와 섞여 "무엇의 몇 위"인지 맥락이 사라지므로 숨김.
     const rankMap = sauceRankMap();
+    const showRankBadges = activeCat === '소스' && !personFilter && !query.trim() && !showFavoritesOnly;
     filtered.forEach((r) => {
       let el = browseCardCache.get(r.id);
       if (!el) {
         el = buildBrowseGridCard(r);
         browseCardCache.set(r.id, el);
       }
-      const rank = r.cat === '소스' ? rankMap.get(r.id) : undefined;
+      const rank = (showRankBadges && r.cat === '소스') ? rankMap.get(r.id) : undefined;
       syncBrowseGridCard(el, r, (rank != null && rank < 5) ? rank : null);
       gridEl.appendChild(el);
     });
@@ -1306,7 +1313,7 @@
     popularRailEl.innerHTML = top.map((r, i) =>
       '<button class="hp-card" type="button" data-id="' + r.id + '">'
       + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r, true) + '</span>'
-      + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
+      + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
       + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
       + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
       + '</span>'
@@ -1354,7 +1361,7 @@
     listElement.innerHTML = list.slice(0, 3).map((r) =>
       '<button class="hc-row" type="button" data-id="' + r.id + '">'
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
-      + '<span class="hc-row-txt"><span class="hc-row-name">' + (r.nameHtml || r.name) + '</span>'
+      + '<span class="hc-row-txt"><span class="hc-row-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
       + '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" aria-label="좋아요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>'
       + '</button>'
