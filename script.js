@@ -3397,7 +3397,7 @@
 
   async function shareSite() {
     const isLocalPreview = /^(localhost|127\.0\.0\.1|\d{1,3}(?:\.\d{1,3}){3})$/.test(location.hostname);
-    const shareUrl = location.origin + location.pathname + (isLocalPreview ? '?share=6' : '');
+    const shareUrl = location.origin + location.pathname + (isLocalPreview ? '?share=7' : '');
     const shareData = { title: document.title, url: shareUrl };
     if (navigator.share) {
       try {
