@@ -782,6 +782,78 @@
     ],
   };
 
+  // ── 훠궈·하이디라오 알쓸신잡(배너 3번 고정) ───────────────────
+  const HOTPOT_TRIVIA_COLUMN = {
+    id: 'col-hotpot-trivia',
+    isColumn: true,
+    title: '알쓸신잡',
+    heroDesc: '알아도 쓸모없는 훠궈 · 하이디라오 잡지식',
+    bannerImg: 'assets/columns/hotpot-trivia.webp?v=1',
+    bannerBg: 'linear-gradient(150deg,#9F281F 0%,#C84A36 55%,#E89A61 100%)',
+    emoji: '🍲',
+    body:
+      '<p class="col-lead">훠궈를 먹으면서 그 이름이 무슨 뜻인지 생각해 본 적 있나요? ' +
+      '훠궈와 하이디라오의 이름에 얽힌 이야기부터 마라가 입안을 얼얼하게 만드는 이유, 독특한 모양의 냄비와 온천까지—' +
+      '알아도 딱히 쓸 데는 없지만 신기한 이야기들을 모았습니다.</p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/hotpot-trivia/mahjong.webp?v=1" width="880" height="496" loading="lazy" decoding="async" alt="마작패가 놓인 마작 테이블">' +
+      '</figure>' +
+      '<h3>훠궈와 하이디라오는 무슨 뜻일까?</h3>' +
+      '<p><b>훠궈(火锅)</b>는 ‘불 화(火)’와 ‘솥 과(锅)’가 합쳐진 말이에요. 글자 그대로 풀면 ‘불 위의 냄비’라는 뜻으로, ' +
+      '끓는 냄비에 고기와 채소를 직접 익혀 먹는 요리를 가리킵니다.</p>' +
+      '<p><b>하이디라오(海底捞)</b>는 ‘바다 밑에서 건져 올리다’라는 뜻이에요. 하지만 식당 이름의 유래는 바다가 아니라 마작에 있습니다.</p>' +
+      '<p>마작에서는 마지막 패로 승리하는 것을 ‘하이디라오웨(海底捞月)’라고 해요. ‘바다 밑에서 달을 건져 올린다’는 뜻으로, ' +
+      '쓰촨에서는 이를 줄여 ‘하이디라오’라고 부르기도 합니다.</p>' +
+      '<p>하이디라오 창업자 장융이 식당 이름을 정하지 못해 고민하던 어느 날, 옆에서 마작을 하던 당시 여자친구가 마지막 패로 승리했어요. ' +
+      '점수가 크게 붙는 승리여서 기뻐하던 여자친구는 고민 중인 장융에게 “그냥 하이디라오라고 하는 게 낫겠다”고 제안했습니다. ' +
+      '장융도 듣자마자 좋은 이름이라고 생각했고, 그렇게 지금의 하이디라오가 탄생했다고 합니다.' +
+      '<button class="col-note-ref" type="button" data-note="1" aria-label="출처 1 보기">[1]</button></p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/hotpot-trivia/yuan-dynasty.webp?v=1" width="880" height="880" loading="lazy" decoding="async" alt="원나라 군대가 야영지에서 음식을 준비하는 모습">' +
+      '</figure>' +
+      '<h3>양고기 훠궈는 전쟁터에서 태어났다고?</h3>' +
+      '<p>전쟁 중 원나라 황제 쿠빌라이 칸이 요리사에게 양고기 요리를 주문했는데, 음식을 준비하던 사이 적군이 다가오고 있다는 소식이 전해졌다고 해요.</p>' +
+      '<p>시간이 부족했던 요리사는 양고기를 아주 얇게 썰어 끓는 물에 빠르게 익힌 뒤 양념을 곁들여 내놓았습니다. ' +
+      '황제는 급히 식사를 마치고 전투에 나섰고, 이후 이 요리가 얇은 양고기를 끓는 물에 데쳐 먹는 중국식 양고기 훠궈인 ‘솬양러우(涮羊肉)’가 ' +
+      '되었다는 이야기가 전해집니다.<button class="col-note-ref" type="button" data-note="2" aria-label="출처 2 보기">[2]</button></p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/hotpot-trivia/sichuan-pepper.webp?v=1" width="880" height="880" loading="lazy" decoding="async" alt="나무 그릇과 탁자 위에 놓인 붉은 화자오">' +
+      '</figure>' +
+      '<h3>마라를 먹으면 왜 입안이 얼얼할까?</h3>' +
+      '<p><b>마라(麻辣)</b>는 ‘저릴 마(麻)’와 ‘매울 랄(辣)’이 합쳐진 말로, ‘마’는 혀와 입술이 저리고 마비된 듯한 얼얼함을, ' +
+      '‘라’는 화끈하게 매운맛을 뜻합니다.</p>' +
+      '<p>이 두 감각을 만드는 재료도 서로 달라요. 고추의 캡사이신이 화끈한 매운맛을 만든다면, 얼얼한 감각을 만드는 주인공은 ' +
+      '<b>화자오(花椒)</b>입니다.</p>' +
+      '<p>화자오에 들어 있는 산쇼올 성분은 입안의 감각 신경을 자극해 미세한 진동과 비슷한 얼얼함을 일으켜요. ' +
+      '그래서 마라를 먹으면 단순히 맵기만 한 것이 아니라, 혀와 입술이 찌릿하고 떨리는 듯한 감각까지 함께 느껴지는 것입니다.' +
+      '<button class="col-note-ref" type="button" data-note="3" aria-label="출처 3 보기">[3]</button></p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/hotpot-trivia/9-grid-hotpot.webp?v=1" width="880" height="496" loading="lazy" decoding="async" alt="아홉 칸으로 나뉜 충칭식 훠궈 냄비">' +
+      '</figure>' +
+      '<h3>아홉 칸으로 나뉜 훠궈 냄비가 있다고?</h3>' +
+      '<p>하이디라오에서는 하나의 냄비를 최대 네 칸으로 나눌 수 있어요. 그런데 충칭에는 냄비를 아홉 칸으로 나눈 ' +
+      '<b>구궁격 훠궈(九宫格火锅)</b>가 있습니다.</p>' +
+      '<p>과거 부두의 노점에서는 서로 모르는 손님들이 큰 냄비 하나를 함께 사용했는데요. 각자 자기 칸을 정해 재료가 섞이지 않게 먹고, ' +
+      '먹은 만큼 따로 계산하기 위해 칸을 나눴다는 이야기가 전해집니다.</p>' +
+      '<p>오늘날에는 칸마다 끓는 정도가 다른 점을 이용해 가운데에서는 고기를 빠르게 익히고, 가장자리에서는 오래 익힐 재료를 천천히 끓여요.' +
+      '<button class="col-note-ref" type="button" data-note="4" aria-label="출처 4 보기">[4]</button></p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/hotpot-trivia/harbin-hotpot-spa.webp?v=1" width="880" height="1174" loading="lazy" decoding="async" alt="붉은 탕과 흰 탕으로 나뉜 훠궈 모양 온천을 즐기는 사람들">' +
+      '</figure>' +
+      '<h3>훠궈에 고기 대신 사람이 들어간다고?</h3>' +
+      '<p>하얼빈의 펑예샤오전 온천 리조트(枫叶小镇温泉度假区)에는 거대한 훠궈 냄비처럼 꾸민 온천이 있어요. ' +
+      '온천은 붉은 탕과 흰 탕으로 나뉘고, 물 위에는 고추와 채소까지 떠다녀 보기만 해도 온몸이 얼얼해질 것 같습니다.</p>' +
+      '<p>하지만 실제로 매운 훠궈 국물을 사용한 것은 아니에요. 붉은 탕은 빨간 조명으로 색을 연출하며, 떠다니는 채소 중 일부는 모형이라고 합니다.' +
+      '<button class="col-note-ref" type="button" data-note="5" aria-label="출처 5 보기">[5]</button></p>',
+    notes: [
+      { label: '중국요리협회 — 하이디라오 창업자 장융 인터뷰', url: 'https://m.ccas.com.cn/site/content/102709.html' },
+      { label: 'CCTV — 솬양러우 기원에 관한 세 가지 전설', url: 'https://big5.cctv.com/gate/big5/discovery.cctv.com/20070626/103803.shtml' },
+      { label: '영국왕립학회 — 화자오의 산쇼올이 일으키는 진동 감각 연구', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3779329/' },
+      { label: '중국요리협회 — 충칭 훠궈의 변천', url: 'https://m.ccas.com.cn/site/content/102250.html' },
+      { label: '중국관광신문 — 펑예샤오전의 원앙궈 온천', url: 'https://www.ctnews.com.cn/hlj/content/2024-12/26/content_168745.html' },
+    ],
+  };
+
   // ── 가이드 배너(항상 마지막 고정) ────────────────────────────
   // 홈 아래쪽 '하이디라오가 처음인 당신에게' 가이드를 놓치는 사람이 많아, 히어로 마지막 칸에도
   // 한 번 더 노출. 클릭 시 같은 가이드 패널(#guideOverlay)이 열림(내용 공유).
@@ -796,15 +868,6 @@
     emoji: '📖',
   };
 
-  // ── 준비중 배너(3번 자리, 2026-07-23) ── 무지 배경 + 공사 이모지. 클릭 동작 없음.
-  const SOON_BANNER = {
-    id: 'banner-soon',
-    isSoon: true,
-    title: '준비중이에요',
-    emoji: '🚧',
-    bannerBg: '#B7B1A7',           // 무지(플레인) 배경
-  };
-
   function pickMonthlyFeatures() {
     const pool = RECIPES.filter((r) => r.img); // 히어로는 큰 이미지 필요
     if (!pool.length) return [];
@@ -815,8 +878,8 @@
     if (monthlySauce) out.push(monthlySauce);
     // 2) 두 번째 배너 = 기획 칼럼(고정).
     out.push(GOSU_COLUMN);
-    // 3) 세 번째 배너 = 준비중 플레이스홀더(2026-07-23, 기존 자동 로테이션 대신).
-    out.push(SOON_BANNER);
+    // 3) 세 번째 배너 = 훠궈·하이디라오 알쓸신잡.
+    out.push(HOTPOT_TRIVIA_COLUMN);
     // 4) 마지막 배너 = 가이드 배너(항상 끝에 고정).
     out.push(GUIDE_BANNER);
     return out;
@@ -2074,6 +2137,7 @@
   }
   function openColumn(col) {
     const hero = document.getElementById('columnHero');
+    columnSheet.classList.toggle('column-sheet--light-close', col.id === 'col-hotpot-trivia');
     hero.style.cssText = col.bannerImg
       ? 'background-image:url(' + col.bannerImg + ');background-size:cover;background-position:center;'
       : 'background:' + col.bannerBg + ';';
@@ -2088,6 +2152,8 @@
     });
     // 하단: 관련 소스 자동 목록(각 항목 클릭 → 칼럼 닫고 해당 레시피 열기)
     const sauces = getColumnSauces(col);
+    const saucesSection = document.querySelector('.column-sauces');
+    saucesSection.hidden = !sauces.length;
     const listEl = document.getElementById('columnSauceList');
     listEl.innerHTML = sauces.map((r) => {
       const ver = r.ver ? '<span class="col-sauce-ver">' + r.ver + '</span>' : '';
@@ -2126,6 +2192,7 @@
   }
   function closeColumn() { columnOverlay.hidden = true; }
   document.getElementById('columnClose').addEventListener('click', closeColumn);
+  document.getElementById('columnBottomClose').addEventListener('click', closeColumn);
   columnOverlay.addEventListener('click', (e) => { if (e.target === columnOverlay) closeColumn(); });
   gachaPull.addEventListener('click', gachaPullOnce);
   gachaClose.addEventListener('click', closeGacha);

@@ -4521,6 +4521,19 @@ img {
 .column-close:active {
   color: var(--brand-red);
 }
+.column-sheet--light-close .column-close {
+  color: #fff;
+}
+@media (hover: hover) {
+  .column-sheet--light-close .column-close:hover {
+    color: #fff;
+    opacity: .82;
+  }
+}
+.column-sheet--light-close .column-close:active {
+  color: #fff;
+  opacity: .72;
+}
 .guide-sheet-ic { font-size: 34px; line-height: 1; display: block; }
 .guide-sheet-title {
   margin: 12px 0 0;
@@ -4684,7 +4697,7 @@ img {
 .col-sauce-arrow { width: 18px; height: 18px; flex: 0 0 18px; color: #c3bbb3; }
 /* 관련 소스 다음에 오는 주석·출처 */
 .column-notes {
-  margin: 0 22px; padding: 22px 0 34px;
+  margin: 0 22px; padding: 22px 0;
   border-top: 1px solid #ECE5DC;
 }
 .column-notes[hidden] { display: none; }
@@ -4712,3 +4725,23 @@ img {
   margin-left: 3px; vertical-align: -1px;
 }
 .column-note-link:active { color: var(--brand-red); }
+.column-footer {
+  padding: 22px 22px calc(34px + env(safe-area-inset-bottom));
+}
+.column-bottom-close {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #DED6CE;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text-dark);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .column-bottom-close:hover { background: #F7F3EF; }
+}
+.column-bottom-close:active { background: #F0EAE4; }
