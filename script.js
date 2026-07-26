@@ -2136,6 +2136,7 @@
       r.ings && r.ings.some((ing) => ing[0] === col.ingFilter));
   }
   function openColumn(col) {
+    document.documentElement.style.overflow = 'hidden';
     const hero = document.getElementById('columnHero');
     columnSheet.classList.toggle('column-sheet--light-close', col.id === 'col-hotpot-trivia');
     hero.style.cssText = col.bannerImg
@@ -2190,7 +2191,10 @@
     columnOverlay.hidden = false;
     columnOverlay.scrollTop = 0;
   }
-  function closeColumn() { columnOverlay.hidden = true; }
+  function closeColumn() {
+    document.documentElement.style.overflow = '';
+    columnOverlay.hidden = true;
+  }
   document.getElementById('columnClose').addEventListener('click', closeColumn);
   document.getElementById('columnBottomClose').addEventListener('click', closeColumn);
   columnOverlay.addEventListener('click', (e) => { if (e.target === columnOverlay) closeColumn(); });

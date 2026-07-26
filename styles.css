@@ -4563,6 +4563,7 @@ img {
   background: rgba(20, 10, 6, .5);
   display: flex; justify-content: center; align-items: flex-start;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 .column-overlay[hidden] { display: none; }
