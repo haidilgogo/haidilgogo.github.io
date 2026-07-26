@@ -736,27 +736,50 @@
     ingFilter: '고수',             // 이 재료가 든 항목을 칼럼 하단에 자동 나열
     catFilter: '소스',             // 그중 이 카테고리만(요리·히든메뉴 제외, '소스'만)
     body:
-      '<p class="col-lead">훠궈 소스바 앞, 초록빛 고수 앞에서 손이 멈칫한 적 있으신가요? ' +
-      '“고수 빼주세요”가 입버릇이 된 분들께, 오늘은 딱 한 번만 다르게 권해봅니다.</p>' +
-      '<h3>그 향, 사실은 ‘상쾌함’이에요</h3>' +
-      '<p>호불호를 가르는 고수 특유의 향은 레몬·라임을 스치는 듯한 시트러스 계열 향이에요. ' +
-      '처음엔 낯설어도 익숙해지면 ‘비누 맛’이 아니라 ‘싱그러움’으로 바뀝니다. ' +
-      '전 세계 미식가들이 고수에 빠지는 이유죠.</p>' +
-      '<h3>기름진 훠궈에 딱 필요한 한 끗</h3>' +
-      '<p>얼얼한 마라 국물, 고소한 참깨·땅콩 소스… 훠궈는 기본적으로 진하고 묵직해요. ' +
-      '여기에 고수 한 꼬집이 들어가면 느끼함을 싹 정리하고 뒷맛을 개운하게 잡아줍니다. ' +
-      '중식·태국·베트남 요리가 고수를 사랑하는 데는 이유가 있어요.</p>' +
-      '<h3>덤으로, 몸에도 반가운 허브</h3>' +
-      '<p>고수는 비타민과 항산화 성분이 풍부한 허브로 알려져 있어요. ' +
-      '향만 즐기는 게 아니라 소소한 영양까지 곁들이는 셈이죠.</p>' +
-      '<h3>고수가 처음이라면, 이렇게</h3>' +
-      '<ul>' +
-      '<li><b>잎보다 줄기부터.</b> 줄기는 향이 부드럽고 아삭한 식감이 좋아요.</li>' +
-      '<li><b>한 꼬집씩.</b> 소스에 조금만 섞어 향을 입혀보세요.</li>' +
-      '<li><b>진한 소스와 특히 잘 맞아요.</b> 마라·땅콩처럼 묵직한 소스에 넣으면 밸런스가 살아요.</li>' +
-      '</ul>' +
-      '<p class="col-outro">오늘은 “빼주세요” 대신 “조금만 넣어주세요”. ' +
-      '훠궈의 마지막 퍼즐이 채워질지도 몰라요. 🌿</p>',
+      '<p class="col-lead">고수를 한입 먹자마자 “어? 비누 맛인데?” 싶었다면 기분 탓만은 아니에요. ' +
+      '누군가에게는 상큼한 허브지만, 누군가에게는 비누나 세제처럼 느껴지는 데에는 실제 이유가 있습니다.</p>' +
+      '<figure class="col-figure">' +
+        '<img src="assets/columns/cilantro/soap.webp?v=1" width="880" height="587" loading="lazy" decoding="async" alt="접시 위 비누에 고수가 올려진 모습">' +
+        '<figcaption>비누가 없다면, 고수를 대신 써보세요</figcaption>' +
+      '</figure>' +
+      '<h3>진짜 비누가 들어 있는 건 아니에요</h3>' +
+      '<p>고수 잎에는 향을 만드는 ‘알데하이드’라는 성분들이 들어 있어요. 과일과 식물에서도 자연적으로 발견되는 향 성분인데, ' +
+      '그중 일부는 비누나 세제의 향을 만들 때도 사용됩니다. 고수에 비누가 들어 있는 것은 아니지만, 비슷한 종류의 향 성분을 함께 가지고 있는 셈이에요. ' +
+      '</p>' +
+      '<p>고수에서 노린재 같은 벌레 냄새가 난다는 사람도 있는데, 일부 곤충 역시 자신을 보호하기 위해 알데하이드 성분이 포함된 냄새를 내보내기 때문에 ' +
+      '근거 없는 표현은 아닙니다.<button class="col-note-ref" type="button" data-note="1" aria-label="출처 1 보기">[1]</button></p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/cilantro/tattoo.webp?v=2" width="880" height="1175" loading="lazy" decoding="async" alt="고수를 싫어한다는 문구와 고수 그림을 새긴 발목">' +
+      '</figure>' +
+      '<h3>같은 고수인데 왜 사람마다 다르게 느낄까?</h3>' +
+      '<p>사람마다 냄새를 감지하는 방식에는 조금씩 차이가 있어요. 어떤 사람은 고수의 상큼한 향보다 비누를 떠올리게 하는 향을 더 강하게 느낍니다.</p>' +
+      '<p>이 차이와 관련해 자주 언급되는 것이 냄새를 감지하는 <b>OR6A2 유전자</b>예요. 이 유전자가 고수의 알데하이드 향을 사람마다 다르게 느끼는 데 ' +
+      '일부 영향을 줄 수 있다는 연구 결과가 있습니다.<button class="col-note-ref" type="button" data-note="2" aria-label="출처 2 보기">[2]</button></p>' +
+      '<p>하지만 OR6A2 하나만으로 고수 취향이 결정되는 것은 아니에요. 어릴 때부터 고수를 자주 먹었는지, 그 향에 얼마나 익숙한지 같은 경험과 식문화도 ' +
+      '함께 영향을 줄 수 있습니다.<button class="col-note-ref" type="button" data-note="3" aria-label="출처 3 보기">[3]</button></p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/cilantro/review.webp?v=1" width="880" height="1092" loading="lazy" decoding="async" alt="고수를 추가해줘서 고맙다는 내용의 별점 5점 후기">' +
+      '</figure>' +
+      '<h3>고수에는 어떤 영양소가 있을까?</h3>' +
+      '<p>고수에는 비타민 K를 비롯해 비타민 A와 C 등이 들어 있어요. 미국 농무부 자료에 따르면 생고수 약 4g에는 비타민 K가 12.4㎍ 들어 있습니다.' +
+      '<button class="col-note-ref" type="button" data-note="4" aria-label="출처 4 보기">[4]</button></p>' +
+      '<p>다만 고수는 보통 고명이나 향신 채소로 조금만 먹기 때문에 주요 영양 공급원으로 보기는 어려워요. 고수를 먹지 않더라도 다른 채소를 통해 필요한 ' +
+      '영양소를 충분히 섭취할 수 있으니, 건강을 위해 억지로 먹을 필요는 없습니다.</p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/cilantro/couple.webp?v=1" width="880" height="587" loading="lazy" decoding="async" alt="고수를 빼달라는 티셔츠와 넣어달라는 티셔츠를 입은 커플">' +
+      '</figure>' +
+      '<h3>그래도 한번 도전해보고 싶다면</h3>' +
+      '<p>생고수의 향이 너무 강하다면 처음부터 잎을 그대로 먹을 필요는 없어요.</p>' +
+      '<p>하이디라오에서 처음 도전한다면 고수를 그대로 먹기보다, 땅콩참깨소스처럼 고소하고 진한 소스에 아주 조금만 섞어보세요. ' +
+      '한 번에 많이 넣지 말고 맛을 본 뒤 조금씩 추가하면 부담을 줄일 수 있습니다.</p>' +
+      '<p class="col-outro">그래도 싫다면 당당하게 “고수 빼주세요!”라고 말해도 괜찮아요. 같은 향을 사람마다 다르게 느끼는 것이니까요. ' +
+      '반대로 조금 궁금해졌다면, 부담 없는 양으로 다시 한번 도전해봐도 좋고요.</p>',
+    notes: [
+      { label: '미국화학회 — 고수의 알데하이드와 비누·곤충 냄새', url: 'https://www.acs.org/education/chemmatters/articles/cilantro-delicious-or-disgusting.html' },
+      { label: '고수 선호와 후각 수용체 주변의 유전적 차이 연구', url: 'https://link.springer.com/article/10.1186/2044-7248-1-22' },
+      { label: '문화권별 고수 비선호율 연구', url: 'https://link.springer.com/article/10.1186/2044-7248-1-8' },
+      { label: '미국 농무부 영양 데이터 — 생고수의 비타민 K', url: 'https://ods.od.nih.gov/pubs/usdandb/VitK-Phylloquinone-Content.pdf' },
+    ],
   };
 
   // ── 가이드 배너(항상 마지막 고정) ────────────────────────────
@@ -2057,24 +2080,41 @@
     document.getElementById('columnTitle').textContent = col.title;
     document.getElementById('columnSub').textContent = col.heroDesc || '';
     document.getElementById('columnBody').innerHTML = col.body || '';
+    // 본문의 출처 번호는 URL/history를 바꾸지 않고 하단 해당 출처로 이동.
+    [...document.querySelectorAll('#columnBody .col-note-ref')].forEach((el) => {
+      el.addEventListener('click', () => {
+        document.getElementById('columnNote' + el.dataset.note)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
     // 하단: 관련 소스 자동 목록(각 항목 클릭 → 칼럼 닫고 해당 레시피 열기)
     const sauces = getColumnSauces(col);
-    document.getElementById('columnSauceCount').textContent = sauces.length;
     const listEl = document.getElementById('columnSauceList');
     listEl.innerHTML = sauces.map((r) => {
-      const amt = (r.ings.find((ing) => ing[0] === col.ingFilter) || []);
-      const amtTxt = [amt[1], amt[2]].filter(Boolean).join(' ');
       const ver = r.ver ? '<span class="col-sauce-ver">' + r.ver + '</span>' : '';
       const thumb = r.img
         ? '<img class="col-sauce-thumb" src="' + r.img + '" alt="" draggable="false">'
         : '<span class="col-sauce-thumb col-sauce-thumb--emoji">' + (r.emoji || '🥣') + '</span>';
       return '<button class="col-sauce" type="button" data-rid="' + r.id + '">'
         + thumb
-        + '<span class="col-sauce-meta"><span class="col-sauce-name">' + r.name + ver + '</span>'
-        + '<span class="col-sauce-amt">' + col.ingFilter + ' ' + amtTxt + '</span></span>'
+        + '<span class="col-sauce-meta"><span class="col-sauce-name">' + r.name + '</span>'
+        + ver + '</span>'
         + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
         + '</button>';
     }).join('');
+    // 관련 소스 아래: 주석·출처(아티클의 마지막 요소)
+    const notesEl = document.getElementById('columnNotes');
+    const notes = col.notes || [];
+    notesEl.hidden = !notes.length;
+    notesEl.innerHTML = notes.length
+      ? '<h3 class="column-notes-title">출처</h3><ol class="column-notes-list">'
+        + notes.map((note, idx) =>
+          '<li id="columnNote' + (idx + 1) + '"><span class="column-note-num">[' + (idx + 1) + ']</span>'
+          + '<a class="column-note-link" href="' + note.url + '" target="_blank" rel="noopener noreferrer">'
+          + note.label
+          + '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M18 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          + '</a></li>').join('')
+        + '</ol>'
+      : '';
     [...listEl.querySelectorAll('.col-sauce')].forEach((el) => {
       el.addEventListener('click', () => {
         const r = RECIPES.find((x) => x.id === el.dataset.rid);
@@ -2082,7 +2122,7 @@
       });
     });
     columnOverlay.hidden = false;
-    if (columnSheet) columnSheet.scrollTop = 0;
+    columnOverlay.scrollTop = 0;
   }
   function closeColumn() { columnOverlay.hidden = true; }
   document.getElementById('columnClose').addEventListener('click', closeColumn);
