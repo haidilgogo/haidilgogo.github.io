@@ -146,7 +146,7 @@ img {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 1px;
+  gap: 6px;
   /* 로고가 든 줄의 높이를 상단바 최대 요소(카테고리 탭=42px)에 맞춰 고정 → 레시피(탭·검색 있음)든
      매장(제목만)이든 로고가 늘 같은 높이 줄에서 중심을 잡아, 탭 전환 시 로고가 위아래로 안 움직임.
      ⚠️ 값은 상단바에서 제일 큰 컨트롤(.tabs) 높이와 맞춰야 함 — 탭 크기 바꾸면 이 값도 같이 확인. */
@@ -160,6 +160,15 @@ img {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.topbar-logo-mark {
+  display: block;
+  width: 25px;
+  height: 22px;
+  object-fit: contain;
+  flex: none;
+  pointer-events: none;
 }
 
 .topbar-title {
