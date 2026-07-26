@@ -64,7 +64,9 @@
   .splash-hide { opacity: 0; pointer-events: none; }
   /* 로고+제목을 한 덩어리로 함께 등장시켜 시간차 방지 */
   .splash-inner {
-    display: flex; flex-direction: column; align-items: center; gap: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 0; opacity: 0;
+  }
+  .splash-inner.splash-ready {
     animation: splashPop .5s cubic-bezier(.2,.8,.2,1) both;
   }
   .splash-logo { width: 130px; height: 130px; object-fit: contain; }
@@ -76,7 +78,9 @@
     line-height: 1; margin-top: 4px;
   }
   @keyframes splashPop { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
-  @media (prefers-reduced-motion: reduce) { .splash-inner { animation: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .splash-inner.splash-ready { animation: none; opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -98,16 +102,44 @@
   // 이미 이번 세션에 봤으면(새로고침·로고클릭 등) 즉시 제거 — 깜빡임 없음
   if (sessionStorage.getItem('hg_splash')) { s.parentNode.removeChild(s); return; }
   sessionStorage.setItem('hg_splash', '1');
-  var MIN = 1100, start = Date.now(), done = false;
+  var inner = s.querySelector('.splash-inner');
+  var logo = s.querySelector('.splash-logo');
+  var MIN = 1100, start = 0, done = false, ready = false, loaded = false;
   function hide() {
     if (done) return; done = true;
     s.classList.add('splash-hide');
     setTimeout(function () { if (s.parentNode) s.parentNode.removeChild(s); }, 420);
   }
-  function schedule() { setTimeout(hide, Math.max(0, MIN - (Date.now() - start))); }
+  function schedule() {
+    loaded = true;
+    if (!ready) return;
+    setTimeout(hide, Math.max(0, MIN - (Date.now() - start)));
+  }
+  function reveal() {
+    if (ready) return;
+    ready = true;
+    start = Date.now();
+    if (inner) inner.classList.add('splash-ready');
+    if (loaded) schedule();
+  }
+  function waitForLogo() {
+    if (!logo) return Promise.resolve();
+    if (logo.complete && logo.naturalWidth) {
+      return logo.decode ? logo.decode().catch(function () {}) : Promise.resolve();
+    }
+    return new Promise(function (resolve) {
+      logo.addEventListener('load', resolve, { once: true });
+      logo.addEventListener('error', resolve, { once: true });
+    });
+  }
+  var fontReady = document.fonts && document.fonts.load
+    ? document.fonts.load('500 33px PaperlogySplash').catch(function () {})
+    : Promise.resolve();
+  Promise.all([waitForLogo(), fontReady]).then(reveal);
+  setTimeout(reveal, 700); // 이미지나 글꼴 준비 확인 실패 시에도 빈 화면 방지
   if (document.readyState === 'complete') schedule();
   else window.addEventListener('load', schedule);
-  setTimeout(hide, 2200); // 로딩이 길어도 여기서 강제 종료
+  setTimeout(hide, 3000); // 로딩이 길어도 여기서 강제 종료
 })();
 </script>
 
