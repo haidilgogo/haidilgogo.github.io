@@ -856,16 +856,40 @@
 
   // ── 가이드 배너(항상 마지막 고정) ────────────────────────────
   // 홈 아래쪽 '하이디라오가 처음인 당신에게' 가이드를 놓치는 사람이 많아, 히어로 마지막 칸에도
-  // 한 번 더 노출. 클릭 시 같은 가이드 패널(#guideOverlay)이 열림(내용 공유).
+  // 한 번 더 노출. 홈 배너와 히어로 배너 모두 이 아티클을 연다(내용 공유).
+  // 아티클은 고수·알쓸신잡과 같은 칼럼 패널(openColumn)을 그대로 쓴다 — 배너 스타일만
+  // isGuide로 구분(.mf-hero--guide). 본문은 '01 태블릿으로 주문하기'까지 확정분만 들어 있다.
   const GUIDE_BANNER = {
     id: 'banner-guide',
     isGuide: true,
-    title: '어서와~ 하이디라오는 처음이지?',            // 접근성(aria)·비상용 한 줄
+    title: '어서와~ 하이디라오는 처음이지?',            // 접근성(aria)·칼럼 제목
     titleHtml: '어서와~<br>하이디라오는 처음이지?',       // 배너 표시용(두 줄)
     heroDesc: '주문부터 소스바 사용까지 · 가이드',
     bannerImg: 'assets/columns/guide.jpg?v=1',
     bannerBg: 'linear-gradient(150deg,#C6402E 0%,#E5704A 55%,#F2A878 100%)',
     emoji: '📖',
+    body:
+      '<p class="col-lead">하이디라오 방문이 처음이라면, 기다리는 동안 미리 알아보세요. ' +
+      '태블릿 주문부터 소스 만들기까지, 하딜고고가 하이디라오를 편하게 즐길 수 있도록 도와드릴게요.</p>' +
+      // 이미지 안에 제목과 01·02·03 문구가 다 있어 웹 글자로 중복 표시하지 않음(사용자 지정).
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/guide/order-overview.webp?v=1" width="880" height="1174" loading="lazy" decoding="async" alt="한눈에 보는 이용 순서 — 01 태블릿으로 주문하기, 02 소스바에서 소스 만들기, 03 재료 넣고 익혀 먹기">' +
+      '</figure>' +
+      '<h3>01 태블릿으로 주문하기</h3>' +
+      '<p>자리를 안내받으면, 태블릿에서 가장 먼저 먹고 싶은 탕을 골라요.</p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/guide/tablet-order.webp?v=1" width="880" height="660" loading="lazy" decoding="async" alt="태블릿 주문 화면에서 전골 4가지 맛을 골라 네 칸으로 나뉜 냄비가 표시된 모습">' +
+      '</figure>' +
+      '<p>전골 1맛·2가지 맛·4가지 맛 중 하나를 고른 다음, 각 칸에 먹고 싶은 탕을 선택하면 돼요.</p>' +
+      '<p>전골 구성에 따라 한 칸의 크기와 탕 가격이 달라요.</p>' +
+      '<p>2가지 맛은 한 칸의 양이 더 많아 같은 탕도 가격이 더 높고, 4가지 맛은 한 칸의 양이 적어 가격도 더 낮아요.</p>' +
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/guide/hotpot-flavor-select.webp?v=1" width="880" height="572" loading="lazy" decoding="async" alt="전골 2가지 맛과 4가지 맛의 냄비 칸 구성을 나란히 비교한 그림">' +
+      '</figure>' +
+      '<h3>처음이라면 전골 4가지 맛을 추천해요</h3>' +
+      '<p>여러 탕을 조금씩 맛볼 수 있고, 먹고 싶은 탕만 고른 뒤 나머지 칸은 0원인 맑은 탕(물)으로 선택할 수도 있어요.</p>' +
+      '<p>맑은 탕(물)은 소스바 재료를 넣어 DIY 탕을 만들거나, 국자를 헹구는 용도로 활용할 수 있어요.</p>' +
+      '<p>탕 위치는 냄비 그림에서 드래그해 원하는 자리로 옮길 수 있어요.</p>',
   };
 
   function pickMonthlyFeatures() {
@@ -922,8 +946,7 @@
     heroes.forEach((el, i) => el.addEventListener('click', () => {
       const item = monthlyList[i];
       if (item.isSoon) return;                         // 준비중 배너는 클릭 무반응
-      if (item.isColumn) openColumn(item);
-      else if (item.isGuide) document.getElementById('guideOverlay').hidden = false;
+      if (item.isColumn || item.isGuide) openColumn(item);
       else openModal(item);
     }));
     const pill = mfDots.querySelector('.mf-dots-pill');
@@ -2120,11 +2143,9 @@
   const homeRandomBtn = document.getElementById('homeRandomBtn');
   if (homeRandomBtn) homeRandomBtn.addEventListener('click', openGacha);
 
-  // 초심자 가이드 패널(뼈대) — 배너 클릭으로 열고, X·바깥 클릭으로 닫음
-  const guideOverlay = document.getElementById('guideOverlay');
-  document.getElementById('homeGuide').addEventListener('click', () => { guideOverlay.hidden = false; });
-  document.getElementById('guideClose').addEventListener('click', () => { guideOverlay.hidden = true; });
-  guideOverlay.addEventListener('click', (e) => { if (e.target === guideOverlay) guideOverlay.hidden = true; });
+  // 초심자 가이드 — 홈 배너도 히어로 배너와 같은 칼럼 패널을 연다(GUIDE_BANNER).
+  // 옛 '곧 만나요!' 자리표시 패널(#guideOverlay)은 아티클이 들어오면서 제거됨.
+  document.getElementById('homeGuide').addEventListener('click', () => { openColumn(GUIDE_BANNER); });
 
   // ── 기획 칼럼 패널 ──────────────────────────────────────────
   const columnOverlay = document.getElementById('columnOverlay');

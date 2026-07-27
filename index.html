@@ -323,18 +323,8 @@
       </footer>
     </div>
 
-    <!-- 초심자 가이드 패널(뼈대, 2026-07-21) — 콘텐츠는 추후 채움. 홈 가이드 배너에서 열림 -->
-    <div class="guide-overlay" id="guideOverlay" hidden>
-      <div class="guide-sheet" role="dialog" aria-label="초심자 가이드">
-        <button class="guide-close" id="guideClose" type="button" aria-label="닫기">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.02" stroke-linecap="round"/></g></svg>
-        </button>
-        <span class="guide-sheet-ic">📖</span>
-        <h2 class="guide-sheet-title">하이디라오가 처음인 당신에게</h2>
-        <p class="guide-sheet-desc">주문 순서부터 소스바 사용법, 첫 방문 추천 코스까지<br>차근차근 알려주는 가이드를 준비하고 있어요.</p>
-        <p class="guide-sheet-soon">곧 만나요!</p>
-      </div>
-    </div>
+    <!-- 초심자 가이드는 칼럼 패널(#columnOverlay)을 그대로 쓴다 — 옛 '곧 만나요!' 자리표시
+         패널(#guideOverlay)은 아티클이 들어오면서 제거됨(2026-07-28) -->
 
     <!-- 메뉴 섹션 (준비 중) -->
     <div class="view" id="view-menu" hidden>
@@ -747,7 +737,7 @@
   </div>
 </div>
 
-<script src="script.js?v=421"></script>
+<script src="script.js?v=422"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
