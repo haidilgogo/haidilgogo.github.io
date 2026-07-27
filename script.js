@@ -1869,6 +1869,7 @@
     if (e.target.closest('#topShareBtn')) return;
     if (modalOverlay.classList.contains('open')) closeModal();
     if (stampViewOverlay.classList.contains('open')) closeStampView();
+    if (!columnOverlay.hidden) closeColumn(); // 기획 칼럼(아티클)도 같은 규칙
   }, true);
   modalFavBtn.addEventListener('click', () => {
     if (!currentModalRecipe) return;
