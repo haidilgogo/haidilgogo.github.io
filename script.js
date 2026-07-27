@@ -2157,6 +2157,7 @@
       r.ings && r.ings.some((ing) => ing[0] === col.ingFilter));
   }
   function openColumn(col) {
+    syncTopbarH(); // 칼럼 패널이 상단바 바로 아래에서 시작하도록 열 때마다 재측정
     document.documentElement.style.overflow = 'hidden';
     const hero = document.getElementById('columnHero');
     columnSheet.classList.toggle('column-sheet--light-close', col.id === 'col-hotpot-trivia');
