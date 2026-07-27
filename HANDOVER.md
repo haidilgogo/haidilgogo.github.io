@@ -41,7 +41,7 @@ main: 6e6ec03 (로컬·원격 동일)
 원본 기획자료:
 
 ```text
-/Users/Macmini_J/Downloads/TalkFile_하딜고고_하이디라오_첫방문가이드_기획초안.pdf
+/Users/Macmini_J/ClaudeCode/02. Data/Haidilgogo/main-banner/guide/TalkFile_하딜고고_하이디라오_첫방문가이드_기획초안.pdf
 ```
 
 - 2026-07-26 제작, 6페이지.
