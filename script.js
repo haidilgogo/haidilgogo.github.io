@@ -1848,6 +1848,7 @@
     setPressedState(modalLikeBtn, likedByMe.has(id));
     modalLikeCount.textContent = getLikeCount(id);
     syncLikeUI(id); // 뒤에 깔린 카드 하트(숫자+빨강 채움)도 같이 맞춤
+    popHeart(modalLikeBtn); // 홈 하트와 같은 통통 팝 — 알약을 벗기며 사라진 "눌림" 신호를 대신한다
   });
 
   // 모바일 전체화면 상세: 오버레이가 상단바 아래에서 시작하도록 실제 높이를 CSS 변수로 전달
