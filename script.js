@@ -875,12 +875,12 @@
       '태블릿 주문부터 소스 만들기까지, 하딜고고가 하이디라오를 편하게 즐길 수 있도록 도와드릴게요.</p>' +
       // 이미지 안에 제목과 01·02·03 문구가 다 있어 웹 글자로 중복 표시하지 않음(사용자 지정).
       '<figure class="col-figure col-figure--no-caption">' +
-        '<img src="assets/columns/guide/order-overview.webp?v=1" width="880" height="1174" loading="lazy" decoding="async" alt="한눈에 보는 이용 순서 — 01 태블릿으로 주문하기, 02 소스바에서 소스 만들기, 03 재료 넣고 익혀 먹기">' +
+        '<img src="assets/columns/guide/order-overview.webp?v=2" width="850" height="1400" loading="lazy" decoding="async" alt="한눈에 보는 이용 순서 — 01 태블릿으로 주문하기, 02 소스바에서 소스 만들기, 03 재료 넣고 익혀 먹기">' +
       '</figure>' +
       '<h3>01 태블릿으로 주문하기</h3>' +
       '<p>자리를 안내받으면, 태블릿에서 가장 먼저 먹고 싶은 탕을 골라요.</p>' +
       '<figure class="col-figure col-figure--no-caption">' +
-        '<img src="assets/columns/guide/tablet-order.webp?v=1" width="880" height="660" loading="lazy" decoding="async" alt="태블릿 주문 화면에서 전골 4가지 맛을 골라 네 칸으로 나뉜 냄비가 표시된 모습">' +
+        '<img src="assets/columns/guide/tablet-order.webp?v=2" width="880" height="620" loading="lazy" decoding="async" alt="태블릿 주문 화면에서 전골 4가지 맛을 골라 네 칸으로 나뉜 냄비가 표시된 모습">' +
       '</figure>' +
       // '전골'은 태블릿 실제 선택지 명칭이라 그대로 쓰고, 그 뒤로는 탕·물 칸으로 통일(기획초안 지침).
       // 전골=냄비를 몇 칸으로 나눌지, 탕=각 칸에 담기는 국물 — 첫 방문자가 둘을 헷갈려서 한 문장에 관계를 드러냄.

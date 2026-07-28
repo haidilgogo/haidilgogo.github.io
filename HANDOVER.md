@@ -133,20 +133,24 @@ STEP 1에서 확정된 편집 판단(되돌리지 말 것):
 
 ```text
 /Users/Macmini_J/ClaudeCode/02. Data/Haidilgogo/main-banner/guide/
-├── 한눈에 보는 이용 순서.png       1080×1440
-├── 태블릿으로 주문하기.png          1448×1086
+├── 한눈에 보는 이용 순서.png        850×1400   (2026-07-28 교체)
+├── 태블릿으로 주문하기.png          1281×902   (2026-07-28 교체)
 └── 전골 맛 선택.png                 1000×650
 ```
 
 커밋된 웹용 사본:
 
 ```text
-assets/columns/guide/order-overview.webp         880×1174
-assets/columns/guide/tablet-order.webp            880×660
+assets/columns/guide/order-overview.webp         850×1400
+assets/columns/guide/tablet-order.webp            880×620
 assets/columns/guide/hotpot-flavor-select.webp    880×572
 ```
 
 원본은 삭제·덮어쓰지 않는다. 웹 사본은 원본 비율을 유지한다.
+변환은 `cwebp -q 82`(가로 880 초과면 `-resize 880 0`)로 한다. **880보다 작은 원본은 확대하지 않는다** —
+칼럼 본문 폭이 375px 화면에서 331px이라 2배(≈662px)면 충분하다. `한눈에 보는 이용 순서`가 그래서 850 그대로다.
+교체할 때는 `script.js`의 `width`/`height` 속성을 새 크기로 고치고 `?v=` 숫자를 올린다 —
+속성이 옛 비율이면 이미지가 뜨기 전 자리가 어긋난다.
 
 ## F. 검증·표시 결정
 
