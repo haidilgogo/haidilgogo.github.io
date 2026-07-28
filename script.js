@@ -905,7 +905,7 @@
       // 드래그는 보이지 않는 동작이라 알려줄 값어치는 있으나 필수는 아니라 앞 문장에 딸린 부가 설명으로 붙임.
       '<p>전골 1맛·2가지 맛·4가지 맛 중에서 냄비를 몇 칸으로 나눌지 고르고, 각 칸에 먹고 싶은 탕을 선택하면 돼요. 탕 위치는 냄비 그림에서 드래그해 원하는 자리로 옮길 수 있어요.</p>' +
       '<figure class="col-figure col-figure--no-caption">' +
-        '<img src="assets/columns/guide/hotpot-flavor-select.webp?v=2" width="880" height="382" loading="lazy" decoding="async" alt="전골 1맛·2가지 맛·4가지 맛의 냄비 칸 구성을 나란히 비교한 그림">' +
+        '<img src="assets/columns/guide/hotpot-flavor-select.webp?v=3" width="880" height="382" loading="lazy" decoding="async" alt="전골 1맛·2가지 맛·4가지 맛의 냄비 칸 구성을 나란히 비교한 그림">' +
       '</figure>' +
       '<p>전골 구성에 따라 한 칸의 크기와 탕 가격이 달라요. 2가지 맛은 한 칸의 양이 더 많아 같은 탕도 가격이 더 높고, 4가지 맛은 한 칸의 양이 적어 가격도 더 낮아요.</p>' +
       // 인원별 숫자 예시(4명=탕3+물1 등)는 공식이 아니라 넣지 않기로 확정 — 일반 안내 문구만 둔다.
