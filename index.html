@@ -31,7 +31,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=584">
+<link rel="stylesheet" href="styles.css?v=585">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -532,10 +532,17 @@
     </div>
     <!-- 원본 썸네일 -->
     <div class="modal-thumb" id="modalThumb"></div>
-    <!-- 이름(윗줄)·부제(아랫줄), 좌측 정렬 -->
+    <!-- 이름(윗줄)·부제(아랫줄) 왼쪽 + 좋아요 오른쪽 — 브라우즈 카드(.hc-card-foot)와 같은 구조.
+         하트는 이름·부제 묶음의 세로 가운데에 선다(2026-07-28, 하단에 혼자 떠 있던 것을 옮김). -->
     <div class="modal-header">
-      <h2 class="modal-name" id="modalName"></h2>
-      <span class="modal-ver" id="modalVer"></span>
+      <div class="modal-header-txt">
+        <h2 class="modal-name" id="modalName"></h2>
+        <span class="modal-ver" id="modalVer"></span>
+      </div>
+      <button class="modal-like-btn" id="modalLikeBtn" type="button" aria-label="좋아요" aria-pressed="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <span class="like-count" id="modalLikeCount">0</span>
+      </button>
     </div>
     <!-- 설명 — 박스 없이 문단 -->
     <p class="modal-desc" id="modalDesc"></p>
@@ -561,12 +568,6 @@
           <img class="tip-ic" src="assets/icons/bulb.png?v=1" alt="" width="18" height="18" draggable="false">
           <div id="modalTip"></div>
         </div>
-      </div>
-      <div class="modal-like-wrap">
-        <button class="modal-like-btn" id="modalLikeBtn" type="button" aria-label="좋아요" aria-pressed="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-          <span class="like-count" id="modalLikeCount">0</span>
-        </button>
       </div>
       <!-- 하단 닫기 — 칼럼 아티클과 같은 문법. 긴 상세를 끝까지 읽고 나서 상단 X까지
            되올라가지 않아도 빠져나올 수 있게(2026-07-28). 상단 X와 같은 closeModal 호출. -->
