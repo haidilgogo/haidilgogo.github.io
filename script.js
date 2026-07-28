@@ -2170,7 +2170,11 @@
     hero.style.cssText = col.bannerImg
       ? 'background-image:url(' + col.bannerImg + ');background-size:cover;background-position:center;'
       : 'background:' + col.bannerBg + ';';
-    document.getElementById('columnTitle').textContent = col.title;
+    // 배너와 같은 줄바꿈을 칼럼 제목에도 — titleHtml이 있으면 그걸 쓴다(가이드만 해당, <br> 포함).
+    // 없으면 기존대로 순수 텍스트(고수·알쓸신잡). aria 제목은 계속 col.title을 쓴다.
+    const titleEl = document.getElementById('columnTitle');
+    if (col.titleHtml) titleEl.innerHTML = col.titleHtml;
+    else titleEl.textContent = col.title;
     document.getElementById('columnSub').textContent = col.heroDesc || '';
     document.getElementById('columnBody').innerHTML = col.body || '';
     // 본문의 출처 번호는 URL/history를 바꾸지 않고 하단 해당 출처로 이동.

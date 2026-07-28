@@ -4608,6 +4608,10 @@ img {
   position: relative; z-index: 1;
   margin: 0;
   font-size: 24px; font-weight: 800; letter-spacing: -.03em;
+  /* 가이드 제목이 두 줄이 되면서 줄 간격이 필요해짐(2026-07-28). 값은 기존 렌더링과 같은 1.2 —
+     보이는 건 그대로고 브라우저 기본값(normal)의 기기별 편차만 없앤다.
+     명시 안 하면 iOS에서 받침이 잘린다(폰트 규칙). 배너 제목 .mf-name은 1.1로 이미 명시돼 있음. */
+  line-height: 1.2;
   text-shadow: 0 1px 10px rgba(0, 0, 0, .35);
 }
 .column-sub {
