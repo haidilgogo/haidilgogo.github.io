@@ -4666,8 +4666,17 @@ img {
   margin-bottom: 3px;
   font-size: 12px;
   letter-spacing: .1em;      /* 라벨이라 자간을 벌린다 — 제목은 -.02em로 좁은 것과 대비 */
-  color: var(--brand-red);
+  color: var(--brand-red);   /* 단계 번호가 없을 때의 기본값 */
 }
+/* STEP 번호 색 = 맨 위 '한눈에 보는 이용 순서' 그림의 01·02·03 색을 그대로 뽑아 쓴 것
+   (2026-07-28 사용자 확정). 그림과 본문이 같은 색으로 짝지어져 "지금 몇 단계인지"가 잡힌다.
+   🔴 크림 배경(#FCF9F5) 대비는 낮다 — 1번 1.99:1 / 2번 3.95:1 / 3번 4.07:1.
+      화면 밝기를 낮추면 1번 주황이 가장 먼저 흐려진다. 어둡게 조정하는 안(#CE7A06 = 3.12:1,
+      주황 느낌은 유지)을 검토했으나 그림과의 색 일치를 우선하기로 사용자가 정했다.
+      나중에 "흐리다"는 얘기가 나오면 위 절충값이 출발점이다. */
+.column-body h3.column-step--1 .step-no { color: #F8A018; }
+.column-body h3.column-step--2 .step-no { color: #608830; }
+.column-body h3.column-step--3 .step-no { color: #F02008; }
 .column-body p {
   margin: 0 0 4px;
   font-size: 14px; line-height: 1.75;

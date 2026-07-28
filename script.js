@@ -898,7 +898,8 @@
       // 'STEP 1'은 아래 소제목들(재료·소스바·추천)과 급을 구분하려고 붙인 큰 단계 표시다
       // (2026-07-28 사용자 확정, 옛 표기는 '01'). 맨 위 '한눈에 보는 이용 순서' 그림은
       // '01'로 구워져 있는데, 숫자가 같아 독자가 헷갈리지 않는다고 보고 그림은 두었다.
-      '<h3 class="column-step"><span class="step-no">STEP 1</span>태블릿으로 주문하기</h3>' +
+      // --1: 번호 색을 요약 그림의 01(주황)과 맞춘다. STEP 2·3은 --2(초록)·--3(빨강)을 붙이면 된다.
+      '<h3 class="column-step column-step--1"><span class="step-no">STEP 1</span>태블릿으로 주문하기</h3>' +
       '<p>자리를 안내받으면, 태블릿에서 가장 먼저 먹고 싶은 탕을 골라요.</p>' +
       '<figure class="col-figure col-figure--no-caption">' +
         '<img src="assets/columns/guide/tablet-order.webp?v=2" width="880" height="620" loading="lazy" decoding="async" alt="태블릿 주문 화면에서 전골 4가지 맛을 골라 네 칸으로 나뉜 냄비가 표시된 모습">' +
