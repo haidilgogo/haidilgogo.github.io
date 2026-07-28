@@ -788,7 +788,10 @@
   const HOTPOT_TRIVIA_COLUMN = {
     id: 'col-hotpot-trivia',
     isColumn: true,
-    title: '안물안궁',
+    // 그림 안에 제목 글씨가 구워져 있어 화면 제목도 같은 말로 맞춘다.
+    // 한 줄로는 320px에서 감기므로 가이드 배너처럼 titleHtml로 일부러 두 줄로 끊는다.
+    title: '물어본 사람~ 궁금한 사람~',              // 접근성(aria)·칼럼 제목
+    titleHtml: '물어본 사람~<br>궁금한 사람~',        // 배너 표시용(두 줄)
     heroDesc: '훠궈와 관련된 TMI',
     bannerImg: 'assets/columns/hotpot-trivia.webp?v=2',
     bannerBg: 'linear-gradient(150deg,#9F281F 0%,#C84A36 55%,#E89A61 100%)',
