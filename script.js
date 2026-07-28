@@ -748,8 +748,9 @@
       '</p>' +
       '<p>고수에서 노린재 같은 벌레 냄새가 난다는 사람도 있는데, 일부 곤충 역시 자신을 보호하기 위해 알데하이드 성분이 포함된 냄새를 내보내기 때문에 ' +
       '근거 없는 표현은 아닙니다.<button class="col-note-ref" type="button" data-note="1" aria-label="출처 1 보기">[1]</button></p>' +
-      '<figure class="col-figure col-figure--no-caption">' +
+      '<figure class="col-figure">' +
         '<img src="assets/columns/cilantro/tattoo.webp?v=2" width="880" height="1175" loading="lazy" decoding="async" alt="고수를 싫어한다는 문구와 고수 그림을 새긴 발목">' +
+        '<figcaption>나는 고수가 싫어요</figcaption>' +
       '</figure>' +
       '<h3>같은 고수인데 왜 사람마다 다르게 느낄까?</h3>' +
       '<p>사람마다 냄새를 감지하는 방식에는 조금씩 차이가 있어요. 어떤 사람은 고수의 상큼한 향보다 비누를 떠올리게 하는 향을 더 강하게 느낍니다.</p>' +
@@ -757,8 +758,9 @@
       '일부 영향을 줄 수 있다는 연구 결과가 있습니다.<button class="col-note-ref" type="button" data-note="2" aria-label="출처 2 보기">[2]</button></p>' +
       '<p>하지만 OR6A2 하나만으로 고수 취향이 결정되는 것은 아니에요. 어릴 때부터 고수를 자주 먹었는지, 그 향에 얼마나 익숙한지 같은 경험과 식문화도 ' +
       '함께 영향을 줄 수 있습니다.<button class="col-note-ref" type="button" data-note="3" aria-label="출처 3 보기">[3]</button></p>' +
-      '<figure class="col-figure col-figure--no-caption">' +
+      '<figure class="col-figure">' +
         '<img src="assets/columns/cilantro/review.webp?v=1" width="880" height="1092" loading="lazy" decoding="async" alt="고수를 추가해줘서 고맙다는 내용의 별점 5점 후기">' +
+        '<figcaption>사장님 고수 좀 추가해주세요~</figcaption>' +
       '</figure>' +
       '<h3>고수에는 어떤 영양소가 있을까?</h3>' +
       '<p>고수에는 비타민 K를 비롯해 비타민 A와 C 등이 들어 있어요. 미국 농무부 자료에 따르면 생고수 약 4g에는 비타민 K가 12.4㎍ 들어 있습니다.' +
