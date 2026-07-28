@@ -790,7 +790,7 @@
     isColumn: true,
     title: '안물안궁',
     heroDesc: '훠궈와 관련된 TMI',
-    bannerImg: 'assets/columns/hotpot-trivia.webp?v=1',
+    bannerImg: 'assets/columns/hotpot-trivia.webp?v=2',
     bannerBg: 'linear-gradient(150deg,#9F281F 0%,#C84A36 55%,#E89A61 100%)',
     emoji: '🍲',
     body:
@@ -2168,7 +2168,10 @@
     syncTopbarH(); // 칼럼 패널이 상단바 바로 아래에서 시작하도록 열 때마다 재측정
     document.documentElement.style.overflow = 'hidden';
     const hero = document.getElementById('columnHero');
-    columnSheet.classList.toggle('column-sheet--light-close', col.id === 'col-hotpot-trivia');
+    // 어두운 썸네일 위에서는 상단 X를 흰색으로(기본 X는 어두운 색이라 안 보인다).
+    // 칼럼마다 lightClose로 지정 — 예전엔 id === 'col-hotpot-trivia'로 박아뒀는데, 그 썸네일이
+    // 밝은 그림으로 바뀌자 흰 X가 안 보이게 됐다. 그림에 딸린 성질이니 칼럼 데이터에 둔다.
+    columnSheet.classList.toggle('column-sheet--light-close', !!col.lightClose);
     hero.style.cssText = col.bannerImg
       ? 'background-image:url(' + col.bannerImg + ');background-size:cover;background-position:center;'
       : 'background:' + col.bannerBg + ';';
