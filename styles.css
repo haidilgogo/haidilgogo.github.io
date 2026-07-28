@@ -4688,6 +4688,33 @@ img {
    위보다 아래를 좁게 둔 건 의도다 — 가이드의 사진은 바로 아래 문단을 설명하므로 한 덩어리로 보여야 한다.
    ※ 사진 다음이 소제목(h3)이면 h3의 margin-top 24px이 이겨서 24px이 된다(정상).
    ※ 최종 숫자는 가이드 STEP 2~5의 사진이 다 들어온 뒤 전체를 보고 다시 판단하기로 함(사용자와 합의). */
+/* 아티클용 팁 박스 — 레시피 상세의 .tip-box와 같은 로즈 톤·전구 아이콘(2026-07-28 사용자 확정).
+   추천·조언은 이 박스로 빼고, 소제목(h3)에는 '태블릿에서 할 일' 같은 절차만 남긴다.
+   그래야 한 STEP 안에서 소제목이 줄줄이 평평하게 늘어서지 않는다.
+   .tip-box를 그대로 재사용하지 않은 이유: 거긴 white-space:pre-line이라 문단(<p>)을 넣으면
+   줄바꿈이 이중으로 먹는다. 여기는 제목+문단 여러 개가 들어가므로 규칙을 따로 둔다.
+   ※ word-break: keep-all은 넣지 않는다 — 칼럼 공통 줄바꿈 동작을 유지한다(인계 문서 F항). */
+.column-body .col-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 20px 0 4px;
+  padding: 15px 14px;
+  background: #FDF1EE;
+  border: 1px solid #F1D5CD;
+  border-radius: 8px;
+}
+/* 제목 첫 줄에 광학적으로 맞추는 3px 내림(.tip-ic의 2px과 같은 계산, 여기는 15px 제목 기준) */
+.column-body .col-tip-ic { width: 18px; height: 18px; flex: none; margin-top: 3px; }
+.column-body .col-tip-body { flex: 1; min-width: 0; }
+.column-body .col-tip-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.35;
+}
 .column-body .col-figure {
   margin: 28px 0 14px;
 }
