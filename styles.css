@@ -1826,8 +1826,8 @@ img {
   border: none;
   background: none;
   color: #B29288;
-  padding: 13px 10px;  /* 하트 18px + 위아래 13px = 손가락 영역 44px(권장 최소치) */
-  margin: -13px -10px;
+  padding: 12px 10px;  /* 하트 20px + 위아래 12px = 손가락 영역 44px(권장 최소치) */
+  margin: -12px -10px;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 700;
