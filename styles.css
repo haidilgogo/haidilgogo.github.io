@@ -4364,15 +4364,20 @@ img {
 @media (hover: hover) {
   .hp-card:hover:not(:has(.hp-like:hover)) .hp-thumb > img { width: 106%; height: 106%; margin: -3%; }
 }
-/* 클릭/터치 눌림 — 배너·인기소스 = 프레임 전체 축소 / 탕·히든 = 이미지만(2026-07-24 사용자 요청).
-   탕·히든은 이미지를 '축소'하면 컨테이너 배경이 가장자리에 드러나 테두리처럼 보임 → 대신 살짝 '확대(줌인)'해서
-   항상 컨테이너를 덮게 함(테두리 없음). :active는 :hover보다 소스 순서상 뒤라 누르는 동안 이 값이 이김.
+/* 클릭/터치 눌림 = 사이트 전체가 '틀이 눌리는' 느낌으로 통일(2026-07-28 사용자 확정).
+   호버는 틀 그대로 + 안의 사진만 확대 / 누름은 사진 그대로 + 틀이 살짝 작아짐 — 이 두 갈래를 지킨다.
+   메인배너 .985(큰 요소라 살짝만) · 인기소스 .97 · 셀럽 · 오늘의 소스 버튼이 모두 이 형식이고,
+   탕·히든만 이미지가 커지는 방식이라 혼자 달랐다 → 인기소스와 같은 .97로 맞춤.
+   ※ 2026-07-24의 '탕·히든은 이미지만 줌인' 결정을 대체한다. 그때 문제는 이미지를 '축소'하면
+     줄어든 자리로 컨테이너 배경이 드러나 테두리처럼 보인 것인데, 틀째로 줄이면 그 문제가 없다.
+   ※ 히든메뉴(.hc-row)는 행 전체가 아니라 썸네일만 줄인다 — 행에 위아래 구분선(border)이 붙어 있어
+     행을 통째로 scale하면 선까지 짧아지며 이웃 행과 어긋난다.
    좋아요·즐겨찾기 버튼을 누르는 중일 땐 카드 자체의 눌림 효과 제외(2026-07-25). */
-.mf-hero, .hp-card { transition: transform .18s ease; }
+.mf-hero, .hp-card, .hc-card, .hc-row-thumb { transition: transform .18s ease; }
 .mf-hero:not(.mf-hero--soon):active { transform: scale(.985); } /* 큰 요소라 살짝만 */
 .hp-card:active:not(:has(.hp-like:active)) { transform: scale(.97); }
-.hc-card:not(.hc-card--static):active:not(:has(.browse-fav:active, .hc-row-like:active)) .hc-thumb > img { transform: scale(1.09); }
-.hc-row:active:not(:has(.hc-row-like:active)) .hc-row-thumb > img { transform: scale(1.09); }
+.hc-card:not(.hc-card--static):active:not(:has(.browse-fav:active, .hc-row-like:active)) { transform: scale(.97); }
+.hc-row:active:not(:has(.hc-row-like:active)) .hc-row-thumb { transform: scale(.97); }
 
 /* ═══════════ 전체보기(브라우즈) 화면 — 전체/소스/히든메뉴/탕 카테고리 탭 (2026-07-25 이중 필터로 재구조화) ═══════════
    탭은 브라우즈 중 항상 표시(list-head 자체가 홈에서 통째로 숨음). 소스만 상위 5개에 순위 배지.
