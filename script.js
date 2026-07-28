@@ -782,12 +782,14 @@
     ],
   };
 
-  // ── 훠궈·하이디라오 알쓸신잡(배너 3번 고정) ───────────────────
+  // ── 훠궈·하이디라오 잡학 아티클(배너 3번 고정) ───────────────────
+  // 제목은 2026-07-28에 '알쓸신잡' → '안물안궁'으로 교체. 알쓸신잡은 2017년 프로그램이라
+  // 낡았다는 사용자 판단. id·이미지 파일명(hotpot-trivia)은 화면에 안 나오므로 그대로 둔다.
   const HOTPOT_TRIVIA_COLUMN = {
     id: 'col-hotpot-trivia',
     isColumn: true,
-    title: '알쓸신잡',
-    heroDesc: '알아도 쓸모없는 훠궈 · 하이디라오 잡지식',
+    title: '안물안궁',
+    heroDesc: '훠궈와 관련된 TMI',
     bannerImg: 'assets/columns/hotpot-trivia.webp?v=1',
     bannerBg: 'linear-gradient(150deg,#9F281F 0%,#C84A36 55%,#E89A61 100%)',
     emoji: '🍲',
