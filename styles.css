@@ -4652,6 +4652,22 @@ img {
   font-size: 16px; font-weight: 800; letter-spacing: -.02em;
   color: var(--text-dark);
 }
+/* 큰 단계 제목(STEP 1·2·3…) — 가이드 아티클용(2026-07-28 사용자 확정).
+   보통 소제목(16px)과 같은 크기로 두면 한 STEP 안의 소제목들과 평평하게 보여
+   'STEP이 아래를 묶는다'는 게 안 읽힌다. 그래서 제목만 19px로 키우고
+   번호는 위에 작은 빨강 라벨로 올렸다.
+   맨 위 '한눈에 보는 이용 순서' 그림도 '작은 색 숫자 + 제목' 구조라 그림에서 글로 자연스럽게 넘어간다. */
+.column-body h3.column-step {
+  margin-top: 30px;
+  font-size: 19px;
+}
+.column-body h3.column-step .step-no {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 12px;
+  letter-spacing: .1em;      /* 라벨이라 자간을 벌린다 — 제목은 -.02em로 좁은 것과 대비 */
+  color: var(--brand-red);
+}
 .column-body p {
   margin: 0 0 4px;
   font-size: 14px; line-height: 1.75;
