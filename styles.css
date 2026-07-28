@@ -679,9 +679,10 @@ img {
   transform: translateY(-14px);   /* 캡션과 겹치지 않게 살짝 위로 */
 }
 .mf-hero--column .mf-badge-em { color: #fff; }  /* '기획' 라벨은 흰색 */
-/* 특수 배너 제목은 두 줄(예: 어서와~ / 하이디라오는 처음이지?)이 들어가므로 살짝 작게 */
-.mf-hero--column .mf-name { font-size: 30px; line-height: 1.2; }
-/* 가이드 배너는 제목이 길어 한 단계 더 작게(두 줄 여백 확보) */
+/* 칼럼 배너 제목의 줄 간격(제목 크기는 .mf-name 공통 30px) */
+.mf-hero--column .mf-name { line-height: 1.2; }
+/* 가이드 배너만 작게 — 제목이 두 줄(어서와~ / 하이디라오는 처음이지?)이라 30px이면
+   좁은 폰(320px)에서 둘째 줄이 한 번 더 감겨 세 줄이 된다(2026-07-28 측정). */
 .mf-hero--guide .mf-name { font-size: 26px; }
 /* 준비중 배너 — 클릭 안 되니 기본 커서 */
 .mf-hero--soon { cursor: default; }
@@ -693,7 +694,9 @@ img {
   text-align: left;
 }
 .mf-name {
-  font-size: 34px;
+  /* 배너 제목 공통 30px(2026-07-28, 이달의 소스 34 → 30으로 낮춰 통일).
+     배너를 넘길 때 제목 크기가 계단처럼 바뀌지 않게 — 예외는 두 줄인 가이드(26px)뿐. */
+  font-size: 30px;
   font-weight: 800;
   color: #fff;
   letter-spacing: -.03em;
