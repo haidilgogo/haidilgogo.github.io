@@ -703,6 +703,22 @@ img {
   line-height: 1.1;
   text-shadow: 0 1px 8px rgba(0, 0, 0, .4);
 }
+/* 예능 자막 밈처럼 제목 글자 사이에 끼우는 ↘ ↗ 화살표(안물안궁 칼럼).
+   em 단위라 배너 30px·아티클 24px 어디서 써도 글자에 맞춰 같이 커지고 작아진다.
+   stroke가 currentColor라 흰 제목·어두운 제목 양쪽에서 글자색을 따라간다. */
+.ttl-arw {
+  display: inline-block;
+  width: .72em;
+  height: .72em;
+  margin: 0 .02em;
+  vertical-align: -.02em;
+  fill: none;
+  stroke: currentColor;
+  /* 제목이 800 굵기라 화살표가 가늘면 따로 논다. viewBox 24 기준 3.8이면 글자 획과 비슷해진다. */
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 /* 이름 밑 한 줄 설명(29CM식) — 한 줄 넘으면 …로 자름 */
 .mf-desc {
   margin-top: 7px;

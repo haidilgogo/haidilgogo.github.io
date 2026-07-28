@@ -782,16 +782,29 @@
     ],
   };
 
+  // 예능 자막 밈처럼 제목 글자 사이에 끼우는 ↘ ↗ 화살표.
+  // 글자(↘ U+2198 / ↗ U+2197)를 그냥 쓰면 iOS Safari가 컬러 이모지로 그려 제목 톤이 깨지고
+  // 기기마다 모양이 달라진다 → 매장 핀·시계 아이콘과 같은 인라인 SVG로 그린다.
+  // currentColor라 배너의 흰 제목·아티클의 어두운 제목 어디서나 글자색을 따라간다.
+  const TITLE_ARROW_DOWN =
+    '<svg class="ttl-arw" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+      '<path d="M6 6 L18 18 M18 11 V18 H11"/></svg>';
+  const TITLE_ARROW_UP =
+    '<svg class="ttl-arw" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+      '<path d="M6 18 L18 6 M11 6 H18 V13"/></svg>';
+
   // ── 훠궈·하이디라오 잡학 아티클(배너 3번 고정) ───────────────────
-  // 제목은 2026-07-28에 '알쓸신잡' → '안물안궁'으로 교체. 알쓸신잡은 2017년 프로그램이라
-  // 낡았다는 사용자 판단. id·이미지 파일명(hotpot-trivia)은 화면에 안 나오므로 그대로 둔다.
+  // 제목은 2026-07-28에 '알쓸신잡' → '안물안궁' → '물어본 사람~ 궁금한 사람~'으로 확정.
+  // id·이미지 파일명(hotpot-trivia)은 화면에 안 나오므로 그대로 둔다.
   const HOTPOT_TRIVIA_COLUMN = {
     id: 'col-hotpot-trivia',
     isColumn: true,
     // 그림 안에 제목 글씨가 구워져 있어 화면 제목도 같은 말로 맞춘다.
     // 한 줄로는 320px에서 감기므로 가이드 배너처럼 titleHtml로 일부러 두 줄로 끊는다.
+    // 화살표는 읽어줄 필요가 없으니 titleHtml에만 넣는다(title은 낭독·aria용 순수 글자).
     title: '물어본 사람~ 궁금한 사람~',              // 접근성(aria)·칼럼 제목
-    titleHtml: '물어본 사람~<br>궁금한 사람~',        // 배너 표시용(두 줄)
+    titleHtml: '물' + TITLE_ARROW_DOWN + '어본' + TITLE_ARROW_UP + '사람~<br>' +
+               '궁' + TITLE_ARROW_DOWN + '금한' + TITLE_ARROW_UP + '사람~',
     heroDesc: '훠궈와 관련된 TMI',
     bannerImg: 'assets/columns/hotpot-trivia.webp?v=2',
     bannerBg: 'linear-gradient(150deg,#9F281F 0%,#C84A36 55%,#E89A61 100%)',
