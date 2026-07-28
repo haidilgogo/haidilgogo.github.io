@@ -4672,6 +4672,15 @@ img {
   height: auto;
   border-radius: 14px;
 }
+/* 세로로 긴 그림용 — 폭을 줄여 화면을 덜 잡아먹게 한다(2026-07-28 사용자 확정).
+   셀프소스바 카드가 폭 100%일 때 320px 폰에서 448px(화면의 55%)였다. 항목 하나 보여주는
+   그림이 '한눈에 보는 이용 순서'(전체 요약, 56%)와 같은 크기라 과했다.
+   60%면 269px(33%)이고 카드 제목이 13px이라 본문 14px과 비슷해 읽는 데 문제없다.
+   🔴 55% 아래로는 내리지 말 것 — 제목이 12px 밑으로 내려간다(실측). */
+.column-body .col-figure--narrow img {
+  max-width: 60%;
+  margin-inline: auto;
+}
 .column-body .col-figure figcaption {
   margin-top: 8px;
   color: #8B8680;

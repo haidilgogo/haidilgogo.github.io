@@ -935,7 +935,8 @@
       // 🔴 그림 속 가격은 사용자가 일부러 'W ●,●●●'로 가려뒀다. 금액은 지점·시기마다 달라서
       //   (태블릿 화면 3,000원 / 제주·부산 메뉴 데이터 3,500원) 숫자를 박으면 틀린 정보가 된다.
       //   그림을 다시 만들 일이 있어도 금액은 넣지 말 것.
-      '<figure class="col-figure col-figure--no-caption">' +
+      // --narrow: 세로로 긴 그림이라 폭을 60%로 줄인다(styles.css의 규칙 주석 참고).
+      '<figure class="col-figure col-figure--no-caption col-figure--narrow">' +
         '<img src="assets/columns/guide/sauce-bar-qty.webp?v=1" width="826" height="1340" loading="lazy" decoding="async" alt="태블릿의 셀프소스바 (1인) 항목 카드와 인원을 더하는 버튼">' +
       '</figure>' +
       '<p>다양한 재료를 원하는 대로 조합해 나만의 소스를 만들 수 있고, ' +
