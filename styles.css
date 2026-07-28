@@ -4742,7 +4742,12 @@ img {
 .column-footer {
   padding: 22px 22px calc(34px + env(safe-area-inset-bottom));
 }
-.column-bottom-close {
+/* 레시피 상세 하단 닫기도 같은 모양 — 두 패널의 '나가기'가 달라 보이면 안 된다(2026-07-28) */
+.modal-footer {
+  padding: 14px 16px calc(20px + env(safe-area-inset-bottom));
+}
+.column-bottom-close,
+.modal-bottom-close {
   width: 100%;
   height: 48px;
   border: 1px solid #DED6CE;
@@ -4756,6 +4761,8 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 @media (hover: hover) {
-  .column-bottom-close:hover { background: #F7F3EF; }
+  .column-bottom-close:hover,
+  .modal-bottom-close:hover { background: #F7F3EF; }
 }
-.column-bottom-close:active { background: #F0EAE4; }
+.column-bottom-close:active,
+.modal-bottom-close:active { background: #F0EAE4; }

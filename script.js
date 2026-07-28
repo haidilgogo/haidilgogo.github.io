@@ -1820,6 +1820,7 @@
   modalOverlay.addEventListener('click', closeModal);
   modalScroll.addEventListener('click', (e) => e.stopPropagation());
   modalClose.addEventListener('click', closeModal);
+  document.getElementById('modalBottomClose').addEventListener('click', closeModal); // 하단 닫기 = 상단 X와 동일 동작(history 처리 포함)
   modalScroll.addEventListener('keydown', (e) => trapFocusWithin(modalScroll, e));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
   window.addEventListener('popstate', () => {
