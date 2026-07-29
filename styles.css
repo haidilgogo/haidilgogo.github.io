@@ -4752,7 +4752,9 @@ img {
    줄 일이 생기면 여기에 규칙을 다시 만든다. */
 .column-body .col-outro {
   margin-top: 20px;
-  font-weight: 700; color: var(--brand-red); line-height: 1.7;
+  /* line-height는 본문 문단과 같은 1.75다(2026-07-29에 1.7에서 맞춤). 굵은 글씨(700)라
+     글자가 두꺼운데 줄 간격까지 좁으면 이 문단만 답답해 보인다 — 실제로 그렇게 보였다. */
+  font-weight: 700; color: var(--brand-red); line-height: 1.75;
 }
 /* 가이드 마무리(2026-07-29): 굵기·여백은 col-outro와 같되 줄 전체는 본문색으로 두고
    '하딜고고'만 브랜드 빨강으로 띄운다. 고수 아티클의 col-outro(줄 전체 빨강)는 그대로다. */
