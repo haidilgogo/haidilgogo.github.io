@@ -4784,7 +4784,9 @@ img {
   display: block;
   width: 100%;
   height: 48px;
-  margin: 20px 0 4px;
+  /* 위 28px: 마무리 문구와 버튼을 살짝 떼어놓는다(2026-07-29 사용자 지정, 20 → 28).
+     아래 4px은 하단 '닫기'와 한 묶음으로 붙여 두려는 값이라 건드리지 않는다. */
+  margin: 28px 0 4px;
   border: 0;
   border-radius: 12px;
   background: var(--brand-red);
