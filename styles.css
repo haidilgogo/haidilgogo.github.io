@@ -4763,7 +4763,39 @@ img {
 /* 가이드 마무리(2026-07-29): 굵기·여백은 col-outro와 같되 줄 전체는 본문색으로 두고
    '하딜고고'만 브랜드 빨강으로 띄운다. 고수 아티클의 col-outro(줄 전체 빨강)는 그대로다. */
 .column-body .col-outro--plain { color: var(--text-dark); }
-.column-body .col-outro--plain .col-brand { color: var(--brand-red); }
+/* 문구 속 '하딜고고' = 푸터(.footer-brand)와 같은 처리 — 로고체 Paperlogy + 로고 색.
+   Paperlogy는 5Medium 서브셋만 있어 주변 굵은 글씨(700)보다 얇게 보이는 게 정상이다. */
+.column-body .col-brand {
+  font-family: 'Paperlogy', 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+  color: var(--brand-red);
+  letter-spacing: -.01em;
+}
+/* STEP 사이·마무리 앞 구분선(2026-07-29). 색은 출처 영역 구분선(.column-notes)과 같은 값. */
+.column-body .col-divider {
+  height: 0;
+  margin: 26px 0;
+  border: 0;
+  border-top: 1px solid #ECE5DC;
+}
+/* 가이드 마무리 CTA — 하단 '닫기'와 같은 크기·모서리를 쓰되 채운 버튼으로 구분한다.
+   칼럼을 닫고 전체보기를 여는 유일한 출구라, 닫기보다 눈에 먼저 들어와야 한다. */
+.column-body .col-cta {
+  display: block;
+  width: 100%;
+  height: 48px;
+  margin: 20px 0 4px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--brand-red);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.column-body .col-cta:active { transform: scale(.97); }
 .col-note-ref {
   margin: 0 0 0 2px; padding: 0;
   border: 0; background: none;

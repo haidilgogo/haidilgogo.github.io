@@ -936,6 +936,8 @@
       // (2026-07-28 사용자 확정, 옛 표기는 '01'). 맨 위 '한눈에 보는 이용 순서' 그림은
       // '01'로 구워져 있는데, 숫자가 같아 독자가 헷갈리지 않는다고 보고 그림은 두었다.
       // --1: 번호 색을 요약 그림의 01(주황)과 맞춘다. STEP 2·3은 --2(초록)·--3(빨강)을 붙이면 된다.
+      // STEP 앞마다 구분선(2026-07-29 사용자 지정, 네이버 블로그식). 마무리 앞에도 하나 더 있다.
+      '<hr class="col-divider">' +
       '<h3 class="column-step column-step--1"><span class="step-no">STEP 1</span>태블릿으로 주문하기</h3>' +
       '<p>자리를 안내받으면, 태블릿에서 가장 먼저 먹고 싶은 탕을 골라요.</p>' +
       '<figure class="col-figure col-figure--no-caption">' +
@@ -1042,6 +1044,7 @@
       //        지금 순서(태블릿 주문을 다 끝내고 소스바로 감)와 안 맞아 보여 아래 안으로 대체했다.
       // 제목은 맨 위 '한눈에 보는 이용 순서' 그림의 '02 소스바에서 소스 만들기' 그대로 맞췄다
       // (STEP 1이 그림의 '01 태블릿으로 주문하기'와 같은 것과 동일한 규칙).
+      '<hr class="col-divider">' +
       '<h3 class="column-step column-step--2"><span class="step-no">STEP 2</span>소스바에서 소스 만들기</h3>' +
       // '자리에서 일어나'는 STEP 1의 소스바 대목과 구분하려고 넣었다(2026-07-29).
       // STEP 1은 앉아서 태블릿으로 인원을 고르는 일, 여기는 실제로 걸어가는 일인데
@@ -1099,6 +1102,7 @@
       // 제목은 맨 위 요약 그림에 구워진 '03 재료 넣고 익혀 먹기' 그대로다.
       // 🔴 기획초안의 'STEP 5 재료는 조금씩 넣어 즐겨요'가 아니다 — STEP 1·2도 그림의 01·02와
       //   같은 말로 맞췄고, 그림이 화면에 그대로 보이는데 제목만 다르면 독자가 헷갈린다.
+      '<hr class="col-divider">' +
       '<h3 class="column-step column-step--3"><span class="step-no">STEP 3</span>재료 넣고 익혀 먹기</h3>' +
       // 🔴 상태를 단정하지 않는다(2026-07-29 사용자 지적). 소스를 만들어 오는 시간도, 냄비가 언제
       //   나오는지도 지점·상황마다 달라서 '냄비가 끓고 있어요'·'재료가 나와 있어요'로는 쓸 수 없다.
@@ -1144,12 +1148,16 @@
         '</div>' +
       '</div>' +
       // ── 마무리 ────────────────────────────────────────────────
+      '<hr class="col-divider">' +
       // 가이드의 전제(입장 대기 중에 읽는다)를 마지막에 회수한다(2026-07-29 사용자 아이디어).
       // 다 읽은 시점에 독자는 '대기가 끝났다 / 아직 기다린다' 둘 중 하나라, 두 갈래를 다 챙긴다.
       '<p>입장 대기가 끝났다면, 이제 하이디라오를 재밌게 즐겨보세요! 아직 기다리는 중이라면 하딜고고의 레시피를 구경하며 기다려도 좋아요.</p>' +
       // col-outro는 고수 아티클도 쓰는 마무리 서식(굵게 + 위 여백 20px)이다.
-      // --plain을 더해 줄 전체는 본문색으로 두고 '하딜고고'만 브랜드 빨강으로 띄운다(사용자 지정).
-      '<p class="col-outro col-outro--plain">소스바 앞에서 헤매지 않도록, <span class="col-brand">하딜고고</span>가 함께할게요.</p>',
+      // --plain을 더해 줄 전체는 본문색으로 두고 '하딜고고'만 로고체+빨강으로 띄운다(사용자 지정).
+      '<p class="col-outro col-outro--plain">소스바 앞에서 헤매지 않도록, <span class="col-brand">하딜고고</span>가 함께할게요.</p>' +
+      // '레시피를 구경하며 기다려도 좋아요'를 실제로 이어주는 출구. 누르면 칼럼을 닫고 전체보기를 연다.
+      // data-go 값으로 동작을 정한다(openColumn에서 배선) — 소스 카드의 data-rid와 같은 방식이다.
+      '<button class="col-cta" type="button" data-go="browse">레시피 보러 가기</button>',
   };
 
   function pickMonthlyFeatures() {
@@ -2490,6 +2498,13 @@
       el.addEventListener('click', () => {
         const r = RECIPES.find((x) => x.id === el.dataset.rid);
         if (r) { closeColumn(); openModal(r); }
+      });
+    });
+    // 본문 안 CTA 버튼. data-go 값으로 갈 곳을 정한다 — 소스 카드의 data-rid와 같은 방식이라
+    // 나중에 다른 아티클에서 <button class="col-cta" data-go="browse">만 넣으면 그대로 동작한다.
+    [...columnOverlay.querySelectorAll('.col-cta[data-go]')].forEach((el) => {
+      el.addEventListener('click', () => {
+        if (el.dataset.go === 'browse') { closeColumn(); enterBrowse('전체'); }
       });
     });
     columnOverlay.hidden = false;
