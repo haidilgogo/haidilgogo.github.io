@@ -4796,6 +4796,13 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 .column-body .col-cta:active { transform: scale(.97); }
+/* CTA가 있는 칼럼에서만 본문 끝과 하단 '닫기' 사이를 좁힌다(2026-07-29).
+   원래 간격 34px = CTA 아래 4 + 본문 아래 패딩 8 + 푸터 위 패딩 22. 푸터의 22px은 '본문 끝과
+   닫기 버튼'을 벌리려던 값인데, 그 자리에 버튼이 하나 더 오면서 버튼 둘이 멀어 보였다.
+   두 버튼은 한 묶음으로 읽혀야 한다. 버튼 없는 고수·안물안궁은 지금 간격 그대로다.
+   ~ 를 쓰는 이유: 사이에 .column-sauces·.column-notes가 있어(숨겨져도 DOM에는 있음) + 로는 못 닿는다. */
+.column-body:has(.col-cta) { padding-bottom: 0; }
+.column-body:has(.col-cta) ~ .column-footer { padding-top: 10px; }
 .col-note-ref {
   margin: 0 0 0 2px; padding: 0;
   border: 0; background: none;
