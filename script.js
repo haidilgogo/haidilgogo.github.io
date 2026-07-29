@@ -555,6 +555,13 @@
           // 첫 도착: 인기순 그리드 재정렬 + 홈 인기소스 순위도 실데이터로 다시 그림
           renderGrid();
           if (typeof renderHomePopular === 'function') renderHomePopular();
+          // 🔴 홈 탕·히든메뉴도 반드시 다시 그릴 것 (2026-07-30).
+          //    이 둘도 byPopular로 정렬하는데 여기서 빠져 있어서, 첫 방문(localStorage 캐시가
+          //    빈 상태)이면 좋아요가 0인 채로 그려진 순서가 그대로 남았다. 실제 좋아요가 있는
+          //    메기살덮밥(3개)이 홈 히든메뉴 상위 3칸에서 밀려 안 보였다 — 라이브에서 확인.
+          //    refreshLikeCounts()는 숫자만 갱신하고 순서는 건드리지 않으므로 이걸로는 안 된다.
+          if (typeof renderHomeCatList === 'function') renderHomeCatList('히든메뉴', hiddenGridEl);
+          if (typeof renderHomeCatGrid === 'function') renderHomeCatGrid('탕', tangGridEl);
           refreshLikeCounts();
         } else {
           refreshLikeCounts();
