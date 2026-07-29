@@ -4754,6 +4754,10 @@ img {
   margin-top: 20px;
   font-weight: 700; color: var(--brand-red); line-height: 1.7;
 }
+/* 가이드 마무리(2026-07-29): 굵기·여백은 col-outro와 같되 줄 전체는 본문색으로 두고
+   '하딜고고'만 브랜드 빨강으로 띄운다. 고수 아티클의 col-outro(줄 전체 빨강)는 그대로다. */
+.column-body .col-outro--plain { color: var(--text-dark); }
+.column-body .col-outro--plain .col-brand { color: var(--brand-red); }
 .col-note-ref {
   margin: 0 0 0 2px; padding: 0;
   border: 0; background: none;
