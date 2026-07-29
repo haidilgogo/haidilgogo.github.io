@@ -4775,6 +4775,10 @@ img {
   color: var(--text-dark);
 }
 .column-sauce-list { display: flex; flex-direction: column; gap: 8px; }
+/* 본문 중간에 놓는 소스 목록(가이드 STEP 2). 바로 위 팁 박스에 딸린 것으로 읽혀야 하므로
+   본문 문단 간격(24px)보다는 좁게, 카드 사이 간격(8px)보다는 넓게 잡는다 —
+   묶음 경계가 안쪽 간격보다 좁으면 팁 박스에 들러붙어 보인다(기본값이 4px이었음). */
+#columnBody .column-sauce-list { margin: 14px 0 24px; }
 .col-sauce {
   display: flex; align-items: center; gap: 12px;
   width: 100%; padding: 8px;

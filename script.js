@@ -1032,14 +1032,16 @@
           // 뭐부터 해야될지 모르겠다면 이렇게 해보세요')은 458px이라 두 줄이 되어 줄인 것 —
           // '처음인데다'는 가이드 전체가 첫 방문자용이라 없어도 전달된다.
           '<b class="col-tip-title">소스 종류가 너무 많아 고민된다면 이렇게 해보세요</b>' +
+          '<p>처음이라면 가장 많이 만들어 먹는 두 가지로 시작해보세요. 달달한 소스와 짭짤한 소스라 서로 맛이 겹치지 않아요.</p>' +
           // 이 문장은 STEP 1 소스바 대목에서 일부러 빼둔 예약 문장이다(2026-07-28 사용자 지정).
-          // 소스를 실제로 만드는 여기가 제자리다.
+          // 소스를 실제로 만드는 여기가 제자리다. 아래 소스 목록을 바로 받는 자리라 끝에 둔다.
           '<p>무엇을 넣어야 할지 모르겠다면 하딜고고에서 취향에 맞는 레시피를 찾아보세요!</p>' +
-          // 기획초안이 'STEP 4는 인기 소스·셀럽 소스를 시각적으로 강조'라고 했으나 카드 UI는 아직 논의 전이라
-          // 우선 문장 안에만 녹였다. 나중에 카드로 세울 자리.
-          '<p>많은 사람이 찾는 인기 소스부터 유명인이 즐겨 먹는 셀럽 소스까지, 재료와 양이 그대로 적혀 있어 순서대로 담기만 하면 돼요.</p>' +
         '</div>' +
-      '</div>',
+      '</div>' +
+      // 팁 박스 바로 아래에 직접 고른 소스 두 개(2026-07-29 사용자 지정).
+      // 누르면 칼럼이 닫히고 해당 레시피 상세가 열린다 — 위 '레시피를 찾아보세요'를 실제로 이어준다.
+      // s1=건희소스(오리지널·2021, 달달) / s2=쑨디2호소스(2022, 건더기 씹히는 짭짤).
+      '<div class="column-sauce-list" data-sauce-ids="s1,s2"></div>',
       // 여기 있던 팁 박스 '한 번에 완성하지 않아도 괜찮아요'(처음엔 조금만 만들어 맛보고 재료를
       // 더해보라는 내용)는 2026-07-29 사용자 지시로 뺐다. 팁 박스가 둘 나란히 붙어 무거웠다.
       // 소스바 왕복이 자유롭다는 사실은 확인됐으니, 되살릴 일이 있으면 내용은 그대로 쓸 수 있다.
@@ -2307,6 +2309,20 @@
   const columnOverlay = document.getElementById('columnOverlay');
   const columnSheet = document.getElementById('columnSheet');
   // ingFilter 재료가 ings에 든 레시피 자동 수집(고수 든 소스 등)
+  // 칼럼에 붙는 소스 한 줄(썸네일 + 이름 + 버전 + 화살표). 누르면 칼럼을 닫고 그 레시피를 연다.
+  // 아티클 맨 아래 자동 목록과 본문 중간 목록이 같은 모양을 쓰도록 여기 한 곳에서만 만든다.
+  function buildColumnSauce(r) {
+    const ver = r.ver ? '<span class="col-sauce-ver">' + r.ver + '</span>' : '';
+    const thumb = r.img
+      ? '<img class="col-sauce-thumb" src="' + r.img + '" alt="" draggable="false">'
+      : '<span class="col-sauce-thumb col-sauce-thumb--emoji">' + (r.emoji || '🥣') + '</span>';
+    return '<button class="col-sauce" type="button" data-rid="' + r.id + '">'
+      + thumb
+      + '<span class="col-sauce-meta"><span class="col-sauce-name">' + r.name + '</span>'
+      + ver + '</span>'
+      + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '</button>';
+  }
   function getColumnSauces(col) {
     return RECIPES.filter((r) =>
       (!col.catFilter || r.cat === col.catFilter) &&
@@ -2341,18 +2357,18 @@
     const saucesSection = document.querySelector('.column-sauces');
     saucesSection.hidden = !sauces.length;
     const listEl = document.getElementById('columnSauceList');
-    listEl.innerHTML = sauces.map((r) => {
-      const ver = r.ver ? '<span class="col-sauce-ver">' + r.ver + '</span>' : '';
-      const thumb = r.img
-        ? '<img class="col-sauce-thumb" src="' + r.img + '" alt="" draggable="false">'
-        : '<span class="col-sauce-thumb col-sauce-thumb--emoji">' + (r.emoji || '🥣') + '</span>';
-      return '<button class="col-sauce" type="button" data-rid="' + r.id + '">'
-        + thumb
-        + '<span class="col-sauce-meta"><span class="col-sauce-name">' + r.name + '</span>'
-        + ver + '</span>'
-        + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        + '</button>';
-    }).join('');
+    listEl.innerHTML = sauces.map(buildColumnSauce).join('');
+    // 본문 중간에 직접 고른 소스를 놓는 자리. 본문 HTML에
+    // <div class="column-sauce-list" data-sauce-ids="s1,s2"></div> 를 넣으면 그 자리에 채워진다.
+    // 아래 자동 목록(.column-sauces)은 재료로 모으고 위치가 맨 끝 고정이라, 가이드처럼
+    // "이 두 개를 골랐다"를 본문 흐름 안에서 보여줘야 하는 경우를 위해 따로 둔다.
+    // 적은 순서 그대로 나오고, 없는 id는 조용히 건너뛴다.
+    [...document.getElementById('columnBody').querySelectorAll('.column-sauce-list[data-sauce-ids]')].forEach((box) => {
+      box.innerHTML = box.dataset.sauceIds.split(',')
+        .map((id) => RECIPES.find((r) => r.id === id.trim()))
+        .filter(Boolean)
+        .map(buildColumnSauce).join('');
+    });
     // 관련 소스 아래: 주석·출처(아티클의 마지막 요소)
     const notesEl = document.getElementById('columnNotes');
     const notes = col.notes || [];
@@ -2367,7 +2383,9 @@
           + '</a></li>').join('')
         + '</ol>'
       : '';
-    [...listEl.querySelectorAll('.col-sauce')].forEach((el) => {
+    // 자동 목록과 본문 중간 목록을 함께 잡는다(listEl만 보면 본문 것이 눌리지 않는다).
+    // 열 때마다 버튼을 새로 만들므로 리스너가 겹치지 않는다.
+    [...columnOverlay.querySelectorAll('.col-sauce')].forEach((el) => {
       el.addEventListener('click', () => {
         const r = RECIPES.find((x) => x.id === el.dataset.rid);
         if (r) { closeColumn(); openModal(r); }
