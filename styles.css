@@ -4710,6 +4710,10 @@ img {
   border: 1px solid #F1D5CD;
   border-radius: 8px;
 }
+/* 팁 박스 바로 뒤에 본문 문단이 오는 경우에만 여백을 준다(2026-07-29).
+   .col-tip의 아래 여백은 4px뿐이고 본문 <p>는 위 여백이 0이라 둘이 들러붙어 보였다.
+   뒤에 소제목(24px)이나 소스 목록(14px)이 오는 경우는 각자 여백이 있어 건드리지 않는다. */
+.column-body .col-tip + p { margin-top: 20px; }
 /* 제목 첫 줄에 광학적으로 맞추는 3px 내림(.tip-ic의 2px과 같은 계산, 여기는 15px 제목 기준) */
 .column-body .col-tip-ic { width: 18px; height: 18px; flex: none; margin-top: 3px; }
 .column-body .col-tip-body { flex: 1; min-width: 0; }
