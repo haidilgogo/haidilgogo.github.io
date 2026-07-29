@@ -4110,6 +4110,12 @@ img {
   color: rgba(255, 255, 255, .6);
   font-size: 13px;
   font-weight: 400;
+  /* 한 줄 고정(2026-07-29) — 부제가 감기면 그 카드만 키가 커져 인기소스 줄이 어긋난다.
+     바로 위 .hp-name과 그리드·전체보기의 .card-sub가 이미 같은 처리라 여기만 빠져 있었다.
+     쓸 수 있는 폭은 390px 기기에서 80px뿐이다(이름·부제 80 + 하트 44). */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .hp-name {
   display: block;
