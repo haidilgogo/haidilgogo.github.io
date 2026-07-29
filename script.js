@@ -378,8 +378,19 @@
     }
     saveLikeCounts();
   }
-  function getLikeCount(id) {
+  // 🔴 "실제 방문자 좋아요만"과 "화면에 보이는 숫자"를 갈라둔다 (2026-07-30).
+  //    지금은 둘이 같은 값이라 동작 차이가 없다. 그런데도 나눠둔 이유는, 나중에 기본 좋아요(더미)를
+  //    더해 표시하게 되면 이 구분이 없으면 곧바로 버그가 되기 때문이다:
+  //    toggleLike가 화면 숫자(더미 포함)를 실제값 자리에 저장해서, 좋아요를 취소하는 순간
+  //    숫자가 거꾸로 튀어오른다(더미 32 + 실제 6 = 38에서 취소 → 69로 뛴 뒤 Firebase 응답이
+  //    와서야 37로 제자리). likeCounts·Firebase에 저장되는 값은 언제나 "실제분"이어야 한다.
+  //    ⚠️ 같은 값이라고 getRealLikeCount를 지우고 합치지 말 것.
+  function getRealLikeCount(id) {
     return likeCounts[id] || 0;
+  }
+  // 화면 표시·인기순 정렬용. 저장에는 절대 쓰지 않는다.
+  function getLikeCount(id) {
+    return getRealLikeCount(id);
   }
 
   function setPressedState(el, active) {
@@ -517,7 +528,9 @@
       likedByMe.add(id);
     }
     // 낙관적 반영(즉시 반응) — Firebase 응답이 오면 정확한 값으로 덮어씀
-    likeCounts[id] = Math.max(0, getLikeCount(id) + (liked ? -1 : 1));
+    // 🔴 반드시 getRealLikeCount를 쓸 것. likeCounts는 실제 좋아요만 담는 자리이므로,
+    //    화면 표시용 getLikeCount로 계산하면 나중에 더미가 섞여 저장된다(위 주석 참고).
+    likeCounts[id] = Math.max(0, getRealLikeCount(id) + (liked ? -1 : 1));
     saveLikes();
     // Firebase: 원자적 증감(동시 접속에도 숫자 안 꼬임)
     if (likesRef) {
