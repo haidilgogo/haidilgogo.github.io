@@ -2607,8 +2607,10 @@ img {
 /* ⚠️ 여기 있던 `.stamp-empty-paw`(🐾 36px)는 죽은 규칙이라 지웠다(2026-07-30) — 그 클래스를
    붙이는 코드가 script.js·index.html 어디에도 없었다. 빈 상태 문구가 발바닥에서
    "아직 스티커가 없어요 / ✏️ 기록하기로 첫 방문을 남겨보세요"로 바뀔 때 CSS만 남은 것이다.
-   🔴 이제 사이트에 남은 발바닥 🐾는 `.stamp-slot-paw`(기록 시트의 '스티커 붙이는 곳') 하나뿐이다.
-   그림 없는 지점의 🐾 자리표시 카드는 같은 날 함께 삭제했다(아래 .stamp-ph 자리 주석 참고). */
+   🔴 **이제 사이트에 발바닥 🐾는 하나도 없다**(2026-07-31). 마지막 하나였던
+   `.stamp-slot-paw`(기록 시트의 '스티커 붙이는 곳')는 스티커 탭바 아이콘과 같은 그림
+   `.stamp-slot-ico`로 교체됐다. 그림 없는 지점의 🐾 자리표시 카드는 07-30에 삭제했다
+   (아래 .stamp-ph 자리 주석 참고). */
 .stamp-empty .stamp-empty-pen { vertical-align: -2px; margin-right: 3px; } /* 문구 속 연필 SVG 정렬 */
 /* 스티커 = 투명 배경 라운드 다이컷 PNG. 앱은 그림자만 얹음(다이컷·테두리는 에셋에 구움).
    그래서 사용자가 픽셀메이터로 만든 사각 카드도, 처리 스크립트가 흰 외곽선+라운드+투명을
@@ -2863,7 +2865,10 @@ img {
   padding: 0 10px;
   text-align: center;
 }
-.stamp-slot-paw { font-size: 34px; opacity: 0.4; }
+/* 자리표시 아이콘 — 옛 발바닥 🐾(34px 텍스트 이모지) 자리. 색은 아래 힌트 글씨와 같은 톤이라
+   아이콘·글씨가 한 덩어리로 읽힌다. 크기를 바꾸면 index.html의 stroke-width도 같이 볼 것
+   (42px에 1.25 = 화면 획 약 2.2px). */
+.stamp-slot-ico { width: 42px; height: 42px; color: #B7A699; display: block; }
 .stamp-slot-hint {
   font-size: 12px;
   font-weight: 600;
