@@ -2604,12 +2604,12 @@ img {
   line-height: 1.7;
 }
 .stamp-empty-text { margin: 0; }
-.stamp-empty .stamp-empty-paw {
-  display: block;
-  font-size: 36px;
-  margin-bottom: 10px;
-  opacity: .45;
-}
+/* ⚠️ 여기 있던 `.stamp-empty-paw`(🐾 36px)는 죽은 규칙이라 지웠다(2026-07-30) — 그 클래스를
+   붙이는 코드가 script.js·index.html 어디에도 없었다. 빈 상태 문구가 발바닥에서
+   "아직 스티커가 없어요 / ✏️ 기록하기로 첫 방문을 남겨보세요"로 바뀔 때 CSS만 남은 것이다.
+   🔴 아직 살아 있는 발바닥 두 곳과 헷갈리지 말 것: `.stamp-slot-paw`(기록 시트의 '스티커
+   붙이는 곳')와 `.stamp-ph`의 🐾(스티커 그림이 없는 지점 카드 — 지금은 그림 없는 곳이
+   부산점뿐이고 그 매장이 'soon'이라 선택 자체가 막혀 있어 화면에 안 나온다). */
 .stamp-empty .stamp-empty-pen { vertical-align: -2px; margin-right: 3px; } /* 문구 속 연필 SVG 정렬 */
 /* 스티커 = 투명 배경 라운드 다이컷 PNG. 앱은 그림자만 얹음(다이컷·테두리는 에셋에 구움).
    그래서 사용자가 픽셀메이터로 만든 사각 카드도, 처리 스크립트가 흰 외곽선+라운드+투명을
