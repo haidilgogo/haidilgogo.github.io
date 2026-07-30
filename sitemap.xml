@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  하딜고고 사이트맵 (2026-07-30 신설)
+
+  🔴 주소가 하나뿐인 이유: 이 사이트는 index.html 한 장이고 레시피·가이드·아티클이 전부
+     script.js 안에서 그려지는 SPA다. 검색엔진에 알릴 개별 주소가 없다.
+     레시피마다 주소를 만드는 구조 변경을 하면 그때 이 파일에 항목을 늘린다.
+
+  ⚠️ lastmod는 사이트 내용이 실제로 바뀔 때만 갱신할 것. 매번 오늘 날짜로 바꾸면
+     검색엔진이 신뢰하지 않는다.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://haidilgogo.com/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
