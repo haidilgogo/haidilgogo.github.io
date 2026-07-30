@@ -525,8 +525,10 @@
 
   // 화면에 그려진 하트 숫자들을 현재 likeCounts로 갱신 (active 상태는 기기별이라 건드리지 않음)
   function refreshLikeCounts() {
-    // 그리드 카드(.like-btn)·홈 인기소스 칩(.hp-like)·홈 히든 리스트 하트(.hc-row-like) 모두 갱신
-    document.querySelectorAll('.like-btn, .hp-like, .hc-row-like').forEach((btn) => {
+    // 홈 인기소스 칩(.hp-like)·홈 히든 리스트 하트(.hc-row-like) 모두 갱신
+    // (옛 그리드 카드 `.like-btn`은 2026-07-30에 죽은 코드와 함께 선택자에서 뺐다. 모달 하트는
+    //  아래 modalLikeCount로 따로 갱신한다 — 이 선택자에 새 하트를 추가할 땐 위 주석도 같이 고칠 것.)
+    document.querySelectorAll('.hp-like, .hc-row-like').forEach((btn) => {
       const countEl = btn.querySelector('.like-count');
       if (countEl) countEl.textContent = getLikeCount(btn.dataset.id);
     });
@@ -689,9 +691,6 @@
       el.style.fontSize = size + 'px';
     }
   }
-  function fitCardTitles(root) {
-    (root || document).querySelectorAll('.recipe-name').forEach(fitCardTitle);
-  }
   // 인기 소스는 한 줄을 유지하되, 넘치는 이름만 최대 16px→14px 범위에서 필요한 만큼 줄인다.
   // 짧은 이름은 CSS 기본 크기 그대로이며, 14px에서도 안 들어가는 극단적인 이름만 말줄임표를 유지한다.
   const POPULAR_TITLE_MIN_RATIO = 14 / 16;
@@ -708,55 +707,9 @@
   // 웹폰트(Pretendard)가 늦게 오면 fallback 폰트 폭으로 잰 결과라 틀림 → 도착하면 전부 다시 잰다
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
-      fitCardTitles();
       fitPopularTitles();
       fitBrowseTitles();
     });
-  }
-
-  // 카드 1장(그리드·가챠 결과 공용) — 완전히 같은 마크업/핸들러를 쓰므로 스타일이 항상 동일하다.
-  function buildCard(r, opts) {
-    opts = opts || {};
-    const showSource = r.source && !opts.hideSource;
-    const card = document.createElement('div');
-    card.className = 'recipe-card';
-    card.dataset.cat = r.cat; // 카테고리 프레임·배지 색 스위치 (CSS 변수 세트)
-    card.innerHTML = `
-        <span class="recipe-cat-label">${r.cat}</span>
-        <button class="fav-star${favorites.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="즐겨찾기"><svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
-        <div class="recipe-card-inner">
-          <div class="recipe-thumb" style="background:${r.img ? (r.imgBg || '#fff') : r.tint}">${r.img ? `<img class="recipe-thumb-img${r.imgFit === 'cover' ? ' recipe-thumb-img--cover' : ''}" src="${r.img}" alt="${r.name}" draggable="false" loading="${opts.eager ? 'eager' : 'lazy'}"${r.imgPosition ? ` style="object-position:${r.imgPosition}"` : ''}><div class="recipe-thumb-overlay">${showSource ? `<div class="recipe-thumb-source">${sourceHtml(r.source)}</div>` : ''}</div>` : `<span>${r.emoji}</span>`}</div>
-          <div class="recipe-body">
-            <h3 class="recipe-name${r.star ? ' has-star' : ''}">${r.star ? STAR_SVG : ''}${r.nameHtml || r.name}</h3>
-            <span class="recipe-ver">${r.ver || ''}</span>
-            <button class="like-btn${likedByMe.has(r.id) ? ' active' : ''}" data-id="${r.id}" type="button" aria-label="좋아요"><svg width="17" height="17" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="like-count">${getLikeCount(r.id)}</span></button>
-          </div>
-        </div>
-      `;
-    card.addEventListener('click', opts.onOpen || (() => openModal(r)));
-    card.querySelector('.fav-star').addEventListener('click', (e) => {
-      e.stopPropagation();
-      const btn = e.currentTarget;
-      if (favorites.has(r.id)) {
-        favorites.delete(r.id);
-      } else {
-        favorites.add(r.id);
-      }
-      saveFavorites();
-      if (showFavoritesOnly) {
-        renderGrid();  // 즐겨찾기 화면에선 카드가 사라져야 하므로 재렌더
-      } else {
-        btn.classList.toggle('active', favorites.has(r.id));  // 그 외엔 별표만 토글(이미지 재로드 방지)
-      }
-    });
-    card.querySelector('.like-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      const btn = e.currentTarget;
-      toggleLike(r.id);
-      btn.classList.toggle('active', likedByMe.has(r.id));
-      btn.querySelector('.like-count').textContent = getLikeCount(r.id);
-    });
-    return card;
   }
 
   // ── 이 달의 레시피(월간 히어로 카레셀) ── 매월 자동 교체(서버 없이 월 계산). 큰 이미지 히어로 3-5개를 가로 스와이프.
@@ -2397,8 +2350,8 @@
       }, idx * 170);
     });
     setTimeout(() => {
-      // 브라우즈 그리드 카드와 완전히 동일한 마크업을 재사용(buildBrowseGridCard, 2026-07-25 — 옛 TCG
-      // 카드(buildCard/.recipe-card)에서 교체). 좋아요는 숨기고 즐겨찾기·셀럽 별은 그대로 노출.
+      // 브라우즈 그리드 카드와 완전히 동일한 마크업을 재사용(buildBrowseGridCard, 2026-07-25에 옛 TCG
+      // 카드에서 교체. 그 옛 코드는 2026-07-30에 삭제됨). 좋아요는 숨기고 즐겨찾기·셀럽 별은 그대로 노출.
       // 카드는 opacity 0(리셋 상태)로 먼저 그려두고, 이미지가 실제로 로드된 뒤에만 공개한다.
       // → 캐시 여부와 무관하게 카드가 흰 네모로 먼저 뜨는 현상 방지.
       gachaResult.innerHTML = '';
@@ -3795,11 +3748,6 @@
 
   // iOS Safari에서 :active 스타일이 먹히려면 touchstart 리스너가 하나라도 있어야 함
   document.addEventListener('touchstart', () => {}, { passive: true });
-
-  // 썸네일 이미지 우클릭 저장/복사 방지
-  document.addEventListener('contextmenu', (e) => {
-    if (e.target.closest('.recipe-thumb-img')) e.preventDefault();
-  });
 
   // 기기/브라우저 판별
   const ua = navigator.userAgent;

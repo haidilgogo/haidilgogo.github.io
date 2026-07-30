@@ -82,7 +82,6 @@ html.is-locked {
   overflow-y: hidden;
 }
 
-
 body {
   margin: 0;
   overscroll-behavior-y: none;
@@ -782,44 +781,7 @@ img {
 [data-cat="히든메뉴"] { --frame-line: #9BA983; --badge-bg: #E9EEDD; --badge-ink: #55663D; --card-bg: #F3F6EB; } /* 구 밥·면·기타 통합 → 초록 */
 
 /* 넓은 밴드는 크림 고정 — 메인 카드·상세 공통. 밴드와 본체 사이 얇은 선(--frame-line)은 카테고리색 */
-.recipe-card, .modal { --frame: #E6D4BA; }
-
-/* 메인 그리드 카드 = TCG 카드 프레임. data-cat이 색을 결정.
-   상단 밴드(배지 좌 + 즐겨찾기 우) → 아트창 → 이름·연도 → 좋아요(아래 가운데) */
-.recipe-card {
-  --band-h: 38px; /* 상단 밴드 높이 = 배지·즐겨찾기 세로 중앙 정렬 기준 */
-  cursor: pointer;
-  position: relative; /* 밴드 위 배지·즐겨찾기(absolute) 기준 */
-  background: var(--frame, #E6D4BA);
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(43, 18, 13, .10);
-  overflow: hidden;
-  /* 상단 밴드 — 배지·즐겨찾기가 앉는 헤더. 좌우하는 프레임 테두리 두께 */
-  padding: var(--band-h) 7px 7px;
-  display: flex;
-  flex-direction: column;
-  transition: transform .15s, box-shadow .15s, background-color .15s;
-}
-
-/* 모바일: 프레임 좌·우·하단 테두리를 더 얇게 (상단 밴드는 배지 때문에 유지) */
-@media all {
-  .recipe-card {
-    --band-h: 34px;
-    padding-left: 4px;
-    padding-right: 4px;
-    padding-bottom: 4px;
-    border-radius: 13px;
-  }
-}
-
-/* 프레임 안 흰 본체 — 아트창 + 텍스트를 감싸 카드/프레임 이중 테두리 */
-.recipe-card-inner {
-  background: #fff;
-  border: 1px solid var(--frame-line, #D9C3A8);
-  border-radius: 11px;
-  overflow: hidden;
-}
+.modal{ --frame: #E6D4BA; }
 
 .empty-state {
   grid-column: 1 / -1;
@@ -828,43 +790,6 @@ img {
   color: #A88F87;
   font-size: 15px;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
-}
-
-@media (hover: hover) {
-  .recipe-card:hover {
-    transform: translateY(-4px);
-    background: var(--frame-line, var(--card-hover-border)); /* 밴드가 자기 카테고리 진한색(얇은 선 색)으로 점등 */
-    box-shadow: 0 8px 20px rgba(43, 18, 13, .16);
-  }
-}
-
-/* 모바일 탭(누를 때) 반응 — hover 없는 터치기기용: 밴드가 카테고리 진한색으로.
-   단, 좋아요·책갈피 버튼을 누를 땐 밴드·썸네일 확대·제목 반응 제외(:active 전파 차단) */
-@media (hover: none) {
-  .recipe-card:active {
-    background: var(--frame-line, var(--card-hover-border));
-  }
-  .recipe-card:has(.fav-star:active),
-  .recipe-card:has(.like-btn:active) {
-    background: var(--frame);
-  }
-  .recipe-card:has(.fav-star:active) .recipe-thumb-img,
-  .recipe-card:has(.like-btn:active) .recipe-thumb-img {
-    transform: none;
-  }
-  .recipe-card:has(.fav-star:active) .recipe-name,
-  .recipe-card:has(.like-btn:active) .recipe-name {
-    color: var(--text-dark);
-  }
-}
-
-.recipe-thumb {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
 }
 
 .recipe-thumb-overlay {
@@ -924,122 +849,6 @@ img {
   text-overflow: ellipsis;
 }
 
-.recipe-thumb > span {
-  font-size: 68px;
-  line-height: 1;
-}
-
-.recipe-thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  padding: 0;
-  box-sizing: border-box;
-  transition: transform .3s ease;
-  -webkit-user-drag: none;
-  user-drag: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-@media (hover: hover) {
-  .recipe-card:hover .recipe-thumb-img {
-    transform: scale(1.06);
-  }
-}
-
-.recipe-card:active .recipe-thumb-img {
-  transform: scale(1.06);
-}
-
-.recipe-thumb-img--cover {
-  object-fit: cover;
-  padding: 0;
-}
-
-/* 즐겨찾기 — 크림 밴드 오른쪽(밴드 세로 중앙). 카테고리 무관 중립 회갈색(기능 버튼) */
-.fav-star {
-  position: absolute;
-  top: 0;
-  right: 8px;
-  width: 30px;
-  height: var(--band-h);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: none;
-  color: #A8968D;
-  cursor: pointer;
-  transition: transform .15s;
-  -webkit-tap-highlight-color: transparent;
-  z-index: 2;
-}
-
-.fav-star:hover {
-  transform: scale(1.08);
-}
-
-/* 데스크톱: 마우스 올리면 좋아요 하트처럼 북마크 테두리가 빨갛게 (모바일 터치는 제외) */
-@media (hover: hover) {
-  .fav-star:hover {
-    color: var(--brand-red);
-  }
-}
-
-.fav-star svg path {
-  transition: fill .15s;
-}
-
-/* 즐겨찾기됨: 브랜드 빨강 채움 */
-.fav-star.active svg path {
-  fill: var(--brand-red);
-  stroke: none;
-}
-
-/* 모바일: 탭 영역 넉넉히(폭) + 글리프 살짝 키움, 높이는 밴드에 맞춰 세로 중앙 */
-@media all {
-  .fav-star {
-    width: 38px;
-    right: 5px;
-  }
-  .fav-star svg {
-    width: 19px;
-    height: 19px;
-  }
-}
-
-.like-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-  border: none;
-  background: none;
-  padding: 4px 2px;
-  cursor: pointer;
-  color: #C6B8B1;
-  transition: transform .15s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.like-btn.active {
-  color: var(--brand-red);
-}
-
-.like-btn svg path {
-  transition: fill .15s;
-}
-
-.like-btn.active svg path {
-  fill: currentColor;
-}
-
-.like-btn:active {
-  transform: scale(.88);
-}
-
 .like-count {
   font-size: 14px;
   font-weight: 700;
@@ -1047,117 +856,10 @@ img {
   min-width: 8px;
 }
 
-@media (hover: hover) {
-  .like-btn:hover {
-    transform: scale(1.06);
-    color: var(--brand-red);
-  }
-}
-
-/* 이름+별(좌)·연도(우) 한 행 → 좋아요(아래 가운데).
-   상세 본체와 같은 카테고리 옅은 틴트 — 카드 텍스트 영역이 상세 열었을 때와 같은 톤 */
-.recipe-body {
-  padding: 10px 14px 7px;
-  background: var(--card-bg, #fff);
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: baseline;
-  column-gap: 8px;
-  row-gap: 6px;
-}
-
-/* 카테고리 배지 — 크림 밴드 왼쪽. 카테고리색 알약 + 카테고리색 테두리(얇은 선과 동일), 밴드 세로 중앙 */
-.recipe-cat-label {
-  position: absolute;
-  top: calc(var(--band-h) / 2);
-  left: 11px;
-  transform: translateY(-50%);
-  z-index: 2;
-  display: inline-block;
-  font-size: 11px;
-  padding: 3px 10px;
-  background: var(--badge-bg, rgba(43, 18, 13, .06));
-  color: var(--badge-ink, #8A7A73);
-  border: 1px solid var(--frame-line, #D9C3A8);
-  border-radius: 999px;
-  font-weight: 700;
-  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
-}
-
-.recipe-name {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: baseline;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0;
-  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  color: var(--text-dark);
-  letter-spacing: -.01em;
-  transition: color .15s;
-}
-
 /* 이름 안의 작은 수식어 (예: 라젤(이 아는 동생)소스) — 카드·모달·가챠 공통 */
 .name-sub {
   font-size: 0.68em;
   font-weight: 700;
-}
-
-/* 카드는 좁아 긴 이름이 잘리므로 괄호 수식어를 더 작게(모달은 넓어서 0.68em 유지) */
-.recipe-card .name-sub {
-  font-size: 0.5em;
-}
-
-/* 연예인 스타 표시 — 제목 첫 글자 왼쪽 위 골드 별 (연예인 이름은 짧아 ellipsis 불필요) */
-.recipe-name.has-star {
-  position: relative;
-  overflow: visible;
-}
-
-.recipe-name .star-accent {
-  position: absolute;
-  left: -9px;
-  top: -8px;
-  width: 15px;
-  height: 15px;
-  z-index: 2;
-}
-
-.recipe-ver {
-  grid-column: 1;
-  grid-row: 2;
-  justify-self: start;
-  align-self: baseline;
-  display: block;
-  margin: 0;
-  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  color: #A88F87;
-  line-height: 1.3;
-  white-space: nowrap;
-  min-height: 17px; /* 연도 없는 카드도 이 줄 높이를 확보 → 카드마다 body 높이·하단 균일 (모바일과 동일 처리) */
-}
-
-.recipe-body .like-btn {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  justify-self: end;
-  align-self: center;
-}
-
-@media (hover: hover) {
-  .recipe-card:hover .recipe-name {
-    color: var(--brand-red);
-  }
-}
-
-.recipe-card:active .recipe-name {
-  color: var(--brand-red);
 }
 
 @media all {
@@ -1174,26 +876,6 @@ img {
     grid-template-columns: repeat(2, 1fr);
     column-gap: 12px;
     row-gap: 22px; /* 2026-07-25: 브라우즈 카드 행 간격을 넓혀 빽빽함 해소(기존 12px) */
-  }
-
-  .recipe-body {
-    padding: 9px 11px 6px;
-    column-gap: 8px;
-    row-gap: 5px;
-  }
-
-  .recipe-name {
-    font-size: 15px; /* 긴 이름은 script.js의 fitCardTitle()이 실제 폭을 재서 이 크기에서 줄인다 */
-  }
-
-  .recipe-cat-label {
-    font-size: 10px;
-    padding: 2px 8px;
-  }
-
-  .recipe-ver {
-    font-size: 12px;
-    min-height: 15px;
   }
 
   .recipe-thumb-source {
@@ -1717,8 +1399,9 @@ img {
   z-index: 5; /* 그릇 앞면(.gacha-bowl-front, 4)보다 위 — 스테이지 안으로 들어오면서 필요해짐 */
 }
 
-/* 가챠 결과 카드 = 브라우즈 그리드 카드(.hc-card--browse)와 동일 스타일 재사용(2026-07-25,
-   옛 TCG 카드 .recipe-card에서 교체 — buildBrowseGridCard(r, {hideLike:true})로 렌더).
+/* 가챠 결과 카드 = 브라우즈 그리드 카드(.hc-card--browse)와 동일 스타일 재사용
+   (2026-07-25에 옛 TCG 카드에서 교체 — buildBrowseGridCard(r, {hideLike:true})로 렌더.
+   그 옛 카드 코드·CSS는 2026-07-30에 삭제했다).
    좋아요는 JS에서 아예 안 그려 넣고, 배지는 syncBrowseGridCard를 호출하지 않아 자연히 빈 채로 둔다.
    즐겨찾기(북마크)·셀럽 별은 그대로 유지. 컨테이너(.gacha-result)는 클릭 통과(pointer-events:none)라
    카드만 다시 클릭 가능하게 켠다. 폭은 실제 모바일 그리드 카드와 같은 162px —
@@ -1814,8 +1497,10 @@ img {
   fill: currentColor;
 }
 
-/* 모달 제목의 연예인 별 — 옛 TCG 카드처럼 이름 좌측 위 대각선으로 겹침(2026-07-25 재조정,
-   그리드 카드 .recipe-name .star-accent와 같은 방식). .modal-name이 position:relative를 잡아준다.
+/* 모달 제목의 연예인 별 — 이름 좌측 위 대각선으로 겹침(2026-07-25 재조정. 옛 TCG 카드의
+   .recipe-name .star-accent와 같은 방식이었고, 그 카드는 2026-07-30에 삭제됐다. 지금 같은
+   방식을 쓰는 살아 있는 규칙은 .hp-foot .hp-name.has-star .star-accent와
+   .hc-row-name.has-star .star-accent다). .modal-name이 position:relative를 잡아준다.
    -20px/-9px는 별 오른쪽 끝~첫 글자 사이 gapX 2px는 좁았지만 gapY(별 위~글자 위) 10px로 너무 떠
    보였음(실측, Range.getBoundingClientRect 기준) → -19px/-3px로 당겨 gapX 1px·gapY 4px로 밀착
    (겹침은 없음: gapX>0 확인). 화면 왼쪽엔 안 잘리게 .modal-header 왼쪽 padding 22px 유지(위 참고). */
@@ -2016,7 +1701,6 @@ img {
   color: #7a3b33;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
-
 
 /* (우하단 플로팅 설치 CTA 제거 — 하단 탭바와 겹쳐서 헤더 아이콘(.tabs-install-btn/topInstallBtn)으로 이동) */
 
@@ -3501,7 +3185,6 @@ img {
   background: var(--brand-red);
 }
 
-
 /* ═══════════ 홈 7단 섹션 (2026-07-21 확정 구조) ═══════════
    홈 = #view-recipe.is-home(필터 없음): 히어로→셀럽레일→인기소스→가이드→탕→히든메뉴→랜덤뽑기.
    그리드 뷰 = is-home 해제(검색·즐겨찾기·전체보기·인물보기): 기존 list-head + recipe-grid.
@@ -3562,7 +3245,7 @@ img {
 
 /* "셀럽 레시피" 제목의 별 = 범례(2026-07-25) — 카드/모달의 별이 "셀럽 소스"를 뜻한다는 걸
    여기서 학습하게 함. 제목을 침범하지 않고 '셀' 좌측 위 대각선에 붙게 실측 배치
-   (.recipe-name .star-accent와 동일 비율감으로, 제목 19px에 맞춰 살짝 키움). */
+   (카드 별 .hp-name.has-star .star-accent와 동일 비율감으로, 제목 19px에 맞춰 살짝 키움). */
 .celeb-sec-title { position: relative; }
 /* 실측(Range.getBoundingClientRect 기준) — 처음 값(-12/-7)은 gapX -4px로 '셀' 글자를 4px 침범했음
    → -16px/-3px로 조정해 gapX 0px·gapY 5px(침범 없이 밀착). 화면 좌측 4px 여백 남아 안 잘림 확인. */
