@@ -15,13 +15,26 @@
   if (v && !/maximum-scale/.test(v.content)) v.content += ', maximum-scale=1';
 })();
 </script>
-<title>하딜고고</title>
+<!-- 검색결과용 제목(2026-07-30). 옛 값은 `하딜고고` 하나였는데 검색어가 한 글자도 없었다.
+     "설명 먼저, 브랜드 마지막"은 한국 사이트의 표준 패턴이다(만개의레시피 `요리를 즐겁게~ 만개의레시피`,
+     29CM `감도 깊은 취향 셀렉트샵 29CM`, 다이닝코드 `빅데이터 맛집검색, 다이닝코드`).
+     🔴 구글이 이 제목을 안 쓰고 `하딜고고`로 갈아끼울 수 있다 — 실측: 29CM은 제목에
+     `감도 깊은 취향 셀렉트샵 29CM`을 넣어뒀는데 구글 검색결과 파란 제목은 `29CM`만 나온다
+     (브랜드 검색·설명형 검색 둘 다 그랬다). 홈페이지는 브랜드명으로 단순화하는 경향이 있다.
+     그래서 제목에 과하게 공들일 값어치는 낮다. 통제력이 큰 건 아래 description이다. -->
+<title>하이디라오 소스 레시피 모음 · 하딜고고</title>
 <meta name="description" content="하이디라오(훠궈) 소스·레시피 꿀팁 모음">
 <!-- 검색엔진 소유확인(2026-07-30). 🔴 지우면 등록이 풀린다.
      구글은 DNS TXT 방식이라 태그가 없다 — 가비아 DNS의 google-site-verification TXT 레코드가
      그 역할을 하므로 그것도 지우면 안 된다. 네이버는 DNS 방식이 없어 이 태그를 쓴다. -->
 <meta name="naver-site-verification" content="1da64b85c00541d366aa791134f7a2bcecaf36b6" />
 <meta property="og:type" content="website">
+<!-- 🔴 og:site_name — 구글 검색결과 맨 윗줄(아이콘 옆)에 뜨는 "사이트 이름"의 근거 중 하나다.
+     없으면 구글이 도메인(haidilgogo.com)을 쓰거나 알아서 추측한다(2026-07-30 신설). -->
+<meta property="og:site_name" content="하딜고고">
+<!-- 🔴 og:title은 <title>과 일부러 다르다. <title>은 검색결과용이고 이건 카톡·트위터
+     공유 카드의 제목이다. 카드에서는 아래 og:description이 설명을 맡으므로 제목은 브랜드만
+     두는 편이 깔끔하다(제목·설명이 같은 말을 두 번 하지 않게). -->
 <meta property="og:title" content="하딜고고">
 <meta property="og:description" content="하이디라오(훠궈) 소스·레시피 꿀팁 모음">
 <meta property="og:image" content="https://haidilgogo.com/assets/icons/og-image-v6.jpg?v=1">
@@ -781,7 +794,7 @@
   </div>
 </div>
 
-<script src="script.js?v=499"></script>
+<script src="script.js?v=500"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
