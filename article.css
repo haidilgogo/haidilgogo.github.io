@@ -29,10 +29,19 @@
 }
 
 /* ② 버튼 → 링크 보정. 앱의 .col-sauce·.col-cta는 <button>이라 브라우저 기본값이 다르다 */
-.art-page a.col-sauce,
 .art-page a.col-cta,
 .art-page a.col-note-ref {
   text-decoration: none;
+}
+
+/* 안 눌리는 소스 카드(2026-07-30 사용자 지정) — 모양은 앱과 같게 두고 '누를 수 있다'는
+   신호만 지운다. 화살표는 마크업에서 아예 빼고(생성기), 손가락 커서·누름 반응을 없앤다.
+   .col-sauce:active(배경 어두워짐)는 클래스 선택자라 <div>에도 걸리므로 여기서 되돌린다. */
+.art-page .col-sauce--static {
+  cursor: default;
+}
+.art-page .col-sauce--static:active {
+  background: var(--bg-soft, #f7f4f1);
 }
 /* 🔴 .col-cta는 `height: 48px`이 박혀 있고, 앱에서는 <button>이라 브라우저가 글씨를 세로
    가운데로 놓아준다(버튼의 기본 동작). <a>로 바꾸면 그 정렬이 사라져 글씨가 48px 박스의
