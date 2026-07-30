@@ -1703,13 +1703,46 @@
       storyBg.style.background = r.tint;
       storyBg.classList.add('story-bg--tint');
     }
+    // 🔴 넘길 때 흰색이 번쩍이던 것 대응(2026-07-30 사용자 지적, 실기기에서 보임).
+    //    .story-img의 CSS 배경이 #fff라, 새 사진이 다 그려지기 전 그 흰 바탕이 한 프레임 보였다.
+    //    → 카드마다 가진 imgBg(썸네일 여백 색)를 인라인으로 덮어씌운다. imgBg가 없으면 tint를,
+    //      그것도 없으면 투명(뒤의 블러 배경이 비쳐 자연스럽다)으로 둔다. 흰색만 피하면 된다.
+    //    ⚠️ CSS의 background:#fff는 지우지 않는다 — 이 뷰어 밖에서도 쓰일 여지가 있어
+    //      인라인으로만 덮는다.
+    const thumbBg = r.imgBg || r.tint || 'transparent';
     const thumb = r.img
-      ? '<img class="story-img" src="' + r.img + '" alt="' + r.name + '" draggable="false">'
+      ? '<img class="story-img" src="' + r.img + '" alt="' + r.name + '" draggable="false" style="background:' + thumbBg + '">'
       : '<span class="story-img story-img--emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
     storyBody.innerHTML = thumb
       + '<div class="story-rname">' + (r.nameHtml || r.name) + '</div>'
       + (r.ver ? '<div class="story-rver">' + r.ver + '</div>' : '')
       + (r.desc ? '<div class="story-desc">' + r.desc + '</div>' : '');
+    preloadNextStoryImages();
+  }
+
+  // 다음에 나올 사진을 미리 받아둔다 — 배경색만 고쳐도 "흰색 대신 색이 번쩍"일 뿐이라,
+  // 넘김 자체가 매끄러우려면 사진이 이미 캐시에 있어야 한다.
+  // 미리 받는 범위: ①같은 사람의 다음 칸 ②다음 셀럽의 첫 칸(사람이 바뀌는 순간이 제일 티가 난다).
+  // 브라우저 캐시에만 얹으면 되므로 만든 Image 객체는 붙들지 않는다.
+  const storyPreloaded = new Set(); // 같은 주소를 매 슬라이드마다 다시 요청하지 않게
+  function preloadStoryImg(src) {
+    if (!src || storyPreloaded.has(src)) return;
+    storyPreloaded.add(src);
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = src;
+  }
+  function preloadNextStoryImages() {
+    preloadStoryImg(storyList[storyIdx + 1]?.img);
+    if (storyIdx >= storyList.length - 1) {
+      const nextPerson = storyPersons[storyPersonIdx + 1];
+      if (nextPerson) {
+        const first = RECIPES.filter((x) => x.person === nextPerson)
+          .slice()
+          .sort((a, b) => (a.date || '').localeCompare(b.date || ''))[0];
+        preloadStoryImg(first && first.img);
+      }
+    }
   }
 
   // 🔴 마지막 칸에서 다음 = **다음 셀럽으로 이어서**(2026-07-30 사용자 요청, 인스타 스토리와 같은 동작).
