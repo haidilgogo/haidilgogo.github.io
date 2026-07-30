@@ -1586,37 +1586,36 @@
     }
   });
 
-  function renderCelebRail() {
-    const people = [];
+  // 셀럽 레일에 보이는 사람과 그 순서. 🔴 스토리 자동 넘김(다음 사람)도 이 순서를 따르므로
+  // 레일과 스토리가 어긋나지 않게 한 곳에서만 계산한다.
+  // 레일은 연예인(star)만 노출 — 유튜버/크리에이터(쑨디·라젤·수코 등)는 제외(2026-07-22).
+  // 레시피는 그대로 남아 전체보기·검색으로 접근 가능. 추후 크리에이터 별도 레일 분리 예정.
+  // 이름 가나다순. localeCompare(…, 'ko')를 쓴다 — 기본 정렬은 유니코드 코드포인트 순이라
+  // 한글 자모 조합에 따라 사전 순서와 어긋날 수 있다.
+  function celebOrder() {
     const byName = new Map();
     RECIPES.forEach((r) => {
       if (!r.person) return;
-      if (!byName.has(r.person)) {
-        byName.set(r.person, { name: r.person, count: 0, star: false });
-        people.push(byName.get(r.person));
-      }
-      const p = byName.get(r.person);
-      p.count++;
-      if (r.star) p.star = true;
+      if (!byName.has(r.person)) byName.set(r.person, { name: r.person, star: false });
+      if (r.star) byName.get(r.person).star = true;
     });
-    // 셀럽 레일은 연예인(star)만 노출 — 유튜버/크리에이터(쑨디·라젤·수코 등)는 제외(2026-07-22).
-    // 레시피는 그대로 남아 전체보기·검색으로 접근 가능. 추후 크리에이터 별도 레일 분리 예정.
-    // 이름 가나다순. localeCompare(…, 'ko')를 쓴다 — 기본 정렬은 유니코드 코드포인트 순이라
-    // 한글 자모 조합에 따라 사전 순서와 어긋날 수 있다.
-    const base = people.filter((p) => p.star)
-      .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    return [...byName.values()].filter((p) => p.star)
+      .sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+      .map((p) => p.name);
+  }
+
+  function renderCelebRail() {
     // 색은 정렬된 자리 순서대로 배정한다. 셀럽 8명 모두 assets/people/에 사진이 있어 이 색은
     // 사진 뒤에 깔리는 대체 배경일 뿐 화면에 보이지 않는다(사진이 없는 셀럽이 생기면 그때만 드러남).
-    base.forEach((p, idx) => { p.color = CELEB_COLORS[idx % CELEB_COLORS.length]; });
     // 본(터치한) 셀럽은 회색 링(seen)만 표시하고 순서는 그대로 — 항상 가나다순 고정.
-    const celebs = base;
-    celebRailEl.innerHTML = celebs.map((p) => {
-      const seenCls = seenCelebs.has(p.name) ? ' celeb--seen' : '';
-      return '<button class="celeb' + seenCls + '" type="button" data-person="' + p.name + '">'
-        + '<span class="celeb-img"><span class="celeb-face" style="background:' + p.color + '">' + p.name.charAt(0)
-        + '<img src="assets/people/' + p.name + '.jpg" alt="" draggable="false" onerror="this.remove()">'
+    celebRailEl.innerHTML = celebOrder().map((name, idx) => {
+      const seenCls = seenCelebs.has(name) ? ' celeb--seen' : '';
+      const color = CELEB_COLORS[idx % CELEB_COLORS.length];
+      return '<button class="celeb' + seenCls + '" type="button" data-person="' + name + '">'
+        + '<span class="celeb-img"><span class="celeb-face" style="background:' + color + '">' + name.charAt(0)
+        + '<img src="assets/people/' + name + '.jpg" alt="" draggable="false" onerror="this.remove()">'
         + '</span></span>'
-        + '<span class="celeb-name">' + p.name + '</span></button>';
+        + '<span class="celeb-name">' + name + '</span></button>';
     }).join('');
     celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -1636,23 +1635,50 @@
   let storyList = [];
   let storyIdx = 0;
   let currentStoryRecipe = null;
+  // 자동 넘김용 — 지금 보고 있는 사람이 셀럽 순서(celebOrder)에서 몇 번째인지.
+  let storyPersons = [];
+  let storyPersonIdx = -1;
 
-  function openStory(personName) {
+  // 한 사람의 스토리를 뷰어에 채운다(뷰어를 여닫지는 않는다).
+  // atEnd=true면 마지막 칸부터 — 앞사람으로 되돌아갈 때 인스타처럼 그 사람의 끝에서 시작한다.
+  function loadStoryPerson(personName, atEnd) {
     // 그 인물 레시피를 오래된→최신 순으로(스토리는 시간순이 자연스러움)
     storyList = RECIPES.filter((r) => r.person === personName)
       .slice()
       .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-    if (!storyList.length) return;
-    storyIdx = 0;
+    if (!storyList.length) return false;
+    storyIdx = atEnd ? storyList.length - 1 : 0;
     storyAvatarEl.innerHTML = '<img src="assets/people/' + personName + '.jpg" alt="" draggable="false" onerror="this.remove()">';
     storyNameEl.textContent = personName;
     // 각 세그먼트에 안쪽 채움 바(.story-seg-fill) — 현재 칸만 CSS 애니메이션으로 차오름
     storyProgress.innerHTML = storyList.map(() => '<span class="story-seg"><i class="story-seg-fill"></i></span>').join('');
     storyViewer.classList.remove('paused');
     renderStorySlide();
+    return true;
+  }
+
+  function openStory(personName) {
+    storyPersons = celebOrder();
+    storyPersonIdx = storyPersons.indexOf(personName);
+    if (!loadStoryPerson(personName)) return;
     document.documentElement.style.overflow = 'hidden';
     storyViewer.classList.add('open');
     storyViewer.setAttribute('aria-hidden', 'false');
+  }
+
+  // 옆 사람으로 이동(dir: +1 다음 / -1 이전). 갈 사람이 없으면 false.
+  // ⚠️ 레시피가 하나도 없는 사람은 건너뛴다 — 그 사람에서 멈추면 빈 화면이 된다.
+  //    (지금은 celebOrder가 레시피에서 뽑히므로 그런 사람이 없지만, 이름만 남는 경우를 대비.)
+  function goToStoryPerson(dir) {
+    for (let i = storyPersonIdx + dir; i >= 0 && i < storyPersons.length; i += dir) {
+      if (loadStoryPerson(storyPersons[i], dir < 0)) {
+        storyPersonIdx = i;
+        // 넘어간 사람도 '본 것'으로 표시해 레일의 회색 링을 맞춘다(직접 눌렀을 때와 같게).
+        if (dir > 0) { seenCelebs.add(storyPersons[i]); renderCelebRail(); }
+        return true;
+      }
+    }
+    return false;
   }
 
   function renderStorySlide() {
@@ -1686,12 +1712,16 @@
       + (r.desc ? '<div class="story-desc">' + r.desc + '</div>' : '');
   }
 
+  // 🔴 마지막 칸에서 다음 = **다음 셀럽으로 이어서**(2026-07-30 사용자 요청, 인스타 스토리와 같은 동작).
+  //    예전에는 여기서 그냥 닫혔다. 맨 마지막 사람의 마지막 칸에서만 닫힌다.
   function storyNext() {
-    if (storyIdx >= storyList.length - 1) closeStory();
-    else { storyIdx++; renderStorySlide(); }
+    if (storyIdx < storyList.length - 1) { storyIdx++; renderStorySlide(); return; }
+    if (!goToStoryPerson(1)) closeStory();
   }
+  // 첫 칸에서 이전 = 앞 셀럽의 **마지막 칸**으로(인스타와 같음). 맨 앞 사람의 첫 칸이면 아무 일 없음.
   function storyPrev() {
-    if (storyIdx > 0) { storyIdx--; renderStorySlide(); }
+    if (storyIdx > 0) { storyIdx--; renderStorySlide(); return; }
+    goToStoryPerson(-1);
   }
   function closeStory() {
     storyViewer.classList.remove('open', 'paused');
