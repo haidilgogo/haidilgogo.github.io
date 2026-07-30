@@ -62,7 +62,13 @@
 }
 .art-more-btn:active { opacity: .86; }
 
-/* 푸터는 앱 것을 그대로 쓰되, 앱에선 .main 안이라 폭이 잡혀 있었다 */
+/* 푸터는 앱 것을 그대로 쓰되, 앱에선 .main 안이라 폭과 아래 여백이 잡혀 있었다.
+   🔴 아래 여백을 반드시 다시 줘야 한다 — .footer 자체 padding-bottom은 16px뿐이고, 앱에서는
+   .main의 padding-bottom(떠 있는 탭바 자리 106px)이 그 아래를 받쳐줬다. 정적 페이지엔 .main이
+   없어서 그대로 두면 제보 링크가 아이폰 홈바에 붙는다(실기기에서 확인).
+   ⚠️ env(safe-area-inset-bottom)를 쓰지 않는다 — 이 사이트는 viewport-fit=cover를 쓰지 않기로
+   확정했고(사파리 상단바 회귀), 그러면 env()는 항상 0이라 아무 일도 하지 않는다.
+   그래서 앱의 다른 하단 여백과 같은 고정값(모바일 34 / 데스크탑 24)을 쓴다. */
 .art-footer {
   box-sizing: border-box;
   width: 100%;
@@ -70,4 +76,8 @@
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
+  padding-bottom: 34px;
+}
+@media (min-width: 641px) {
+  .art-footer { padding-bottom: 24px; }
 }
