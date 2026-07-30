@@ -21,8 +21,8 @@
 경로: /Users/Macmini_J/ClaudeCode/03. Projects/Haidilgogo
 브랜치: main (2026-07-30 배포 후 그대로 체크아웃돼 있음)
 작업 브랜치: feat/base-likes (= main과 같은 위치). feat/bottom-nav도 남아 있으나 내용은 전부 병합됨
-최신 커밋: (아래 docs 커밋) — 2026-07-30 작업 종료 지점
-main: 8bfc023 코드 + docs 커밋 — 🚀 배포됨 (로컬·원격·작업브랜치 전부 동일)
+최신 커밋: faa0add docs: 본문 HTML화 옵션 분석 기록 — 다음 대화 시작점
+main: faa0add — 🚀 배포됨 (코드 최신은 8bfc023, 이후는 문서만) (로컬·원격·작업브랜치 전부 동일)
 작업 트리: 깨끗함
 캐시 버전: styles.css?v=605 / script.js?v=502
 라이브 주소: **https://haidilgogo.com** (2026-07-30 커스텀 도메인 연결)
