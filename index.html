@@ -23,7 +23,15 @@
      (브랜드 검색·설명형 검색 둘 다 그랬다). 홈페이지는 브랜드명으로 단순화하는 경향이 있다.
      그래서 제목에 과하게 공들일 값어치는 낮다. 통제력이 큰 건 아래 description이다. -->
 <title>하이디라오 소스 레시피 모음 · 하딜고고</title>
-<meta name="description" content="하이디라오(훠궈) 소스·레시피 꿀팁 모음">
+<!-- 검색결과 설명문(2026-07-30 사용자 확정). 옛 값은 22자(`하이디라오(훠궈) 소스·레시피 꿀팁 모음`)로
+     구글이 보여주는 폭(한글 70~80자)의 절반도 못 쓰고, 가이드·탕·히든메뉴가 있다는 걸 못 알렸다.
+     🔴 제목보다 이쪽이 중요하다 — 구글은 홈페이지 <title>을 브랜드명으로 갈아끼우는 경향이 있지만
+     description은 적은 대로 쓴다(실측: 29CM은 title `감도 깊은 취향 셀렉트샵 29CM`이 검색결과에서
+     `29CM`으로 바뀌었지만 description 41자는 그대로 나왔다).
+     ⚠️ `마라탕`이라 쓰지 말 것 — 마라탕과 마라훠궈탕은 다른 음식이고 이 사이트엔 마라탕이 없다.
+        검색량은 마라탕이 많지만 찾던 게 없어 바로 이탈하므로 도움이 안 된다. 매장 태블릿 표기
+        (`마라훠궈탕`)를 따르는 이 프로젝트 원칙과도 어긋난다. -->
+<meta name="description" content="건희소스·영지소스 등 하이디라오 소스 레시피와 마라훠궈탕·히든메뉴까지. 셀프소스바 이용법과 첫 방문 주문 가이드도 한곳에 정리했어요.">
 <!-- 검색엔진 소유확인(2026-07-30). 🔴 지우면 등록이 풀린다.
      구글은 DNS TXT 방식이라 태그가 없다 — 가비아 DNS의 google-site-verification TXT 레코드가
      그 역할을 하므로 그것도 지우면 안 된다. 네이버는 DNS 방식이 없어 이 태그를 쓴다. -->
@@ -36,6 +44,9 @@
      공유 카드의 제목이다. 카드에서는 아래 og:description이 설명을 맡으므로 제목은 브랜드만
      두는 편이 깔끔하다(제목·설명이 같은 말을 두 번 하지 않게). -->
 <meta property="og:title" content="하딜고고">
+<!-- 🔴 og:description은 위 description(74자)과 일부러 다르게 짧게 둔다. 이건 카톡·트위터
+     공유 카드에 뜨는 설명이고, 카톡은 두 줄쯤에서 잘라버린다. 긴 문장을 넣으면 문장 중간이
+     잘려 카드가 지저분해진다. 검색용은 길게, 공유 카드용은 짧게 — 역할이 다르다. -->
 <meta property="og:description" content="하이디라오(훠궈) 소스·레시피 꿀팁 모음">
 <meta property="og:image" content="https://haidilgogo.com/assets/icons/og-image-v6.jpg?v=1">
 <meta property="og:image:type" content="image/jpeg">
@@ -794,7 +805,7 @@
   </div>
 </div>
 
-<script src="script.js?v=500"></script>
+<script src="script.js?v=501"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
