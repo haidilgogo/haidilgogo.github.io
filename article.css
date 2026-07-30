@@ -1,0 +1,73 @@
+/* 아티클 정적 페이지 전용 (검색 유입용 읽기 페이지)
+   🔴 본문 서식은 styles.css의 .column-* / .col-* 을 그대로 쓴다. 여기엔 앱에 없는 것만 적는다:
+      ① 시트를 오버레이가 아니라 페이지로 놓기  ② 앱에서 버튼이던 것을 <a>로 바꾼 만큼의 보정
+      ③ 맨 아래 '하딜고고에서 더 보기'
+   ⚠️ 스크롤바 규칙(styles.css 최상단 * 한 곳)·440px 폭 방침은 여기서 다시 선언하지 않는다. */
+
+/* ① 시트를 페이지로 — 앱에선 .column-overlay가 감싸며 가운데 정렬을 맡았다 */
+.art-page .column-sheet {
+  margin: 0 auto;
+  min-height: 0;
+}
+@media (min-width: 641px) {
+  .art-page .column-sheet {
+    margin: 24px auto;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+}
+
+/* 앱에서는 본문 아래에 '닫기' 버튼 줄(.column-footer)이 있어 여백이 채워졌다.
+   페이지엔 그 줄이 없으니 본문 마지막 요소(CTA)와 푸터가 붙는다 → 아래 여백을 준다. */
+.art-page .column-body {
+  padding-bottom: 30px;
+}
+
+/* 상단바: 앱과 같은 모양이되 로고 한 개짜리 줄(탭·검색 없음) */
+.art-page .topbar-brand {
+  text-decoration: none;
+}
+
+/* ② 버튼 → 링크 보정. 앱의 .col-sauce·.col-cta는 <button>이라 브라우저 기본값이 다르다 */
+.art-page a.col-sauce,
+.art-page a.col-cta,
+.art-page a.col-note-ref {
+  text-decoration: none;
+}
+.art-page a.col-cta {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* ③ 맨 아래 출구 — 다 읽은 사람을 앱으로 들여보낸다 */
+.art-more {
+  padding: 8px 22px 30px;
+}
+.art-more-btn {
+  display: block;
+  padding: 15px 18px;
+  border-radius: 14px;
+  background: var(--brand-red);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .art-more-btn:hover { opacity: .92; }
+}
+.art-more-btn:active { opacity: .86; }
+
+/* 푸터는 앱 것을 그대로 쓰되, 앱에선 .main 안이라 폭이 잡혀 있었다 */
+.art-footer {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
