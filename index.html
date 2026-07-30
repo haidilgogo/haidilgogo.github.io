@@ -38,7 +38,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=604">
+<link rel="stylesheet" href="styles.css?v=605">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -89,6 +89,15 @@
     .splash-inner.splash-ready { animation: none; opacity: 1; }
   }
 </style>
+<!-- 구조화 데이터(JSON-LD, 2026-07-30 신설) — 검색엔진에 "이 페이지가 무엇인지"를 기계가 읽는
+     형식으로 알린다. 크롤러가 보는 본문이 624자뿐이고 훠궈·마라가 0회인 상황을 보완한다.
+     🔴 Recipe 스키마(검색결과에 사진+재료 카드)는 여기 넣지 않았다. 구글은 "레시피가 그 주소의
+        주된 내용"일 때만 그 카드를 주는데, 이 사이트는 주소가 루트 하나뿐이고 33개가 한 페이지에
+        있다. 33개를 Recipe로 선언하면 내용과 어긋나 스팸으로 취급될 수 있다.
+        → 레시피마다 개별 주소를 만드는 구조 변경을 하면 그때 Recipe 스키마로 바꾼다.
+     ⚠️ 레시피를 추가·삭제하거나 이름을 바꾸면 아래 itemListElement와 numberOfItems도 갱신할 것.
+        지금은 script.js의 RECIPES에서 인기순으로 뽑아 손으로 넣은 값이다. -->
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://haidilgogo.com/#website","url":"https://haidilgogo.com/","name":"하딜고고","description":"하이디라오(훠궈) 소스·레시피 꿀팁 모음","inLanguage":"ko-KR"},{"@type":"CollectionPage","@id":"https://haidilgogo.com/#page","url":"https://haidilgogo.com/","name":"하딜고고 — 하이디라오 훠궈 소스 레시피와 첫 방문 가이드","isPartOf":{"@id":"https://haidilgogo.com/#website"},"inLanguage":"ko-KR","about":["하이디라오","훠궈","마라","소스 레시피"],"mainEntity":{"@type":"ItemList","name":"하이디라오 소스·탕·히든메뉴 레시피 모음","numberOfItems":33,"itemListElement":[{"@type":"ListItem","position":1,"name":"건희소스 (오리지널 · 2021)"},{"@type":"ListItem","position":2,"name":"쑨디2호소스 (2022)"},{"@type":"ListItem","position":3,"name":"영지소스 (2025)"},{"@type":"ListItem","position":4,"name":"박은영소스 (참기름)"},{"@type":"ListItem","position":5,"name":"장하오소스"},{"@type":"ListItem","position":6,"name":"건희소스 (짭짤 · 2021)"},{"@type":"ListItem","position":7,"name":"마크소스"},{"@type":"ListItem","position":8,"name":"영지소스 (악마 · 2023)"},{"@type":"ListItem","position":9,"name":"세훈소스 (마장)"},{"@type":"ListItem","position":10,"name":"화령소스"},{"@type":"ListItem","position":11,"name":"건희소스 (2024)"},{"@type":"ListItem","position":12,"name":"쑨디2호소스 (2024)"},{"@type":"ListItem","position":13,"name":"세훈소스 (간장)"},{"@type":"ListItem","position":14,"name":"수코소스"},{"@type":"ListItem","position":15,"name":"박은영소스 (마장)"},{"@type":"ListItem","position":16,"name":"라젤소스"},{"@type":"ListItem","position":17,"name":"김풍소스"},{"@type":"ListItem","position":18,"name":"건희소스 (리뉴얼 · 2025)"},{"@type":"ListItem","position":19,"name":"우기소스"},{"@type":"ListItem","position":20,"name":"라젤 아는 동생소스"},{"@type":"ListItem","position":21,"name":"혼자햐탕"},{"@type":"ListItem","position":22,"name":"지새기탕"},{"@type":"ListItem","position":23,"name":"토마토탕"},{"@type":"ListItem","position":24,"name":"스키야키탕"},{"@type":"ListItem","position":25,"name":"마라훠궈탕"},{"@type":"ListItem","position":26,"name":"유부 새우완자"},{"@type":"ListItem","position":27,"name":"메기살덮밥"},{"@type":"ListItem","position":28,"name":"희수국밥"},{"@type":"ListItem","position":29,"name":"토마토에그누들"},{"@type":"ListItem","position":30,"name":"유부 새우완자 (업그레이드)"},{"@type":"ListItem","position":31,"name":"토마토달걀밥"},{"@type":"ListItem","position":32,"name":"토마토달걀만두"},{"@type":"ListItem","position":33,"name":"탄탄면"}]}}]}</script>
 </head>
 <body>
 
@@ -248,6 +257,13 @@
 
   <!-- MAIN -->
   <main class="main">
+
+    <!-- 페이지 대제목. 화면에는 안 보인다(.sr-only) — 디자인상 큰 제목 자리가 없고, 상단 로고가
+         그 역할을 하기 때문이다. 그런데 h1이 사이트 전체에 하나도 없어서 ①검색엔진이 이 페이지가
+         무엇에 관한 것인지 알 단서가 없고 ②스크린리더 사용자가 페이지 제목을 못 듣는 문제가 있었다
+         (2026-07-30 신설). 화면에 실제로 있는 내용(하이디라오 소스·레시피 모음)을 그대로 서술한다.
+         🔴 검색어를 채워 넣는 자리가 아니다 — 화면과 어긋나면 구글이 속임수로 본다. -->
+    <h1 class="sr-only">하딜고고 — 하이디라오 훠궈 소스 레시피와 첫 방문 가이드</h1>
 
     <!-- 레시피 섹션 — 기본은 홈(7단 섹션), 검색·즐겨찾기·전체보기 땐 is-home 해제되고 그리드 뷰 -->
     <div class="view is-home" id="view-recipe">
@@ -765,7 +781,7 @@
   </div>
 </div>
 
-<script src="script.js?v=498"></script>
+<script src="script.js?v=499"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
