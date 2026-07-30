@@ -3125,24 +3125,19 @@
   } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
 
   // 스티커 카드 DOM(그리드 타일·시트 슬롯 공용). 지점명 밴드는 앱이 얹음(그림 하단 빈 띠 위).
+  // 🔴 여기 있던 '그림 없는 지점 = 🐾 자리표시 카드' 분기는 삭제했다(2026-07-30 사용자 지시).
+  //    대신 **스티커 그림이 없는 매장은 기록 드롭다운에 아예 안 나온다**(아래 드롭다운 코드).
+  //    그래서 이 함수에 들어오는 이름은 항상 STAMP_IMGS에 있다.
+  // ⚠️ 새 매장을 STORES에 추가할 때 스티커를 안 만들면 그 매장은 조용히 선택 목록에서 빠진다.
+  //    빈 카드가 뜨는 것보다 낫다고 판단한 것이다. 새 스티커는 .claude/make_stickers.py로만 만들 것.
   function buildStampCard(name, opts) {
     const card = document.createElement('div');
-    const img = STAMP_IMGS[name];
-    if (img) {
-      // 스티커 이미지엔 지점명이 이미 구워져 있음 → 앱 밴드 오버레이 안 붙임.
-      // loading: 기록 그리드 카드는 lazy(화면 밖은 스크롤 시 로드). 수정 슬롯·찍기(pop)는
-      // 반드시 즉시 보여야 하는 초점 이미지라 eager — lazy면 시트 슬라이드 중 로드가 미뤄져
-      // 스티커가 한 박자 늦게 떴음(opts.eager로 지정).
-      const loading = opts && opts.eager ? 'eager' : 'lazy';
-      card.innerHTML = '<img src="' + img + '" alt="' + name + ' 스티커" loading="' + loading + '">';
-    } else {
-      // 아직 그림 없는 지점 = 자리표시 카드에만 이름 밴드 표시
-      card.innerHTML = '<div class="stamp-ph"><span>🐾</span></div>';
-      const band = document.createElement('div');
-      band.className = 'stamp-band';
-      band.textContent = name;
-      card.appendChild(band);
-    }
+    // 스티커 이미지엔 지점명이 이미 구워져 있음 → 앱 밴드 오버레이 안 붙임.
+    // loading: 기록 그리드 카드는 lazy(화면 밖은 스크롤 시 로드). 수정 슬롯·찍기(pop)는
+    // 반드시 즉시 보여야 하는 초점 이미지라 eager — lazy면 시트 슬라이드 중 로드가 미뤄져
+    // 스티커가 한 박자 늦게 떴음(opts.eager로 지정).
+    const loading = opts && opts.eager ? 'eager' : 'lazy';
+    card.innerHTML = '<img src="' + STAMP_IMGS[name] + '" alt="' + name + ' 스티커" loading="' + loading + '">';
     return card;
   }
 
@@ -3423,6 +3418,11 @@
 
   // 매장 드롭다운 메뉴 — v2: 같은 매장 여러 번 기록 가능이라 ✓ 잠금 없음(전부 선택 가능), 항목 고정이라 한 번만 생성
   STORES.forEach((s) => {
+    // 🔴 스티커 그림이 없는 매장은 목록에 넣지 않는다(2026-07-30). 예전엔 골라도 🐾 자리표시
+    //    카드가 나왔지만 그 카드를 없앴으므로, 고르면 빈 카드가 된다. 애초에 못 고르게 막는다.
+    //    (오픈 예정 매장은 아래에서 '오픈 예정'으로 따로 보여주므로 이 줄에서 거르지 않는다 —
+    //     지금 그림 없는 매장은 부산점 하나뿐이고 그게 곧 오픈 예정 매장이다.)
+    if (!STAMP_IMGS[s.name] && STORE_CATCH[s.name] !== 'soon') return;
     const item = document.createElement('button');
     item.type = 'button';
     item.setAttribute('role', 'option');

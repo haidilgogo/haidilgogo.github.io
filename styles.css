@@ -2628,38 +2628,11 @@ img {
   filter: drop-shadow(0 0.5px 1px rgba(80, 30, 20, 0.22)) drop-shadow(0 2px 3.5px rgba(80, 30, 20, 0.13));
 }
 /* 아직 그림 없는 지점의 자리표시 카드 — 스티커 톤에 맞춘 라운드 카드 */
-.stamp-ph {
-  width: 100%;
-  height: 100%;
-  border-radius: 22px;
-  border: 3px solid #fff;
-  outline: 1.5px solid #E6D8C9;
-  background: linear-gradient(180deg, #FBF4EC 0%, #F1E3D4 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 5px rgba(80, 30, 20, 0.16);
-}
-.stamp-ph span {
-  font-size: 44px;
-  opacity: 0.4;
-}
-/* 지점명 밴드 — 스티커 그림의 하단 빈 띠 위에 앱이 얹는 글자.
-   위치는 에셋의 밴드(안쪽 그림 하단 13.5%)에 맞춤. */
-.stamp-band {
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  bottom: 3%;
-  height: 12.2%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14.5px;
-  font-weight: 800;
-  color: var(--brand-red);
-  letter-spacing: 0.5px;
-}
+/* ⚠️ 여기 있던 `.stamp-ph`(🐾 자리표시 타일)와 `.stamp-band`(앱이 얹던 지점명 띠)를 지웠다
+   (2026-07-30 사용자 지시). 스티커 그림이 없는 매장은 이제 기록 드롭다운에 아예 안 나오므로
+   그런 카드가 만들어질 일이 없다. 지점명은 스티커 이미지에 이미 구워져 있어 밴드도 불필요하다.
+   🔴 되살릴 일이 생기면(예: 그림 없이도 기록하게 하고 싶을 때) script.js buildStampCard의
+      분기와 드롭다운 필터를 함께 되돌려야 한다 — CSS만 되살리면 아무 일도 안 일어난다. */
 /* (구 ➕ 추가 타일·타일 밑 캡션 제거 — 기록하기는 상단바 버튼, 날짜·메모는 카드 안으로) */
 
 /* ── 입력 시트 — 데스크탑=가운데 모달 / 모바일=레시피 상세처럼 상단바 아래 전체화면 ── */
