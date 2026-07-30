@@ -2,9 +2,12 @@
 <!--
   하딜고고 사이트맵 (2026-07-30 신설)
 
-  🔴 주소가 하나뿐인 이유: 이 사이트는 index.html 한 장이고 레시피·가이드·아티클이 전부
-     script.js 안에서 그려지는 SPA다. 검색엔진에 알릴 개별 주소가 없다.
-     레시피마다 주소를 만드는 구조 변경을 하면 그때 이 파일에 항목을 늘린다.
+  🔴 앱(index.html)은 주소가 하나뿐이다. 레시피 33개가 전부 script.js 안에서 그려지는
+     SPA라 검색엔진에 알릴 개별 주소가 없다. 레시피마다 주소를 만들면 그때 항목을 늘린다.
+
+  🔴 아티클 3개는 2026-07-30에 개별 주소를 갖게 됐다(.claude/make_article_pages.mjs가
+     script.js에서 본문을 읽어 생성하는 정적 페이지). ⚠️ 아티클을 추가·삭제하거나 파일명을
+     바꾸면 이 목록도 함께 고칠 것 — 생성기는 sitemap을 건드리지 않는다.
 
   ⚠️ lastmod는 사이트 내용이 실제로 바뀔 때만 갱신할 것. 매번 오늘 날짜로 바꾸면
      검색엔진이 신뢰하지 않는다.
@@ -15,5 +18,26 @@
     <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <!-- 아티클: 어서와~ 하이디라오는 처음이지? (첫 방문 가이드) -->
+  <url>
+    <loc>https://haidilgogo.com/guide.html</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- 아티클: 물어본 사람~ 궁금한 사람~ (훠궈 잡학) -->
+  <url>
+    <loc>https://haidilgogo.com/hotpot.html</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- 아티클: 고수 빼주세요! -->
+  <url>
+    <loc>https://haidilgogo.com/cilantro.html</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

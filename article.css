@@ -1,0 +1,196 @@
+/* 아티클 정적 페이지 전용 (검색 유입용 읽기 페이지)
+   🔴 본문 서식은 styles.css의 .column-* / .col-* 을 그대로 쓴다. 여기엔 앱에 없는 것만 적는다:
+      ① 시트를 오버레이가 아니라 페이지로 놓기  ② 앱에서 버튼이던 것을 <a>로 바꾼 만큼의 보정
+      ③ 맨 아래 '하딜고고에서 더 보기'
+   ⚠️ 스크롤바 규칙(styles.css 최상단 * 한 곳)·440px 폭 방침은 여기서 다시 선언하지 않는다. */
+
+/* ① 시트를 페이지로 — 앱에선 .column-overlay가 감싸며 가운데 정렬을 맡았다 */
+.art-page .column-sheet {
+  margin: 0 auto;
+  min-height: 0;
+}
+@media (min-width: 641px) {
+  .art-page .column-sheet {
+    margin: 24px auto;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+}
+
+/* 앱에서는 본문 아래에 '닫기' 버튼 줄(.column-footer)이 있어 여백이 채워졌다.
+   페이지엔 그 줄이 없으니 본문 마지막 요소(CTA)와 푸터가 붙는다 → 아래 여백을 준다. */
+.art-page .column-body {
+  padding-bottom: 30px;
+}
+
+/* 상단바: 앱과 같은 모양이되 로고 한 개짜리 줄(탭·검색 없음) */
+.art-page .topbar-brand {
+  text-decoration: none;
+}
+
+/* ② 버튼 → 링크 보정. 앱의 .col-sauce·.col-cta는 <button>이라 브라우저 기본값이 다르다 */
+.art-page a.col-cta,
+.art-page a.col-note-ref {
+  text-decoration: none;
+}
+
+/* 안 눌리는 소스 카드(2026-07-30 사용자 지정) — 모양은 앱과 같게 두고 '누를 수 있다'는
+   신호만 지운다. 화살표는 마크업에서 아예 빼고(생성기), 손가락 커서·누름 반응을 없앤다.
+   .col-sauce:active(배경 어두워짐)는 클래스 선택자라 <div>에도 걸리므로 여기서 되돌린다. */
+.art-page .col-sauce--static {
+  cursor: default;
+}
+.art-page .col-sauce--static:active {
+  background: var(--bg-soft, #f7f4f1);
+}
+/* 🔴 .col-cta는 `height: 48px`이 박혀 있고, 앱에서는 <button>이라 브라우저가 글씨를 세로
+   가운데로 놓아준다(버튼의 기본 동작). <a>로 바꾸면 그 정렬이 사라져 글씨가 48px 박스의
+   위쪽에 붙는다 — 실기기에서 "버튼이 이상하다"로 잡힌 것이 이것이다.
+   같은 이유의 형제인 .col-sauce는 이미 flex + align-items:center라 손댈 필요가 없다.
+   ⚠️ 앞으로 앱의 <button>을 정적 페이지에서 <a>로 바꿀 때는 매번 이걸 확인할 것. */
+.art-page a.col-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* 각주 [1]을 눌러 출처로 점프할 때, 목적지가 sticky 상단바(65px) 밑에 숨지 않게 한다.
+   지금은 출처가 늘 페이지 맨 아래에 있어 실제로 가려지지 않지만(스크롤이 끝까지 가서 목적지가
+   화면 중간에 온다), 앞으로 본문이 길어지거나 출처가 중간에 놓이면 가려진다.
+   앱에서는 이 점프를 JS가 scrollIntoView({block:'center'})로 처리해 이 문제가 없었다 —
+   정적 페이지는 순수 링크(#note1)라 CSS로 잡아준다. */
+.art-page .column-notes-list li {
+  scroll-margin-top: 80px;
+}
+
+/* ③ 맨 아래 출구 — 다 읽은 사람을 앱으로 들여보낸다 */
+.art-more {
+  padding: 8px 22px 30px;
+}
+.art-more-btn {
+  display: block;
+  padding: 15px 18px;
+  border-radius: 14px;
+  background: var(--brand-red);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .art-more-btn:hover { opacity: .92; }
+}
+.art-more-btn:active { opacity: .86; }
+
+/* ── 레시피 페이지 (건희소스 등) ────────────────────────────────────
+   재료 표·조리 단계·팁 박스는 앱 상세(.ing-box/.step-row/.tip-box/.modal-section-title)를
+   그대로 쓴다. 여기엔 앱에 없는 것만: 한 페이지에 버전 여러 개를 세로로 쌓는 부분.
+   ⚠️ 앱 상세는 모달 안이라 자기 패딩이 있었는데, 여기선 페이지라 직접 준다. */
+/* 제목 머리 — 사진 히어로 대신 글자만. 이유는 생성기 주석 참고(카드 이미지가 말풍선 캡쳐라
+   배경으로 깔면 위가 비고, 바로 아래 썸네일과 중복된다). */
+/* 🔴 아래 간격 숫자는 눈대중이 아니라 앱 레시피 상세(#modalCard)를 브라우저에서 실측해 맞춘
+   값이다(2026-07-30). 앱 기준값: 가로 여백 20px · 설명→섹션제목 22 · 섹션→섹션 28 ·
+   섹션제목→박스 10 · 썸네일 라운드 12 · 설명 14px/줄간격 1.65 · 섹션제목 16px/700.
+   ⚠️ 고칠 일이 생기면 앱 상세를 다시 재서 맞출 것 — 두 화면이 어긋나면 바로 눈에 띈다. */
+.rp-head {
+  padding: 26px 20px 2px;
+}
+.rp-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.25;
+  color: var(--text-dark);
+}
+.rp-sub {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-muted, #8B8680);
+}
+
+.rp-body {
+  padding: 22px 20px 30px; /* 앱 .modal-body와 같은 값 */
+}
+/* 버전 사이 = 구분선 위 34 / 아래 30. 버전 제목의 위 여백은 0으로 두고 간격을 여기서만
+   통제한다(두 곳에서 주면 선이 한쪽으로 쏠린다 — 처음에 그렇게 만들어 어긋났다). */
+.rp-ver + .rp-ver {
+  margin-top: 34px;
+  padding-top: 30px;
+  border-top: 1px solid #ECE5DC; /* 상단바 구분선과 같은 회백색 */
+}
+.rp-ver-title {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.4;
+  color: var(--brand-red);
+}
+/* 섹션 제목(주문·소스바·만드는 법·팁) — 앱은 .modal-body의 패딩과 섹션 wrap이 간격을 만들지만
+   이 페이지는 한 흐름이라 제목의 마진으로 만든다. 값은 앱 실측 그대로. */
+.rp-ver .modal-section-title {
+  margin: 28px 0 10px;
+}
+.rp-desc + .modal-section-title,
+.rp-thumb + .modal-section-title {
+  margin-top: 22px;
+}
+/* 썸네일 = 카드와 같은 1:1 정사각(썸네일 규격, CLAUDE.md) */
+.rp-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px; /* 앱 #modalThumb과 같은 값 */
+  overflow: hidden;
+  background: #fff;
+}
+.rp-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 출처 — 카드 썸네일과 같은 자리(하단 그라데이션 위 흰 글자) */
+.rp-source {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 26px 12px 9px;
+  background: linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 100%);
+  color: rgba(255,255,255,.94);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+.rp-desc {
+  margin: 16px 0 0; /* 앱: 썸네일→글자 16 */
+  font-size: 14px;
+  line-height: 1.65; /* 앱 실측 23.1px / 14px */
+  color: var(--text-dark);
+}
+
+/* 푸터는 앱 것을 그대로 쓰되, 앱에선 .main 안이라 폭과 아래 여백이 잡혀 있었다.
+   🔴 아래 여백을 반드시 다시 줘야 한다 — .footer 자체 padding-bottom은 16px뿐이고, 앱에서는
+   .main의 padding-bottom(떠 있는 탭바 자리 106px)이 그 아래를 받쳐줬다. 정적 페이지엔 .main이
+   없어서 그대로 두면 제보 링크가 아이폰 홈바에 붙는다(실기기에서 확인).
+   ⚠️ env(safe-area-inset-bottom)를 쓰지 않는다 — 이 사이트는 viewport-fit=cover를 쓰지 않기로
+   확정했고(사파리 상단바 회귀), 그러면 env()는 항상 0이라 아무 일도 하지 않는다.
+   그래서 앱의 다른 하단 여백과 같은 고정값(모바일 34 / 데스크탑 24)을 쓴다. */
+.art-footer {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 34px;
+}
+@media (min-width: 641px) {
+  .art-footer { padding-bottom: 24px; }
+}
