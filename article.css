@@ -93,8 +93,12 @@
    ⚠️ 앱 상세는 모달 안이라 자기 패딩이 있었는데, 여기선 페이지라 직접 준다. */
 /* 제목 머리 — 사진 히어로 대신 글자만. 이유는 생성기 주석 참고(카드 이미지가 말풍선 캡쳐라
    배경으로 깔면 위가 비고, 바로 아래 썸네일과 중복된다). */
+/* 🔴 아래 간격 숫자는 눈대중이 아니라 앱 레시피 상세(#modalCard)를 브라우저에서 실측해 맞춘
+   값이다(2026-07-30). 앱 기준값: 가로 여백 20px · 설명→섹션제목 22 · 섹션→섹션 28 ·
+   섹션제목→박스 10 · 썸네일 라운드 12 · 설명 14px/줄간격 1.65 · 섹션제목 16px/700.
+   ⚠️ 고칠 일이 생기면 앱 상세를 다시 재서 맞출 것 — 두 화면이 어긋나면 바로 눈에 띈다. */
 .rp-head {
-  padding: 26px 22px 2px;
+  padding: 26px 20px 2px;
 }
 .rp-title {
   margin: 0;
@@ -113,26 +117,37 @@
 }
 
 .rp-body {
-  padding: 4px 22px 30px;
+  padding: 22px 20px 30px; /* 앱 .modal-body와 같은 값 */
 }
+/* 버전 사이 = 구분선 위 34 / 아래 30. 버전 제목의 위 여백은 0으로 두고 간격을 여기서만
+   통제한다(두 곳에서 주면 선이 한쪽으로 쏠린다 — 처음에 그렇게 만들어 어긋났다). */
 .rp-ver + .rp-ver {
   margin-top: 34px;
-  padding-top: 26px;
+  padding-top: 30px;
   border-top: 1px solid #ECE5DC; /* 상단바 구분선과 같은 회백색 */
 }
 .rp-ver-title {
-  margin: 18px 0 12px;
+  margin: 0 0 12px;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -.02em;
   line-height: 1.4;
   color: var(--brand-red);
 }
+/* 섹션 제목(주문·소스바·만드는 법·팁) — 앱은 .modal-body의 패딩과 섹션 wrap이 간격을 만들지만
+   이 페이지는 한 흐름이라 제목의 마진으로 만든다. 값은 앱 실측 그대로. */
+.rp-ver .modal-section-title {
+  margin: 28px 0 10px;
+}
+.rp-desc + .modal-section-title,
+.rp-thumb + .modal-section-title {
+  margin-top: 22px;
+}
 /* 썸네일 = 카드와 같은 1:1 정사각(썸네일 규격, CLAUDE.md) */
 .rp-thumb {
   position: relative;
   aspect-ratio: 1 / 1;
-  border-radius: 14px;
+  border-radius: 12px; /* 앱 #modalThumb과 같은 값 */
   overflow: hidden;
   background: #fff;
 }
@@ -154,9 +169,9 @@
   letter-spacing: -.01em;
 }
 .rp-desc {
-  margin: 14px 0 4px;
+  margin: 16px 0 0; /* 앱: 썸네일→글자 16 */
   font-size: 14px;
-  line-height: 1.75;
+  line-height: 1.65; /* 앱 실측 23.1px / 14px */
   color: var(--text-dark);
 }
 
