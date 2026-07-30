@@ -21,16 +21,47 @@
 경로: /Users/Macmini_J/ClaudeCode/03. Projects/Haidilgogo
 브랜치: main (2026-07-30 배포 후 그대로 체크아웃돼 있음)
 작업 브랜치: feat/base-likes (= main과 같은 위치). feat/bottom-nav도 남아 있으나 내용은 전부 병합됨
-최신 커밋: d0cd886 feat(좋아요): 기본 좋아요 숫자를 전면 재조정 — 1씩 떨어지는 계단 제거
-main: d0cd886 — 🚀 배포됨 (로컬·원격·작업브랜치 전부 동일)
+최신 커밋: 0bf09e4 refactor: 옛 TCG 그리드 카드 죽은 코드 삭제 (JS 64줄 · CSS 335줄)
+main: 0bf09e4 — 🚀 배포됨 (로컬·원격·작업브랜치 전부 동일)
 작업 트리: 깨끗함
-캐시 버전: styles.css?v=603 / script.js?v=494
+캐시 버전: styles.css?v=604 / script.js?v=495
 ```
 
 🔴 **`main`에 체크아웃된 상태로 시작할 수 있다.** 코드를 고치기 전에 반드시 작업 브랜치를 떼라 —
 `main`은 GitHub Pages가 서빙하는 라이브 브랜치라 푸시하는 순간 배포된다. 2026-07-30에 실제로
 `main`에 있는 채로 작업이 시작됐고, 사용자가 "브랜치로 작업하는 거죠?"라고 물어 잡았다.
 (이 문서의 옛 A항이 `브랜치: feat/bottom-nav`라고 적어둔 탓에 확인 없이 믿을 위험이 있었다.)
+
+### 🚀 2026-07-30 배포 — 옛 TCG 그리드 카드 죽은 코드 삭제 (`0bf09e4`)
+
+2026-07-25에 그리드 카드를 `buildBrowseGridCard`(클린 카드)로 교체하면서 남겨둔 옛 코드를 지웠다.
+`script.js` −64줄 / `styles.css` −335줄. **화면 동작은 하나도 안 바뀐다**(호출처가 없던 코드다).
+
+지운 것: `buildCard()` 43줄 · `fitCardTitles()`(`.recipe-name`을 찾는데 요소가 0개라 무동작) ·
+`refreshLikeCounts` 선택자의 `.like-btn` · `.recipe-thumb-img`용 `contextmenu` 리스너(중복) ·
+`.recipe-card`/`.fav-star`/`.like-btn` 계열 CSS 전부(`@media` 안쪽 포함).
+
+🔴 **이름이 비슷해도 남긴 것 — 지우지 말 것:** `.recipe-thumb-overlay`·`.recipe-thumb-source`(모달
+썸네일 출처) · `.like-count`(모달 좋아요, `index.html`에 정적) · `.name-sub`(`s15 라젤(이 아는
+동생)소스`의 `nameHtml`이 사용) · `.recipe-grid`(전체보기 컨테이너) · `.empty-state` ·
+`.browse-fav` · `fitCardTitle()`(인기소스·전체보기 제목 폭 맞추기).
+
+🔴 **이미지 저장 방지는 두 겹이고 둘 다 살아 있다.** `styles.css`의 `img { -webkit-touch-callout:
+none }`(모바일 꾹 누르기)과 `script.js`의 **모든 `<img>`** `contextmenu` 차단(데스크톱 우클릭).
+지운 건 후자와 겹치던 낡은 잔재(`.recipe-thumb-img`만 노리던 것)다. 클래스로 좁힌 선택자는 카드
+마크업이 바뀌면 조용히 풀리므로, 다시 좁히지 말 것.
+
+**검증(이 방법을 다음에도 쓰면 된다):** 삭제 전 버전을 `git show <이전커밋>:파일`로 `_tmp-before/`에
+꺼내 같은 로컬 서버의 하위 경로로 띄우고(assets는 심볼릭 링크), **같은 브라우저·같은 조작 순서**로
+양쪽을 훑어 요소 개수·계산된 스타일·화면 텍스트를 기계적으로 비교했다. 24개 화면 1,248개 항목 +
+매장·발도장·기록시트·스토리뷰어·가챠 결과카드 + 320/390/1280px 전부 **차이 0**, 콘솔 에러 0.
+Codex 교차검증도 이상 없음. 🔴 **비교 전 두 버전을 같은 상태로 맞춰야 한다** — 안정화 조건은
+인기소스 1위 숫자가 실제값(당시 17)이 되고 `.hc-card`가 37개 이상일 때다. 이걸 안 맞춰서 처음에
+"차이 65건"이라는 오진을 냈다.
+
+🔴 **`.gacha-btn`은 가챠 버튼이 아니다.** `index.html`에서 발도장 **기록하기** 버튼이
+`class="gacha-btn stamp-write-btn"`로 스타일만 공유한다. 진짜 가챠는 홈의 `#homeRandomBtn`이 연다
+(이걸 착각해 "가챠 확인했다"고 잘못 보고한 적 있음).
 
 ### 🚀 2026-07-30 배포 — 기본 좋아요(BASE_LIKES)로 0을 없앴다
 
@@ -650,12 +681,9 @@ STEP 4 하딜고고로 소스를 만들어요
 
 **발견만 하고 미룬 것**
 
-- `buildCard()`(script.js)와 딸린 CSS 약 60줄은 **호출되는 곳이 없는 죽은 코드**다.
-  전 탭·전체보기 3곳에서 `.recipe-card`·`.like-btn` 0개 확인.
-  🔴 지울 때 이름이 비슷한 **살아 있는 셋을 남길 것**: `.recipe-thumb-overlay`·`.recipe-thumb-source`(모달 썸네일 출처),
-  `.like-count`(모달 좋아요 숫자). `.fav-star`는 죽음(살아 있는 카드는 `.browse-fav`).
-  `syncLikeUI()` 선택자에서도 `.like-btn`을 빼야 한다.
-  **정리 시점: 메뉴 탭 완성 → main 배포 후.**
+- ~~`buildCard()`와 딸린 CSS는 호출되는 곳이 없는 죽은 코드다. 정리 시점: 메뉴 탭 완성 → main 배포 후.~~
+  → ✅ **2026-07-30 삭제·배포 완료(`0bf09e4`)**. 실제 규모는 CSS 약 60줄이 아니라 **335줄**이었다.
+  자세한 내역·남긴 것·검증 방법은 이 문서 앞쪽 A항의 「죽은 코드 삭제」 절 참고.
 
 **카드 반응 규칙 (2026-07-28 사용자 확정 — 사이트 전체 공통)**
 
