@@ -3111,8 +3111,10 @@
   // 저장 = 이 기기 localStorage에만(즐겨찾기와 동일, 로그인 없음). 나중에 서버 이전이 쉽게
   // 버전 있는 JSON 한 덩어리로 보관: { version: 1, stamps: { 지점명: { date, memo } } }
   const STAMPS_KEY = 'haidilao_stamps';
-  // 스티커 그림이 준비된 지점(assets/stickers/). 그림 없는 지점은 자리표시 카드(🐾)로
-  // 나오고, 새 그림이 생기면 여기에 한 줄 추가만 하면 됨.
+  // 스티커 그림이 준비된 지점(assets/stickers/). 새 그림이 생기면 여기에 한 줄 추가.
+  // 🔴 **이 목록에 없는 매장은 기록 드롭다운에 안 나온다**(2026-07-30). 예전엔 골라도 🐾
+  //    자리표시 카드로 나왔지만 그 카드를 없앴다 — 새 매장을 STORES에 넣고 스티커를 안 만들면
+  //    그 매장은 조용히 선택 목록에서 빠지므로, 스티커부터 만들 것(.claude/make_stickers.py).
   const STAMP_IMGS = {
     '명동점': 'assets/stickers/명동점.webp',
     '서초점': 'assets/stickers/서초점.webp',
