@@ -21,8 +21,10 @@
 경로: /Users/Macmini_J/ClaudeCode/03. Projects/Haidilgogo
 브랜치: main (2026-07-30 배포 후 그대로 체크아웃돼 있음)
 작업 브랜치: feat/base-likes (= main과 같은 위치). feat/bottom-nav도 남아 있으나 내용은 전부 병합됨
-최신 커밋: faa0add docs: 본문 HTML화 옵션 분석 기록 — 다음 대화 시작점
-main: faa0add — 🚀 배포됨 (코드 최신은 8bfc023, 이후는 문서만) (로컬·원격·작업브랜치 전부 동일)
+코드 최신 커밋: 8bfc023 fix(문구): og:description·JSON-LD에 남아 있던 `꿀팁` 제거
+  (그 뒤 커밋은 이 문서 갱신뿐이다 — 사이트 코드는 8bfc023이 마지막이다)
+main: 🚀 배포 완료 (로컬·원격·작업브랜치 전부 동일). 정확한 HEAD는 `git log -1`로 확인할 것 —
+  이 줄에 해시를 적으면 이 문서를 고치는 커밋 자신을 가리킬 수 없어 늘 한 칸 어긋난다.
 작업 트리: 깨끗함
 캐시 버전: styles.css?v=605 / script.js?v=502
 라이브 주소: **https://haidilgogo.com** (2026-07-30 커스텀 도메인 연결)
