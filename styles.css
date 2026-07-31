@@ -2922,16 +2922,23 @@ img {
    글자가 X 밑으로 흘러 겹친다**. 시트 첫 줄에 문장을 넣을 일이 생기면 오른쪽 여백 48px을 줄 것
    — 34px은 글자 끝과 X가 1px까지 붙어 부족했다(실측). 지금은 첫 줄이 짧은 제목('내 코드')이라
    문제가 없다. */
-.sync-code {   /* 코드는 읽고 옮겨 적는 것 — 자간 넓게, 숫자·영문이 헷갈리지 않게 */
-  margin: 2px 0 12px;
-  padding: 14px 12px;
-  border: 1px solid var(--card-border);
-  border-radius: 14px;
+/* 코드는 읽고 옮겨 적는 것 — 자간 넓게, 숫자·영문이 헷갈리지 않게.
+   🔴 아래 입력칸(.stamp-field)과 **같은 상자**여야 한다(2026-07-31 사용자 지시):
+   min-height 44 · border 1.5 · radius 12 · 좌우 padding 13 — 넷 다 그 값을 그대로 가져왔다.
+   그래야 글자 시작 x까지 위아래가 정확히 맞는다. 글자는 **왼쪽 정렬**(예전엔 가운데였다). */
+.sync-code {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1.5px solid var(--card-border);
+  border-radius: 12px;
   background: #fff;
   font-size: 21px;
   font-weight: 800;
   letter-spacing: .12em;
-  text-align: center;
+  text-align: left;
   color: #3D2B23;
   user-select: all;   /* 한 번 탭하면 통째로 선택되게 */
 }
@@ -2950,7 +2957,8 @@ img {
   font-weight: 700;
   letter-spacing: .12em;
 }
-.sync-actions { display: flex; gap: 8px; }
+/* 버튼은 설명 아래에 온다(index.html 주석 참고). 위 문단과의 간격을 넉넉히 띄운다. */
+.sync-actions { display: flex; gap: 8px; margin-top: 16px; }
 .sync-btn {
   flex: 1;
   padding: 11px 0;
