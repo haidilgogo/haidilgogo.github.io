@@ -4239,23 +4239,30 @@
   if (syncLoadBtn) syncLoadBtn.addEventListener('click', () => {
     const code = normalizeCode(syncInput && syncInput.value);
     if (!code) { setSyncMsg('코드는 HG- 뒤에 6글자예요. 다시 확인해 주세요', 'bad'); return; }
-    if (code === getSyncCode()) { setSyncMsg('지금 쓰고 있는 코드예요', 'bad'); return; }
+    // 🔴 자기 코드를 넣어도 **막지 않는다**(2026-07-31 사용자 시나리오로 발견).
+    //    폰을 잃어버려 임시폰에서 쓰다가 원래 폰을 되찾은 경우, 원래 폰에서 자기 코드를 넣어보는 게
+    //    자연스러운 행동이다. 앱을 열 때 이미 자동으로 맞춰지지만 사용자는 그걸 모르니 눌러본다.
+    //    예전엔 "지금 쓰고 있는 코드예요"라고 빨갛게 거부해서 고장난 것처럼 보였다.
+    //    그냥 한 번 더 맞춰주면 될 일이다 — 합치기라서 여러 번 해도 해롭지 않다.
     if (!syncRoot) { setSyncMsg('연결이 안 돼요. 잠시 뒤 다시 해주세요', 'bad'); return; }
     setSyncMsg('불러오는 중…');
     syncLoadBtn.disabled = true;
     pullSync(code).then((remote) => {
       syncLoadBtn.disabled = false;
-      if (!remote) { setSyncMsg('그 코드로 저장된 기록을 못 찾았어요', 'bad'); return; }
-      const before = (stampData.records || []).length;
+      if (!remote) { setSyncMsg('그 코드로 저장된 데이터가 없어요', 'bad'); return; }
       mergeIntoLocal(remote);
       // 🔴 불러온 코드를 이 기기의 코드로 삼는다 — 그래야 이후 저장이 같은 곳에 쌓인다.
       setSyncCode(code);
       refreshAfterSync();
       pushSync(); // 합친 결과를 서버에도 올려 양쪽을 같게 만든다
-      const added = (stampData.records || []).length - before;
       syncCodeText.textContent = code;
-      setSyncMsg(added > 0 ? ('기록 ' + added + '개를 가져왔어요 (합계 ' + stampData.records.length + '곳)')
-                           : '이미 다 있는 기록이에요', 'ok');
+      // 🔴 개수를 세지 않는다(2026-07-31 사용자 확정: "그냥 데이터를 불러왔어요").
+      //    예전엔 '기록 N개를 가져왔어요 (합계 N곳)'이었는데 두 가지가 틀렸다 —
+      //    ① '곳'은 위쪽 「다녀온 매장 N곳」이 매장 종류를 세는 것과 단위가 겹치는데 여기선
+      //       기록 개수를 세서 같은 단어로 다른 숫자가 나왔다.
+      //    ② 스티커만 세어서, 즐겨찾기만 든 코드를 불러오면 '이미 다 있다'는 거짓말을 했다.
+      //    개수는 화면(스티커 목록·하트·북마크)이 이미 보여준다. 문장은 짧을수록 안 틀린다.
+      setSyncMsg('데이터를 불러왔어요', 'ok');
     });
   });
 
