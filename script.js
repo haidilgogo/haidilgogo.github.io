@@ -3668,6 +3668,15 @@
     if (!rec) return;
     stampViewReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     stampViewId = id;
+    renderStampView(rec);
+    stampViewOverlay.classList.add('open');
+    requestAnimationFrame(() => focusDialogClose(stampViewClose));
+  }
+  // 🔴 그리기만 하는 부분을 따로 뒀다(2026-07-31 5차 교차검증 2번). 열려 있는 상세를 새
+  //   내용으로 다시 그려야 하는데, `openStampView`를 그대로 다시 부르면 **포커스 복귀 대상**
+  //   (`stampViewReturnFocus`)이 지금 눌린 대화상자 안 버튼으로 덮여 닫을 때 못 돌아간다.
+  //   여는 것(포커스·open 클래스)은 openStampView만, 여기서는 내용만 바꾼다.
+  function renderStampView(rec) {
     // 스티커(크게, 즉시 로드)
     const sticker = buildStampCard(rec.name, { eager: true });
     sticker.className = 'stamp-view-card';
@@ -3683,8 +3692,16 @@
     // 값은 사용자 입력이라 textContent로(안전) 채움
     stampViewInfo.querySelectorAll('.stamp-view-val').forEach((el, i) => { el.textContent = rows[i][1]; });
     resetStampViewDelete();
-    stampViewOverlay.classList.add('open');
-    requestAnimationFrame(() => focusDialogClose(stampViewClose));
+  }
+  // 열려 있는 상세를 지금 데이터로 맞춘다. 지워졌으면 닫는다.
+  // 🔴 다른 기기에서 고친 내용이 동기화로 들어와도 상세는 옛 매장·날짜·메모를 그대로 보여줬다
+  //   (5차 교차검증 2번). 목록만 갱신되니 **같은 화면 안에서 두 값이 어긋났다.** 게다가 지워진
+  //   기록에서 `수정`을 누르면 그 id를 못 찾아 **빈 새 기록 화면**이 떴다.
+  function refreshStampView() {
+    if (!stampViewId || !stampViewOverlay.classList.contains('open')) return;
+    const rec = stampData.records.find((r) => r.id === stampViewId);
+    if (!rec) { closeStampView(); return; }
+    renderStampView(rec);
   }
   function closeStampView() {
     stampViewOverlay.classList.remove('open');
@@ -3792,9 +3809,23 @@
         stampData = Array.isArray(saved.records) ? saved : { version: 2, records: [] };
         stampCardCache.clear();
         renderStamps();
-        if (stampViewId && !stampData.records.some((r) => r.id === stampViewId)) {
-          closeStampView();
-        }
+        // 열린 상세도 맞춘다 — 예전엔 **지워졌을 때 닫기만** 하고 내용이 바뀐 경우는 그대로 둬서
+        // 목록과 상세가 어긋났다(동기화 경로에서 발견된 것과 같은 결함, 5차 교차검증 2번).
+        refreshStampView();
+      }
+    }
+
+    // 🔴 다른 탭에서 코드를 불러오면 이 탭도 그 코드를 따라간다(5차 교차검증 1번).
+    //   이 항목만 빠져 있어서, 탭1이 코드 A를 불러온 뒤 탭2에서 B를 불러오면 **탭1은 계속 A로
+    //   전송했다.** 다른 데이터는 이 함수가 이미 탭 사이를 맞추고 있으므로 코드도 같이 맞춘다.
+    //   ⚠️ 값이 비었으면(다른 탭이 저장소를 통째로 비운 경우) 메모리 사본을 지우지 않는다 —
+    //     그 사본은 저장소가 막혔을 때 코드를 잃지 않으려고 둔 것이다.
+    if (syncAll || key === SYNC_CODE_KEY) {
+      let stored = '';
+      try { stored = localStorage.getItem(SYNC_CODE_KEY) || ''; } catch (e) { /* 무시 */ }
+      if (stored && stored !== syncCodeMem) {
+        syncCodeMem = stored;
+        renderCodeNotice(); // 화면에 뜬 코드·띠 문구도 새 코드로
       }
     }
   }
@@ -3802,7 +3833,7 @@
   window.addEventListener('storage', (e) => {
     if (e.key === null) {
       syncExternalState();
-    } else if ([FAVORITES_KEY, LIKED_KEY, LIKE_COUNTS_KEY, STAMPS_KEY].includes(e.key)) {
+    } else if ([FAVORITES_KEY, LIKED_KEY, LIKE_COUNTS_KEY, STAMPS_KEY, SYNC_CODE_KEY].includes(e.key)) {
       syncExternalState(e.key);
     }
   });
@@ -4246,10 +4277,21 @@
     }
   }
 
-  // 코드로 서버에서 받아오기. merge=true면 이 기기 것과 합쳐 저장까지 한다.
+  // 코드로 서버에서 받아오기.
+  // 🔴 **읽기 실패와 '서버가 빈 것'을 구분해서** 돌려준다(5차 교차검증 3번). 예전엔 둘 다
+  //   `null`이어서, 네트워크가 끊긴 상태로 불러오면 "저장된 데이터가 없어요"가 떴다 —
+  //   멀쩡한 코드를 틀린 코드로 오해하고 버리게 만드는 문구다.
+  //   `{ ok:false }` = 못 읽었다 / `{ ok:true, value:null }` = 읽었는데 비어 있다.
+  function pullSyncResult(code) {
+    if (!syncRoot || !code) return Promise.resolve({ ok: false });
+    return syncRoot.child(code).once('value')
+      .then((snap) => ({ ok: true, value: snap.val() }))
+      .catch(() => ({ ok: false }));
+  }
+  // 시작 동기화용 — 여기서는 둘을 구분할 필요가 없다. 못 읽었으면 못 읽은 대로 `null`이고,
+  // 그래도 push는 한다(4차 교차검증 ①). 트랜잭션이 서버 최신값을 다시 읽으므로 유실은 없다.
   function pullSync(code) {
-    if (!syncRoot || !code) return Promise.resolve(null);
-    return syncRoot.child(code).once('value').then((snap) => snap.val()).catch(() => null);
+    return pullSyncResult(code).then((res) => (res.ok ? res.value : null));
   }
 
   // 합친 뒤 화면을 다시 그린다 — 세 데이터가 걸린 화면이 여러 곳이라 한꺼번에
@@ -4259,6 +4301,10 @@
     saveLikes();
     try {
       if (typeof renderStamps === 'function') renderStamps();
+      // 🔴 열린 스티커 상세도 맞춘다(5차 교차검증 2번) — 목록만 새로 그리면 상세가 옛 매장·날짜·
+      //   메모를 그대로 들고 있어 **같은 화면 안에서 두 값이 어긋났다.** 지워진 기록이면 닫는다
+      //   (그대로 두면 `수정`을 눌렀을 때 빈 새 기록 화면이 뜬다).
+      if (typeof refreshStampView === 'function') refreshStampView();
       if (typeof renderGrid === 'function') renderGrid();
       if (typeof renderHomePopular === 'function') renderHomePopular();
       if (typeof syncHome === 'function') syncHome();
@@ -4482,8 +4528,12 @@
     if (!syncRoot) { setSyncMsg('연결이 안 돼요. 잠시 뒤 다시 해주세요', 'bad'); return; }
     setSyncMsg('불러오는 중…');
     syncLoadBtn.disabled = true;
-    pullSync(code).then((remote) => {
+    pullSyncResult(code).then((res) => {
       syncLoadBtn.disabled = false;
+      // 🔴 못 읽은 것과 빈 것을 다르게 말한다(5차 교차검증 3번). 문구는 위 연결 실패와 같은 것을
+      //   쓴다 — 사용자에게는 둘 다 "지금은 안 되니 잠시 뒤에"로 같은 상황이다.
+      if (!res.ok) { setSyncMsg('연결이 안 돼요. 잠시 뒤 다시 해주세요', 'bad'); return; }
+      const remote = res.value;
       if (!remote) { setSyncMsg('입력하신 코드로 저장된 데이터가 없어요', 'bad'); return; }
       mergeIntoLocal(remote);
       // 🔴 불러온 코드를 이 기기의 코드로 삼는다 — 그래야 이후 저장이 같은 곳에 쌓인다.
