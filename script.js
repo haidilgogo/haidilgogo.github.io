@@ -3560,6 +3560,21 @@
         //    없으면 수정해도 addedAt이 그대로라, 다른 기기에 남아 있던 **옛 내용이 이겨서
         //    수정한 메모가 되돌아간다**(2026-07-31 교차검증에서 잡힘).
         rec.editedAt = Date.now();
+      } else {
+        // 🔴 시트를 열어둔 사이에 **다른 기기가 이 기록을 지웠다**(2026-07-31 6차 교차검증 2번).
+        //   예전엔 `if (rec)`에 걸려 **아무것도 저장하지 않고 시트만 닫혔다** — 사용자는 저장된
+        //   줄 알고 방금 쓴 내용을 잃었다(재현함).
+        //   → 방금 쓴 것을 **새 기록으로 남긴다**(2026-07-31 사용자 확정).
+        //   ⚠️ 이건 '지운 기록의 부활'이 아니다. **새 id**라 tombstone(`deleted`)에 걸리지 않고,
+        //     지워진 그 기록은 지워진 채로 남는다. 되살아나는 건 사용자가 지금 쓴 내용뿐이다.
+        stampData.records.push({
+          id: newStampId(),
+          name: stampSelected,
+          date: stampDateEl.value || todayIso(),
+          memo: stampMemoEl.value.trim(),
+          with: getStampWithValue() || undefined,
+          addedAt: Date.now(),
+        });
       }
       stampCardCache.delete(stampEditId); // 내용 바뀌었으니 카드 새로 그리게(날짜·매장·스티커 갱신)
       saveStamps();
@@ -3825,7 +3840,10 @@
       try { stored = localStorage.getItem(SYNC_CODE_KEY) || ''; } catch (e) { /* 무시 */ }
       if (stored && stored !== syncCodeMem) {
         syncCodeMem = stored;
-        renderCodeNotice(); // 화면에 뜬 코드·띠 문구도 새 코드로
+        renderCodeNotice(); // 띠 문구·버튼
+        // 🔴 열려 있는 「내 코드」 시트의 코드 글자도 바꾼다(6차 교차검증 1번).
+        //   안 바꾸면 **보이는 코드와 복사되는 코드가 달라진다** — 복사·보내기는 `getSyncCode()`를 쓴다.
+        renderSyncCode();
       }
     }
   }
@@ -4367,16 +4385,24 @@
   }
   // ⚠️ 예전엔 '첫 기록 직후'를 알리는 안내 문단을 띄울지(isIntro) 골랐는데, 그 문단을 없애서
   //    구분이 사라졌다(2026-07-31). 이제 어디서 열든 같은 화면이다.
-  function openSyncSheet() {
-    if (!syncOverlay) return;
+  // 시트에 뜬 '내 코드'를 지금 코드로 맞춘다.
+  // 🔴 한 곳에서만 그린다(2026-07-31 6차 교차검증 1번). 예전엔 **시트를 열 때와 불러오기
+  //   성공 직후에만** 글자를 찍어서, 다른 탭이 코드를 바꾸면 **화면엔 옛 코드가 남았다.**
+  //   복사·보내기는 `getSyncCode()`를 쓰므로 **보이는 코드와 복사되는 코드가 달랐다** —
+  //   복구 코드를 정확히 적어두게 하는 것이 이 화면의 목적이라 그냥 넘길 문제가 아니다.
+  function renderSyncCode() {
     const code = getSyncCode();
     // 🔴 박스 안에는 **6자리만** 넣는다 — `HG-`는 박스 밖에 따로 있다(index.html .sync-code-row).
-    syncCodeText.textContent = code ? code.replace(/^HG-/, '') : '';
+    if (syncCodeText) syncCodeText.textContent = code ? code.replace(/^HG-/, '') : '';
     // 🔴 코드가 없으면 '내 코드' 덩어리를 통째로 숨긴다(2026-07-31 사용자 확정).
     //    예전엔 '아직 없어요'와 함께 복사·보내기 버튼이 남아 있었는데, 눌러도 아무 일이
     //    안 일어나 고장난 것처럼 보였다. 할 일이 '불러오기' 하나뿐인 사람에겐 그것만 보이면 된다.
     const mine = document.getElementById('syncMine');
     if (mine) mine.hidden = !code;
+  }
+  function openSyncSheet() {
+    if (!syncOverlay) return;
+    renderSyncCode();
     setSyncMsg('');
     setCodeMsg(''); // 지난번에 뜬 '복사했어요'가 남아 있지 않게
     if (syncInput) syncInput.value = '';
@@ -4540,11 +4566,10 @@
       setSyncCode(code);
       refreshAfterSync();
       pushSync(); // 합친 결과를 서버에도 올려 양쪽을 같게 만든다
-      // 🔴 박스 안에는 6자리만(밖에 `HG-`가 따로 있다). 전체 코드를 넣어 `HG- HG-XXXXXX`로
-      //    보이던 것을 고쳤다(2026-07-31 교차검증). 코드가 없던 기기는 '내 코드' 덩어리도 열어준다.
-      syncCodeText.textContent = code.replace(/^HG-/, '');
-      const mineEl = document.getElementById('syncMine');
-      if (mineEl) mineEl.hidden = false;
+      // 박스 안에는 6자리만(밖에 `HG-`가 따로 있다) + 코드가 없던 기기는 '내 코드' 덩어리도
+      // 열어준다 — 둘 다 renderSyncCode 한 곳에서 한다(위 주석 참고). `setSyncCode`가 이미
+      // 위에서 불렸으므로 여기서 읽는 코드는 방금 불러온 그 코드다.
+      renderSyncCode();
       // 🔴 개수를 세지 않는다(2026-07-31 사용자 확정: "그냥 데이터를 불러왔어요").
       //    예전엔 '기록 N개를 가져왔어요 (합계 N곳)'이었는데 두 가지가 틀렸다 —
       //    ① '곳'은 위쪽 「다녀온 매장 N곳」이 매장 종류를 세는 것과 단위가 겹치는데 여기선
