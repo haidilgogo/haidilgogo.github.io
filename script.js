@@ -4009,8 +4009,13 @@
   //    "코드가 없다"고 판단해 **서버 업로드를 통째로 건너뛰었다.** 로컬도 못 쓰고 서버에도 안 올라가
   //    기록이 그냥 사라진다. 메모리에 사본을 들고 있으면 최소한 서버에는 올라간다.
   let syncCodeMem = '';
+  // 🔴 **메모리 사본이 먼저다**(2026-07-31 2차 교차검증). 저장소에 옛 코드가 남아 있는데
+  //    새 코드 저장이 실패하면, 저장소를 먼저 읽는 순간 화면엔 새 코드가 보이는데 데이터는
+  //    **옛 코드 쪽으로 올라간다.** 메모리 사본은 이번 세션에 실제로 정한 코드이므로 이게 진실이다.
+  //    (페이지를 새로 열면 메모리는 비어 있어 자연스럽게 저장소 값이 쓰인다.)
   function getSyncCode() {
-    try { return localStorage.getItem(SYNC_CODE_KEY) || syncCodeMem || ''; } catch (e) { return syncCodeMem || ''; }
+    if (syncCodeMem) return syncCodeMem;
+    try { return localStorage.getItem(SYNC_CODE_KEY) || ''; } catch (e) { return ''; }
   }
   function setSyncCode(code) {
     syncCodeMem = code;
@@ -4073,69 +4078,89 @@
   }
 
   // 서버 것 + 이 기기 것을 합쳐서 로컬에 적용. 합친 결과를 돌려준다(개수 안내용).
-  function mergeIntoLocal(remote) {
-    if (!remote) return { stamps: 0, favorites: 0, liked: 0 };
-    const before = (stampData.records || []).length;
-
-    // ① 지운 id 합치기 — 먼저 모아야 아래에서 되살아나는 걸 막을 수 있다
-    const deleted = new Set(stampData.deleted || []);
-    ((remote.stamps && remote.stamps.deleted) || []).forEach((id) => deleted.add(id));
-
-    // ② 기록 합치기 — id가 같으면 하나로(더 나중에 손댄 쪽을 남긴다)
-    const byId = new Map();
+  // ── 합치기는 **순수 계산**이다 ────────────────────────────────────────────
+  // 🔴 왜 순수해야 하나(2026-07-31 2차 교차검증): 이걸 Firebase `transaction()` 안에서 쓰는데,
+  //    트랜잭션 콜백은 **여러 번 불릴 수 있고 null로도 불린다.** 안에서 로컬 상태를 건드리면
+  //    그 부작용이 여러 번 적용된다. 그래서 값만 받아 값만 돌려주고, 로컬 반영은 커밋된 뒤에 한다.
+  //    덕분에 **쓰기가 실패하면 로컬도 안 바뀐다** — 화면·저장소가 어긋나던 문제(2차 지적 3)도 같이 풀린다.
+  function marksOf(marks, list) {
+    // 이력이 없던 시절 자료 보완: 목록에 있으면 '켠 것(시각 0)'. 0이라 명시적 변경에는 진다.
+    const out = {};
+    (list || []).forEach((id) => { out[id] = { v: 1, t: 0 }; });
+    Object.keys(marks || {}).forEach((id) => { if (marks[id]) out[id] = marks[id]; });
+    return out;
+  }
+  function mergeMarkMaps(a, b) {
+    const out = {};
+    [a, b].forEach((m) => Object.keys(m).forEach((id) => {
+      const cur = out[id], nw = m[id];
+      if (!cur) { out[id] = nw; return; }
+      const ct = cur.t || 0, nt = nw.t || 0;
+      if (nt > ct) { out[id] = nw; return; }
+      // 🔴 동점이면 **끈 쪽**을 남긴다. 안 그러면 두 기기가 서로 자기 것만 고집해 영영 안 맞는다.
+      if (nt === ct && nw.v === 0) out[id] = nw;
+    }));
+    return out;
+  }
+  function mergePayloads(a, b) {
+    // 🔴 한쪽이 없어도 **그냥 돌려주면 안 된다.** 아래 applyPayload는 이력(marks)만 보고
+    //    집합을 다시 만드는데, 이력이 없던 시절 자료는 marksOf를 거쳐야 살아난다.
+    //    그대로 넘기면 옛 즐겨찾기가 그 순간 사라진다(1차 교차검증에서 겪은 그 버그).
+    a = a || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
+    b = b || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
+    const deleted = new Set([].concat(
+      (a.stamps && a.stamps.deleted) || [], (b.stamps && b.stamps.deleted) || []
+    ));
     // 같은 id끼리는 **내용을 마지막으로 손댄 쪽**이 이긴다.
-    // 🔴 addedAt만 보면 안 된다 — 수정해도 addedAt은 그대로라 두 쪽이 늘 동점이 되고,
-    //    그러면 나중에 처리되는 서버 기록이 무조건 이겨 수정한 메모가 되돌아간다(교차검증).
+    // 🔴 addedAt만 보면 안 된다 — 수정해도 addedAt은 그대로라 늘 동점이 되고, 나중에 처리되는
+    //    쪽이 무조건 이겨 수정한 메모가 되돌아간다(1차 교차검증).
+    // 🔴 시각까지 같으면 **내용 문자열이 큰 쪽**으로 정한다. 크고 작음에 뜻은 없고, 두 기기가
+    //    같은 답에 도달하는 것이 목적이다. 예전엔 '동점이면 로컬'이라 기기마다 답이 달라
+    //    영영 수렴하지 않았다(2차 교차검증).
     const touchedAt = (r) => Math.max(r.editedAt || 0, r.addedAt || 0);
+    const byId = new Map();
     const put = (r) => {
       if (!r || !r.id || deleted.has(r.id)) return;
       const old = byId.get(r.id);
-      if (!old || touchedAt(r) > touchedAt(old)) byId.set(r.id, r);
+      if (!old) { byId.set(r.id, r); return; }
+      const rt = touchedAt(r), ot = touchedAt(old);
+      if (rt > ot) { byId.set(r.id, r); return; }
+      if (rt === ot && JSON.stringify(r) > JSON.stringify(old)) byId.set(r.id, r);
     };
-    (stampData.records || []).forEach(put);
-    ((remote.stamps && remote.stamps.records) || []).forEach(put);
-
-    stampData.records = [...byId.values()];
-    stampData.deleted = [...deleted];
-
-    // ③ 즐겨찾기·좋아요 = **켠/끈 이력을 시각으로 비교**해서 나중 것이 이긴다.
-    //    예전엔 그냥 합집합이라, 한 기기에서 끈 것이 다른 기기에 남아 있으면 되살아났다
-    //    (사용자 지적: "좋아요나 즐겨찾기를 했다가 빼면 없어지지 않는군요?").
-    //    ⚠️ 옛 자료(이력이 없던 시절)와도 섞일 수 있으니, 이력에 없는 id는 켠 것으로 본다.
-    const mergeMarks = (localMarks, localSet, remoteMarks, remoteList) => {
-      // 🔴 **로컬 것부터** 보완해야 한다(2026-07-31 교차검증에서 잡힌 데이터 유실).
-      //    아래 applyMarks가 집합을 비우고 이력만으로 다시 만들기 때문에, 이력에 없는 즐겨찾기는
-      //    그 순간 사라진다. 이 기능이 생기기 전부터 즐겨찾기를 쓰던 사람은 이력이 통째로 없어서
-      //    **첫 불러오기에 즐겨찾기·좋아요를 전부 잃었다**(재현 확인: s1,s2 → 사라짐).
-      //    시각 0으로 넣으므로 다른 기기의 명시적 변경에는 정상적으로 진다.
-      localSet.forEach((id) => { if (!localMarks[id]) localMarks[id] = { v: 1, t: 0 }; });
-      // 이력이 없는 옛 자료는 잃지 않게 '켠 것(시각 0)'으로 본다 — 시각 0이라 무엇에든 진다.
-      (remoteList || []).forEach((id) => { if (!localMarks[id]) localMarks[id] = { v: 1, t: 0 }; });
-      Object.keys(remoteMarks || {}).forEach((id) => {
-        const rm = remoteMarks[id], lm = localMarks[id];
-        if (!rm) return;
-        if (!lm || (rm.t || 0) > (lm.t || 0)) localMarks[id] = rm; // 나중에 바꾼 쪽이 이긴다
-      });
+    ((a.stamps && a.stamps.records) || []).forEach(put);
+    ((b.stamps && b.stamps.records) || []).forEach(put);
+    const favMarksM = mergeMarkMaps(marksOf(a.favMarks, a.favorites), marksOf(b.favMarks, b.favorites));
+    const likedMarksM = mergeMarkMaps(marksOf(a.likedMarks, a.liked), marksOf(b.likedMarks, b.liked));
+    return {
+      stamps: { records: [...byId.values()], deleted: [...deleted] },
+      favMarks: favMarksM,
+      likedMarks: likedMarksM,
+      // 목록도 이력과 같이 채워 둔다 — 이력이 진실이지만, 사람이 서버 값을 열어볼 때 읽기 쉽다.
+      favorites: setsFromMarks(favMarksM),
+      liked: setsFromMarks(likedMarksM),
+      updatedAt: Date.now(),
     };
-    const applyMarks = (marks, set) => {
-      set.clear();
-      Object.keys(marks).forEach((id) => { if (marks[id].v === 1) set.add(id); });
-    };
-    mergeMarks(favMarks, favorites, remote.favMarks, remote.favorites);
-    mergeMarks(likedMarks, likedByMe, remote.likedMarks, remote.liked);
-    applyMarks(favMarks, favorites);
-    applyMarks(likedMarks, likedByMe);
+  }
+  function setsFromMarks(marks) {
+    return Object.keys(marks || {}).filter((id) => marks[id] && marks[id].v === 1);
+  }
+  // 합쳐진 값을 로컬에 반영한다. 🔴 서버 쓰기가 **성공한 뒤에만** 부른다.
+  function applyPayload(p) {
+    if (!p) return;
+    stampData.records = (p.stamps && p.stamps.records) || [];
+    stampData.deleted = (p.stamps && p.stamps.deleted) || [];
+    favMarks = p.favMarks || {};
+    likedMarks = p.likedMarks || {};
+    favorites.clear(); setsFromMarks(favMarks).forEach((id) => favorites.add(id));
+    likedByMe.clear(); setsFromMarks(likedMarks).forEach((id) => likedByMe.add(id));
     try {
       localStorage.setItem(FAV_MARKS_KEY, JSON.stringify(favMarks));
       localStorage.setItem(LIKED_MARKS_KEY, JSON.stringify(likedMarks));
     } catch (e) { /* 무시 */ }
-
-    return {
-      stamps: stampData.records.length - before, // 새로 늘어난 개수
-      total: stampData.records.length,
-      favorites: favorites.size,
-      liked: likedByMe.size,
-    };
+  }
+  function mergeIntoLocal(remote) {
+    if (!remote) return;
+    applyPayload(mergePayloads(syncPayload(), remote));
   }
 
   // 서버에 올리기 — 저장이 연달아 일어나도 한 번만 보내게 묶는다
@@ -4173,20 +4198,23 @@
     // try로 감싼다 — set()은 값이 잘못되면 비동기가 아니라 **그 자리에서** 던진다(위 clean 주석).
     // 여기서 새면 이걸 부른 쪽(저장·기록 흐름)이 통째로 멈춘다. 동기화는 덤이지 본업이 아니다.
     try {
-      const ref = syncRoot.child(code);
-      return ref.once('value').then((snap) => {
-        const remote = snap.val();
-        let changed = false;
-        if (remote) {
-          const before = fingerprint();
-          mergeIntoLocal(remote);
-          changed = fingerprint() !== before;
-        }
-        return ref.set(syncPayload()).then(() => {
-          if (changed) refreshAfterSync(); // 다른 기기 것이 들어왔으면 화면에도 반영
+      // 🔴 `transaction`을 쓴다(2026-07-31 2차 교차검증). 읽고→합치고→쓰기는 그 사이가
+      //    원자적이지 않아서, **두 기기가 같은 옛 상태를 동시에 읽으면** 나중 쓰기가 앞 기기 것을
+      //    지웠다. 트랜잭션은 충돌하면 서버 최신값으로 콜백을 다시 불러 재시도한다.
+      //    ⚠️ 콜백은 여러 번·null로도 불리므로 **부작용이 없어야 한다** → mergePayloads는 순수.
+      const mine = syncPayload();      // 로컬 스냅샷(값)
+      const before = fingerprint();
+      return syncRoot.child(code).transaction((remote) => mergePayloads(mine, remote))
+        .then((res) => {
+          // 🔴 커밋된 뒤에만 로컬에 반영한다 — 쓰기가 실패하면 화면·저장소도 그대로 둬야
+          //    어긋나지 않는다(2차 지적 3).
+          if (res && res.committed && res.snapshot) {
+            applyPayload(res.snapshot.val());
+            if (fingerprint() !== before) refreshAfterSync();
+          }
           return done(true);
-        });
-      }).catch(() => done(false));
+        })
+        .catch(() => done(false));
     } catch (e) {
       return Promise.resolve(done(false));
     }
@@ -4383,12 +4411,15 @@
   // 붙여넣은 글에서 코드만 뽑아낸다. 🔴 문장째 붙여넣는 경우를 반드시 받아야 한다 —
   //    '내게 보내기'가 만드는 문구가 「하딜고고 내 데이터 코드: HG-PAGZZ2」라서,
   //    카톡에서 그 줄을 통째로 복사해 오는 게 오히려 자연스럽다.
+  // 🔴 **조용히 자르지 않는다**(2026-07-31 2차 교차검증). 예전엔 앞 6자만 남겨서,
+  //    `HG-TESTA2X`처럼 한 글자 더 붙은 걸 붙여넣으면 `TESTA2`가 되어 **멀쩡한 코드처럼
+  //    보인 뒤** "저장된 데이터가 없어요"로 나왔다. 잘못 붙여넣은 건 잘못돼 보여야 한다.
+  //    문장 속에서 뽑는 경우는 코드 뒤에 다른 글자가 안 붙어 있을 때만(뒤 (?![A-Z0-9])).
   function extractCode(raw) {
     const up = String(raw || '').toUpperCase();
-    const m = up.match(/HG[-\s]?([A-Z0-9]{6})/); // 문장 속 'HG-XXXXXX'를 먼저 찾는다
+    const m = up.match(/HG[-\s]?([A-Z0-9]{6})(?![A-Z0-9])/);
     if (m) return m[1];
-    const only = up.replace(/[^A-Z0-9]/g, '');   // 없으면 글자·숫자만 남겨 앞 6자
-    return only.slice(0, 6);
+    return up.replace(/[^A-Z0-9]/g, '').slice(0, 20); // 6자가 아니면 normalizeCode가 거른다
   }
   if (syncInput) {
     syncInput.addEventListener('input', () => {
@@ -4402,7 +4433,12 @@
   if (syncLoadBtn) syncLoadBtn.addEventListener('click', () => {
     const code = normalizeCode(syncInput && syncInput.value);
     // 🔴 'HG-'를 언급하지 않는다 — 이제 박스 밖 고정 글자라 사용자는 6자리만 친다(2026-07-31).
-    if (!code) { setSyncMsg('코드 6글자를 모두 입력해 주세요', 'bad'); return; }
+    if (!code) {
+      // 덜 쳤을 때와 잘못 붙여넣었을 때는 할 말이 다르다.
+      const typed = (syncInput && syncInput.value || '').length;
+      setSyncMsg(typed < 6 ? '코드 6글자를 모두 입력해 주세요' : '코드를 다시 확인해 주세요', 'bad');
+      return;
+    }
     // 🔴 자기 코드를 넣어도 **막지 않는다**(2026-07-31 사용자 시나리오로 발견).
     //    폰을 잃어버려 임시폰에서 쓰다가 원래 폰을 되찾은 경우, 원래 폰에서 자기 코드를 넣어보는 게
     //    자연스러운 행동이다. 앱을 열 때 이미 자동으로 맞춰지지만 사용자는 그걸 모르니 눌러본다.
