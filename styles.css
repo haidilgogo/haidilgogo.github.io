@@ -2988,8 +2988,10 @@ img {
 /* 🔴 안내 메시지는 **가운데 정렬**이고 위아래로 넉넉히 띄운다(2026-07-31 사용자 지시).
    바로 아래 '불러오기' 버튼도 가운데 정렬(width 182px + margin auto)이라 축이 맞는다. */
 .sync-msg { margin: 18px 0 0; font-size: 13px; line-height: 1.55; font-weight: 600; text-align: center; }
-/* 복사·보내기 결과는 그 버튼 바로 위(코드 칸 아래)에 뜬다 — 아래 여백은 버튼과의 간격 */
-.sync-msg--code { margin: 0 0 10px; }
+/* 복사·보내기 결과는 그 버튼 **바로 위**에 뜬다(설명 문단과 버튼 사이).
+   🔴 위쪽 여백이 0이라 설명 문단에 딱 붙어 한 문장처럼 보였다 → 위아래를 비슷하게 띄운다
+   (아래 .sync-actions의 margin-top 16px과 맞물려 위 14 / 아래 16). */
+.sync-msg--code { margin: 14px 0 0; }
 .sync-msg--ok { color: #2E7D5B; }
 .sync-msg--bad { color: var(--brand-red); }
 .sync-msg[hidden] { display: none; }
