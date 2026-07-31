@@ -4201,12 +4201,8 @@
   function openSyncSheet() {
     if (!syncOverlay) return;
     const code = getSyncCode();
-    // 🔴 `HG-`는 옅게, 실제 6자리는 진하게(2026-07-31 사용자 제안). 아래 입력칸도 같은 문법이라
-    //    위아래가 한 짝으로 읽히고, 사용자가 옮겨 적어야 할 부분이 먼저 눈에 든다.
-    //    code는 우리가 만든 값이라 형식이 보장된다(HG- + [A-Z2-9] 6자).
-    syncCodeText.innerHTML = code
-      ? '<span class="sync-code-pre">HG-</span>' + code.replace(/^HG-/, '')
-      : '';
+    // 🔴 박스 안에는 **6자리만** 넣는다 — `HG-`는 박스 밖에 따로 있다(index.html .sync-code-row).
+    syncCodeText.textContent = code ? code.replace(/^HG-/, '') : '';
     // 🔴 코드가 없으면 '내 코드' 덩어리를 통째로 숨긴다(2026-07-31 사용자 확정).
     //    예전엔 '아직 없어요'와 함께 복사·보내기 버튼이 남아 있었는데, 눌러도 아무 일이
     //    안 일어나 고장난 것처럼 보였다. 할 일이 '불러오기' 하나뿐인 사람에겐 그것만 보이면 된다.
