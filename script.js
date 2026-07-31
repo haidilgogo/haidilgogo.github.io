@@ -4071,8 +4071,11 @@
       favorites: [...favorites],
       liked: [...likedByMe],
       // 켠/끈 이력도 함께 보낸다 — 이게 있어야 "끈 것"이 다른 기기에서 안 되살아난다.
-      favMarks: favMarks,
-      likedMarks: likedMarks,
+      // 🔴 **사본**이어야 한다. 이 값은 트랜잭션이 도는 동안 스냅샷으로 붙들려 있는데,
+      //    원본을 그대로 넘기면 그 사이 사용자가 즐겨찾기를 눌러 원본이 바뀔 때 스냅샷도 같이
+      //    흔들린다(3차 교차검증 R1). 항목 자체는 통째로 교체되므로 얕은 사본이면 충분하다.
+      favMarks: Object.assign({}, favMarks),
+      likedMarks: Object.assign({}, likedMarks),
       updatedAt: Date.now(),
     };
   }
@@ -4149,6 +4152,9 @@
     if (!p) return;
     stampData.records = (p.stamps && p.stamps.records) || [];
     stampData.deleted = (p.stamps && p.stamps.deleted) || [];
+    // 🔴 카드 캐시를 비운다(3차 교차검증 3번). 목록 카드는 id로 재사용하는데, 다른 기기에서
+    //    수정된 내용이 들어와도 캐시가 옛 카드를 그대로 내놓아 **목록과 상세가 다르게** 보였다.
+    stampCardCache.clear();
     favMarks = p.favMarks || {};
     likedMarks = p.likedMarks || {};
     favorites.clear(); setsFromMarks(favMarks).forEach((id) => favorites.add(id));
@@ -4208,8 +4214,15 @@
         .then((res) => {
           // 🔴 커밋된 뒤에만 로컬에 반영한다 — 쓰기가 실패하면 화면·저장소도 그대로 둬야
           //    어긋나지 않는다(2차 지적 3).
-          if (res && res.committed && res.snapshot) {
-            applyPayload(res.snapshot.val());
+          // 🔴 커밋 결과를 **그대로 덮어쓰면 안 된다**(3차 교차검증). 이 결과는 트랜잭션을
+          //    시작할 때 찍은 옛 스냅샷(mine) 기준이라, **전송하는 동안 사용자가 새로 저장한 것**이
+          //    빠져 있다. 그대로 적용하면 방금 남긴 스티커나 방금 끈 즐겨찾기가 사라진다.
+          //    → 지금 로컬 상태와 **한 번 더 합쳐서** 넣는다. 그 사이 변경은 pendingPush가
+          //      다음 전송으로 서버에 올린다.
+          // 🔴 코드가 바뀌었으면 적용하지 않는다 — 코드 A 전송 중 코드 B를 불러왔는데 A의 늦은
+          //    결과가 B 상태를 덮는 경로가 있었다(3차 교차검증 2번).
+          if (res && res.committed && res.snapshot && getSyncCode() === code) {
+            applyPayload(mergePayloads(syncPayload(), res.snapshot.val()));
             if (fingerprint() !== before) refreshAfterSync();
           }
           return done(true);
