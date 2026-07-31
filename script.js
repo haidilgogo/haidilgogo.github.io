@@ -340,6 +340,7 @@
     } catch (err) {
       // 저장 공간이 없거나 접근이 막힌 경우는 무시
     }
+    schedulePush(); // 서버 사본 갱신(맨 아래 「내 데이터 코드」 절)
   }
 
   // 좋아요: "내가 누른 것"(likedByMe)은 이 기기(localStorage)에만, "집계"(likeCounts)는
@@ -377,6 +378,7 @@
       // 무시
     }
     saveLikeCounts();
+    schedulePush(); // 서버 사본 갱신(맨 아래 「내 데이터 코드」 절)
   }
   // 🔴 기본 좋아요(2026-07-30 사용자 확정) — 화면 숫자 = BASE_LIKES + 실제 방문자 좋아요.
   //    소스 20개 중 좋아요가 있는 건 4개뿐이고 16개가 0이라 "사람 없는 커뮤니티"처럼 보였다.
@@ -540,6 +542,7 @@
 
   // --- Firebase 실시간 DB 연결 ---
   let likesRef = null;
+  let syncRoot = null; // 내 데이터 코드용. 연결 실패해도 앱은 로컬만으로 그대로 동작한다.
   try {
     if (window.firebase && firebase.initializeApp) {
       const firebaseConfig = {
@@ -553,6 +556,7 @@
       };
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       likesRef = firebase.database().ref('likes');
+      syncRoot = firebase.database().ref('sync'); // 내 데이터 코드(맨 아래 절 참고)
       // 집계가 바뀔 때마다(내가/남이 눌렀든) 실시간으로 화면 숫자 갱신.
       // 🐛 첫 로드 땐 좋아요가 아직 도착 전이라 인기순이 전부 0으로 정렬돼 어긋남(사실상 가나다순).
       //    Firebase에서 좋아요가 처음 오면, 인기순일 때 딱 한 번 재정렬해 바로잡는다.
@@ -3168,6 +3172,8 @@
   let stampData = { version: 2, records: [] };
   function saveStamps() {
     try { localStorage.setItem(STAMPS_KEY, JSON.stringify(stampData)); } catch (e) { /* 시크릿 모드 등 저장 실패 무시 */ }
+    schedulePush(); // 서버 사본 갱신(맨 아래 「내 데이터 코드」 절)
+    maybeIntroCode(); // 첫 기록이면 코드를 만들어 한 번 알려준다
   }
   function newStampId() {
     return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -3682,6 +3688,10 @@
       return;
     }
     stampData.records = stampData.records.filter((r) => r.id !== stampViewId);
+    // 🔴 지운 id를 남긴다 — 안 남기면 다른 기기와 합칠 때 지운 기록이 되살아난다.
+    //    (맨 아래 「내 데이터 코드」 절의 합치기 규칙 참고)
+    if (!Array.isArray(stampData.deleted)) stampData.deleted = [];
+    if (stampData.deleted.indexOf(stampViewId) === -1) stampData.deleted.push(stampViewId);
     saveStamps();
     closeStampView();
     renderStamps();
@@ -3937,4 +3947,291 @@
   if (storeShareBtn) storeShareBtn.addEventListener('click', shareSite);
   const stampShareBtn = document.getElementById('stampShareBtn'); // 발도장 섹션(모바일) 공유 버튼
   if (stampShareBtn) stampShareBtn.addEventListener('click', shareSite);
+
+  // ════════════════════════════════════════════════════════════════════════
+  // 내 데이터 코드 — 기기 간 복구 (2026-07-31)
+  // ════════════════════════════════════════════════════════════════════════
+  // 🔴 왜 만들었나: localStorage만으로는 이 사이트 데이터를 못 지킨다.
+  //   ① **iOS 홈 화면 웹앱은 사파리와 저장소가 분리된다**(2026-07-31 실기기 확인). 사파리에서
+  //      남긴 스티커 기록이 홈 화면 앱에선 하나도 안 보였다. 홈 화면 추가는 사이트가 마음에 든
+  //      사람이 하는 행동이라, **기록을 제일 많이 쌓은 사람이 제일 크게 잃는다.**
+  //   ② 사파리는 7일간 그 사이트 방문이 없으면 저장소를 비울 수 있다(애플 ITP).
+  //   ③ 폰을 바꾸면 끝난다.
+  //   스티커 방문 일기는 사용자가 직접 쓴 것이라 **다시 만들 수 없다** → 서버에 사본을 둔다.
+  //   (즐겨찾기·좋아요는 다시 누르면 그만이지만, 구조가 같아 같이 태운다.)
+  //
+  // 방식 = **코드 하나**. 로그인·이메일·개인정보 없음. 이미 쓰는 Firebase에 얹는다.
+  //   첫 스티커 기록 때 코드가 생기고 그 뒤로는 같은 코드에 계속 쌓인다(매번 안 보여준다).
+  //
+  // 🔴 합치기 규칙 (2026-07-31 사용자 확정: "덮어쓰기 말고 합치기"):
+  //   - **스티커** = id로 합치고, 지운 id는 `deleted`에 남겨 되살아나지 않게 한다.
+  //     이 tombstone이 없으면 A기기에서 지운 기록이 B기기 동기화 때 되살아난다.
+  //   - **즐겨찾기·좋아요** = 합집합만. 해제한 게 다른 기기에서 되살아날 수 있지만 다시 누르면
+  //     그만이라 감수한다(스티커와 달리 복구 불가한 데이터가 아니다).
+  // 🔴 좋아요 **숫자**는 여기서 절대 안 건드린다. 숫자는 `likes/`에 있고 여기 있는 건 "내가
+  //   눌렀다"는 표시뿐이다. 이게 따라다니면 기기를 옮겨도 같은 레시피를 두 번 세는 일이 준다.
+  // 🔴 서버가 없거나 막혀도 앱은 **지금과 똑같이 로컬만으로 동작한다.** 동기화는 전부 덤이다.
+
+  const SYNC_CODE_KEY = 'haidilao_sync_code';
+  // 헷갈리는 글자(I·O·0·1) 제외 — 사용자가 눈으로 읽고 손으로 입력하는 코드다.
+  const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+  function getSyncCode() {
+    try { return localStorage.getItem(SYNC_CODE_KEY) || ''; } catch (e) { return ''; }
+  }
+  function setSyncCode(code) {
+    try { localStorage.setItem(SYNC_CODE_KEY, code); } catch (e) { /* 무시 */ }
+  }
+  function makeSyncCode() {
+    let s = '';
+    const buf = new Uint32Array(6);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
+    for (let i = 0; i < 6; i++) {
+      const n = buf[i] || Math.floor(Math.random() * 0xffffffff);
+      s += CODE_ALPHABET[n % CODE_ALPHABET.length];
+    }
+    return 'HG-' + s;
+  }
+  function normalizeCode(raw) {
+    const body = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^HG/, '');
+    return body.length === 6 ? 'HG-' + body : '';
+  }
+
+  // 이 기기의 현재 상태를 서버에 보낼 모양으로.
+  // 🔴 `undefined`인 값이 하나라도 섞이면 Firebase의 set()이 **그 자리에서 예외를 던진다**(비동기 아님).
+  //    실제로 겪었다 — 동행을 안 적은 기록의 `with`가 undefined라, 코드를 만든 직후 여기서 멈춰
+  //    뒤따르는 코드(안내 띠 표시 등)가 통째로 안 돌았고 화면상 아무 일도 안 일어난 것처럼 보였다.
+  //    그래서 보내기 전에 undefined를 **반드시** 털어낸다. 새 필드를 추가할 때도 이 함수를 거칠 것.
+  function clean(obj) {
+    const out = {};
+    Object.keys(obj).forEach((k) => { if (obj[k] !== undefined) out[k] = obj[k]; });
+    return out;
+  }
+  function syncPayload() {
+    return {
+      stamps: {
+        records: (stampData.records || []).map(clean),
+        deleted: (stampData.deleted || []).slice(),
+      },
+      favorites: [...favorites],
+      liked: [...likedByMe],
+      updatedAt: Date.now(),
+    };
+  }
+
+  // 서버 것 + 이 기기 것을 합쳐서 로컬에 적용. 합친 결과를 돌려준다(개수 안내용).
+  function mergeIntoLocal(remote) {
+    if (!remote) return { stamps: 0, favorites: 0, liked: 0 };
+    const before = (stampData.records || []).length;
+
+    // ① 지운 id 합치기 — 먼저 모아야 아래에서 되살아나는 걸 막을 수 있다
+    const deleted = new Set(stampData.deleted || []);
+    ((remote.stamps && remote.stamps.deleted) || []).forEach((id) => deleted.add(id));
+
+    // ② 기록 합치기 — id가 같으면 하나로(더 나중에 손댄 쪽을 남긴다)
+    const byId = new Map();
+    const put = (r) => {
+      if (!r || !r.id || deleted.has(r.id)) return;
+      const old = byId.get(r.id);
+      if (!old || (r.addedAt || 0) >= (old.addedAt || 0)) byId.set(r.id, r);
+    };
+    (stampData.records || []).forEach(put);
+    ((remote.stamps && remote.stamps.records) || []).forEach(put);
+
+    stampData.records = [...byId.values()];
+    stampData.deleted = [...deleted];
+
+    // ③ 즐겨찾기·좋아요 = 합집합
+    (remote.favorites || []).forEach((id) => favorites.add(id));
+    (remote.liked || []).forEach((id) => likedByMe.add(id));
+
+    return {
+      stamps: stampData.records.length - before, // 새로 늘어난 개수
+      total: stampData.records.length,
+      favorites: favorites.size,
+      liked: likedByMe.size,
+    };
+  }
+
+  // 서버에 올리기 — 저장이 연달아 일어나도 한 번만 보내게 묶는다
+  let pushTimer = null;
+  function schedulePush() {
+    if (!syncRoot || !getSyncCode()) return; // 코드가 없으면 아직 아무것도 안 올린다
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushSync, 800);
+  }
+  function pushSync() {
+    const code = getSyncCode();
+    if (!syncRoot || !code) return Promise.resolve(false);
+    // 🔴 try로 감싼다 — set()은 값이 잘못되면 비동기가 아니라 **그 자리에서** 던진다(위 clean 주석).
+    //    여기서 새면 이걸 부른 쪽(저장·기록 흐름)이 통째로 멈춘다. 동기화는 덤이지 본업이 아니다.
+    try {
+      return syncRoot.child(code).set(syncPayload()).then(() => true).catch(() => false);
+    } catch (e) {
+      return Promise.resolve(false);
+    }
+  }
+
+  // 코드로 서버에서 받아오기. merge=true면 이 기기 것과 합쳐 저장까지 한다.
+  function pullSync(code) {
+    if (!syncRoot || !code) return Promise.resolve(null);
+    return syncRoot.child(code).once('value').then((snap) => snap.val()).catch(() => null);
+  }
+
+  // 합친 뒤 화면을 다시 그린다 — 세 데이터가 걸린 화면이 여러 곳이라 한꺼번에
+  function refreshAfterSync() {
+    saveStamps();
+    saveFavorites();
+    saveLikes();
+    try {
+      if (typeof renderStamps === 'function') renderStamps();
+      if (typeof renderGrid === 'function') renderGrid();
+      if (typeof renderHomePopular === 'function') renderHomePopular();
+      if (typeof syncHome === 'function') syncHome();
+    } catch (e) { /* 그리기 실패해도 데이터는 이미 저장됐다 */ }
+  }
+
+  // 첫 스티커 기록 때 코드를 만든다. 이미 있으면 그대로 쓴다.
+  function ensureSyncCode() {
+    let code = getSyncCode();
+    if (code) return code;
+    code = makeSyncCode();
+    setSyncCode(code);
+    pushSync(); // 만들자마자 지금 있는 기록을 통째로 올린다(기존 사용자 이전 포함)
+    return code;
+  }
+
+  // 앱을 열 때: 코드가 있으면 서버 것과 한 번 맞춰본다.
+  // 🔴 이때도 '합치기'다 — 다른 기기에서 추가된 게 있으면 따라오고, 지운 건 되살아나지 않는다.
+  function syncOnStart() {
+    const code = getSyncCode();
+    if (!syncRoot || !code) return;
+    pullSync(code).then((remote) => {
+      if (!remote) return;
+      const before = JSON.stringify(syncPayload());
+      mergeIntoLocal(remote);
+      if (JSON.stringify(syncPayload()) !== before) refreshAfterSync(); // 바뀐 게 있을 때만
+      pushSync();
+    });
+  }
+
+  // ── 화면 ──────────────────────────────────────────────────────────────
+  const syncOverlay = document.getElementById('syncSheetOverlay');
+  const syncCodeText = document.getElementById('syncCodeText');
+  const syncInput = document.getElementById('syncInput');
+  const syncMsg = document.getElementById('syncMsg');
+  const syncIntro = document.getElementById('syncIntro');
+
+  function setSyncMsg(text, kind) {
+    if (!syncMsg) return;
+    syncMsg.textContent = text || '';
+    syncMsg.className = 'sync-msg' + (kind ? ' sync-msg--' + kind : '');
+    syncMsg.hidden = !text;
+  }
+  function openSyncSheet(isIntro) {
+    if (!syncOverlay) return;
+    syncCodeText.textContent = getSyncCode() || '아직 없어요';
+    if (syncIntro) syncIntro.hidden = !isIntro;
+    setSyncMsg('');
+    if (syncInput) syncInput.value = '';
+    syncOverlay.classList.add('open');
+    syncOverlay.setAttribute('aria-hidden', 'false');
+  }
+  function closeSyncSheet() {
+    if (!syncOverlay) return;
+    syncOverlay.classList.remove('open');
+    syncOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  // 첫 기록을 남기면 코드를 만들고, 스티커 탭에 **띠 안내**를 띄운다.
+  // 🔴 팝업으로 한 번 띄우는 방식은 버렸다(2026-07-31) — 스티커 붙는 연출 뒤에 겹쳐 뜨는 데다
+  //    한 번 지나가면 다시 못 보고, "코드를 저장해두라"는 말은 놓치면 의미가 없다.
+  //    띠는 사용자가 **직접 닫을 때까지 남는다**. 타이밍에 기대지 않아 훨씬 튼튼하다.
+  const CODE_NOTICE_KEY = 'haidilao_code_notice_done';
+  function maybeIntroCode() {
+    if (!(stampData.records || []).length) return;
+    ensureSyncCode();   // 이미 있으면 그대로 둔다
+    renderCodeNotice();
+  }
+  function renderCodeNotice() {
+    const el = document.getElementById('codeNotice');
+    if (!el) return;
+    let done = '';
+    try { done = localStorage.getItem(CODE_NOTICE_KEY) || ''; } catch (e) { /* 무시 */ }
+    el.hidden = !!done || !getSyncCode() || !(stampData.records || []).length;
+  }
+  function dismissCodeNotice() {
+    try { localStorage.setItem(CODE_NOTICE_KEY, '1'); } catch (e) { /* 무시 */ }
+    renderCodeNotice();
+  }
+
+  const syncOpenBtn = document.getElementById('syncOpenBtn');
+  if (syncOpenBtn) syncOpenBtn.addEventListener('click', () => openSyncSheet(false));
+  const codeNoticeBtn = document.getElementById('codeNoticeBtn');
+  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet(true));
+  const codeNoticeClose = document.getElementById('codeNoticeClose');
+  if (codeNoticeClose) codeNoticeClose.addEventListener('click', dismissCodeNotice);
+  renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
+  const syncCloseBtn = document.getElementById('syncSheetClose');
+  if (syncCloseBtn) syncCloseBtn.addEventListener('click', closeSyncSheet);
+  if (syncOverlay) {
+    syncOverlay.addEventListener('click', (e) => { if (e.target === syncOverlay) closeSyncSheet(); });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && syncOverlay && syncOverlay.classList.contains('open')) closeSyncSheet();
+  });
+
+  const syncCopyBtn = document.getElementById('syncCopyBtn');
+  if (syncCopyBtn) syncCopyBtn.addEventListener('click', async () => {
+    const code = getSyncCode();
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setSyncMsg('코드를 복사했어요', 'ok');
+    } catch (e) {
+      setSyncMsg('복사가 안 됐어요. 코드를 직접 적어두세요', 'bad');
+    }
+  });
+
+  const syncShareBtn = document.getElementById('syncShareBtn');
+  if (syncShareBtn) syncShareBtn.addEventListener('click', async () => {
+    const code = getSyncCode();
+    if (!code) return;
+    const text = '하딜고고 내 데이터 코드: ' + code;
+    if (navigator.share) {
+      try { await navigator.share({ title: '하딜고고 내 데이터 코드', text: text }); return; } catch (e) { return; }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setSyncMsg('코드를 복사했어요. 메모나 카톡에 붙여넣어 두세요', 'ok');
+    } catch (e) {
+      setSyncMsg('코드를 직접 적어두세요', 'bad');
+    }
+  });
+
+  const syncLoadBtn = document.getElementById('syncLoadBtn');
+  if (syncLoadBtn) syncLoadBtn.addEventListener('click', () => {
+    const code = normalizeCode(syncInput && syncInput.value);
+    if (!code) { setSyncMsg('코드는 HG- 뒤에 6글자예요. 다시 확인해 주세요', 'bad'); return; }
+    if (code === getSyncCode()) { setSyncMsg('지금 쓰고 있는 코드예요', 'bad'); return; }
+    if (!syncRoot) { setSyncMsg('연결이 안 돼요. 잠시 뒤 다시 해주세요', 'bad'); return; }
+    setSyncMsg('불러오는 중…');
+    syncLoadBtn.disabled = true;
+    pullSync(code).then((remote) => {
+      syncLoadBtn.disabled = false;
+      if (!remote) { setSyncMsg('그 코드로 저장된 기록을 못 찾았어요', 'bad'); return; }
+      const before = (stampData.records || []).length;
+      mergeIntoLocal(remote);
+      // 🔴 불러온 코드를 이 기기의 코드로 삼는다 — 그래야 이후 저장이 같은 곳에 쌓인다.
+      setSyncCode(code);
+      refreshAfterSync();
+      pushSync(); // 합친 결과를 서버에도 올려 양쪽을 같게 만든다
+      const added = (stampData.records || []).length - before;
+      syncCodeText.textContent = code;
+      setSyncMsg(added > 0 ? ('기록 ' + added + '개를 가져왔어요 (합계 ' + stampData.records.length + '곳)')
+                           : '이미 다 있는 기록이에요', 'ok');
+    });
+  });
+
+  syncOnStart();
 })();

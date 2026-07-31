@@ -2865,6 +2865,106 @@ img {
   padding: 0 10px;
   text-align: center;
 }
+/* 첫 기록 뒤 뜨는 안내 띠 — 사용자가 '나중에'를 누를 때까지 남는다. 로즈 톤(팁 박스와 같은 문법) */
+.code-notice {
+  margin: 0 0 16px;
+  padding: 14px 15px 12px;
+  border: 1px solid #F1D5CD;
+  border-radius: 14px;
+  background: #FDF1EE;
+}
+.code-notice[hidden] { display: none; }
+.code-notice-text { margin: 0; font-size: 13px; line-height: 1.65; color: #4D4139; }
+.code-notice-text b { font-weight: 700; }
+.code-notice-actions { display: flex; align-items: center; gap: 8px; margin-top: 11px; }
+.code-notice-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #F6E4DE;         /* 가챠 '레시피 보기'와 같은 로즈 소프트필 */
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #C0392B;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, background .15s;
+}
+.code-notice-btn:active { transform: scale(.97); background: #EAC7BD; }
+.code-notice-close {
+  padding: 8px 6px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── 내 데이터 코드 시트 (2026-07-31) — 기기 간 복구. 입력 시트 문법을 그대로 쓴다 ── */
+.sync-open-btn {   /* 스티커 목록 아래 담백한 밑줄 링크 — 제보 링크와 같은 문법(알약 금지) */
+  display: block;
+  margin: 26px auto 8px;
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) { .sync-open-btn:hover { color: var(--brand-red); } }
+.sync-open-btn:active { color: var(--brand-red); }
+
+.sync-intro {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #4D4139;
+}
+.sync-intro b { font-weight: 700; }
+.sync-code {   /* 코드는 읽고 옮겨 적는 것 — 자간 넓게, 숫자·영문이 헷갈리지 않게 */
+  margin: 2px 0 12px;
+  padding: 14px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-align: center;
+  color: #3D2B23;
+  user-select: all;   /* 한 번 탭하면 통째로 선택되게 */
+}
+.sync-actions { display: flex; gap: 8px; }
+.sync-btn {
+  flex: 1;
+  padding: 11px 0;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4D4139;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, background .15s;
+}
+.sync-btn:active { transform: scale(.98); background: var(--bg-cream); }
+.sync-note { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+.sync-note b { font-weight: 700; color: #4D4139; }
+.sync-divider { height: 1px; background: #E6DCD5; margin: 22px 0 18px; }
+.sync-msg { margin: 12px 0 0; font-size: 13px; line-height: 1.55; font-weight: 600; }
+.sync-msg--ok { color: #2E7D5B; }
+.sync-msg--bad { color: var(--brand-red); }
+.sync-msg[hidden] { display: none; }
+#syncInput { text-transform: uppercase; }
+
 /* 자리표시 아이콘 — 옛 발바닥 🐾(34px 텍스트 이모지) 자리. 색은 아래 힌트 글씨와 같은 톤이라
    아이콘·글씨가 한 덩어리로 읽힌다. 크기를 바꾸면 index.html의 stroke-width도 같이 볼 것
    (42px에 1.25 = 화면 획 약 2.2px). */

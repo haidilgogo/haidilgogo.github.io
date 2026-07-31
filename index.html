@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=607">
+<link rel="stylesheet" href="styles.css?v=609">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -411,7 +411,17 @@
         <p class="count-line stamps-count">다녀온 하이디라오 매장 <span class="count-num" id="stampCountNum">0</span>곳</p>
         <button class="gacha-btn stamp-write-btn" id="stampWriteBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기</button>
       </div>
+      <!-- 첫 기록 뒤 뜨는 띠. 닫을 때까지 남는다(팝업은 놓치기 쉬워서 버렸다 — script.js 참고) -->
+      <div class="code-notice" id="codeNotice" hidden>
+        <p class="code-notice-text">기록은 <b>이 기기에만</b> 저장돼요. 내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 그대로 불러올 수 있어요.</p>
+        <div class="code-notice-actions">
+          <button class="code-notice-btn" id="codeNoticeBtn" type="button">내 코드 보기</button>
+          <button class="code-notice-close" id="codeNoticeClose" type="button">나중에</button>
+        </div>
+      </div>
       <div class="stamps" id="stampGrid"></div>
+      <!-- 기록은 이 기기에만 남는다 → 코드로 다른 기기에서 불러올 수 있게. script.js 「내 데이터 코드」 절 -->
+      <button class="sync-open-btn" id="syncOpenBtn" type="button">다른 기기에서 내 기록 보기</button>
     </div>
 
   </main>
@@ -534,6 +544,36 @@
       </div>
     </div>
     <button class="stamp-submit" id="stampSubmit" type="button" disabled>스티커 붙이기</button>
+  </div>
+</div>
+
+<!-- 내 데이터 코드 시트 — 기기 간 복구(2026-07-31). 입력 시트와 같은 오버레이 문법 -->
+<div class="stamp-sheet-overlay sync-sheet-overlay" id="syncSheetOverlay" aria-hidden="true">
+  <div class="stamp-sheet sync-sheet" role="dialog" aria-modal="true" aria-label="내 데이터 코드">
+    <button class="stamp-sheet-close focus-silent" id="syncSheetClose" type="button" aria-label="닫기">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+
+    <!-- 첫 기록 때만 뜨는 안내. 그 뒤 '다른 기기에서 내 기록 보기'로 열면 이 문단은 숨는다 -->
+    <p class="sync-intro" id="syncIntro" hidden>기록이 저장됐어요. 아래 코드를 적어두면 <b>폰을 바꾸거나 홈 화면에 추가해도</b> 그대로 불러올 수 있어요.</p>
+
+    <p class="stamp-q">내 코드</p>
+    <div class="sync-code" id="syncCodeText">HG-000000</div>
+    <div class="sync-actions">
+      <button class="sync-btn" id="syncCopyBtn" type="button">복사</button>
+      <button class="sync-btn" id="syncShareBtn" type="button">보내두기</button>
+    </div>
+    <p class="sync-note">이 코드가 있으면 어디서든 기록을 불러올 수 있어요. 아는 사람은 내 기록을 볼 수 있으니 남에게 알려주지 마세요.</p>
+
+    <div class="sync-divider"></div>
+
+    <p class="stamp-q">다른 기기 코드 불러오기</p>
+    <div class="stamp-fields">
+      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">코드</span><input type="text" id="syncInput" maxlength="12" placeholder="HG-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+    </div>
+    <p class="sync-note">지금 이 기기의 기록은 <b>지워지지 않고 합쳐집니다.</b></p>
+    <p class="sync-msg" id="syncMsg" hidden></p>
+    <button class="stamp-submit" id="syncLoadBtn" type="button">불러오기</button>
   </div>
 </div>
 
@@ -819,7 +859,7 @@
   </div>
 </div>
 
-<script src="script.js?v=504"></script>
+<script src="script.js?v=509"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
