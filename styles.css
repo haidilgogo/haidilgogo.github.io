@@ -2915,22 +2915,7 @@ img {
 /* (여기 있던 `.code-notice-close`('나중에' 버튼)는 지웠다 — 띠가 닫기에서 접기로 바뀌었다) */
 
 /* ── 내 데이터 코드 시트 (2026-07-31) — 기기 간 복구. 입력 시트 문법을 그대로 쓴다 ── */
-.sync-open-btn {   /* 스티커 목록 아래 담백한 밑줄 링크 — 제보 링크와 같은 문법(알약 금지) */
-  display: block;
-  margin: 26px auto 8px;
-  padding: 6px 4px;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: 12.5px;
-  color: var(--text-muted);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-@media (hover: hover) { .sync-open-btn:hover { color: var(--brand-red); } }
-.sync-open-btn:active { color: var(--brand-red); }
+/* (여기 있던 `.sync-open-btn`(목록 아래 밑줄 링크)은 지웠다 — 입구를 띠의 버튼 하나로 합쳤다) */
 
 .sync-intro {
   margin: 0 0 18px;

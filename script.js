@@ -4159,13 +4159,24 @@
   function renderCodeNotice() {
     const el = document.getElementById('codeNotice');
     if (!el) return;
-    // 기록이 있으면 항상 보인다. 코드는 첫 기록 때 생기므로 사실상 같은 조건이다.
-    el.hidden = !(stampData.records || []).length;
+    // 🔴 기록이 없어도 **항상** 보인다(2026-07-31 사용자 확정: "기록이 없을 때도 띄우자").
+    //    기록이 없을 때가 오히려 중요하다 — 새 기기·홈 화면에서 처음 열었을 때가 그 상태이고,
+    //    그 사람에게 필요한 건 '내 코드'가 아니라 **불러오기**다. 그래서 문구·버튼이 상황에 따라 바뀐다.
+    el.hidden = false;
+    const hasCode = !!getSyncCode();
+    const text = document.getElementById('codeNoticeText');
+    const btn = document.getElementById('codeNoticeBtn');
+    if (text) {
+      text.innerHTML = hasCode
+        ? '내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 그대로 불러올 수 있어요. 즐겨찾기와 좋아요도 함께 따라옵니다.'
+        : '다른 기기에서 남긴 기록이 있다면 코드로 불러올 수 있어요. 즐겨찾기와 좋아요도 함께 따라옵니다.';
+    }
+    if (btn) btn.textContent = hasCode ? '내 코드 보기 · 불러오기' : '코드로 불러오기';
     let folded = '';
     try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
     el.classList.toggle('is-folded', !!folded);
-    const btn = document.getElementById('codeNoticeToggle');
-    if (btn) btn.setAttribute('aria-expanded', folded ? 'false' : 'true');
+    const toggle = document.getElementById('codeNoticeToggle');
+    if (toggle) toggle.setAttribute('aria-expanded', folded ? 'false' : 'true');
   }
   function toggleCodeNotice() {
     let folded = '';
@@ -4177,10 +4188,11 @@
     renderCodeNotice();
   }
 
-  const syncOpenBtn = document.getElementById('syncOpenBtn');
-  if (syncOpenBtn) syncOpenBtn.addEventListener('click', () => openSyncSheet(false));
+  // 🔴 입구는 띠의 버튼 **하나뿐**이다(2026-07-31). 목록 아래 있던 별도 링크는 지웠다 —
+  //    시트 안에 '내 코드'와 '불러오기'가 둘 다 있어서 입구가 둘일 이유가 없었다.
+  //    안내 문단은 **코드가 있을 때만** 띄운다("기록이 저장됐어요"가 빈 기기에선 거짓말이 된다).
   const codeNoticeBtn = document.getElementById('codeNoticeBtn');
-  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet(true));
+  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet(!!getSyncCode()));
   const codeNoticeToggle = document.getElementById('codeNoticeToggle');
   if (codeNoticeToggle) codeNoticeToggle.addEventListener('click', toggleCodeNotice);
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게

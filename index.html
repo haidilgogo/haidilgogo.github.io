@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=612">
+<link rel="stylesheet" href="styles.css?v=613">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -419,13 +419,16 @@
           <svg class="code-notice-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="code-notice-body" id="codeNoticeBody">
-          <p class="code-notice-text">내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 그대로 불러올 수 있어요. 즐겨찾기와 좋아요도 함께 따라옵니다.</p>
-          <button class="code-notice-btn" id="codeNoticeBtn" type="button">내 코드 보기</button>
+          <!-- 문구·버튼 라벨은 상황에 따라 바뀐다(script.js renderCodeNotice) —
+               코드가 있으면 '보관', 없으면 '불러오기'가 할 일이라서. -->
+          <p class="code-notice-text" id="codeNoticeText"></p>
+          <button class="code-notice-btn" id="codeNoticeBtn" type="button"></button>
         </div>
       </div>
       <div class="stamps" id="stampGrid"></div>
-      <!-- 기록은 이 기기에만 남는다 → 코드로 다른 기기에서 불러올 수 있게. script.js 「내 데이터 코드」 절 -->
-      <button class="sync-open-btn" id="syncOpenBtn" type="button">다른 기기에서 내 기록 보기</button>
+      <!-- ⚠️ 여기 있던 '다른 기기에서 내 기록 보기' 링크는 지웠다(2026-07-31 사용자 요청) —
+           위 띠의 버튼 하나로 합쳤다. 시트 안에 '내 코드'와 '불러오기'가 둘 다 있어서
+           입구가 둘일 이유가 없었다. -->
     </div>
 
   </main>
@@ -863,7 +866,7 @@
   </div>
 </div>
 
-<script src="script.js?v=510"></script>
+<script src="script.js?v=511"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
