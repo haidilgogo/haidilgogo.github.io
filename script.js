@@ -4341,7 +4341,8 @@
   const syncLoadBtn = document.getElementById('syncLoadBtn');
   if (syncLoadBtn) syncLoadBtn.addEventListener('click', () => {
     const code = normalizeCode(syncInput && syncInput.value);
-    if (!code) { setSyncMsg('코드는 HG- 뒤에 6글자예요. 다시 확인해 주세요', 'bad'); return; }
+    // 🔴 'HG-'를 언급하지 않는다 — 이제 박스 밖 고정 글자라 사용자는 6자리만 친다(2026-07-31).
+    if (!code) { setSyncMsg('코드 6글자를 모두 입력해 주세요', 'bad'); return; }
     // 🔴 자기 코드를 넣어도 **막지 않는다**(2026-07-31 사용자 시나리오로 발견).
     //    폰을 잃어버려 임시폰에서 쓰다가 원래 폰을 되찾은 경우, 원래 폰에서 자기 코드를 넣어보는 게
     //    자연스러운 행동이다. 앱을 열 때 이미 자동으로 맞춰지지만 사용자는 그걸 모르니 눌러본다.
