@@ -4147,14 +4147,27 @@
   function setsFromMarks(marks) {
     return Object.keys(marks || {}).filter((id) => marks[id] && marks[id].v === 1);
   }
+  // 기록 한 건의 지문. 🔴 키 순서에 흔들리면 안 된다 — 로컬 객체와 서버에서 온 객체는
+  //   같은 내용이라도 키 순서가 다를 수 있어, 그냥 stringify하면 안 바뀐 것도 바뀐 것이 된다.
+  function recFingerprint(r) {
+    return JSON.stringify(r, Object.keys(r).sort());
+  }
   // 합쳐진 값을 로컬에 반영한다. 🔴 서버 쓰기가 **성공한 뒤에만** 부른다.
   function applyPayload(p) {
     if (!p) return;
+    const prevRecs = stampData.records || [];
     stampData.records = (p.stamps && p.stamps.records) || [];
     stampData.deleted = (p.stamps && p.stamps.deleted) || [];
-    // 🔴 카드 캐시를 비운다(3차 교차검증 3번). 목록 카드는 id로 재사용하는데, 다른 기기에서
-    //    수정된 내용이 들어와도 캐시가 옛 카드를 그대로 내놓아 **목록과 상세가 다르게** 보였다.
-    stampCardCache.clear();
+    // 🔴 카드 캐시에서 **내용이 바뀐 id만** 지운다(3차 교차검증 3번 + 4차 3번). 목록 카드는
+    //    id로 재사용하는데, 다른 기기에서 수정된 내용이 들어와도 캐시가 옛 카드를 그대로
+    //    내놓아 **목록과 상세가 다르게** 보였다. 그렇다고 매번 전부 비우면(3차 수정) 아무것도
+    //    안 바뀐 동기화에서도 카드·이미지를 통째로 다시 만들어 깜빡일 수 있다(4차 지적).
+    //    ⚠️ 사라진 id의 캐시는 renderStamps 끝에서 liveIds로 정리하므로 여기선 안 건드린다.
+    const nextById = new Map(stampData.records.map((r) => [r.id, r]));
+    prevRecs.forEach((old) => {
+      const nw = nextById.get(old.id);
+      if (nw && recFingerprint(nw) !== recFingerprint(old)) stampCardCache.delete(old.id);
+    });
     favMarks = p.favMarks || {};
     likedMarks = p.likedMarks || {};
     favorites.clear(); setsFromMarks(favMarks).forEach((id) => favorites.add(id));
@@ -4268,10 +4281,19 @@
     const code = getSyncCode();
     if (!syncRoot || !code) return;
     pullSync(code).then((remote) => {
-      if (!remote) return;
-      const before = fingerprint(); // updatedAt 제외 비교(위 fingerprint 주석 참고)
-      mergeIntoLocal(remote);
-      if (fingerprint() !== before) refreshAfterSync(); // 바뀐 게 있을 때만
+      // 🔴 코드가 바뀌었으면 이 응답은 버린다(4차 교차검증 2번). 코드 A로 시작한 자동
+      //    불러오기가 늦게 도착하는 사이 사용자가 코드 B를 불러왔다면, A의 기록이 B에
+      //    합쳐지고 그대로 B 서버로 올라간다. pushSync에만 있던 확인을 여기에도 둔다.
+      if (getSyncCode() !== code) return;
+      if (remote) {
+        const before = fingerprint(); // updatedAt 제외 비교(위 fingerprint 주석 참고)
+        mergeIntoLocal(remote);
+        if (fingerprint() !== before) refreshAfterSync(); // 바뀐 게 있을 때만
+      }
+      // 🔴 서버가 비어 있어도(remote가 null) **올린다**(4차 교차검증 5번). 예전엔 여기서
+      //    그냥 끝나서, 첫 전송이 실패한 사람은 다음 실행에서도 업로드를 안 했다. 추가로
+      //    저장하는 일이 없으면 서버 백업이 영영 없고, 그 상태로 폰을 잃으면 코드로도
+      //    복구가 안 된다. 이 기능의 목적 자체가 사라지는 자리다.
       pushSync();
     });
   }
