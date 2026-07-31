@@ -4216,15 +4216,11 @@
     //    그 사람에게 필요한 건 '내 코드'가 아니라 **불러오기**다. 그래서 문구·버튼이 상황에 따라 바뀐다.
     el.hidden = false;
     const hasCode = !!getSyncCode();
-    // 🔴 제목도 상황에 따라 바뀐다(2026-07-31 사용자 지적). 코드가 생기는 순간부터 데이터는
-    //    **서버에도** 있으므로 "이 기기에만"은 사실과 다르다. 내 데이터가 어디 있는지에 대한
-    //    문구라 틀리면 그냥 어색한 게 아니라 사용자를 오해시킨다.
-    const title = document.getElementById('codeNoticeTitle');
-    if (title) {
-      title.innerHTML = hasCode
-        ? '데이터는 <b>내 코드</b>에 저장돼요'
-        : '데이터는 <b>이 기기에만</b> 저장돼요';
-    }
+    // 🔴 제목은 **한 가지로 고정**한다(2026-07-31 사용자 확정).
+    //    잠깐 상태에 따라 바꿔봤는데("이 기기에만" ↔ "내 코드에"), 제목이 뒤집히는 게 더 이상했다.
+    //    코드가 없는 상태 = 아직 아무것도 저장 안 한 새 방문자뿐인데, 그 사람이 뭐라도 저장하는
+    //    순간 코드가 생기면서 "이 기기에만"이 곧바로 거짓이 된다.
+    //    「데이터는 내 코드에 저장돼요」는 지금도 앞으로도 맞는 말이라 뒤집힐 일이 없다.
     const text = document.getElementById('codeNoticeText');
     const btn = document.getElementById('codeNoticeBtn');
     if (text) {

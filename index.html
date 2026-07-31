@@ -415,8 +415,9 @@
            계속 보이게 하는 게 목적이라, 닫기가 아니라 **접기**다. 접어도 제목 한 줄은 늘 남는다. -->
       <div class="code-notice" id="codeNotice" hidden>
         <button class="code-notice-head" id="codeNoticeToggle" type="button" aria-expanded="true">
-          <!-- 문구는 상황에 따라 바뀐다(script.js renderCodeNotice). 여기 적힌 건 첫 그림 전 기본값. -->
-          <span class="code-notice-title" id="codeNoticeTitle">데이터는 <b>이 기기에만</b> 저장돼요</span>
+          <!-- 🔴 제목은 고정이다(상태에 따라 안 바뀐다) — script.js renderCodeNotice의 주석 참고.
+               아래 본문과 버튼만 코드 유무에 따라 바뀐다. -->
+          <span class="code-notice-title" id="codeNoticeTitle">데이터는 <b>내 코드</b>에 저장돼요</span>
           <svg class="code-notice-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="code-notice-body" id="codeNoticeBody">
@@ -867,7 +868,7 @@
   </div>
 </div>
 
-<script src="script.js?v=517"></script>
+<script src="script.js?v=518"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
