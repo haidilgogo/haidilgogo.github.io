@@ -3556,6 +3556,10 @@
         rec.memo = stampMemoEl.value.trim();
         rec.with = getStampWithValue() || undefined; // 동행(프리셋 or 직접입력) — 없으면 JSON에서 자동 생략
         // addedAt은 그대로(처음 기록한 시각 보존 — 같은 날짜 안 정렬 기준)
+        // 🔴 대신 editedAt을 찍는다 — 합칠 때 '어느 쪽이 최신 내용인가'를 이걸로 가린다.
+        //    없으면 수정해도 addedAt이 그대로라, 다른 기기에 남아 있던 **옛 내용이 이겨서
+        //    수정한 메모가 되돌아간다**(2026-07-31 교차검증에서 잡힘).
+        rec.editedAt = Date.now();
       }
       stampCardCache.delete(stampEditId); // 내용 바뀌었으니 카드 새로 그리게(날짜·매장·스티커 갱신)
       saveStamps();
@@ -4000,11 +4004,17 @@
   // 헷갈리는 글자(I·O·0·1) 제외 — 사용자가 눈으로 읽고 손으로 입력하는 코드다.
   const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
+  // 🔴 저장소가 가득 차거나 막혀도 **이 세션에선 코드가 살아 있어야 한다**(2026-07-31 교차검증).
+  //    예전엔 setSyncCode의 실패를 삼켰는데, pushSync가 저장소에서 코드를 다시 읽는 구조라
+  //    "코드가 없다"고 판단해 **서버 업로드를 통째로 건너뛰었다.** 로컬도 못 쓰고 서버에도 안 올라가
+  //    기록이 그냥 사라진다. 메모리에 사본을 들고 있으면 최소한 서버에는 올라간다.
+  let syncCodeMem = '';
   function getSyncCode() {
-    try { return localStorage.getItem(SYNC_CODE_KEY) || ''; } catch (e) { return ''; }
+    try { return localStorage.getItem(SYNC_CODE_KEY) || syncCodeMem || ''; } catch (e) { return syncCodeMem || ''; }
   }
   function setSyncCode(code) {
-    try { localStorage.setItem(SYNC_CODE_KEY, code); } catch (e) { /* 무시 */ }
+    syncCodeMem = code;
+    try { localStorage.setItem(SYNC_CODE_KEY, code); } catch (e) { /* 저장 실패해도 위 사본으로 버틴다 */ }
   }
   function makeSyncCode() {
     let s = '';
@@ -4020,10 +4030,14 @@
   // 🔴 'HG'를 무조건 떼면 안 된다. 코드 알파벳에 H와 G가 있어서 뒤 6자리가 'HGXY12'처럼
   //    HG로 시작할 수 있는데, 그때 접두어로 착각해 떼면 4글자만 남아 멀쩡한 코드가 거부된다.
   //    → **길이가 8일 때만** 앞의 HG를 접두어로 본다(6자리면 그대로가 본체다).
+  // 🔴 실제 코드에 쓰는 글자만 통과시킨다(CODE_ALPHABET과 같은 집합 = I·O·0·1 제외).
+  //    예전엔 [A-Z0-9]를 다 받아서, 0이나 1이 섞인 코드가 화면에선 멀쩡히 통과한 뒤
+  //    서버 규칙에 막혀 "저장된 데이터가 없어요"로 나왔다 — 형식 문제인데 없는 코드처럼 보였다.
+  const CODE_CHAR = /^[A-HJ-NP-Z2-9]{6}$/;
   function normalizeCode(raw) {
     let s = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (s.length === 8 && s.slice(0, 2) === 'HG') s = s.slice(2);
-    return s.length === 6 ? 'HG-' + s : '';
+    return CODE_CHAR.test(s) ? 'HG-' + s : '';
   }
 
   // 이 기기의 현재 상태를 서버에 보낼 모양으로.
@@ -4035,6 +4049,13 @@
     const out = {};
     Object.keys(obj).forEach((k) => { if (obj[k] !== undefined) out[k] = obj[k]; });
     return out;
+  }
+  // 내용이 실제로 바뀌었는지 비교할 때 쓰는 지문. 🔴 updatedAt은 뺀다 —
+  // 부를 때마다 Date.now()가 새로 들어가서 데이터가 같아도 늘 "바뀌었다"가 된다(교차검증).
+  function fingerprint() {
+    const p = syncPayload();
+    delete p.updatedAt;
+    return JSON.stringify(p);
   }
   function syncPayload() {
     return {
@@ -4062,10 +4083,14 @@
 
     // ② 기록 합치기 — id가 같으면 하나로(더 나중에 손댄 쪽을 남긴다)
     const byId = new Map();
+    // 같은 id끼리는 **내용을 마지막으로 손댄 쪽**이 이긴다.
+    // 🔴 addedAt만 보면 안 된다 — 수정해도 addedAt은 그대로라 두 쪽이 늘 동점이 되고,
+    //    그러면 나중에 처리되는 서버 기록이 무조건 이겨 수정한 메모가 되돌아간다(교차검증).
+    const touchedAt = (r) => Math.max(r.editedAt || 0, r.addedAt || 0);
     const put = (r) => {
       if (!r || !r.id || deleted.has(r.id)) return;
       const old = byId.get(r.id);
-      if (!old || (r.addedAt || 0) >= (old.addedAt || 0)) byId.set(r.id, r);
+      if (!old || touchedAt(r) > touchedAt(old)) byId.set(r.id, r);
     };
     (stampData.records || []).forEach(put);
     ((remote.stamps && remote.stamps.records) || []).forEach(put);
@@ -4077,7 +4102,13 @@
     //    예전엔 그냥 합집합이라, 한 기기에서 끈 것이 다른 기기에 남아 있으면 되살아났다
     //    (사용자 지적: "좋아요나 즐겨찾기를 했다가 빼면 없어지지 않는군요?").
     //    ⚠️ 옛 자료(이력이 없던 시절)와도 섞일 수 있으니, 이력에 없는 id는 켠 것으로 본다.
-    const mergeMarks = (localMarks, remoteMarks, remoteList) => {
+    const mergeMarks = (localMarks, localSet, remoteMarks, remoteList) => {
+      // 🔴 **로컬 것부터** 보완해야 한다(2026-07-31 교차검증에서 잡힌 데이터 유실).
+      //    아래 applyMarks가 집합을 비우고 이력만으로 다시 만들기 때문에, 이력에 없는 즐겨찾기는
+      //    그 순간 사라진다. 이 기능이 생기기 전부터 즐겨찾기를 쓰던 사람은 이력이 통째로 없어서
+      //    **첫 불러오기에 즐겨찾기·좋아요를 전부 잃었다**(재현 확인: s1,s2 → 사라짐).
+      //    시각 0으로 넣으므로 다른 기기의 명시적 변경에는 정상적으로 진다.
+      localSet.forEach((id) => { if (!localMarks[id]) localMarks[id] = { v: 1, t: 0 }; });
       // 이력이 없는 옛 자료는 잃지 않게 '켠 것(시각 0)'으로 본다 — 시각 0이라 무엇에든 진다.
       (remoteList || []).forEach((id) => { if (!localMarks[id]) localMarks[id] = { v: 1, t: 0 }; });
       Object.keys(remoteMarks || {}).forEach((id) => {
@@ -4090,8 +4121,8 @@
       set.clear();
       Object.keys(marks).forEach((id) => { if (marks[id].v === 1) set.add(id); });
     };
-    mergeMarks(favMarks, remote.favMarks, remote.favorites);
-    mergeMarks(likedMarks, remote.likedMarks, remote.liked);
+    mergeMarks(favMarks, favorites, remote.favMarks, remote.favorites);
+    mergeMarks(likedMarks, likedByMe, remote.likedMarks, remote.liked);
     applyMarks(favMarks, favorites);
     applyMarks(likedMarks, likedByMe);
     try {
@@ -4120,15 +4151,44 @@
     clearTimeout(pushTimer);
     pushTimer = setTimeout(pushSync, 800);
   }
+  // 🔴 **읽고 → 합치고 → 쓴다**(2026-07-31 교차검증에서 잡힌 데이터 유실).
+  //    예전엔 그냥 set()으로 통째 덮어썼다. 같은 코드를 쓰는 다른 기기가 그 사이 올린 것이
+  //    **나중에 저장한 기기 때문에 통째로 사라졌다.** 특히 둘 다 오프라인에서 각자 기록한 뒤
+  //    차례로 연결되면 앞 기기 것이 날아간다.
+  //    ⚠️ 합치면 로컬 상태가 바뀔 수 있으므로, 바뀌었으면 화면도 다시 그린다.
+  //    ⚠️ 재진입 방지(pushing) — refreshAfterSync가 save*를 부르고 그게 다시 schedulePush를
+  //       부르는 고리를 끊는다. 대신 그 사이 들어온 저장은 pendingPush로 기억했다 한 번 더 올린다.
+  let pushing = false;
+  let pendingPush = false;
   function pushSync() {
     const code = getSyncCode();
     if (!syncRoot || !code) return Promise.resolve(false);
-    // 🔴 try로 감싼다 — set()은 값이 잘못되면 비동기가 아니라 **그 자리에서** 던진다(위 clean 주석).
-    //    여기서 새면 이걸 부른 쪽(저장·기록 흐름)이 통째로 멈춘다. 동기화는 덤이지 본업이 아니다.
+    if (pushing) { pendingPush = true; return Promise.resolve(false); }
+    pushing = true;
+    const done = (ok) => {
+      pushing = false;
+      if (pendingPush) { pendingPush = false; schedulePush(); }
+      return ok;
+    };
+    // try로 감싼다 — set()은 값이 잘못되면 비동기가 아니라 **그 자리에서** 던진다(위 clean 주석).
+    // 여기서 새면 이걸 부른 쪽(저장·기록 흐름)이 통째로 멈춘다. 동기화는 덤이지 본업이 아니다.
     try {
-      return syncRoot.child(code).set(syncPayload()).then(() => true).catch(() => false);
+      const ref = syncRoot.child(code);
+      return ref.once('value').then((snap) => {
+        const remote = snap.val();
+        let changed = false;
+        if (remote) {
+          const before = fingerprint();
+          mergeIntoLocal(remote);
+          changed = fingerprint() !== before;
+        }
+        return ref.set(syncPayload()).then(() => {
+          if (changed) refreshAfterSync(); // 다른 기기 것이 들어왔으면 화면에도 반영
+          return done(true);
+        });
+      }).catch(() => done(false));
     } catch (e) {
-      return Promise.resolve(false);
+      return Promise.resolve(done(false));
     }
   }
 
@@ -4168,9 +4228,9 @@
     if (!syncRoot || !code) return;
     pullSync(code).then((remote) => {
       if (!remote) return;
-      const before = JSON.stringify(syncPayload());
+      const before = fingerprint(); // updatedAt 제외 비교(위 fingerprint 주석 참고)
       mergeIntoLocal(remote);
-      if (JSON.stringify(syncPayload()) !== before) refreshAfterSync(); // 바뀐 게 있을 때만
+      if (fingerprint() !== before) refreshAfterSync(); // 바뀐 게 있을 때만
       pushSync();
     });
   }
@@ -4359,7 +4419,11 @@
       setSyncCode(code);
       refreshAfterSync();
       pushSync(); // 합친 결과를 서버에도 올려 양쪽을 같게 만든다
-      syncCodeText.textContent = code;
+      // 🔴 박스 안에는 6자리만(밖에 `HG-`가 따로 있다). 전체 코드를 넣어 `HG- HG-XXXXXX`로
+      //    보이던 것을 고쳤다(2026-07-31 교차검증). 코드가 없던 기기는 '내 코드' 덩어리도 열어준다.
+      syncCodeText.textContent = code.replace(/^HG-/, '');
+      const mineEl = document.getElementById('syncMine');
+      if (mineEl) mineEl.hidden = false;
       // 🔴 개수를 세지 않는다(2026-07-31 사용자 확정: "그냥 데이터를 불러왔어요").
       //    예전엔 '기록 N개를 가져왔어요 (합계 N곳)'이었는데 두 가지가 틀렸다 —
       //    ① '곳'은 위쪽 「다녀온 매장 N곳」이 매장 종류를 세는 것과 단위가 겹치는데 여기선
