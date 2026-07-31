@@ -415,7 +415,8 @@
            계속 보이게 하는 게 목적이라, 닫기가 아니라 **접기**다. 접어도 제목 한 줄은 늘 남는다. -->
       <div class="code-notice" id="codeNotice" hidden>
         <button class="code-notice-head" id="codeNoticeToggle" type="button" aria-expanded="true">
-          <span class="code-notice-title">데이터는 <b>이 기기에만</b> 저장돼요</span>
+          <!-- 문구는 상황에 따라 바뀐다(script.js renderCodeNotice). 여기 적힌 건 첫 그림 전 기본값. -->
+          <span class="code-notice-title" id="codeNoticeTitle">데이터는 <b>이 기기에만</b> 저장돼요</span>
           <svg class="code-notice-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="code-notice-body" id="codeNoticeBody">
@@ -866,7 +867,7 @@
   </div>
 </div>
 
-<script src="script.js?v=516"></script>
+<script src="script.js?v=517"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
