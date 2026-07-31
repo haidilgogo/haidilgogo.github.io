@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=615">
+<link rel="stylesheet" href="styles.css?v=616">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -589,7 +589,10 @@
          가져온다'로 읽혔다(2026-07-31 사용자 지적). -->
     <p class="stamp-q">데이터를 코드로 불러오기</p>
     <div class="stamp-fields">
-      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">코드</span><input type="text" id="syncInput" maxlength="12" placeholder="HG-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+      <!-- 🔴 `HG-`는 화면에 박아두고 **6자리만** 치게 한다(2026-07-31 사용자 제안, 구글 인증코드 'G-' 방식).
+           "HG-도 넣어야 하나?"를 고민할 일 자체가 없어진다.
+           ⚠️ 전체 코드를 붙여넣어도 되어야 하므로 script.js가 입력값을 다듬는다(앞의 HG- 제거). -->
+      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">코드</span><span class="sync-code-prefix" aria-hidden="true">HG-</span><input type="text" id="syncInput" maxlength="6" placeholder="XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="코드 여섯 자리"></label>
     </div>
     <p class="sync-note">지금 이 기기의 데이터는 <b>지워지지 않고 합쳐집니다.</b></p>
     <p class="sync-msg" id="syncMsg" hidden></p>
@@ -879,7 +882,7 @@
   </div>
 </div>
 
-<script src="script.js?v=519"></script>
+<script src="script.js?v=521"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

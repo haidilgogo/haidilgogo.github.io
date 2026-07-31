@@ -2973,7 +2973,17 @@ img {
    기록하기 시트에선 버튼 위가 스티커 자리의 margin-bottom 36px으로 넉넉히 떠 있는데,
    여기선 바로 위가 작은 안내 문구(margin 10~18px)라 버튼이 글에 붙어 보였다. */
 #syncLoadBtn { margin-top: 30px; }
-#syncInput { text-transform: uppercase; }
+/* 🔴 칸 안에 박아둔 `HG-` — 입력값이 아니라 글자다(구글 인증코드 'G-' 방식).
+   입력 글자와 같은 크기·굵기라 'HG-XXXXXX' 한 덩어리로 읽히고, 색만 옅어 안내임을 알 수 있다. */
+.sync-code-prefix {
+  flex: none;
+  margin-right: 1px;
+  color: #8B7A6E;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+#syncInput { text-transform: uppercase; letter-spacing: .02em; }
 
 /* 자리표시 아이콘 — 옛 발바닥 🐾(34px 텍스트 이모지) 자리. 색은 아래 힌트 글씨와 같은 톤이라
    아이콘·글씨가 한 덩어리로 읽힌다. 크기를 바꾸면 index.html의 stroke-width도 같이 볼 것

@@ -4016,9 +4016,14 @@
     }
     return 'HG-' + s;
   }
+  // 사용자가 어떻게 적어와도 받아준다 — 소문자, 공백, 하이픈 유무, 'HG' 생략까지.
+  // 🔴 'HG'를 무조건 떼면 안 된다. 코드 알파벳에 H와 G가 있어서 뒤 6자리가 'HGXY12'처럼
+  //    HG로 시작할 수 있는데, 그때 접두어로 착각해 떼면 4글자만 남아 멀쩡한 코드가 거부된다.
+  //    → **길이가 8일 때만** 앞의 HG를 접두어로 본다(6자리면 그대로가 본체다).
   function normalizeCode(raw) {
-    const body = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^HG/, '');
-    return body.length === 6 ? 'HG-' + body : '';
+    let s = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (s.length === 8 && s.slice(0, 2) === 'HG') s = s.slice(2);
+    return s.length === 6 ? 'HG-' + s : '';
   }
 
   // 이 기기의 현재 상태를 서버에 보낼 모양으로.
@@ -4299,6 +4304,20 @@
       setSyncMsg('코드를 직접 적어두세요', 'bad');
     }
   });
+
+  // 🔴 입력칸은 6자리만 받는다(`HG-`는 칸 안에 글자로 박혀 있다). 그래도 전체 코드를
+  //    붙여넣는 사람이 반드시 있으므로, 입력될 때마다 다듬어준다 —
+  //    대문자로 올리고, 글자·숫자만 남기고, 앞의 HG는 **8자리로 붙여넣었을 때만** 떼어낸다
+  //    (본체가 HG로 시작할 수 있어서다. normalizeCode 주석 참고).
+  if (syncInput) {
+    syncInput.addEventListener('input', () => {
+      let s = syncInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (s.length === 8 && s.slice(0, 2) === 'HG') s = s.slice(2);
+      s = s.slice(0, 6);
+      if (s !== syncInput.value) syncInput.value = s;
+      setSyncMsg(''); // 다시 치기 시작하면 옛 오류 문구는 지운다
+    });
+  }
 
   const syncLoadBtn = document.getElementById('syncLoadBtn');
   if (syncLoadBtn) syncLoadBtn.addEventListener('click', () => {
