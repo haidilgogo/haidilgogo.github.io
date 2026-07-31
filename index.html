@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=613">
+<link rel="stylesheet" href="styles.css?v=614">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -566,15 +566,21 @@
     <!-- 첫 기록 때만 뜨는 안내. 그 뒤 '다른 기기에서 내 기록 보기'로 열면 이 문단은 숨는다 -->
     <p class="sync-intro" id="syncIntro" hidden>데이터가 저장됐어요. 아래 코드를 적어두면 <b>폰을 바꾸거나 홈 화면에 추가해도</b> 그대로 불러올 수 있어요.</p>
 
-    <p class="stamp-q">내 코드</p>
-    <div class="sync-code" id="syncCodeText">HG-000000</div>
-    <div class="sync-actions">
-      <button class="sync-btn" id="syncCopyBtn" type="button">복사</button>
-      <button class="sync-btn" id="syncShareBtn" type="button">보내두기</button>
+    <!-- 🔴 코드가 없으면 이 덩어리를 통째로 숨긴다(2026-07-31 사용자 확정).
+         예전엔 '아직 없어요'를 띄우고 복사·보내기 버튼을 그대로 뒀는데, 눌러도 아무 일이
+         안 일어나 고장난 것처럼 보였다. 코드가 없는 사람에게 할 일은 아래 '불러오기' 하나뿐이다. -->
+    <div id="syncMine" hidden>
+      <p class="stamp-q">내 코드</p>
+      <div class="sync-code" id="syncCodeText">HG-000000</div>
+      <div class="sync-actions">
+        <button class="sync-btn" id="syncCopyBtn" type="button">복사</button>
+        <!-- '공유'라고 쓰지 말 것 — 바로 아래 "남에게 알려주지 마세요"와 정면으로 부딪힌다.
+             '내게 보내기'는 카톡 '나에게 보내기'와 같은 말이라 무엇을 하는지 바로 읽힌다. -->
+        <button class="sync-btn" id="syncShareBtn" type="button">내게 보내기</button>
+      </div>
+      <p class="sync-note">이 코드가 있으면 어디서든 데이터를 불러올 수 있어요. 아는 사람은 내 데이터를 볼 수 있으니 남에게 알려주지 마세요.</p>
+      <div class="sync-divider"></div>
     </div>
-    <p class="sync-note">이 코드가 있으면 어디서든 데이터를 불러올 수 있어요. 아는 사람은 내 데이터를 볼 수 있으니 남에게 알려주지 마세요.</p>
-
-    <div class="sync-divider"></div>
 
     <!-- 🔴 '코드 불러오기'가 아니라 '코드로 불러오기'다 — 불러오는 대상은 코드가 아니라 데이터고,
          코드는 그걸 가져오는 열쇠다. 옛 문구('다른 기기 코드 불러오기')는 '다른 기기의 코드를
@@ -871,7 +877,7 @@
   </div>
 </div>
 
-<script src="script.js?v=518"></script>
+<script src="script.js?v=519"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

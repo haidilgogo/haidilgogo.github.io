@@ -4185,7 +4185,13 @@
   }
   function openSyncSheet(isIntro) {
     if (!syncOverlay) return;
-    syncCodeText.textContent = getSyncCode() || '아직 없어요';
+    const code = getSyncCode();
+    syncCodeText.textContent = code || '';
+    // 🔴 코드가 없으면 '내 코드' 덩어리를 통째로 숨긴다(2026-07-31 사용자 확정).
+    //    예전엔 '아직 없어요'와 함께 복사·보내기 버튼이 남아 있었는데, 눌러도 아무 일이
+    //    안 일어나 고장난 것처럼 보였다. 할 일이 '불러오기' 하나뿐인 사람에겐 그것만 보이면 된다.
+    const mine = document.getElementById('syncMine');
+    if (mine) mine.hidden = !code;
     if (syncIntro) syncIntro.hidden = !isIntro;
     setSyncMsg('');
     if (syncInput) syncInput.value = '';
