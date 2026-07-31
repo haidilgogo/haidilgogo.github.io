@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=611">
+<link rel="stylesheet" href="styles.css?v=612">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -411,12 +411,16 @@
         <p class="count-line stamps-count">다녀온 하이디라오 매장 <span class="count-num" id="stampCountNum">0</span>곳</p>
         <button class="gacha-btn stamp-write-btn" id="stampWriteBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기</button>
       </div>
-      <!-- 첫 기록 뒤 뜨는 띠. 닫을 때까지 남는다(팝업은 놓치기 쉬워서 버렸다 — script.js 참고) -->
+      <!-- 🔴 이 띠는 **없어지지 않는다**(2026-07-31 사용자 확정). "이 기기에만 저장된다"는 사실을
+           계속 보이게 하는 게 목적이라, 닫기가 아니라 **접기**다. 접어도 제목 한 줄은 늘 남는다. -->
       <div class="code-notice" id="codeNotice" hidden>
-        <p class="code-notice-text">기록은 <b>이 기기에만</b> 저장돼요. 내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 그대로 불러올 수 있어요.</p>
-        <div class="code-notice-actions">
+        <button class="code-notice-head" id="codeNoticeToggle" type="button" aria-expanded="true">
+          <span class="code-notice-title">기록은 <b>이 기기에만</b> 저장돼요</span>
+          <svg class="code-notice-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="code-notice-body" id="codeNoticeBody">
+          <p class="code-notice-text">내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 그대로 불러올 수 있어요. 즐겨찾기와 좋아요도 함께 따라옵니다.</p>
           <button class="code-notice-btn" id="codeNoticeBtn" type="button">내 코드 보기</button>
-          <button class="code-notice-close" id="codeNoticeClose" type="button">나중에</button>
         </div>
       </div>
       <div class="stamps" id="stampGrid"></div>
@@ -859,7 +863,7 @@
   </div>
 </div>
 
-<script src="script.js?v=509"></script>
+<script src="script.js?v=510"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

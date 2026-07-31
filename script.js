@@ -4147,7 +4147,10 @@
   // 🔴 팝업으로 한 번 띄우는 방식은 버렸다(2026-07-31) — 스티커 붙는 연출 뒤에 겹쳐 뜨는 데다
   //    한 번 지나가면 다시 못 보고, "코드를 저장해두라"는 말은 놓치면 의미가 없다.
   //    띠는 사용자가 **직접 닫을 때까지 남는다**. 타이밍에 기대지 않아 훨씬 튼튼하다.
-  const CODE_NOTICE_KEY = 'haidilao_code_notice_done';
+  // 🔴 띠는 **없어지지 않는다**(2026-07-31 사용자 확정) — "이 기기에만 저장된다"를 계속 보이게 하는 게
+  //    목적이라 닫기가 아니라 **접기**다. 접힌 상태에서도 제목 한 줄은 남는다.
+  //    저장하는 건 '닫았다'가 아니라 '접어뒀다'뿐이고, 기록이 하나라도 있으면 띠 자체는 늘 뜬다.
+  const CODE_FOLD_KEY = 'haidilao_code_notice_folded';
   function maybeIntroCode() {
     if (!(stampData.records || []).length) return;
     ensureSyncCode();   // 이미 있으면 그대로 둔다
@@ -4156,12 +4159,21 @@
   function renderCodeNotice() {
     const el = document.getElementById('codeNotice');
     if (!el) return;
-    let done = '';
-    try { done = localStorage.getItem(CODE_NOTICE_KEY) || ''; } catch (e) { /* 무시 */ }
-    el.hidden = !!done || !getSyncCode() || !(stampData.records || []).length;
+    // 기록이 있으면 항상 보인다. 코드는 첫 기록 때 생기므로 사실상 같은 조건이다.
+    el.hidden = !(stampData.records || []).length;
+    let folded = '';
+    try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
+    el.classList.toggle('is-folded', !!folded);
+    const btn = document.getElementById('codeNoticeToggle');
+    if (btn) btn.setAttribute('aria-expanded', folded ? 'false' : 'true');
   }
-  function dismissCodeNotice() {
-    try { localStorage.setItem(CODE_NOTICE_KEY, '1'); } catch (e) { /* 무시 */ }
+  function toggleCodeNotice() {
+    let folded = '';
+    try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
+    try {
+      if (folded) localStorage.removeItem(CODE_FOLD_KEY);
+      else localStorage.setItem(CODE_FOLD_KEY, '1');
+    } catch (e) { /* 무시 */ }
     renderCodeNotice();
   }
 
@@ -4169,8 +4181,8 @@
   if (syncOpenBtn) syncOpenBtn.addEventListener('click', () => openSyncSheet(false));
   const codeNoticeBtn = document.getElementById('codeNoticeBtn');
   if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet(true));
-  const codeNoticeClose = document.getElementById('codeNoticeClose');
-  if (codeNoticeClose) codeNoticeClose.addEventListener('click', dismissCodeNotice);
+  const codeNoticeToggle = document.getElementById('codeNoticeToggle');
+  if (codeNoticeToggle) codeNoticeToggle.addEventListener('click', toggleCodeNotice);
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
   const syncCloseBtn = document.getElementById('syncSheetClose');
   if (syncCloseBtn) syncCloseBtn.addEventListener('click', closeSyncSheet);
