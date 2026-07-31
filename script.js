@@ -340,6 +340,7 @@
     } catch (err) {
       // 저장 공간이 없거나 접근이 막힌 경우는 무시
     }
+    updateMarks(favorites, favMarks, FAV_MARKS_KEY); // 켠/끈 이력 갱신(합칠 때 필요)
     schedulePush(); // 서버 사본 갱신(맨 아래 「내 데이터 코드」 절)
   }
 
@@ -353,6 +354,29 @@
   } catch (err) {
     likedByMe = new Set();
   }
+  // 🔴 즐겨찾기·좋아요의 **켠/끈 이력**(2026-07-31). 맨 아래 「내 데이터 코드」 절에서 쓴다.
+  //    { 레시피id: { v: 1(켬)|0(끔), t: 바꾼시각 } }
+  //    왜 필요한가: 합치기가 "양쪽 걸 더하기"라서, 한 기기에서 끈 것이 다른 기기에 남아 있으면
+  //    다시 살아 돌아온다(사용자가 지적). 스티커는 지운 id를 적어둬서 이런 일이 없다.
+  //    ⚠️ 스티커와 달리 **껐다 다시 켤 수 있어서** "지웠다"만 적으면 다시 켜는 게 막힌다.
+  //       그래서 시각까지 적고, 합칠 때 **나중에 바꾼 쪽이 이긴다.**
+  const FAV_MARKS_KEY = 'haidilao_fav_marks';
+  const LIKED_MARKS_KEY = 'haidilao_liked_marks';
+  function loadMarks(key) {
+    try { return JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { return {}; }
+  }
+  let favMarks = loadMarks(FAV_MARKS_KEY);
+  let likedMarks = loadMarks(LIKED_MARKS_KEY);
+  // 지금 집합을 이력에 반영한다(새로 켠 것 / 사라진 것에 시각을 찍는다)
+  function updateMarks(set, marks, key) {
+    const now = Date.now();
+    set.forEach((id) => { if (!marks[id] || marks[id].v !== 1) marks[id] = { v: 1, t: now }; });
+    Object.keys(marks).forEach((id) => {
+      if (marks[id].v === 1 && !set.has(id)) marks[id] = { v: 0, t: now };
+    });
+    try { localStorage.setItem(key, JSON.stringify(marks)); } catch (e) { /* 무시 */ }
+  }
+
   let likeCounts;
   try {
     likeCounts = JSON.parse(localStorage.getItem(LIKE_COUNTS_KEY)) || {};
@@ -378,6 +402,7 @@
       // 무시
     }
     saveLikeCounts();
+    updateMarks(likedByMe, likedMarks, LIKED_MARKS_KEY); // 켠/끈 이력 갱신(합칠 때 필요)
     schedulePush(); // 서버 사본 갱신(맨 아래 「내 데이터 코드」 절)
   }
   // 🔴 기본 좋아요(2026-07-30 사용자 확정) — 화면 숫자 = BASE_LIKES + 실제 방문자 좋아요.
@@ -4014,6 +4039,9 @@
       },
       favorites: [...favorites],
       liked: [...likedByMe],
+      // 켠/끈 이력도 함께 보낸다 — 이게 있어야 "끈 것"이 다른 기기에서 안 되살아난다.
+      favMarks: favMarks,
+      likedMarks: likedMarks,
       updatedAt: Date.now(),
     };
   }
@@ -4040,9 +4068,31 @@
     stampData.records = [...byId.values()];
     stampData.deleted = [...deleted];
 
-    // ③ 즐겨찾기·좋아요 = 합집합
-    (remote.favorites || []).forEach((id) => favorites.add(id));
-    (remote.liked || []).forEach((id) => likedByMe.add(id));
+    // ③ 즐겨찾기·좋아요 = **켠/끈 이력을 시각으로 비교**해서 나중 것이 이긴다.
+    //    예전엔 그냥 합집합이라, 한 기기에서 끈 것이 다른 기기에 남아 있으면 되살아났다
+    //    (사용자 지적: "좋아요나 즐겨찾기를 했다가 빼면 없어지지 않는군요?").
+    //    ⚠️ 옛 자료(이력이 없던 시절)와도 섞일 수 있으니, 이력에 없는 id는 켠 것으로 본다.
+    const mergeMarks = (localMarks, remoteMarks, remoteList) => {
+      // 이력이 없는 옛 자료는 잃지 않게 '켠 것(시각 0)'으로 본다 — 시각 0이라 무엇에든 진다.
+      (remoteList || []).forEach((id) => { if (!localMarks[id]) localMarks[id] = { v: 1, t: 0 }; });
+      Object.keys(remoteMarks || {}).forEach((id) => {
+        const rm = remoteMarks[id], lm = localMarks[id];
+        if (!rm) return;
+        if (!lm || (rm.t || 0) > (lm.t || 0)) localMarks[id] = rm; // 나중에 바꾼 쪽이 이긴다
+      });
+    };
+    const applyMarks = (marks, set) => {
+      set.clear();
+      Object.keys(marks).forEach((id) => { if (marks[id].v === 1) set.add(id); });
+    };
+    mergeMarks(favMarks, remote.favMarks, remote.favorites);
+    mergeMarks(likedMarks, remote.likedMarks, remote.liked);
+    applyMarks(favMarks, favorites);
+    applyMarks(likedMarks, likedByMe);
+    try {
+      localStorage.setItem(FAV_MARKS_KEY, JSON.stringify(favMarks));
+      localStorage.setItem(LIKED_MARKS_KEY, JSON.stringify(likedMarks));
+    } catch (e) { /* 무시 */ }
 
     return {
       stamps: stampData.records.length - before, // 새로 늘어난 개수
