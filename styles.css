@@ -2901,7 +2901,7 @@ img {
 .code-notice-btn {
   padding: 8px 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;         /* 🔴 기록하기 버튼(.gacha-btn)과 같은 값(2026-07-31 사용자 지시) */
   background: #F6E4DE;         /* 가챠 '레시피 보기'와 같은 로즈 소프트필 */
   font-family: inherit;
   font-size: 13px;
@@ -2960,13 +2960,19 @@ img {
 .sync-note { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
 .sync-note b { font-weight: 700; color: #4D4139; }
 .sync-divider { height: 1px; background: #E6DCD5; margin: 22px 0 18px; }
-.sync-msg { margin: 12px 0 0; font-size: 13px; line-height: 1.55; font-weight: 600; }
+/* 🔴 안내 메시지는 **가운데 정렬**이고 위아래로 넉넉히 띄운다(2026-07-31 사용자 지시).
+   바로 아래 '불러오기' 버튼도 가운데 정렬(width 182px + margin auto)이라 축이 맞는다. */
+.sync-msg { margin: 18px 0 0; font-size: 13px; line-height: 1.55; font-weight: 600; text-align: center; }
 .sync-msg--ok { color: #2E7D5B; }
 .sync-msg--bad { color: var(--brand-red); }
 .sync-msg[hidden] { display: none; }
 /* 코드가 없을 때 '내 코드' 덩어리를 통째로 숨긴다. 지금은 기본 display가 block이라 UA의
    [hidden]으로도 숨지만, 이 저장소에서 여러 번 걸린 함정이라 처음부터 명시해 둔다. */
 #syncMine[hidden] { display: none; }
+/* 🔴 '불러오기' 버튼 위 간격(2026-07-31 사용자 지시: "위와 세로폭 간격이 너무 좁아요").
+   기록하기 시트에선 버튼 위가 스티커 자리의 margin-bottom 36px으로 넉넉히 떠 있는데,
+   여기선 바로 위가 작은 안내 문구(margin 10~18px)라 버튼이 글에 붙어 보였다. */
+#syncLoadBtn { margin-top: 30px; }
 #syncInput { text-transform: uppercase; }
 
 /* 자리표시 아이콘 — 옛 발바닥 🐾(34px 텍스트 이모지) 자리. 색은 아래 힌트 글씨와 같은 톤이라
