@@ -4309,11 +4309,19 @@
   //    붙여넣는 사람이 반드시 있으므로, 입력될 때마다 다듬어준다 —
   //    대문자로 올리고, 글자·숫자만 남기고, 앞의 HG는 **8자리로 붙여넣었을 때만** 떼어낸다
   //    (본체가 HG로 시작할 수 있어서다. normalizeCode 주석 참고).
+  // 붙여넣은 글에서 코드만 뽑아낸다. 🔴 문장째 붙여넣는 경우를 반드시 받아야 한다 —
+  //    '내게 보내기'가 만드는 문구가 「하딜고고 내 데이터 코드: HG-PAGZZ2」라서,
+  //    카톡에서 그 줄을 통째로 복사해 오는 게 오히려 자연스럽다.
+  function extractCode(raw) {
+    const up = String(raw || '').toUpperCase();
+    const m = up.match(/HG[-\s]?([A-Z0-9]{6})/); // 문장 속 'HG-XXXXXX'를 먼저 찾는다
+    if (m) return m[1];
+    const only = up.replace(/[^A-Z0-9]/g, '');   // 없으면 글자·숫자만 남겨 앞 6자
+    return only.slice(0, 6);
+  }
   if (syncInput) {
     syncInput.addEventListener('input', () => {
-      let s = syncInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      if (s.length === 8 && s.slice(0, 2) === 'HG') s = s.slice(2);
-      s = s.slice(0, 6);
+      const s = extractCode(syncInput.value);
       if (s !== syncInput.value) syncInput.value = s;
       setSyncMsg(''); // 다시 치기 시작하면 옛 오류 문구는 지운다
     });
