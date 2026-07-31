@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=619">
+<link rel="stylesheet" href="styles.css?v=620">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -575,6 +575,10 @@
     <div id="syncMine" hidden>
       <p class="stamp-q">내 코드</p>
       <div class="sync-code" id="syncCodeText">HG-000000</div>
+      <!-- 🔴 복사·보내기 결과는 **그 버튼 바로 위**에 뜬다(2026-07-31 사용자 지시).
+           예전엔 시트 맨 아래 한 곳(#syncMsg)에 몰아서, 위쪽 버튼을 눌렀는데 저 아래에 떠 안 보였다.
+           불러오기 결과는 그대로 아래(#syncMsg)에 뜬다 — 각자 자기 버튼 옆에서 말하게 한다. -->
+      <p class="sync-msg sync-msg--code" id="syncCodeMsg" hidden></p>
       <div class="sync-actions">
         <button class="sync-btn" id="syncCopyBtn" type="button">복사하기</button>
         <!-- '공유'라고 쓰지 말 것 — 바로 아래 "남에게 알려주지 마세요"와 정면으로 부딪힌다.
@@ -602,7 +606,7 @@
            → 길이 제한을 두지 않고 **script.js의 extractCode가 코드만 뽑아 6자로 만든다.** -->
       <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">코드</span><span class="sync-code-prefix" aria-hidden="true">HG-</span><input type="text" id="syncInput" placeholder="XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="코드 여섯 자리"></label>
     </div>
-    <p class="sync-note">지금 이 기기의 데이터는 <b>지워지지 않고 합쳐집니다.</b></p>
+    <p class="sync-note sync-note--strong">지금 이 기기의 데이터는 <b>지워지지 않고 합쳐집니다.</b></p>
     <p class="sync-msg" id="syncMsg" hidden></p>
     <button class="stamp-submit" id="syncLoadBtn" type="button">불러오기</button>
   </div>
@@ -890,7 +894,7 @@
   </div>
 </div>
 
-<script src="script.js?v=524"></script>
+<script src="script.js?v=525"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

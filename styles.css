@@ -2935,6 +2935,9 @@ img {
   color: #3D2B23;
   user-select: all;   /* 한 번 탭하면 통째로 선택되게 */
 }
+/* `HG-`만 옅게 — 아래 입력칸의 고정 접두어와 같은 색이라 위아래가 한 짝으로 읽히고,
+   옮겨 적어야 할 6자리가 먼저 눈에 든다(2026-07-31 사용자 제안). */
+.sync-code-pre { color: #8B7A6E; }
 .sync-actions { display: flex; gap: 8px; }
 .sync-btn {
   flex: 1;
@@ -2965,6 +2968,8 @@ img {
 /* 🔴 안내 메시지는 **가운데 정렬**이고 위아래로 넉넉히 띄운다(2026-07-31 사용자 지시).
    바로 아래 '불러오기' 버튼도 가운데 정렬(width 182px + margin auto)이라 축이 맞는다. */
 .sync-msg { margin: 18px 0 0; font-size: 13px; line-height: 1.55; font-weight: 600; text-align: center; }
+/* 복사·보내기 결과는 그 버튼 바로 위(코드 칸 아래)에 뜬다 — 아래 여백은 버튼과의 간격 */
+.sync-msg--code { margin: 0 0 10px; }
 .sync-msg--ok { color: #2E7D5B; }
 .sync-msg--bad { color: var(--brand-red); }
 .sync-msg[hidden] { display: none; }

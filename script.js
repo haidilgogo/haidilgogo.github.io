@@ -4187,18 +4187,33 @@
     syncMsg.className = 'sync-msg' + (kind ? ' sync-msg--' + kind : '');
     syncMsg.hidden = !text;
   }
+  // 🔴 복사·보내기 결과는 **그 버튼 바로 위**(내 코드 칸 아래)에 뜬다. 아래 #syncMsg는
+  //    불러오기 전용이다 — 위 버튼을 눌렀는데 저 아래에서 말하면 안 보인다(2026-07-31 사용자 지시).
+  const syncCodeMsg = document.getElementById('syncCodeMsg');
+  function setCodeMsg(text, kind) {
+    if (!syncCodeMsg) return;
+    syncCodeMsg.textContent = text || '';
+    syncCodeMsg.className = 'sync-msg sync-msg--code' + (kind ? ' sync-msg--' + kind : '');
+    syncCodeMsg.hidden = !text;
+  }
   // ⚠️ 예전엔 '첫 기록 직후'를 알리는 안내 문단을 띄울지(isIntro) 골랐는데, 그 문단을 없애서
   //    구분이 사라졌다(2026-07-31). 이제 어디서 열든 같은 화면이다.
   function openSyncSheet() {
     if (!syncOverlay) return;
     const code = getSyncCode();
-    syncCodeText.textContent = code || '';
+    // 🔴 `HG-`는 옅게, 실제 6자리는 진하게(2026-07-31 사용자 제안). 아래 입력칸도 같은 문법이라
+    //    위아래가 한 짝으로 읽히고, 사용자가 옮겨 적어야 할 부분이 먼저 눈에 든다.
+    //    code는 우리가 만든 값이라 형식이 보장된다(HG- + [A-Z2-9] 6자).
+    syncCodeText.innerHTML = code
+      ? '<span class="sync-code-pre">HG-</span>' + code.replace(/^HG-/, '')
+      : '';
     // 🔴 코드가 없으면 '내 코드' 덩어리를 통째로 숨긴다(2026-07-31 사용자 확정).
     //    예전엔 '아직 없어요'와 함께 복사·보내기 버튼이 남아 있었는데, 눌러도 아무 일이
     //    안 일어나 고장난 것처럼 보였다. 할 일이 '불러오기' 하나뿐인 사람에겐 그것만 보이면 된다.
     const mine = document.getElementById('syncMine');
     if (mine) mine.hidden = !code;
     setSyncMsg('');
+    setCodeMsg(''); // 지난번에 뜬 '복사했어요'가 남아 있지 않게
     if (syncInput) syncInput.value = '';
     syncOverlay.classList.add('open');
     syncOverlay.setAttribute('aria-hidden', 'false');
@@ -4283,9 +4298,9 @@
     if (!code) return;
     try {
       await navigator.clipboard.writeText(code);
-      setSyncMsg('코드를 복사했어요', 'ok');
+      setCodeMsg('코드를 복사했어요', 'ok');
     } catch (e) {
-      setSyncMsg('복사가 안 됐어요. 코드를 직접 적어두세요', 'bad');
+      setCodeMsg('복사가 안 됐어요. 코드를 직접 적어두세요', 'bad');
     }
   });
 
@@ -4299,9 +4314,9 @@
     }
     try {
       await navigator.clipboard.writeText(text);
-      setSyncMsg('코드를 복사했어요. 메모나 카톡에 붙여넣어 두세요', 'ok');
+      setCodeMsg('코드를 복사했어요. 메모나 카톡에 붙여넣어 두세요', 'ok');
     } catch (e) {
-      setSyncMsg('코드를 직접 적어두세요', 'bad');
+      setCodeMsg('코드를 직접 적어두세요', 'bad');
     }
   });
 
