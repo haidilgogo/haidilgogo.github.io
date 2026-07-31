@@ -4180,7 +4180,6 @@
   const syncCodeText = document.getElementById('syncCodeText');
   const syncInput = document.getElementById('syncInput');
   const syncMsg = document.getElementById('syncMsg');
-  const syncIntro = document.getElementById('syncIntro');
 
   function setSyncMsg(text, kind) {
     if (!syncMsg) return;
@@ -4188,7 +4187,9 @@
     syncMsg.className = 'sync-msg' + (kind ? ' sync-msg--' + kind : '');
     syncMsg.hidden = !text;
   }
-  function openSyncSheet(isIntro) {
+  // ⚠️ 예전엔 '첫 기록 직후'를 알리는 안내 문단을 띄울지(isIntro) 골랐는데, 그 문단을 없애서
+  //    구분이 사라졌다(2026-07-31). 이제 어디서 열든 같은 화면이다.
+  function openSyncSheet() {
     if (!syncOverlay) return;
     const code = getSyncCode();
     syncCodeText.textContent = code || '';
@@ -4197,7 +4198,6 @@
     //    안 일어나 고장난 것처럼 보였다. 할 일이 '불러오기' 하나뿐인 사람에겐 그것만 보이면 된다.
     const mine = document.getElementById('syncMine');
     if (mine) mine.hidden = !code;
-    if (syncIntro) syncIntro.hidden = !isIntro;
     setSyncMsg('');
     if (syncInput) syncInput.value = '';
     syncOverlay.classList.add('open');
@@ -4264,7 +4264,7 @@
   //    시트 안에 '내 코드'와 '불러오기'가 둘 다 있어서 입구가 둘일 이유가 없었다.
   //    안내 문단은 **코드가 있을 때만** 띄운다("기록이 저장됐어요"가 빈 기기에선 거짓말이 된다).
   const codeNoticeBtn = document.getElementById('codeNoticeBtn');
-  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet(!!getSyncCode()));
+  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet());
   const codeNoticeToggle = document.getElementById('codeNoticeToggle');
   if (codeNoticeToggle) codeNoticeToggle.addEventListener('click', toggleCodeNotice);
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
@@ -4341,7 +4341,7 @@
     syncLoadBtn.disabled = true;
     pullSync(code).then((remote) => {
       syncLoadBtn.disabled = false;
-      if (!remote) { setSyncMsg('그 코드로 저장된 데이터가 없어요', 'bad'); return; }
+      if (!remote) { setSyncMsg('입력하신 코드로 저장된 데이터가 없어요', 'bad'); return; }
       mergeIntoLocal(remote);
       // 🔴 불러온 코드를 이 기기의 코드로 삼는다 — 그래야 이후 저장이 같은 곳에 쌓인다.
       setSyncCode(code);

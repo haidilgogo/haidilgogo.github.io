@@ -2917,17 +2917,11 @@ img {
 /* ── 내 데이터 코드 시트 (2026-07-31) — 기기 간 복구. 입력 시트 문법을 그대로 쓴다 ── */
 /* (여기 있던 `.sync-open-btn`(목록 아래 밑줄 링크)은 지웠다 — 입구를 띠의 버튼 하나로 합쳤다) */
 
-.sync-intro {
-  margin: 0 0 18px;
-  /* 🔴 닫기(X)가 오른쪽 위에 절대배치라, 안내가 첫 줄일 때 글자가 X 밑으로 흘러 겹쳤다
-     (2026-07-31 실기기 사진에서 '홈 화면'의 '면' 위에 X가 얹혔다). 첫 줄만 X를 피하면 되므로
-     오른쪽 여백을 준다. 아래 '내 코드'처럼 짧은 제목이 첫 줄일 땐 겹치지 않아 이 규칙이 없었다. */
-  padding-right: 48px; /* X 버튼 폭 44 + 여유. 34는 글자 끝과 X가 1px까지 붙어 너무 빠듯했다(실측) */
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: #4D4139;
-}
-.sync-intro b { font-weight: 700; }
+/* (여기 있던 `.sync-intro`(시트 맨 위 안내)는 지웠다 — 문단 자체를 없앴다.
+   ⚠️ 그때 배운 것은 남겨둔다: 닫기 X가 오른쪽 위 절대배치라, **첫 줄에 긴 문장을 두면
+   글자가 X 밑으로 흘러 겹친다**. 시트 첫 줄에 문장을 넣을 일이 생기면 오른쪽 여백 48px을 줄 것
+   — 34px은 글자 끝과 X가 1px까지 붙어 부족했다(실측). 지금은 첫 줄이 짧은 제목('내 코드')이라
+   문제가 없다. */
 .sync-code {   /* 코드는 읽고 옮겨 적는 것 — 자간 넓게, 숫자·영문이 헷갈리지 않게 */
   margin: 2px 0 12px;
   padding: 14px 12px;
@@ -2957,8 +2951,16 @@ img {
   transition: transform .08s ease, background .15s;
 }
 .sync-btn:active { transform: scale(.98); background: var(--bg-cream); }
+/* 🔴 두 버튼을 다른 색으로(2026-07-31 사용자 지시). '나에게 보내기'가 실제로 권하는 행동이라
+   강조색을 준다 — 가챠 '레시피 보기'·띠 버튼과 같은 로즈 소프트필 문법. '복사하기'는 담백하게. */
+.sync-btn--accent { border-color: transparent; background: #F6E4DE; color: #C0392B; }
+.sync-btn--accent:active { background: #EAC7BD; }
 .sync-note { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
 .sync-note b { font-weight: 700; color: #4D4139; }
+/* 🔴 코드 아래 경고문만 진하게(2026-07-31 사용자 지시). 회색 안내와 같은 톤이면
+   "절대 공유하지 마세요"가 묻힌다. 굵기는 <b>로 핵심 두 곳에만. */
+.sync-note--strong { color: #3D2B23; }
+.sync-note--strong b { color: #3D2B23; }
 .sync-divider { height: 1px; background: #E6DCD5; margin: 22px 0 18px; }
 /* 🔴 안내 메시지는 **가운데 정렬**이고 위아래로 넉넉히 띄운다(2026-07-31 사용자 지시).
    바로 아래 '불러오기' 버튼도 가운데 정렬(width 182px + margin auto)이라 축이 맞는다. */

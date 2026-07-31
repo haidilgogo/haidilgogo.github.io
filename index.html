@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=618">
+<link rel="stylesheet" href="styles.css?v=619">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -565,8 +565,9 @@
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
     </button>
 
-    <!-- 첫 기록 때만 뜨는 안내. 그 뒤 '다른 기기에서 내 기록 보기'로 열면 이 문단은 숨는다 -->
-    <p class="sync-intro" id="syncIntro" hidden>데이터가 저장됐어요. 아래 코드를 적어두면 <b>폰을 바꾸거나 홈 화면에 추가해도</b> 그대로 불러올 수 있어요.</p>
+    <!-- ⚠️ 여기 있던 맨 위 안내('데이터가 저장됐어요…')는 없앴다(2026-07-31 사용자 지시).
+         막 저장한 사람에게만 맞는 말이라, 나중에 코드만 보러 열면 어색했다.
+         이제 시트를 열면 바로 '내 코드'가 나온다. -->
 
     <!-- 🔴 코드가 없으면 이 덩어리를 통째로 숨긴다(2026-07-31 사용자 확정).
          예전엔 '아직 없어요'를 띄우고 복사·보내기 버튼을 그대로 뒀는데, 눌러도 아무 일이
@@ -575,19 +576,22 @@
       <p class="stamp-q">내 코드</p>
       <div class="sync-code" id="syncCodeText">HG-000000</div>
       <div class="sync-actions">
-        <button class="sync-btn" id="syncCopyBtn" type="button">복사</button>
+        <button class="sync-btn" id="syncCopyBtn" type="button">복사하기</button>
         <!-- '공유'라고 쓰지 말 것 — 바로 아래 "남에게 알려주지 마세요"와 정면으로 부딪힌다.
              '내게 보내기'는 카톡 '나에게 보내기'와 같은 말이라 무엇을 하는지 바로 읽힌다. -->
-        <button class="sync-btn" id="syncShareBtn" type="button">내게 보내기</button>
+        <!-- 둘 중 실제로 권하는 행동은 이쪽(코드를 안전한 곳에 남기기)이라 강조색을 준다 -->
+        <button class="sync-btn sync-btn--accent" id="syncShareBtn" type="button">나에게 보내기</button>
       </div>
-      <p class="sync-note">이 코드가 있으면 어디서든 데이터를 불러올 수 있어요. 아는 사람은 내 데이터를 볼 수 있으니 남에게 알려주지 마세요.</p>
+      <!-- 🔴 이 설명만 진한 글씨(.sync-note--strong)다 — 코드를 남에게 주면 안 된다는 경고라
+           다른 회색 안내와 같은 톤이면 묻힌다(2026-07-31 사용자 지시). 핵심 두 곳만 굵게. -->
+      <p class="sync-note sync-note--strong">이 코드가 있으면 어디서든 <b>데이터를 불러올 수 있어요.</b><br>코드를 아는 사람은 내 데이터를 볼 수 있으니 <b>절대 공유하지 마세요.</b></p>
       <div class="sync-divider"></div>
     </div>
 
     <!-- 🔴 '코드 불러오기'가 아니라 '코드로 불러오기'다 — 불러오는 대상은 코드가 아니라 데이터고,
          코드는 그걸 가져오는 열쇠다. 옛 문구('다른 기기 코드 불러오기')는 '다른 기기의 코드를
          가져온다'로 읽혔다(2026-07-31 사용자 지적). -->
-    <p class="stamp-q">데이터를 코드로 불러오기</p>
+    <p class="stamp-q">코드를 입력하여 데이터 불러오기</p>
     <div class="stamp-fields">
       <!-- 🔴 `HG-`는 화면에 박아두고 **6자리만** 치게 한다(2026-07-31 사용자 제안, 구글 인증코드 'G-' 방식).
            "HG-도 넣어야 하나?"를 고민할 일 자체가 없어진다.
@@ -886,7 +890,7 @@
   </div>
 </div>
 
-<script src="script.js?v=523"></script>
+<script src="script.js?v=524"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
