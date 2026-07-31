@@ -3172,8 +3172,7 @@
   let stampData = { version: 2, records: [] };
   function saveStamps() {
     try { localStorage.setItem(STAMPS_KEY, JSON.stringify(stampData)); } catch (e) { /* 시크릿 모드 등 저장 실패 무시 */ }
-    schedulePush(); // 서버 사본 갱신(맨 아래 「내 데이터 코드」 절)
-    maybeIntroCode(); // 첫 기록이면 코드를 만들어 한 번 알려준다
+    schedulePush(); // 서버 사본 갱신 + 코드 생성 + 띠 갱신(맨 아래 「내 데이터 코드」 절)
   }
   function newStampId() {
     return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -4056,7 +4055,13 @@
   // 서버에 올리기 — 저장이 연달아 일어나도 한 번만 보내게 묶는다
   let pushTimer = null;
   function schedulePush() {
-    if (!syncRoot || !getSyncCode()) return; // 코드가 없으면 아직 아무것도 안 올린다
+    if (!syncRoot) return;
+    // 🔴 **저장할 게 생기는 순간** 코드를 만든다 — 스티커든 즐겨찾기든 좋아요든(2026-07-31).
+    //    예전엔 스티커 첫 기록 때만 만들어서, 즐겨찾기·좋아요만 쓰는 사람은 코드도 없고
+    //    서버에 아무것도 안 올라갔다. 띠에는 "셋 다 따라온다"고 적어놓고 실제론 아니었다.
+    //    (사용자가 발견: "즐겨찾기나 좋아요 했을때는 반응이 없고")
+    ensureSyncCode();
+    renderCodeNotice(); // 코드가 막 생겼으면 띠 문구·버튼을 바꿔준다
     clearTimeout(pushTimer);
     pushTimer = setTimeout(pushSync, 800);
   }
@@ -4091,13 +4096,13 @@
     } catch (e) { /* 그리기 실패해도 데이터는 이미 저장됐다 */ }
   }
 
-  // 첫 스티커 기록 때 코드를 만든다. 이미 있으면 그대로 쓴다.
+  // 코드를 만든다(이미 있으면 그대로). 🔴 여기서 올리지 않는다 — 부르는 쪽(schedulePush)이
+  //   곧바로 올린다. 여기서도 올리면 저장 한 번에 두 번 보내게 된다.
   function ensureSyncCode() {
     let code = getSyncCode();
     if (code) return code;
     code = makeSyncCode();
     setSyncCode(code);
-    pushSync(); // 만들자마자 지금 있는 기록을 통째로 올린다(기존 사용자 이전 포함)
     return code;
   }
 
@@ -4151,11 +4156,8 @@
   //    목적이라 닫기가 아니라 **접기**다. 접힌 상태에서도 제목 한 줄은 남는다.
   //    저장하는 건 '닫았다'가 아니라 '접어뒀다'뿐이고, 기록이 하나라도 있으면 띠 자체는 늘 뜬다.
   const CODE_FOLD_KEY = 'haidilao_code_notice_folded';
-  function maybeIntroCode() {
-    if (!(stampData.records || []).length) return;
-    ensureSyncCode();   // 이미 있으면 그대로 둔다
-    renderCodeNotice();
-  }
+  // (여기 있던 maybeIntroCode는 지웠다 — 코드 만들기와 띠 갱신을 schedulePush가 맡는다.
+  //  스티커에만 걸려 있던 게 즐겨찾기·좋아요를 빠뜨린 원인이었다.)
   function renderCodeNotice() {
     const el = document.getElementById('codeNotice');
     if (!el) return;
