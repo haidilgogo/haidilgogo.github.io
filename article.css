@@ -194,3 +194,68 @@
 @media (min-width: 641px) {
   .art-footer { padding-bottom: 24px; }
 }
+
+/* ④ 이미지 출처 페이지(credits.html) — 앱에 없는 화면이라 여기에만 있다.
+   목록 항목은 .column-notes 계열과 톤을 맞추되, 40px 원형 썸네일이 붙는 만큼 따로 둔다. */
+.credit-head {
+  padding: 26px 22px 2px;
+}
+.credit-title {
+  margin: 0;
+  font-size: 24px; font-weight: 800; letter-spacing: -.02em;
+  color: var(--text-dark);
+}
+.credit-sub {
+  margin: 8px 0 0;
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-muted);
+}
+.credit-sec {
+  margin: 0 22px; padding: 22px 0;
+  border-top: 1px solid #ECE5DC;
+}
+.credit-sec:first-of-type { border-top: 0; padding-top: 18px; }
+.credit-sec-title {
+  margin: 0 0 6px;
+  font-size: 15px; font-weight: 800; letter-spacing: -.02em;
+  color: var(--text-dark);
+}
+.credit-note {
+  margin: 0 0 2px;
+  font-size: 12px; line-height: 1.6;
+  color: var(--text-muted);
+}
+.credit-list {
+  display: flex; flex-direction: column; gap: 14px;
+  margin: 14px 0 0; padding: 0; list-style: none;
+}
+.credit-item {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px;
+  align-items: center;
+}
+.credit-thumb {
+  width: 40px; height: 40px;
+  border-radius: 50%; object-fit: cover;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
+}
+.credit-meta {
+  display: flex; flex-direction: column; gap: 3px;
+  min-width: 0;
+}
+.credit-name {
+  font-size: 13px; font-weight: 700;
+  color: var(--text-dark);
+}
+.credit-by {
+  font-size: 12px; line-height: 1.45;
+  color: var(--text-muted);
+}
+.credit-links {
+  display: flex; gap: 12px;
+  font-size: 11px;
+}
+.credit-links a {
+  color: #C08A80;
+  text-decoration: underline; text-decoration-color: #E4C0B8; text-underline-offset: 3px;
+}
+.credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }

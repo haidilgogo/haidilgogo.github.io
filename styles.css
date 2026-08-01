@@ -960,6 +960,21 @@ img {
   display: none;
 }
 
+/* 푸터 맨 아래 '이미지 출처' — 제보 링크(.footer-report)보다 한 단계 흐리게.
+   .footer의 gap 8px + .footer-report의 세로 패딩이 겹쳐 뜨므로 위쪽을 당겨 붙인다. */
+.footer-credit {
+  margin-top: -10px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #C7A79F;
+  text-decoration: underline;
+  text-decoration-color: #EBD6CF;
+  text-underline-offset: 3px;
+  transition: color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.footer-credit:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+
 @media all {
   .footer {
     padding: 12px 20px;
