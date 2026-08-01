@@ -965,7 +965,8 @@ img {
 .footer-credit {
   margin-top: -10px;
   padding: 6px 10px;
-  font-size: 11px;
+  font-size: 12px;      /* 제보 링크(.footer-report)와 같은 크기·굵기 */
+  font-weight: 500;
   color: #C7A79F;
   text-decoration: underline;
   text-decoration-color: #EBD6CF;
