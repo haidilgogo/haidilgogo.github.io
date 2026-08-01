@@ -1,6 +1,15 @@
 .DS_Store
 .claude/
 
+# 🔴 내부 문서는 비공개 저장소 haidilgogo/haidilgogo-docs 로 옮겼다 (2026-08-01).
+# 이 저장소는 GitHub Pages 무료 요금제라 반드시 공개여야 하고, _config.yml의 exclude는
+# 사이트 서빙만 막을 뿐 GitHub에서 읽히는 것은 못 막았다(raw 주소로 200이 떴다).
+# 아래 둘은 편의를 위한 바로가기(심볼릭 링크)이고 실체는 ../Haidilgogo-docs/ 에 있다.
+# ⚠️ 새 내부 문서를 여기 만들지 말 것 — 만들면 다시 공개된다.
+CLAUDE.md
+HANDOVER.md
+REVIEW-SYNC-CODE*.md
+
 # 썸네일 원본은 assets 루트에 임시로 놓고 cards/로 최적화 후 삭제함.
 # 혹시 남아도 커밋 안 되게 루트 직속 이미지는 무시(cards/·icons/·fonts/는 영향 없음).
 assets/*.png
