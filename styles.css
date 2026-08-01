@@ -936,9 +936,11 @@ img {
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 500;
-  color: #C08A80;
+  /* 상단바·하단탭바 아이콘과 같은 앱 공통 비활성색. 이전 연한 로즈(#C08A80)는
+     브랜드 문구 아래에서 묻혀 보였다(2026-08-01 세 색 비교). */
+  color: #4D4139;
   text-decoration: underline;
-  text-decoration-color: #E4C0B8;
+  text-decoration-color: #BFB0A6;
   text-underline-offset: 3px;
   text-align: center;
   transition: color .15s ease;
@@ -946,8 +948,8 @@ img {
 }
 
 .footer-report:hover {
-  color: var(--brand-red-dark);
-  text-decoration-color: var(--brand-red-dark);
+  color: var(--brand-red);
+  text-decoration-color: var(--brand-red);
 }
 .footer-report-ic,
 .footer-credit-ic { /* 💌 대체 봉투 아이콘 — currentColor로 링크 색·호버 빨강 자동 추종(2026-07-24) */
@@ -980,7 +982,7 @@ img {
   flex: none;
   width: 1px;
   height: 12px;
-  background: #E4C0B8;
+  background: #BFB0A6;
 }
 .footer-credit {
   /* 좌우 패딩은 제보 링크(.footer-report)와 같은 16px이어야 한다. 다르면 글자 기준
@@ -988,14 +990,14 @@ img {
   padding: 8px 16px;
   font-size: 12px;      /* 제보 링크(.footer-report)와 같은 크기·굵기·색 */
   font-weight: 500;
-  color: #C08A80;
+  color: #4D4139;
   text-decoration: underline;
-  text-decoration-color: #E4C0B8;
+  text-decoration-color: #BFB0A6;
   text-underline-offset: 3px;
   transition: color .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.footer-credit:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+.footer-credit:hover { color: var(--brand-red); text-decoration-color: var(--brand-red); }
 
 @media all {
   .footer {
