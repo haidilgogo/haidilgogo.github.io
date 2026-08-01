@@ -67,14 +67,14 @@ body { background: var(--bg-card); }
   content:''; position:absolute; left:0; right:0; bottom:0;
   height:2px; border-radius:1px; background:var(--brand-red);
 }
-/* 냄비는 왼쪽, 고른 육수는 오른쪽에 번호와 함께 (2026-08-02 사용자 제안) */
-.mn-pot-wrap { display:flex; align-items:center; gap:12px; padding:0 0 4px; }
-.mn-pot-side { flex:1; min-width:0; display:flex; flex-direction:column; gap:14px; }
+/* 냄비는 가운데, 고른 육수 목록은 그 아래 (2026-08-02 사용자 제안).
+   🔴 옆에 두면 냄비와 글자가 폭을 나눠 써서 좁은 기기(360px 이하)에서 이름이 감겼다.
+   아래로 내리면 글자가 화면 폭을 다 쓰므로 어느 기기에서도 안 감긴다. */
+.mn-pot-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; padding:0 0 4px; }
+.mn-pot-side { width:100%; display:flex; flex-direction:column; gap:12px; }
 .mn-pot-row { display:flex; gap:6px; align-items:flex-start; font-size:13px; line-height:1.35; }
 .mn-pot-row b {
-  /* 🔴 24px = 잰 값이다. 26px로 하면 375px 화면에서도 「고수 듬뿍 훠궈」가 두 줄로 감긴다.
-     ⚠️ 360px 이하에서는 배지를 18px로 줄여도 감긴다 — 원인이 배지가 아니라 냄비 폭(196px)이다. */
-  flex:none; width:24px; height:24px; border-radius:0;
+  flex:none; width:26px; height:26px; border-radius:0;   /* 냄비 안 배지와 같은 크기 */
   background:rgba(28,12,8,.45); color:#fff; font-size:14px; font-weight:800;
   display:flex; align-items:center; justify-content:center;
 }
@@ -89,10 +89,8 @@ body { background: var(--bg-card); }
 /* 🔴 실제 하이디라오 태블릿 화면을 따랐다(2026-08-02 사용자 사진).
    흰 냄비 테 + 칸을 가르는 흰 선 + 가운데 모인 번호 배지. 칸마다 붙던 이름 띠는 뺐다. */
 .mn-pot {
-  /* 🔴 196px = 잰 값이다(375px 화면 기준). 오른쪽 줄에 ✕ 가 들어가면서 글자 자리가
-     줄어 206px에서는 「고수 듬뿍 훠궈」가 두 줄로 감긴다. 196px이 경계다.
-     ⚠️ 오른쪽 줄에 무엇을 더 붙이면 이 값을 다시 재야 한다 — 눈대중으로 두지 말 것. */
-  width:196px; height:196px; flex:none; border-radius:25px; padding:11px;
+  /* 목록을 아래로 내려 폭 경쟁이 없어졌으므로 냄비를 키웠다(196 → 220px). */
+  width:220px; height:220px; flex:none; border-radius:28px; padding:12px;
   background:#F3E9DA; border:1px solid #E0D0B4;   /* 바깥 테 = 크림 */
 }
 .mn-pot-inner {
