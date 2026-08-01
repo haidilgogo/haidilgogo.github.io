@@ -949,7 +949,8 @@ img {
   color: var(--brand-red-dark);
   text-decoration-color: var(--brand-red-dark);
 }
-.footer-report-ic { /* 💌 대체 봉투 아이콘 — currentColor로 링크 색·호버 빨강 자동 추종(2026-07-24) */
+.footer-report-ic,
+.footer-credit-ic { /* 💌 대체 봉투 아이콘 — currentColor로 링크 색·호버 빨강 자동 추종(2026-07-24) */
   width: 13px;
   height: 13px;
   vertical-align: -2px;
@@ -962,9 +963,20 @@ img {
 
 /* 푸터 맨 아래 '이미지 출처' — 제보 링크(.footer-report)보다 한 단계 흐리게.
    .footer의 gap 8px + .footer-report의 세로 패딩이 겹쳐 뜨므로 위쪽을 당겨 붙인다. */
+/* 제보 링크와 한 줄로 놓는 묶음. 320px에서 둘이 234px라 280px 안에 들어간다(2026-08-01 측정). */
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.footer-sep {
+  color: #DCC6BF;
+  font-size: 12px;
+}
+
 .footer-credit {
-  margin-top: -10px;
-  padding: 6px 10px;
+  padding: 8px 10px;
   font-size: 12px;      /* 제보 링크(.footer-report)와 같은 크기·굵기·색 */
   font-weight: 500;
   color: #C08A80;
