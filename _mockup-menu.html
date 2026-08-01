@@ -55,24 +55,27 @@ body { background: var(--bg-card); }
 
 /* ── 전골: 냄비 (CSS로 그린다 — 그림 파일 안 씀) ────────────────── */
 /* 칸 수는 화살표가 아니라 글씨를 눌러 고른다(2026-08-02 사용자 지시) */
-.mn-pot-seg { display:flex; justify-content:center; gap:6px; padding:2px 0 10px; }
+.mn-pot-seg { display:flex; justify-content:center; gap:24px; padding:2px 0 12px; }
+/* 🔴 알약(둥근 배경) 쓰지 않는다 — 앱의 탭과 같은 밑줄 방식으로 맞춘다 */
 .mn-pot-seg button {
-  border:1px solid transparent; background:none; font-family:inherit;
-  font-size:14px; font-weight:700; color:var(--text-muted);
-  padding:6px 13px; border-radius:16px; cursor:pointer;
+  border:0; background:none; font-family:inherit; position:relative;
+  font-size:15px; font-weight:600; color:var(--text-muted);
+  padding:0 0 5px; cursor:pointer;
 }
-.mn-pot-seg button.is-on {
-  background:#fff; border-color:var(--card-border); color:var(--text-dark); font-weight:800;
+.mn-pot-seg button.is-on { color:var(--text-dark); font-weight:800; }
+.mn-pot-seg button.is-on::after {
+  content:''; position:absolute; left:0; right:0; bottom:0;
+  height:2px; border-radius:1px; background:var(--brand-red);
 }
 .mn-pot-wrap { display:flex; align-items:center; justify-content:center; padding:0 0 4px; }
 .mn-pot {
-  width:148px; height:148px; border-radius:20px; padding:8px;
+  width:206px; height:206px; border-radius:24px; padding:9px;
   background:#EDE6DC; border:1px solid #D9CCBC;
   box-shadow:inset 0 0 0 4px #F7F2EA;
 }
 /* 칸 사이는 얇은 선 하나로 나눈다 — 틈(gap)의 바닥색이 그대로 선이 된다 */
 .mn-pot-inner {
-  width:100%; height:100%; border-radius:12px; overflow:hidden;
+  width:100%; height:100%; border-radius:15px; overflow:hidden;
   display:grid; gap:1px; background:#C9B49C;
 }
 .mn-pot-inner[data-cells="1"] { grid-template-columns:1fr; grid-template-rows:1fr; }
@@ -84,6 +87,12 @@ body { background: var(--bg-card); }
   position:relative; font-size:11px; color:#B6A497; text-align:center; padding:4px;
 }
 .mn-cell img { width:100%; height:100%; object-fit:cover; }
+.mn-cell-x {
+  position:absolute; top:5px; right:5px; width:22px; height:22px; border-radius:50%;
+  border:0; padding:0; background:rgba(43,18,13,.62); color:#fff;
+  font-size:13px; font-weight:700; line-height:22px; text-align:center;
+  cursor:pointer; font-family:inherit;
+}
 .mn-cell-name {
   position:absolute; left:0; right:0; bottom:0; padding:3px 4px;
   background:rgba(0,0,0,.5); color:#fff; font-size:10px; font-weight:700;
@@ -100,6 +109,9 @@ body { background: var(--bg-card); }
   padding:0; font-family:inherit; transition:border-color .15s, transform .1s;
 }
 .mn-card:active { transform:translateY(1px); }
+/* 육수 카드는 담겨도 표시가 안 바뀌므로 누르는 반응이 유일한 신호다 — 조금 더 분명하게 */
+.mn-card[data-broth]:active { border-color:var(--brand-red); transform:scale(.97); }
+@media (hover:hover) { .mn-card[data-broth]:hover { border-color:var(--card-hover-border); } }
 .mn-card.is-on { border-color:var(--brand-red); border-width:2px; }
 .mn-card-thumb { aspect-ratio:1/1; background:#FBF4E6; display:flex; align-items:center; justify-content:center; }
 .mn-card-thumb img { width:100%; height:100%; object-fit:contain; }
@@ -241,17 +253,18 @@ body { background: var(--bg-card); }
             ${Array.from({ length: cells }, (_, i) => {
               const b = broths[i];
               return b
-                ? `<div class="mn-cell is-filled" data-cell="${i}"><img src="${IMG(b)}" alt=""><span class="mn-cell-name">${b}</span></div>`
-                : `<div class="mn-cell" data-cell="${i}">비어 있음</div>`;
+                ? `<div class="mn-cell is-filled"><img src="${IMG(b)}" alt=""><button class="mn-cell-x" data-cell="${i}" aria-label="빼기">✕</button><span class="mn-cell-name">${b}</span></div>`
+                : `<div class="mn-cell">비어 있음</div>`;
             }).join('')}
           </div>
         </div>
       </div>
       <div class="mn-grid">
         ${D.broths.map(b => {
-          const on = broths.includes(b.n);
-          return `<button class="mn-card ${on ? 'is-on' : ''} ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
-            <span class="mn-card-check">✓</span>
+          // 🔴 담겨도 체크·빨간 테두리를 붙이지 않는다(2026-08-02 사용자 지시) —
+          //    체크가 있으면 「이미 골랐으니 또 못 담는다」로 읽힌다. 중복해서 담을 수 있는 화면이다.
+          //    담긴 것은 위 냄비가 보여준다. 카드에는 누르는 반응(hover/press)만 준다.
+          return `<button class="mn-card ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
             ${b.jeju ? '<span class="mn-card-part">제주 한정</span>' : ''}
             <div class="mn-card-thumb ${b.img ? '' : 'is-text'} ${!b.img && b.jeju ? 'has-part' : ''}">${b.img ? `<img src="${IMG(b.n)}" alt="">` : b.n}</div>
             ${b.img ? `<span class="mn-card-name">${b.n}</span>` : ''}
@@ -323,7 +336,7 @@ body { background: var(--bg-card); }
       return render();
     }
 
-    // 냄비 칸을 누르면 그 칸만 뺀다 (같은 육수가 여러 칸에 있어도 누른 칸만)
+    // 칸 안의 ✕ 를 눌러 뺀다. 칸 아무 데나 눌러 빠지면 실수로 지워진다
     const cell = e.target.closest('[data-cell]');
     if (cell) {
       const i = +cell.dataset.cell;
