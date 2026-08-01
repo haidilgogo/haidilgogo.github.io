@@ -228,6 +228,9 @@ body { background: var(--bg-card); }
   const D = window.MENU_DATA;
   const TABS = [{ name: '전골', pot: true }].concat(D.tabs.map(t => ({ name: t.name, items: t.items })));
   const IMG = n => 'assets/menu/' + n + '.webp';
+  // 냄비 칸은 타일(-타일)을 쓴다. 아직 안 들어온 육수는 카드용 그림을 임시로 쓴다(냄비 속 냄비로 보인다)
+  const TILE = new Set(D.broths.filter(b => b.tile).map(b => b.n));
+  const CELL_IMG = n => IMG(TILE.has(n) ? n + '-타일' : n);
 
   let cur = 0;                    // 지금 탭
   let cells = 2;                  // 냄비 칸 수(1·2·4)
@@ -260,7 +263,7 @@ body { background: var(--bg-card); }
             ${Array.from({ length: cells }, (_, i) => {
               const b = broths[i];
               return b
-                ? `<div class="mn-cell is-filled"><img src="${IMG(b)}" alt=""><button class="mn-cell-x" data-cell="${i}" aria-label="빼기"><span>✕</span></button><span class="mn-cell-name">${b}</span></div>`
+                ? `<div class="mn-cell is-filled"><img src="${CELL_IMG(b)}" alt=""><button class="mn-cell-x" data-cell="${i}" aria-label="빼기"><span>✕</span></button><span class="mn-cell-name">${b}</span></div>`
                 : `<div class="mn-cell">비어 있음</div>`;
             }).join('')}
           </div>

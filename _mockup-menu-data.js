@@ -797,62 +797,74 @@ window.MENU_DATA = {
   {
    "n": "토마토탕훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": true
   },
   {
    "n": "쏸차이훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": true
   },
   {
    "n": "우유마라훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": true
   },
   {
    "n": "청유마라훠궈(오리지널)",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": true
   },
   {
    "n": "소기름훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "똠얌꿍탕훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "삼선탕훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "후추탕훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "삼계탕훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "버섯탕훠궈",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "맑은 탕",
    "img": true,
-   "jeju": false
+   "jeju": false,
+   "tile": false
   },
   {
    "n": "고수 듬뿍 훠궈",
    "img": true,
-   "jeju": true
+   "jeju": true,
+   "tile": false
   }
  ]
 };
