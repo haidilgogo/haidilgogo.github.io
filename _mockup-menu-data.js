@@ -73,7 +73,7 @@ window.MENU_DATA = {
     {
      "n": "차돌박이(지방 적음)",
      "img": false,
-     "part": false,
+     "part": true,
      "jeju": false
     },
     {
@@ -173,12 +173,6 @@ window.MENU_DATA = {
      "jeju": false
     },
     {
-     "n": "소목심",
-     "img": false,
-     "part": true,
-     "jeju": false
-    },
-    {
      "n": "마라오리발",
      "img": false,
      "part": true,
@@ -200,19 +194,13 @@ window.MENU_DATA = {
      "n": "말고기",
      "img": false,
      "part": true,
-     "jeju": true
-    },
-    {
-     "n": "우아롱사태",
-     "img": true,
-     "part": true,
      "jeju": false
     },
     {
      "n": "제주 흑돼지목살",
      "img": false,
      "part": true,
-     "jeju": true
+     "jeju": false
     }
    ]
   },
@@ -295,7 +283,7 @@ window.MENU_DATA = {
      "n": "소라",
      "img": false,
      "part": true,
-     "jeju": true
+     "jeju": false
     }
    ]
   },
@@ -446,12 +434,6 @@ window.MENU_DATA = {
      "jeju": false
     },
     {
-     "n": "두유피",
-     "img": false,
-     "part": false,
-     "jeju": false
-    },
-    {
      "n": "두유피튀김",
      "img": false,
      "part": false,
@@ -472,7 +454,7 @@ window.MENU_DATA = {
     {
      "n": "목면두부",
      "img": false,
-     "part": false,
+     "part": true,
      "jeju": false
     },
     {
@@ -687,7 +669,7 @@ window.MENU_DATA = {
      "n": "흰 무",
      "img": false,
      "part": true,
-     "jeju": true
+     "jeju": false
     }
    ]
   },
@@ -788,7 +770,7 @@ window.MENU_DATA = {
      "n": "매운 떡볶이",
      "img": false,
      "part": true,
-     "jeju": true
+     "jeju": false
     },
     {
      "n": "아이스크림",
@@ -800,7 +782,7 @@ window.MENU_DATA = {
      "n": "제주한라봉셔벗",
      "img": false,
      "part": true,
-     "jeju": true
+     "jeju": false
     },
     {
      "n": "치즈새우볼",

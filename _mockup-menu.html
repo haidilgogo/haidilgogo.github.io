@@ -25,13 +25,9 @@ body { background: var(--bg-card); }
   cursor:pointer; user-select:none;
 }
 .mn-basket-ic { font-size:16px; line-height:1; }
+/* 🔴 숫자는 넣지 않는다(2026-08-02 사용자 확정). 비었는지만 진하기로 구분한다 */
 .mn-basket-txt { font-size:14px; font-weight:700; color:var(--text-dark); }
-.mn-basket-num {
-  min-width:20px; height:20px; padding:0 6px; border-radius:10px;
-  background:var(--brand-red); color:#fff; font-size:12px; font-weight:800;
-  display:inline-flex; align-items:center; justify-content:center;
-}
-.mn-basket-num.is-zero { background:#DED0C4; }
+.mn-basket-txt.is-empty { color:var(--text-muted); font-weight:600; }
 .mn-basket-arrow { margin-left:auto; color:var(--text-muted); font-size:12px; }
 
 /* ── 분류 탭 한 줄 (가로 스크롤) ───────────────────────────────── */
@@ -171,8 +167,7 @@ body { background: var(--bg-card); }
 <main class="main">
   <div class="mn-basket" id="basketBar">
     <span class="mn-basket-ic">🧺</span>
-    <span class="mn-basket-txt">담은 목록</span>
-    <span class="mn-basket-num is-zero" id="basketNum">0</span>
+    <span class="mn-basket-txt" id="basketTxt">담은 목록</span>
     <span class="mn-basket-arrow" id="basketArrow">▲</span>
   </div>
 
@@ -218,10 +213,8 @@ body { background: var(--bg-card); }
 
   function renderTabs() {
     $('#mnTabs').innerHTML = TABS.map((t, i) => {
-      const n = t.pot ? broths.length
-                      : t.items.filter(it => picked.has(it.n)).length;
-      return `<button class="mn-tab ${i === cur ? 'is-on' : ''}" data-i="${i}">${t.name}` +
-             (n ? `<span class="mn-tab-dot">${n}</span>` : '') + `</button>`;
+      // 🔴 탭에 숫자를 넣지 않는다 — 고른 카드에 이미 ✓가 있어 같은 정보가 두 번 나온다
+      return `<button class="mn-tab ${i === cur ? 'is-on' : ''}" data-i="${i}">${t.name}</button>`;
     }).join('');
   }
 
@@ -282,9 +275,7 @@ body { background: var(--bg-card); }
     renderTabs();
     const t = TABS[cur];
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
-    const n = count();
-    $('#basketNum').textContent = n;
-    $('#basketNum').classList.toggle('is-zero', !n);
+    $('#basketTxt').classList.toggle('is-empty', !count());
     renderNext();
     window.scrollTo({ top: 0 });
   }
