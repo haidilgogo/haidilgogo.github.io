@@ -35,6 +35,17 @@ body { background: var(--bg-card); }
   font-size:12px; color:var(--text-muted);
 }
 
+/* ── 부제 (앱의 .card-sub와 같은 모양: 13px·400·회색·한 줄) ─── */
+.cmp-sub {
+  display:block; margin-top:3px;
+  font-size:13px; font-weight:400; line-height:1.3; color:var(--text-muted);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+/* 🔴 글자 카드는 본 목업에서 가로 flex다 — 그냥 두면 부제가 이름 **옆**에 붙는다.
+   화면으로 보고 잡았다. 세로로 쌓아야 한다. */
+.mn-card-thumb.is-text { flex-direction:column; }
+.cmp-desc code { font-size:12px; background:#F3E9DA; padding:1px 4px; border-radius:4px; }
+
 /* ── 안 ②: 수량 스테퍼 ────────────────────────────────── */
 /* 🔴 글자 카드(.mn-card--text)는 본 목업에서 가로 flex다. 그대로 두면 스테퍼가 이름 **옆**에
    붙어 이름 자리가 좁아진다(제주 흑돼지목살이 실제로 두 줄이 됐다). ②에서만 세로로 쌓는다. */
@@ -86,6 +97,13 @@ body { background: var(--bg-card); }
       <button data-mode="3">③ 숫자 배지</button>
     </div>
     <p class="cmp-desc" id="cmpDesc"></p>
+
+    <p class="cmp-q" style="margin-top:14px">괄호 안을 부제로 내릴까요?</p>
+    <div class="cmp-seg" id="subSeg">
+      <button data-sub="0" class="is-on">그대로 두기</button>
+      <button data-sub="1">부제로 내리기</button>
+    </div>
+    <p class="cmp-desc" id="subDesc"></p>
   </div>
 
   <p class="cmp-sum" id="cmpSum"></p>
@@ -120,12 +138,29 @@ body { background: var(--bg-card); }
     });
 
   const D = window.MENU_DATA;
-  const TABS = D.tabs;                       // 전골은 이미 정해졌으니 여기선 뺀다
   const IMG = n => 'assets/menu/' + n + '.webp';
 
+  // 🔴 화면에서만 바꿔 보는 이름이다. `메뉴.md`도 그림 파일명도 안 건드렸다.
+  //    (오리지널)을 되살릴지 눈으로 보고 정하려고 넣었다 — 정해지면 데이터 쪽을 고친다.
+  const 미리보기이름 = { '청유마라훠궈': '청유마라훠궈(오리지널)' };
+  const disp = n => 미리보기이름[n] || n;
+
+  // 육수 카드도 같이 본다 — 괄호 이름이 육수에도 걸려 있어서다(청유마라훠궈).
+  // 냄비·2×2 목록은 본 목업에서 이미 정해졌으므로 여기선 카드만 본다.
+  const TABS = [{ name: '육수(전골)', items: D.broths.map(b => ({ n: b.n, img: b.img, part: false, jeju: b.jeju })) }]
+    .concat(D.tabs);
+
   let mode = 1;
+  let sub = 0;                               // 괄호를 부제로 내릴까
   let cur = 0;
   const qty = new Map();                     // 이름 → 개수
+
+  /** 「앞(뒤)」를 윗줄과 부제로 나눈다. 부제를 안 쓰면 통째로 돌려준다. */
+  function label(n) {
+    const t = disp(n);
+    const m = sub ? t.match(/^(.+?)\((.+)\)$/) : null;
+    return m ? `${m[1]}<span class="cmp-sub">${m[2]}</span>` : t;
+  }
 
   const $ = s => document.querySelector(s);
   const total = () => [...qty.values()].reduce((a, b) => a + b, 0);
@@ -149,9 +184,11 @@ body { background: var(--bg-card); }
     const n = qty.get(it.n) || 0;
     const on = mode === 1 && n > 0;
     const part = it.part ? `<span class="mn-card-part">${it.jeju ? '제주 한정' : '일부 매장'}</span>` : '';
+    // 🔴 그림 주소는 **데이터의 진짜 이름**으로 만든다. 화면 이름(미리보기·부제)과 섞으면
+    //    파일을 못 찾아 카드가 빈칸이 된다.
     const thumb = `<div class="mn-card-thumb ${it.img ? '' : 'is-text'} ${!it.img && it.part ? 'has-part' : ''}">` +
-                  `${it.img ? `<img src="${IMG(it.n)}" alt="">` : it.n}</div>`;
-    const name = it.img ? `<span class="mn-card-name">${it.n}</span>` : '';
+                  `${it.img ? `<img src="${IMG(it.n)}" alt="">` : label(it.n)}</div>`;
+    const name = it.img ? `<span class="mn-card-name">${label(it.n)}</span>` : '';
 
     // ① 확인 표시 — 지금 목업과 같다
     if (mode === 1) {
@@ -171,9 +208,19 @@ body { background: var(--bg-card); }
       ${n > 0 ? `<span class="cnt">${n}</span>` : ''}${part}${thumb}${name}</button>`;
   }
 
+  const SUBDESC = {
+    0: '괄호를 그대로 둔다. 320px에서 <b>5개가 두 줄</b>이 된다 — ' +
+       '<code>차돌박이(지방 적음)</code> · <code>가물치(가시주의)</code> · <code>랍스터(사전예약)</code> · ' +
+       '<code>루로우판(대만식 제육덮밥)</code> · <code>청유마라훠궈(오리지널)</code>',
+    1: '괄호를 떼고 아랫줄에 회색으로 내린다(앱의 <code>.card-sub</code>와 같은 모양). ' +
+       '<b>다섯 개 모두 한 줄</b>이 된다.<br>⚠️ 「가시주의」는 경고인데 회색 작은 글씨가 되고, ' +
+       '「지방 적음/많음」은 두 카드를 <b>구별하는 정보</b>인데 흐려진다.',
+  };
+
   function render() {
     renderTabs();
     $('#cmpDesc').innerHTML = DESC[mode];
+    $('#subDesc').innerHTML = SUBDESC[sub];
     $('#mnBody').innerHTML = `<div class="mn-grid">${TABS[cur].items.map(card).join('')}</div>`;
     const t = total();
     $('#basketTxt').classList.toggle('is-empty', !t);
@@ -196,6 +243,13 @@ body { background: var(--bg-card); }
         mode = +seg.dataset.mode;
         [...document.querySelectorAll('#cmpSeg button')]
           .forEach(b => b.classList.toggle('is-on', b === seg));
+        return render();
+      }
+      const sg = e.target.closest('[data-sub]');
+      if (sg) {
+        sub = +sg.dataset.sub;
+        [...document.querySelectorAll('#subSeg button')]
+          .forEach(b => b.classList.toggle('is-on', b === sg));
         return render();
       }
       const tab = e.target.closest('.mn-tab');
