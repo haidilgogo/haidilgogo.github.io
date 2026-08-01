@@ -67,11 +67,27 @@ body { background: var(--bg-card); }
   content:''; position:absolute; left:0; right:0; bottom:0;
   height:2px; border-radius:1px; background:var(--brand-red);
 }
-.mn-pot-wrap { display:flex; align-items:center; justify-content:center; padding:0 0 4px; }
+/* 냄비는 왼쪽, 고른 육수는 오른쪽에 번호와 함께 (2026-08-02 사용자 제안) */
+.mn-pot-wrap { display:flex; align-items:center; gap:12px; padding:0 0 4px; }
+.mn-pot-side { flex:1; min-width:0; display:flex; flex-direction:column; gap:7px; }
+.mn-pot-row { display:flex; gap:6px; align-items:flex-start; font-size:13px; line-height:1.35; }
+.mn-pot-row b {
+  flex:none; width:18px; height:18px; margin-top:1px; border-radius:4px;
+  background:#A8823C; color:#fff; font-size:11px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.mn-pot-row.is-empty { color:var(--text-muted); }
+.mn-pot-row.is-empty b { background:#DED0C4; }
+.mn-pot-row b.is-dark { color:#241C18; }
+.mn-pot-row span { min-width:0; word-break:keep-all; color:var(--text-dark); font-weight:700; }
+.mn-pot-row.is-empty span { color:var(--text-muted); font-weight:600; }
 /* 🔴 실제 하이디라오 태블릿 화면을 따랐다(2026-08-02 사용자 사진).
    흰 냄비 테 + 칸을 가르는 흰 선 + 가운데 모인 번호 배지. 칸마다 붙던 이름 띠는 뺐다. */
 .mn-pot {
-  width:206px; height:206px; border-radius:26px; padding:11px;
+  /* 🔴 206px = 잰 값이다. 「청유마라훠궈(오리지널)」에서 (오리지널)을 뺀 뒤
+     가장 긴 이름이 「고수 듬뿍 훠궈」가 되어 220px까지도 한 줄로 들어간다(375px 화면 기준, 실측).
+     (오리지널)이 있던 때는 186px만 돼도 두 줄로 감겼다. */
+  width:206px; height:206px; flex:none; border-radius:26px; padding:11px;
   background:#fff; border:1px solid #EBE3D7;
 }
 .mn-pot-inner {
@@ -88,7 +104,7 @@ body { background: var(--bg-card); }
 .mn-pot-nums[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
 .mn-pot-num.is-dark { color:#241C18; }
 .mn-pot-num {
-  width:27px; height:27px; border-radius:4px;
+  width:26px; height:26px; border-radius:4px;
   background:#A8823C; color:#fff; font-size:14px; font-weight:800;
   display:flex; align-items:center; justify-content:center;
   transition:background .15s;
@@ -282,7 +298,7 @@ body { background: var(--bg-card); }
         ${POTS.map(n => `<button data-pot="${n}" class="${n === cells ? 'is-on' : ''}">${potLabel(n)}</button>`).join('')}
       </div>
       <p class="mn-pot-hint">${broths.length}/${cells}칸 · 같은 육수를 여러 칸에 넣어도 돼요</p>
-      ${broths.length ? `<p class="mn-pot-list">${broths.map((b, i) => `<span><b>${i + 1}</b> ${b}</span>`).join('')}</p>` : ''}
+
       <div class="mn-pot-wrap">
         <div class="mn-pot">
           <div class="mn-pot-inner" data-cells="${cells}">
@@ -296,6 +312,12 @@ body { background: var(--bg-card); }
               ${Array.from({ length: cells }, (_, i) => `<span class="mn-pot-num">${i + 1}</span>`).join('')}
             </div>` : ''}
           </div>
+        </div>
+        <div class="mn-pot-side">
+          ${Array.from({ length: cells }, (_, i) => {
+            const b = broths[i];
+            return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span></div>`;
+          }).join('')}
         </div>
       </div>
       <div class="mn-grid">
@@ -379,14 +401,16 @@ body { background: var(--bg-card); }
   //    맑은 탕처럼 뽀얀 국물에 흰 ✕ 를 얹으면 안 보인다.
   function tintNums() {
     const nums = document.querySelectorAll('.mn-pot-num');
+    const side = document.querySelectorAll('.mn-pot-row b');   // 오른쪽 목록 번호도 같은 색으로
     document.querySelectorAll('.mn-cell.is-filled').forEach((cell, i) => {
       const b = broths[i]; if (!b) return;
       const x = cell.querySelector('.mn-cell-x');
       sample(CELL_IMG(b), v => {
-        if (nums[i]) {
-          nums[i].style.background = v.badge;
-          nums[i].classList.toggle('is-dark', v.badgeLight);   // 밝은 배지엔 검은 글씨
-        }
+        [nums[i], side[i]].forEach(el => {
+          if (!el) return;
+          el.style.background = v.badge;
+          el.classList.toggle('is-dark', v.badgeLight);        // 밝은 배지엔 검은 글씨
+        });
         if (x) x.classList.toggle('is-dark', v.light);
       });
     });

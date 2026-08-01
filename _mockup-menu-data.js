@@ -813,7 +813,7 @@ window.MENU_DATA = {
    "tile": true
   },
   {
-   "n": "청유마라훠궈(오리지널)",
+   "n": "청유마라훠궈",
    "img": true,
    "jeju": false,
    "tile": true
@@ -822,49 +822,49 @@ window.MENU_DATA = {
    "n": "소기름훠궈",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "똠얌꿍탕훠궈",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "삼선탕훠궈",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "후추탕훠궈",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "삼계탕훠궈",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "버섯탕훠궈",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "맑은 탕",
    "img": true,
    "jeju": false,
-   "tile": false
+   "tile": true
   },
   {
    "n": "고수 듬뿍 훠궈",
    "img": true,
    "jeju": true,
-   "tile": false
+   "tile": true
   }
  ]
 };
