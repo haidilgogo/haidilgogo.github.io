@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=624">
+<link rel="stylesheet" href="styles.css?v=626">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -383,11 +383,17 @@
     <!-- 초심자 가이드는 칼럼 패널(#columnOverlay)을 그대로 쓴다 — 옛 '곧 만나요!' 자리표시
          패널(#guideOverlay)은 아티클이 들어오면서 제거됨(2026-07-28) -->
 
-    <!-- 메뉴 섹션 (준비 중) -->
+    <!-- 메뉴 섹션 — 분류 탭(매장 지역 탭과 같은 구조) + 2칸 그리드 -->
     <div class="view" id="view-menu" hidden>
-      <div class="view-empty">
-        <p class="view-empty-desc">전체 메뉴를 미리 볼 수 있는 화면이<br>곧 준비될 예정이에요</p>
+      <div class="menu-cat-tabs">
+        <div class="tabs" id="menuTabs">
+          <span class="tabs-underline" id="menuTabsUnderline"></span>
+        </div>
       </div>
+      <div class="menu-head">
+        <span class="menu-count" id="menuCount"></span>
+      </div>
+      <div class="menu-grid" id="menuGrid"></div>
     </div>
 
     <!-- 매장 섹션 -->
@@ -905,7 +911,7 @@
   </div>
 </div>
 
-<script src="script.js?v=533"></script>
+<script src="script.js?v=534"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

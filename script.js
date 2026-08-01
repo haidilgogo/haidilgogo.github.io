@@ -3169,6 +3169,106 @@
     document.body.removeChild(ta);
   }
 
+
+  // ===== 메뉴 (전체 메뉴 둘러보기) =====
+  // 하이디라오 메뉴 목록 — 코덱스가 세 지점(건대·서초·부천) 태블릿 사진을 대조해 확정했다.
+  //   원본: 02. Data/Haidilgogo/menu/menu-list.md (2026-07-29 검증 완료)
+  // 🔴 이름은 **태블릿 표기 그대로**다. 더 흔한 표현으로 임의 교정하지 말 것(코덱스 원칙).
+  // 🔴 지금은 **탕 11개만** 넣었다(2026-08-01 사용자 지시, 단계별로 가기로 함).
+  //   나머지 분류는 menu-list.md에 다 있고 같은 모양으로 한 덩어리씩 붙이면 된다.
+  //   「탑10 시그니처·추천」은 넣을지 아직 안 정했다 — 전부 다른 분류와 중복이고 시기마다 바뀐다.
+  // ⚠️ 그림 파일명 = 이 이름 그대로 assets/menu/<이름>.webp. 없으면 이름만 나온다.
+  const MENU = [
+    ['탕', [
+      '청유마라훠궈(오리지널)', '소기름훠궈', '우유마라훠궈', '토마토탕훠궈', '쏸차이훠궈', '똠얌꿍탕훠궈', '삼선탕훠궈', '삼계탕훠궈',
+      '버섯탕훠궈', '후추탕훠궈', '맑은 탕'
+    ]],
+  ];
+
+  // 분류 탭 + 2칸 그리드. 🔴 매장 지역 탭과 **같은 구조**를 쓴다(.tabs / .tab-btn / .tabs-underline)
+  //   — 사용자가 새로 배울 게 없고, 밑줄 애니메이션도 그대로 따라온다.
+  const menuTabsEl = document.getElementById('menuTabs');
+  const menuGridEl = document.getElementById('menuGrid');
+  const menuUnderline = document.getElementById('menuTabsUnderline');
+  let activeMenuCat = MENU.length ? MENU[0][0] : '';
+  // 그림이 준비된 메뉴만 적는다. 🔴 여기 없는 이름은 <img>를 아예 안 만든다 — 없는 파일을
+  //   가리키면 404가 콘솔에 쌓이고 폰에서 헛된 요청이 나간다.
+  //   .claude/make_menu_images.py로 변환한 뒤 이 목록에 추가한다(파일명 = 메뉴 이름).
+  const MENU_IMGS = {
+    '똠얌꿍탕훠궈': 'assets/menu/똠얌꿍탕훠궈.webp',
+    '맑은 탕': 'assets/menu/맑은 탕.webp',
+    '버섯탕훠궈': 'assets/menu/버섯탕훠궈.webp',
+    '삼계탕훠궈': 'assets/menu/삼계탕훠궈.webp',
+    '삼선탕훠궈': 'assets/menu/삼선탕훠궈.webp',
+    '소기름훠궈': 'assets/menu/소기름훠궈.webp',
+    '쏸차이훠궈': 'assets/menu/쏸차이훠궈.webp',
+    '우유마라훠궈': 'assets/menu/우유마라훠궈.webp',
+    '청유마라훠궈(오리지널)': 'assets/menu/청유마라훠궈(오리지널).webp',
+    '토마토탕훠궈': 'assets/menu/토마토탕훠궈.webp',
+    '후추탕훠궈': 'assets/menu/후추탕훠궈.webp',
+  };
+
+  function updateMenuUnderline() {
+    if (!menuTabsEl || !menuUnderline) return;
+    const on = menuTabsEl.querySelector('.tab-btn.active');
+    if (!on) { menuUnderline.style.width = '0'; return; }
+    menuUnderline.style.width = on.offsetWidth + 'px';
+    menuUnderline.style.transform = 'translateX(' + on.offsetLeft + 'px)';
+  }
+
+  function renderMenuTabs() {
+    if (!menuTabsEl) return;
+    menuTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    MENU.forEach(([cat]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (cat === activeMenuCat ? ' active' : '');
+      btn.textContent = cat;
+      btn.addEventListener('click', () => {
+        if (activeMenuCat === cat) return;
+        activeMenuCat = cat;
+        renderMenuTabs();
+        renderMenuGrid();
+        // 분류를 바꾸면 목록 맨 위로 — 아래쪽에서 눌렀을 때 이전 스크롤 위치가 남으면 헷갈린다
+        if (menuGridEl) menuGridEl.scrollIntoView({ block: 'start' });
+      });
+      menuTabsEl.appendChild(btn);
+    });
+    updateMenuUnderline();
+  }
+
+  function renderMenuGrid() {
+    if (!menuGridEl) return;
+    const found = MENU.find(([c]) => c === activeMenuCat);
+    const items = found ? found[1] : [];
+    const frag = document.createDocumentFragment();
+    items.forEach((name) => {
+      const card = document.createElement('div');
+      card.className = 'menu-card';
+      const thumb = document.createElement('div');
+      thumb.className = 'menu-thumb';
+      if (MENU_IMGS[name]) {
+        const img = document.createElement('img');
+        img.src = MENU_IMGS[name];
+        img.alt = '';                 // 이름은 아래 글자로 이미 읽힌다(중복 낭독 방지)
+        img.loading = 'lazy';         // 🔴 143장이라 필수 — 화면에 들어온 것만 받는다
+        img.decoding = 'async';
+        thumb.appendChild(img);
+      } else {
+        thumb.classList.add('menu-thumb--empty');
+      }
+      const label = document.createElement('div');
+      label.className = 'menu-name';
+      label.textContent = name;
+      card.appendChild(thumb);
+      card.appendChild(label);
+      frag.appendChild(card);
+    });
+    menuGridEl.replaceChildren(frag);
+    const countEl = document.getElementById('menuCount');
+    if (countEl) countEl.textContent = items.length + '개';
+  }
+
   // ===== 발도장 (방문 스티커 기록장) =====
   // 저장 = 이 기기 localStorage에만(즐겨찾기와 동일, 로그인 없음). 나중에 서버 이전이 쉽게
   // 버전 있는 JSON 한 덩어리로 보관: { version: 1, stamps: { 지점명: { date, memo } } }
@@ -3861,8 +3961,11 @@
   renderGrid();
   renderStoreTabs();
   renderStores();
+  renderMenuTabs();
+  renderMenuGrid();
   renderStamps();
   window.addEventListener('resize', updateStoreUnderline);
+  window.addEventListener('resize', updateMenuUnderline);
   window.addEventListener('resize', () => {
     requestAnimationFrame(() => fitPopularTitles(popularRailEl));
     requestAnimationFrame(() => fitBrowseTitles(gridEl));
