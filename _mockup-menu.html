@@ -55,7 +55,7 @@ body { background: var(--bg-card); }
 
 /* ── 전골: 냄비 (CSS로 그린다 — 그림 파일 안 씀) ────────────────── */
 /* 칸 수는 화살표가 아니라 글씨를 눌러 고른다(2026-08-02 사용자 지시) */
-.mn-pot-seg { display:flex; justify-content:center; gap:24px; padding:2px 0 12px; }
+.mn-pot-seg { display:flex; justify-content:center; gap:26px; padding:20px 0 18px; }
 /* 🔴 알약(둥근 배경) 쓰지 않는다 — 앱의 탭과 같은 밑줄 방식으로 맞춘다 */
 .mn-pot-seg button {
   border:0; background:none; font-family:inherit; position:relative;
@@ -73,12 +73,15 @@ body { background: var(--bg-card); }
 .mn-pot-row { display:flex; gap:6px; align-items:flex-start; font-size:13px; line-height:1.35; }
 .mn-pot-row b {
   flex:none; width:18px; height:18px; margin-top:1px; border-radius:4px;
-  background:#A8823C; color:#fff; font-size:11px; font-weight:800;
+  background:rgba(28,12,8,.45); color:#fff; font-size:11px; font-weight:800;
   display:flex; align-items:center; justify-content:center;
 }
 .mn-pot-row.is-empty { color:var(--text-muted); }
 .mn-pot-row.is-empty b { background:#DED0C4; }
-.mn-pot-row b.is-dark { color:#241C18; }
+.mn-row-x {
+  margin-left:auto; flex:none; border:0; background:none; padding:0 0 0 6px;
+  color:var(--text-muted); font-size:14px; cursor:pointer; font-family:inherit;
+}
 .mn-pot-row span { min-width:0; word-break:keep-all; color:var(--text-dark); font-weight:700; }
 .mn-pot-row.is-empty span { color:var(--text-muted); font-weight:600; }
 /* 🔴 실제 하이디라오 태블릿 화면을 따랐다(2026-08-02 사용자 사진).
@@ -102,12 +105,12 @@ body { background: var(--bg-card); }
 }
 .mn-pot-nums[data-cells="2"] { grid-template-columns:1fr 1fr; }
 .mn-pot-nums[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
-.mn-pot-num.is-dark { color:#241C18; }
+/* 🔴 번호 배지는 그림마다 색을 바꾸지 않는다(2026-08-02 사용자 지시).
+   태블릿처럼 반투명 검정 + 흰 글씨 하나로 통일한다 — 어떤 국물 위에서도 같게 보인다. */
 .mn-pot-num {
-  width:26px; height:26px; border-radius:4px;
-  background:#A8823C; color:#fff; font-size:14px; font-weight:800;
+  width:26px; height:26px; border-radius:5px;
+  background:rgba(28,12,8,.45); color:#fff; font-size:14px; font-weight:800;
   display:flex; align-items:center; justify-content:center;
-  transition:background .15s;
 }
 .mn-pot-inner[data-cells="1"] { grid-template-columns:1fr; grid-template-rows:1fr; }
 .mn-pot-inner[data-cells="2"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
@@ -115,23 +118,10 @@ body { background: var(--bg-card); }
 .mn-cell {
   background:#DEDCCF; cursor:pointer;   /* 빈 칸 = 냄비 바닥 */
   display:flex; align-items:center; justify-content:center; overflow:hidden;
-  position:relative; font-size:11px; color:#B6A497; text-align:center; padding:4px;
+  position:relative;                    /* 🔴 padding 두지 말 것 — 그림이 모서리까지 안 찬다 */
 }
+.mn-cell img { display:block; }
 .mn-cell img { width:100%; height:100%; object-fit:cover; }
-/* 빼기 ✕ — 배경 없이 글자만 얹는다. 대비는 색으로 잡는다:
-   ✕ 가 놓이는 모서리를 재서 밝으면 검정, 어두우면 흰색(아래 .is-dark).
-   🔴 그림자(filter)는 쓰지 않는다 — iOS 렌더가 제각각이라 이 프로젝트에서 금지다.
-   손가락 자리는 32px로 넉넉히 잡되 배경은 투명이다. */
-.mn-cell-x {
-  position:absolute; top:0; right:0; width:32px; height:32px;
-  border:0; padding:0 4px 4px 0; color:#fff; background:none;
-  font-size:15px; font-weight:800; text-align:right; line-height:1;
-  display:flex; align-items:flex-start; justify-content:flex-end;
-  cursor:pointer; font-family:inherit;
-}
-.mn-cell-x span { padding:4px 5px 0 0; }
-/* 밝은 국물 위에서는 ✕ 를 검정으로 */
-.mn-cell-x.is-dark { color:#241C18; }
 .mn-cell-name {
   position:absolute; left:0; right:0; bottom:0; padding:3px 4px;
   background:rgba(0,0,0,.5); color:#fff; font-size:10px; font-weight:700;
@@ -297,7 +287,6 @@ body { background: var(--bg-card); }
       <div class="mn-pot-seg">
         ${POTS.map(n => `<button data-pot="${n}" class="${n === cells ? 'is-on' : ''}">${potLabel(n)}</button>`).join('')}
       </div>
-      <p class="mn-pot-hint">${broths.length}/${cells}칸 · 같은 육수를 여러 칸에 넣어도 돼요</p>
 
       <div class="mn-pot-wrap">
         <div class="mn-pot">
@@ -305,7 +294,7 @@ body { background: var(--bg-card); }
             ${Array.from({ length: cells }, (_, i) => {
               const b = broths[i];
               return b
-                ? `<div class="mn-cell is-filled"><img src="${CELL_IMG(b)}" alt=""><button class="mn-cell-x" data-cell="${i}" aria-label="빼기"><span>✕</span></button></div>`
+                ? `<div class="mn-cell is-filled" data-cell="${i}"><img src="${CELL_IMG(b)}" alt=""></div>`
                 : `<div class="mn-cell"></div>`;
             }).join('')}
             ${cells > 1 ? `<div class="mn-pot-nums" data-cells="${cells}">
@@ -316,7 +305,8 @@ body { background: var(--bg-card); }
         <div class="mn-pot-side">
           ${Array.from({ length: cells }, (_, i) => {
             const b = broths[i];
-            return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span></div>`;
+            return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
+                   (b ? `<button class="mn-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
           }).join('')}
         </div>
       </div>
@@ -361,68 +351,12 @@ body { background: var(--bg-card); }
   // 🔴 번호 배지 색은 그 칸의 국물 색을 따라간다(실제 태블릿 화면과 같다).
   //    색을 손으로 적지 않고 타일 그림에서 뽑는다 — 타일이 바뀌면 색도 따라 바뀐다.
   //    1×1 캔버스에 줄여 그리면 그림 전체의 평균색이 나온다(같은 출처라 캔버스가 안 막힌다).
-  const tintCache = new Map();
-
-  /** 그림에서 색을 뽑는다. 전체 평균(배지용)과 오른쪽 위 모서리(✕ 자리)를 따로 잰다.
-   *  1×1 캔버스에 줄여 그리면 그 범위의 평균색이 나온다(같은 출처라 캔버스가 안 막힌다). */
-  function sample(src, done) {
-    if (tintCache.has(src)) return done(tintCache.get(src));
-    const im = new Image();
-    im.onload = () => {
-      const cv = document.createElement('canvas');
-      cv.width = cv.height = 1;
-      const g = cv.getContext('2d');
-      const px = (sx, sy, sw, sh) => {
-        g.clearRect(0, 0, 1, 1);
-        g.drawImage(im, sx, sy, sw, sh, 0, 0, 1, 1);
-        return g.getImageData(0, 0, 1, 1).data;
-      };
-      const all = px(0, 0, im.width, im.height);
-      const cor = px(im.width * .62, 0, im.width * .38, im.height * .38);   // ✕ 가 놓이는 자리
-      // 🔴 「밝기 몇 이상이면 검정」 식으로 눈대중 기준을 두지 않는다. 흰 글씨와 검은 글씨
-      //    중 어느 쪽이 실제로 더 잘 보이는지 대비를 계산해 고른다(WCAG 상대휘도).
-      const needDarkInk = (r, g2, b) => {
-        const f = c => { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); };
-        const L = .2126 * f(r) + .7152 * f(g2) + .0722 * f(b);
-        return (L + .05) / .05 > 1.05 / (L + .05);       // 검은 글씨 대비 > 흰 글씨 대비
-      };
-      const bg = [0, 1, 2].map(i => Math.round(all[i] * .82));
-      const v = {
-        badge: `rgb(${bg[0]},${bg[1]},${bg[2]})`,
-        badgeLight: needDarkInk(bg[0], bg[1], bg[2]),
-        light: needDarkInk(cor[0], cor[1], cor[2]),
-      };
-      tintCache.set(src, v); done(v);
-    };
-    im.src = src;
-  }
-
-  // 🔴 ✕ 는 밝은 탕에서 검정, 어두운 탕에서 흰색이 된다(2026-08-02 사용자 지시).
-  //    맑은 탕처럼 뽀얀 국물에 흰 ✕ 를 얹으면 안 보인다.
-  function tintNums() {
-    const nums = document.querySelectorAll('.mn-pot-num');
-    const side = document.querySelectorAll('.mn-pot-row b');   // 오른쪽 목록 번호도 같은 색으로
-    document.querySelectorAll('.mn-cell.is-filled').forEach((cell, i) => {
-      const b = broths[i]; if (!b) return;
-      const x = cell.querySelector('.mn-cell-x');
-      sample(CELL_IMG(b), v => {
-        [nums[i], side[i]].forEach(el => {
-          if (!el) return;
-          el.style.background = v.badge;
-          el.classList.toggle('is-dark', v.badgeLight);        // 밝은 배지엔 검은 글씨
-        });
-        if (x) x.classList.toggle('is-dark', v.light);
-      });
-    });
-  }
-
   function render() {
     renderTabs();
     const t = TABS[cur];
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
     $('#basketTxt').classList.toggle('is-empty', !count());
     renderNext();
-    if (t.pot) tintNums();
     window.scrollTo({ top: 0 });
   }
 
@@ -456,7 +390,7 @@ body { background: var(--bg-card); }
       return render();
     }
 
-    // 칸 안의 ✕ 를 눌러 뺀다. 칸 아무 데나 눌러 빠지면 실수로 지워진다
+    // 냄비 칸을 누르거나 오른쪽 목록의 ✕ 를 눌러 뺀다
     const cell = e.target.closest('[data-cell]');
     if (cell) {
       const i = +cell.dataset.cell;
