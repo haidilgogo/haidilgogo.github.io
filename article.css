@@ -221,9 +221,12 @@
   color: var(--text-dark);
 }
 .credit-note {
+  /* 본문은 아티클 페이지와 같은 진한 색. 흐린 색(--text-muted)은 도입부(.credit-sub)와
+     인물 부가정보(.credit-by)에만 남긴다 — 다 진하게 하면 이름과 무게가 같아져
+     목록이 빽빽해진다(2026-08-01 세 안 비교). */
   margin: 0 0 2px;
   font-size: 12px; line-height: 1.6;
-  color: var(--text-muted);
+  color: var(--text-dark);
 }
 .credit-list {
   display: flex; flex-direction: column; gap: 14px;
