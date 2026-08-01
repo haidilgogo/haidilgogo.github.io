@@ -69,6 +69,14 @@
 .art-more {
   padding: 8px 22px 30px;
 }
+/* 출처 페이지는 푸터가 없어서 이 버튼이 화면 맨 아래다 — 앱의 하단 여백과 같은 값을 준다.
+   ⚠️ env(safe-area-inset-bottom)은 쓰지 않는다(viewport-fit=cover를 안 써서 항상 0). */
+.art-more:has(.art-more-btn--close) {
+  padding-bottom: 34px;
+}
+@media (min-width: 641px) {
+  .art-more:has(.art-more-btn--close) { padding-bottom: 24px; }
+}
 .art-more-btn {
   display: block;
   padding: 15px 18px;
@@ -205,10 +213,13 @@
   padding: 26px 22px 2px;
 }
 .credit-title {
+  display: flex; align-items: center; gap: 8px;
   margin: 0;
   font-size: 24px; font-weight: 800; letter-spacing: -.02em;
   color: var(--text-dark);
 }
+/* 푸터에서 누른 ⓒ와 같은 아이콘 — 눌렀던 것과 도착한 페이지가 이어져 보이게 */
+.credit-title-ic { width: 22px; height: 22px; flex: none; }
 .credit-sub {
   margin: 8px 0 0;
   font-size: 13px; line-height: 1.6;
