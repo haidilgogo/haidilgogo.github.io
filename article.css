@@ -259,3 +259,10 @@
   text-decoration: underline; text-decoration-color: #E4C0B8; text-underline-offset: 3px;
 }
 .credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+
+/* 출처 안내 문단 안의 링크(제보 폼) — 푸터 링크와 같은 톤 */
+.credit-note a {
+  color: #C08A80;
+  text-decoration: underline; text-decoration-color: #E4C0B8; text-underline-offset: 3px;
+}
+.credit-note a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
