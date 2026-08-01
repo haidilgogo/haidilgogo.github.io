@@ -81,11 +81,15 @@
   line-height: 1.4;
   text-align: center;
   text-decoration: none;
+  cursor: pointer;
+  transition: transform .24s cubic-bezier(.34, 1.5, .64, 1), opacity .15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 @media (hover: hover) {
   .art-more-btn:hover { opacity: .92; }
 }
-.art-more-btn:active { opacity: .86; }
+/* 누를 때 살짝 작아지는 건 앱의 빨간 CTA(.col-cta)와 같은 값이다. 떼면 통통 복귀. */
+.art-more-btn:active { opacity: .86; transform: scale(.97); }
 
 /* ── 레시피 페이지 (건희소스 등) ────────────────────────────────────
    재료 표·조리 단계·팁 박스는 앱 상세(.ing-box/.step-row/.tip-box/.modal-section-title)를
@@ -208,7 +212,7 @@
 .credit-sub {
   margin: 8px 0 0;
   font-size: 13px; line-height: 1.6;
-  color: var(--text-muted);
+  color: var(--text-dark);
 }
 .credit-sec {
   margin: 0 22px; padding: 22px 0;
@@ -263,9 +267,14 @@
 }
 .credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
 
-/* 출처 안내 문단 안의 링크(제보 폼) — 푸터 링크와 같은 톤 */
+/* 출처 안내 문단 안의 링크(제보 폼) — 본문과 같은 검정에 굵게. 링크임은 밑줄로만 알린다.
+   푸터 링크(연한 갈색)와 달리 여기선 문장 속이라 색이 튀면 오히려 읽기 흐름이 끊긴다. */
 .credit-note a {
-  color: #C08A80;
-  text-decoration: underline; text-decoration-color: #E4C0B8; text-underline-offset: 3px;
+  color: var(--text-dark);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(43, 18, 13, .32);
+  text-underline-offset: 3px;
 }
-.credit-note a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+.credit-note a:hover { text-decoration-color: var(--brand-red); color: var(--brand-red); }
+.credit-note a:active { color: var(--brand-red); }
