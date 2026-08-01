@@ -980,7 +980,9 @@ img {
 }
 
 .footer-credit {
-  padding: 8px 10px;
+  /* 좌우 패딩은 제보 링크(.footer-report)와 같은 16px이어야 한다. 다르면 글자 기준
+     가운데가 3px 밀리고 구분선의 좌우 간격도 22:16으로 어긋난다(2026-08-01 측정). */
+  padding: 8px 16px;
   font-size: 12px;      /* 제보 링크(.footer-report)와 같은 크기·굵기·색 */
   font-weight: 500;
   color: #C08A80;
