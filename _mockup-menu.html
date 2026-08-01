@@ -75,6 +75,9 @@ body { background: var(--bg-card); }
    ⚠️ 320px에서 한 칸 135px에 내용물이 약 125px이라 여유가 10px뿐이다.
       지금보다 긴 육수 이름이 생기면 여기서 먼저 두 줄이 된다. */
 .mn-pot-side { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:14px 10px; }
+/* 1맛일 때는 줄이 하나뿐이라 2열 격자의 왼쪽에만 놓여 오른쪽이 비어 보인다 → 가운데로 */
+.mn-pot-side.is-one { grid-template-columns:auto; justify-content:center; }
+.mn-pot-side.is-one .mn-row-x { margin-left:2px; }
 .mn-pot-row { display:flex; gap:7px; align-items:center; font-size:13px; line-height:1.35; }
 .mn-pot-row b {
   /* 냄비 안 23px보다 작게 — 목록에서는 이름이 주인공이고 번호는 거들기만 하면 된다 */
@@ -306,7 +309,7 @@ body { background: var(--bg-card); }
             </div>` : ''}
           </div>
         </div>
-        <div class="mn-pot-side">
+        <div class="mn-pot-side ${cells === 1 ? 'is-one' : ''}">
           ${Array.from({ length: cells }, (_, i) => {
             const b = broths[i];
             return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
