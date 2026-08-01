@@ -973,6 +973,15 @@ img {
   align-items: center;
   justify-content: center;
 }
+/* 두 링크 사이 구분선. 글자 '|'는 폰트마다 높이·굵기가 달라 1px 선으로 그린다.
+   좌우 패딩 16px가 만든 32px 빈칸 안에 들어가므로 여백(margin)을 주지 않는다
+   — 주면 줄이 넓어지고 좌우 간격이 16:16에서 어긋난다. */
+.footer-sep {
+  flex: none;
+  width: 1px;
+  height: 12px;
+  background: #E4C0B8;
+}
 .footer-credit {
   /* 좌우 패딩은 제보 링크(.footer-report)와 같은 16px이어야 한다. 다르면 글자 기준
      가운데가 3px 밀리고 구분선의 좌우 간격도 22:16으로 어긋난다(2026-08-01 측정). */
