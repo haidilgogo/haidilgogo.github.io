@@ -52,14 +52,26 @@ Haidilgogo/
 
 ### 원본 데이터는 저장소 밖에 있다 (중요)
 카드 이미지·아이콘의 **원본은 이 저장소에 없다.** 사용자 아카이브인 `../../02. Data/Haidilgogo/`에 따로 보관된다 — 프로젝트 폴더만 뒤지면 "이미지가 없다"고 잘못 결론 내리게 된다(실제로 그런 적 있음).
+🔴 **2026-08-01 정정 — `thumbnail/` 아래가 용도별로 한 단계 나뉘었다.** 옛 문서에는 `thumbnail/original/`로 적혀 있었는데 지금은 **`thumbnail/recipe/original/`**이다. 옛 경로로 찾아보고 "원본이 없다"고 잘못 보고한 적이 있다(2026-08-01).
+
 ```
 02. Data/Haidilgogo/
 ├── thumbnail/
-│   ├── original/            # 손대지 않은 원본 (png/webp/jpeg)
-│   └── 1080x1080/           # 정사각 가공본 = 카드 만들 대기분
-│       └── complete/        # 카드로 만들어 사이트에 올린 것 (변환 후 여기로 이동)
-└── icon/{logo, src}/        # 로고·출처 플랫폼 아이콘 원본
+│   ├── recipe/                     # 레시피 카드용
+│   │   ├── original/               # 손대지 않은 원본 (대기분)
+│   │   │   └── complete/           # 카드로 만들어 사이트에 올린 것의 원본
+│   │   └── 1080x1080/complete/     # 정사각 가공본 (카드로 올린 것)
+│   ├── menu/                       # 메뉴 탭 일러스트 (2026-08-01 신설)
+│   │   ├── 탕/ · 고기/             # 완성본 = 1080 정사각·배경 투명. 파일명 = 메뉴 이름
+│   │   └── original/               # 뽑아내기 전 시트 (archive·final·reference·review)
+│   └── main-banner/                # 배너·아티클 히어로
+│       ├── columns/{guide,hotpot-trivia,cilantro}
+│       └── monthly-sauce/<연월>/
+├── sticker/complete/               # 발도장 스티커 완성 카드 (위 스티커 규칙 참고)
+├── menu/                           # 코덱스 메뉴 조사 자료(md·스크립트) — 저장소 아님
+└── icon/{logo, src}/               # 로고·출처 플랫폼 아이콘 원본
 ```
+- **메뉴 일러스트는 `.claude/make_menu_images.py`로 변환**한다(1080 정사각 → 540 webp, 하위 폴더까지 훑음, `original/`은 건너뜀). 결과는 `assets/menu/<메뉴 이름>.webp`로 **평평하게** 나온다 — 메뉴의 분류는 지점마다 다르고 바뀔 수 있어서 경로에 분류를 넣지 않는다.
 - ⚠️ 한글 파일명이 자모 분리(NFD)로 저장된 게 섞여 있어 **`find -name "*토마토*"`·`grep`이 파일을 못 찾을 수 있다**. 안 나오면 없는 게 아니라 `ls`로 직접 확인할 것. 또 `find | head`로 자르면 `complete/`를 통째로 놓친다.
 - **새 카드 이미지는 `assets/cards/`에** 넣고, `RECIPES`의 `img`는 `'assets/cards/<소스명>.jpg'`로 참조. 파일명에 소괄호((단)/(짠) 등) 있어도 브라우저에서 정상 로드됨(확인 완료). 파일명은 표시 이름과 맞춰 유지.
 
