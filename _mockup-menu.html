@@ -91,12 +91,12 @@ body { background: var(--bg-card); }
      줄어 206px에서는 「고수 듬뿍 훠궈」가 두 줄로 감긴다. 196px이 경계다.
      ⚠️ 오른쪽 줄에 무엇을 더 붙이면 이 값을 다시 재야 한다 — 눈대중으로 두지 말 것. */
   width:196px; height:196px; flex:none; border-radius:25px; padding:11px;
-  background:#fff; border:1px solid #EBE3D7;
+  background:#F3E9DA; border:1px solid #E0D0B4;   /* 바깥 테 = 크림 */
 }
 .mn-pot-inner {
   position:relative;
   width:100%; height:100%; border-radius:16px; overflow:hidden;
-  display:grid; gap:2px; background:#fff;   /* 틈의 흰색이 그대로 구분선이 된다 */
+  display:grid; gap:2px; background:#fff;   /* 안쪽 = 흰색. 이 색이 그대로 칸 구분선이 된다 */
 }
 /* 번호는 칸이 만나는 가운데에 모인다 */
 .mn-pot-nums {
@@ -116,7 +116,7 @@ body { background: var(--bg-card); }
 .mn-pot-inner[data-cells="2"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
 .mn-pot-inner[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
 .mn-cell {
-  background:#DEDCCF; cursor:pointer;   /* 빈 칸 = 냄비 바닥 */
+  background:#E7D9C2; cursor:pointer;   /* 빈 칸 = 진한 크림 */
   display:flex; align-items:center; justify-content:center; overflow:hidden;
   position:relative;                    /* 🔴 padding 두지 말 것 — 그림이 모서리까지 안 찬다 */
 }
