@@ -54,27 +54,35 @@ body { background: var(--bg-card); }
 }
 
 /* ── 전골: 냄비 (CSS로 그린다 — 그림 파일 안 씀) ────────────────── */
-.mn-pot-wrap { display:flex; align-items:center; justify-content:center; gap:10px; padding:12px 0 4px; }
-.mn-pot-arrow {
-  flex:none; width:34px; height:34px; border-radius:50%;
-  border:1px solid var(--card-border); background:#fff; color:var(--text-dark);
-  font-size:15px; cursor:pointer; font-family:inherit;
+/* 칸 수는 화살표가 아니라 글씨를 눌러 고른다(2026-08-02 사용자 지시) */
+.mn-pot-seg { display:flex; justify-content:center; gap:6px; padding:2px 0 10px; }
+.mn-pot-seg button {
+  border:1px solid transparent; background:none; font-family:inherit;
+  font-size:14px; font-weight:700; color:var(--text-muted);
+  padding:6px 13px; border-radius:16px; cursor:pointer;
 }
+.mn-pot-seg button.is-on {
+  background:#fff; border-color:var(--card-border); color:var(--text-dark); font-weight:800;
+}
+.mn-pot-wrap { display:flex; align-items:center; justify-content:center; padding:0 0 4px; }
 .mn-pot {
   width:148px; height:148px; border-radius:20px; padding:8px;
   background:#EDE6DC; border:1px solid #D9CCBC;
   box-shadow:inset 0 0 0 4px #F7F2EA;
-  display:grid; gap:5px;
 }
-.mn-pot[data-cells="1"] { grid-template-columns:1fr; grid-template-rows:1fr; }
-.mn-pot[data-cells="2"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
-.mn-pot[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+/* 칸 사이는 얇은 선 하나로 나눈다 — 틈(gap)의 바닥색이 그대로 선이 된다 */
+.mn-pot-inner {
+  width:100%; height:100%; border-radius:12px; overflow:hidden;
+  display:grid; gap:1px; background:#C9B49C;
+}
+.mn-pot-inner[data-cells="1"] { grid-template-columns:1fr; grid-template-rows:1fr; }
+.mn-pot-inner[data-cells="2"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
+.mn-pot-inner[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
 .mn-cell {
-  border-radius:12px; background:#F7F2EA; border:1px dashed #D3C4B2;
+  background:#F7F2EA; cursor:pointer;
   display:flex; align-items:center; justify-content:center; overflow:hidden;
   position:relative; font-size:11px; color:#B6A497; text-align:center; padding:4px;
 }
-.mn-cell.is-filled { border-style:solid; border-color:#C9B49C; }
 .mn-cell img { width:100%; height:100%; object-fit:cover; }
 .mn-cell-name {
   position:absolute; left:0; right:0; bottom:0; padding:3px 4px;
@@ -82,7 +90,7 @@ body { background: var(--bg-card); }
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .mn-pot-label { text-align:center; font-size:15px; font-weight:800; color:var(--text-dark); }
-.mn-pot-hint  { text-align:center; font-size:12.5px; color:var(--text-muted); margin-top:3px; }
+.mn-pot-hint  { text-align:center; font-size:12.5px; color:var(--text-muted); margin:0 0 8px; }
 
 /* ── 카드 2칸 ─────────────────────────────────────────────────── */
 .mn-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:16px 0 8px; }
@@ -177,7 +185,7 @@ body { background: var(--bg-card); }
   <p class="mn-notice">메뉴 구성과 판매 여부는 지점 및 시기에 따라 달라질 수 있어요. 방문 전 이용할 지점의 공식 메뉴를 확인해 주세요.</p>
 </main>
 
-<div class="mn-next-wrap"><button class="mn-next is-skip" id="mnNext" type="button">건너뛰기</button></div>
+<div class="mn-next-wrap"><button class="mn-next" id="mnNext" type="button">다음</button></div>
 
 <div class="mn-sheet-dim" id="sheetDim"></div>
 <div class="mn-sheet" id="sheet">
@@ -218,22 +226,26 @@ body { background: var(--bg-card); }
     }).join('');
   }
 
+  const POTS = [1, 2, 4];
+  const potLabel = n => n === 1 ? '1 맛' : n + '가지 맛';
+
   function renderPot() {
-    const filled = broths.length;
     return `
-      <p class="mn-pot-label">전골 ${cells === 1 ? '1 맛' : cells + '가지 맛'}</p>
-      <p class="mn-pot-hint">${filled}/${cells}칸 · 같은 육수를 여러 칸에 넣어도 돼요</p>
+      <div class="mn-pot-seg">
+        ${POTS.map(n => `<button data-pot="${n}" class="${n === cells ? 'is-on' : ''}">${potLabel(n)}</button>`).join('')}
+      </div>
+      <p class="mn-pot-hint">${broths.length}/${cells}칸 · 같은 육수를 여러 칸에 넣어도 돼요</p>
       <div class="mn-pot-wrap">
-        <button class="mn-pot-arrow" data-pot="prev">‹</button>
-        <div class="mn-pot" data-cells="${cells}">
-          ${Array.from({ length: cells }, (_, i) => {
-            const b = broths[i];
-            return b
-              ? `<div class="mn-cell is-filled"><img src="${IMG(b)}" alt=""><span class="mn-cell-name">${b}</span></div>`
-              : `<div class="mn-cell">비어 있음</div>`;
-          }).join('')}
+        <div class="mn-pot">
+          <div class="mn-pot-inner" data-cells="${cells}">
+            ${Array.from({ length: cells }, (_, i) => {
+              const b = broths[i];
+              return b
+                ? `<div class="mn-cell is-filled" data-cell="${i}"><img src="${IMG(b)}" alt=""><span class="mn-cell-name">${b}</span></div>`
+                : `<div class="mn-cell" data-cell="${i}">비어 있음</div>`;
+            }).join('')}
+          </div>
         </div>
-        <button class="mn-pot-arrow" data-pot="next">›</button>
       </div>
       <div class="mn-grid">
         ${D.broths.map(b => {
@@ -260,15 +272,16 @@ body { background: var(--bg-card); }
     }).join('')}</div>`;
   }
 
+  // 🔴 「건너뛰기」는 없앴다(2026-08-02 사용자 지시) — 분류 탭이 위에 늘 있어
+  //    건너뛸 방법이 이미 있다. 아무것도 안 골랐으면 버튼 자체를 안 보여준다.
   function renderNext() {
     const t = TABS[cur];
     const has = t.pot ? broths.length > 0 : t.items.some(it => picked.has(it.n));
     const btn = $('#mnNext');
     const nx = TABS[cur + 1];
-    btn.textContent = !nx ? '담은 목록 보기'
-                    : has ? `다음 · ${nx.name} →`
-                          : '건너뛰기';
-    btn.classList.toggle('is-skip', !!nx && !has);
+    $('.mn-next-wrap').style.display = has ? '' : 'none';
+    btn.textContent = nx ? `다음 · ${nx.name} →` : '담은 목록 보기';
+    btn.classList.remove('is-skip');
   }
 
   function render() {
@@ -303,21 +316,26 @@ body { background: var(--bg-card); }
     const tab = e.target.closest('.mn-tab');
     if (tab) { cur = +tab.dataset.i; return render(); }
 
-    const arrow = e.target.closest('[data-pot]');
-    if (arrow) {
-      const order = [1, 2, 4];
-      let i = order.indexOf(cells) + (arrow.dataset.pot === 'next' ? 1 : -1);
-      cells = order[(i + 3) % 3];
-      if (broths.length > cells) broths = broths.slice(0, cells);
+    const seg = e.target.closest('[data-pot]');
+    if (seg) {
+      cells = +seg.dataset.pot;
+      if (broths.length > cells) broths = broths.slice(0, cells);   // 칸이 줄면 뒤에서 덜어낸다
       return render();
     }
 
+    // 냄비 칸을 누르면 그 칸만 뺀다 (같은 육수가 여러 칸에 있어도 누른 칸만)
+    const cell = e.target.closest('[data-cell]');
+    if (cell) {
+      const i = +cell.dataset.cell;
+      if (i < broths.length) { broths.splice(i, 1); return render(); }
+      return;
+    }
+
+    // 🔴 육수는 중복해서 담을 수 있다 — 다시 눌러도 빠지지 않고 다음 칸에 또 들어간다.
+    //    빼는 것은 냄비 칸을 눌러서 한다(위). 안 그러면 「2칸에 같은 육수」를 만들 방법이 없다.
     const bc = e.target.closest('[data-broth]');
     if (bc) {
-      const n = bc.dataset.broth;
-      const at = broths.indexOf(n);
-      if (at >= 0) broths.splice(at, 1);
-      else if (broths.length < cells) broths.push(n);
+      if (broths.length < cells) broths.push(bc.dataset.broth);
       return render();
     }
 
