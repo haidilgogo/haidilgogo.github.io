@@ -46,6 +46,32 @@ body { background: var(--bg-card); }
 .mn-card-thumb.is-text { flex-direction:column; }
 .cmp-desc code { font-size:12px; background:#F3E9DA; padding:1px 4px; border-radius:4px; }
 
+/* ── 리스트형 (앱의 .hc-row 간격을 그대로 따랐다: 위아래 15px · 사이 15px · 구분선 1px) ── */
+.cmp-list { max-width:440px; margin:0 auto; padding:0 20px; }
+.cmp-row {
+  display:flex; align-items:center; gap:15px; width:100%;
+  padding:15px 0; background:none; border:0; text-align:left;
+  font-family:inherit; cursor:pointer;
+}
+.cmp-row + .cmp-row { border-top:1px solid #E2E2E2; }
+.cmp-row-thumb {
+  flex:none; border-radius:12px; overflow:hidden; background:#FBF4E6;
+  display:flex; align-items:center; justify-content:center;
+}
+.cmp-row-thumb img { width:100%; height:100%; object-fit:contain; display:block; }
+.cmp-row-txt { flex:1; min-width:0; }
+.cmp-row-name { display:block; font-size:15px; font-weight:700; color:var(--text-dark); }
+.cmp-row-part {
+  display:inline-block; margin-left:6px; padding:1px 6px; border-radius:6px;
+  background:#F3E9DA; font-size:11px; font-weight:700; color:var(--text-muted);
+  vertical-align:middle;
+}
+.cmp-row-right { flex:none; }
+.cmp-row-check {
+  width:22px; height:22px; border-radius:50%; background:var(--brand-red); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+}
+
 /* ── 안 ②: 수량 스테퍼 ────────────────────────────────── */
 /* 🔴 글자 카드(.mn-card--text)는 본 목업에서 가로 flex다. 그대로 두면 스테퍼가 이름 **옆**에
    붙어 이름 자리가 좁아진다(제주 흑돼지목살이 실제로 두 줄이 됐다). ②에서만 세로로 쌓는다. */
@@ -104,6 +130,15 @@ body { background: var(--bg-card); }
       <button data-sub="1">부제로 내리기</button>
     </div>
     <p class="cmp-desc" id="subDesc"></p>
+
+    <p class="cmp-q" style="margin-top:14px">배치 — 세로 스크롤이 얼마나 길어지나</p>
+    <div class="cmp-seg" id="layoutSeg">
+      <button data-lay="0" class="is-on">격자 2열</button>
+      <button data-lay="56">리스트 56</button>
+      <button data-lay="64">리스트 64</button>
+      <button data-lay="80">리스트 80</button>
+    </div>
+    <p class="cmp-desc" id="layDesc"></p>
   </div>
 
   <p class="cmp-sum" id="cmpSum"></p>
@@ -152,6 +187,7 @@ body { background: var(--bg-card); }
 
   let mode = 1;
   let sub = 0;                               // 괄호를 부제로 내릴까
+  let lay = 0;                               // 0 = 격자 2열, 그 외 = 리스트(숫자가 썸네일 px)
   let cur = 0;
   const qty = new Map();                     // 이름 → 개수
 
@@ -217,11 +253,55 @@ body { background: var(--bg-card); }
        '「지방 적음/많음」은 두 카드를 <b>구별하는 정보</b>인데 흐려진다.',
   };
 
+  // 눌러본 배치의 높이를 탭별로 쌓아둔다 — 눈이 아니라 숫자로 비교하려고
+  const 잰높이 = {};
+  const LAYNAME = { 0: '격자 2열', 56: '리스트 56', 64: '리스트 64', 80: '리스트 80' };
+
+  function LAYDESC() {
+    const box = $('.cmp-list') || $('.mn-grid');
+    if (!box) return '';
+    const h = Math.round(box.getBoundingClientRect().height);
+    (잰높이[cur] = 잰높이[cur] || {})[lay] = h;
+    const got = Object.entries(잰높이[cur]).sort((a, b) => a[1] - b[1]);
+    const list = got.map(([k, v]) => `${LAYNAME[k]} <b>${v.toLocaleString()}px</b>`).join(' · ');
+    const base = 잰높이[cur][0];
+    const 비율 = base && lay ? ` (격자 대비 <b>${Math.round(h / base * 100)}%</b>)` : '';
+    return `<b>${TABS[cur].name}</b> ${TABS[cur].items.length}개 — 지금 배치 <b>${h.toLocaleString()}px</b>${비율}` +
+      (got.length > 1 ? `<br>재본 것: ${list}` : '<br>다른 배치를 눌러보면 숫자가 쌓입니다');
+  }
+
+  /** 리스트형 한 줄 */
+  function row(it) {
+    const n = qty.get(it.n) || 0;
+    const part = it.part ? `<span class="cmp-row-part">${it.jeju ? '제주 한정' : '일부 매장'}</span>` : '';
+    const thumb = `<div class="cmp-row-thumb" style="width:${lay}px;height:${lay}px">` +
+                  `${it.img ? `<img src="${IMG(it.n)}" alt="">` : ''}</div>`;
+    let right = '';
+    if (mode === 1) right = n ? '<span class="cmp-row-check">✓</span>' : '';
+    else if (mode === 2) right = n
+      ? `<div class="qty" style="border:0;padding:0;gap:6px"><button data-minus="${it.n}">−</button><span>${n}</span><button data-plus="${it.n}">+</button></div>`
+      : `<button class="qty-add" style="border:0;padding:6px 10px;width:auto" data-plus="${it.n}">담기</button>`;
+    else right = n ? `<span class="cmp-row-check">${n}</span>` : '';
+
+    const tag = mode === 2 ? 'div' : 'button';
+    const hook = mode === 2 ? '' : ` data-menu="${it.n}"`;
+    return `<${tag} class="cmp-row"${hook}>${thumb}` +
+      `<div class="cmp-row-txt"><span class="cmp-row-name">${label(it.n)}${part}</span></div>` +
+      `<div class="cmp-row-right">${right}</div></${tag}>`;
+  }
+
   function render() {
     renderTabs();
     $('#cmpDesc').innerHTML = DESC[mode];
     $('#subDesc').innerHTML = SUBDESC[sub];
-    $('#mnBody').innerHTML = `<div class="mn-grid">${TABS[cur].items.map(card).join('')}</div>`;
+    $('#mnBody').innerHTML = lay
+      ? `<div class="cmp-list">${TABS[cur].items.map(row).join('')}</div>`
+      : `<div class="mn-grid">${TABS[cur].items.map(card).join('')}</div>`;
+    // 세로 길이를 화면에 바로 보여준다 — 이게 이 비교의 목적이다
+    requestAnimationFrame(() => {
+      const box = $('.cmp-list') || $('.mn-grid');
+      if (box) $('#layDesc').innerHTML = LAYDESC();
+    });
     const t = total();
     $('#basketTxt').classList.toggle('is-empty', !t);
     $('#basketTxt').textContent = t ? `담은 목록 ${t}` : '담은 목록';
@@ -243,6 +323,13 @@ body { background: var(--bg-card); }
         mode = +seg.dataset.mode;
         [...document.querySelectorAll('#cmpSeg button')]
           .forEach(b => b.classList.toggle('is-on', b === seg));
+        return render();
+      }
+      const lg = e.target.closest('[data-lay]');
+      if (lg) {
+        lay = +lg.dataset.lay;
+        [...document.querySelectorAll('#layoutSeg button')]
+          .forEach(b => b.classList.toggle('is-on', b === lg));
         return render();
       }
       const sg = e.target.closest('[data-sub]');
