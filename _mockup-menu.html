@@ -87,12 +87,19 @@ body { background: var(--bg-card); }
   position:relative; font-size:11px; color:#B6A497; text-align:center; padding:4px;
 }
 .mn-cell img { width:100%; height:100%; object-fit:cover; }
+/* 빼기 ✕ — 원 대신 모서리 그라데이션으로 대비를 만든다.
+   타일이 들어오면 칸 배경이 제각각(검붉은 마라 ↔ 뽀얀 삼계탕)이라
+   ✕만 얹으면 어느 한쪽에서 안 보인다. 손가락 자리는 32px로 넉넉히.
+   🔴 그림자(filter)는 쓰지 않는다 — iOS 렌더가 제각각이라 이 프로젝트에서 금지다. */
 .mn-cell-x {
-  position:absolute; top:5px; right:5px; width:22px; height:22px; border-radius:50%;
-  border:0; padding:0; background:rgba(43,18,13,.62); color:#fff;
-  font-size:13px; font-weight:700; line-height:22px; text-align:center;
+  position:absolute; top:0; right:0; width:32px; height:32px;
+  border:0; padding:0 4px 4px 0; color:#fff;
+  background:radial-gradient(circle at top right, rgba(28,12,8,.62) 0%, rgba(28,12,8,.42) 52%, rgba(28,12,8,0) 78%);
+  font-size:14px; font-weight:700; text-align:right; line-height:1;
+  display:flex; align-items:flex-start; justify-content:flex-end;
   cursor:pointer; font-family:inherit;
 }
+.mn-cell-x span { padding:4px 5px 0 0; }
 .mn-cell-name {
   position:absolute; left:0; right:0; bottom:0; padding:3px 4px;
   background:rgba(0,0,0,.5); color:#fff; font-size:10px; font-weight:700;
@@ -253,7 +260,7 @@ body { background: var(--bg-card); }
             ${Array.from({ length: cells }, (_, i) => {
               const b = broths[i];
               return b
-                ? `<div class="mn-cell is-filled"><img src="${IMG(b)}" alt=""><button class="mn-cell-x" data-cell="${i}" aria-label="빼기">✕</button><span class="mn-cell-name">${b}</span></div>`
+                ? `<div class="mn-cell is-filled"><img src="${IMG(b)}" alt=""><button class="mn-cell-x" data-cell="${i}" aria-label="빼기"><span>✕</span></button><span class="mn-cell-name">${b}</span></div>`
                 : `<div class="mn-cell">비어 있음</div>`;
             }).join('')}
           </div>
