@@ -851,7 +851,7 @@ window.MENU_DATA = {
   },
   {
    "n": "고수 듬뿍 훠궈",
-   "img": false,
+   "img": true,
    "jeju": true
   }
  ]
