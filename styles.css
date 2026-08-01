@@ -970,9 +970,13 @@ img {
   justify-content: center;
   gap: 2px;
 }
+/* 구분선: 글자 '|'는 폰트마다 높이·굵기가 달라 1px 선으로 그린다 */
 .footer-sep {
-  color: #DCC6BF;
-  font-size: 12px;
+  flex: none;
+  width: 1px;
+  height: 12px;
+  margin: 0 6px;
+  background: #E4C0B8;
 }
 
 .footer-credit {
