@@ -965,11 +965,11 @@ img {
 .footer-credit {
   margin-top: -10px;
   padding: 6px 10px;
-  font-size: 12px;      /* 제보 링크(.footer-report)와 같은 크기·굵기 */
+  font-size: 12px;      /* 제보 링크(.footer-report)와 같은 크기·굵기·색 */
   font-weight: 500;
-  color: #C7A79F;
+  color: #C08A80;
   text-decoration: underline;
-  text-decoration-color: #EBD6CF;
+  text-decoration-color: #E4C0B8;
   text-underline-offset: 3px;
   transition: color .15s ease;
   -webkit-tap-highlight-color: transparent;
