@@ -143,6 +143,12 @@ window.MENU_DATA = {
      "jeju": false
     },
     {
+     "n": "소스지",
+     "img": true,
+     "part": true,
+     "jeju": false
+    },
+    {
      "n": "이베리코 흑돼지목살",
      "img": true,
      "part": true,
@@ -387,9 +393,9 @@ window.MENU_DATA = {
      "jeju": false
     },
     {
-     "n": "소스지",
-     "img": true,
-     "part": true,
+     "n": "치즈피쉬볼",
+     "img": false,
+     "part": false,
      "jeju": false
     },
     {
@@ -471,12 +477,6 @@ window.MENU_DATA = {
     },
     {
      "n": "유부",
-     "img": false,
-     "part": false,
-     "jeju": false
-    },
-    {
-     "n": "치즈피쉬볼",
      "img": false,
      "part": false,
      "jeju": false
