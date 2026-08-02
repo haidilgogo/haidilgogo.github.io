@@ -643,7 +643,9 @@
   const modalClose = document.getElementById('modalClose');
   const modalFavBtn = document.getElementById('modalFavBtn');
 
-  // 검색 보정: 괄호·공백을 뺀 형태로도 맞춘다(`라젤(이 아는 동생)소스` ↔ `라젤 아는 동생소스`)
+  // 검색 보정: 괄호·공백을 뺀 형태로도 맞춘다(`라젤(이 아는 동생)소스` ↔ `라젤 이 아는 동생소스`)
+  // 🔴 괄호·공백만 친 경우 이 값이 빈 문자열이 되는데, 빈 문자열은 아무 이름에나 들어 있어서
+  //    그대로 쓰면 전부가 걸린다(2026-08-02 실제로 그랬다). 쓰는 쪽에서 반드시 비었는지 본다.
   const 검색꼴 = (s) => (s || '').replace(/[()\s]/g, '');
   function getFiltered() {
     const q = query.trim();
@@ -657,10 +659,11 @@
       filtered = filtered.filter((r) => favorites.has(r.id));
     }
     if (q) {
+      const nq = 검색꼴(q);          // 비면 아래 보정을 건너뛴다 — 안 그러면 전부가 걸린다
       filtered = filtered.filter((r) =>
         // 괄호·공백을 뺀 형태로도 맞춰본다 — 화면에 보이는 대로 쳐도, 빼고 쳐도 찾아진다
-        // (예: `라젤(이 아는 동생)소스` ↔ `라젤 아는 동생소스`)
-        r.name.includes(q) || 검색꼴(r.name).includes(검색꼴(q))
+        // (예: `라젤(이 아는 동생)소스` ↔ `라젤 이 아는 동생소스`)
+        r.name.includes(q) || (nq && 검색꼴(r.name).includes(nq))
         || (r.ings || []).some((i) => i[0].includes(q))
       );
     }
