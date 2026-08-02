@@ -8,6 +8,11 @@
      앱의 진짜 styles.css를 그대로 불러와 색·글꼴·카드 모양이 실제와 같게 했다. -->
 <link rel="stylesheet" href="styles.css?v=635">
 <style>
+/* 🔴 앱은 JS(syncTopbarH)가 상단바 실제 높이를 --topbar-h 에 넣어준다. 목업엔 그 JS 가 없어서
+   값이 비면 0 이 되고, 앱 스타일을 그대로 쓰는 시트(.stamp-sheet-overlay)가 상단바를 덮는다.
+   목업 상단바는 65px 고정이라 여기서 직접 넣는다. */
+:root { --topbar-h: 65px; }
+
 /* ── 목업 껍데기 (앱에 이미 있는 것은 안 적었다) ───────────────── */
 body { background: var(--bg-card); }
 .main { padding-bottom: 156px; }  /* 하단 고정 버튼(50) + 탭바 자리 */
@@ -20,25 +25,41 @@ body { background: var(--bg-card); }
 .mn-bar {
   position:sticky; top:65px; z-index:30;   /* 65 = 상단바 높이(실측) */
   display:flex; align-items:stretch;
-  margin:0 -20px; padding:0 0 0 20px;
+  margin:0 -20px; padding:0 20px;
   background:var(--bg-card); border-bottom:1px solid #EFE4D6;
 }
-.mn-basket {
-  flex:none; display:flex; align-items:center; gap:3px;
-  padding:12px 12px 11px 0; margin-right:12px;
-  border:0; border-right:1px solid #EFE4D6; background:none;
-  font-family:inherit; cursor:pointer; user-select:none;
+/* 🔴 담은 목록은 상단바 오른쪽 장바구니 아이콘으로 옮겼다(2026-08-02 사용자 확정).
+   분류 탭 줄이 전체 폭을 쓰게 되어 320px 에서 여유가 65px 늘었다.
+   🔴 숫자는 여전히 안 넣는다(앞선 확정) — 담긴 게 있으면 점만 찍는다. */
+.mk-top-right { margin-left:auto; display:flex; align-items:center; gap:2px; }
+.mk-icon-btn {
+  position:relative; width:40px; height:40px; border:0; background:none;
+  display:flex; align-items:center; justify-content:center;
+  color:#4D4139; cursor:pointer; -webkit-tap-highlight-color:transparent;
 }
-/* 🔴 숫자는 넣지 않는다(2026-08-02 사용자 확정). 비었는지만 진하기로 구분한다 */
-.mn-basket-txt { font-size:14px; font-weight:700; color:var(--text-dark); }
-.mn-basket-txt.is-empty { color:var(--text-muted); font-weight:600; }
-.mn-basket-arrow { color:var(--text-muted); font-size:15px; }
+.mk-pot { position:relative; width:18px; height:18px; display:block; color:#4D4139; }
+.mk-pot svg { position:absolute; inset:0; }
+/* 기본 = 선만. 담기면 김이 빨갛게 켜지고, 누르면 채움으로 바뀐다
+   🔴 `.mk-pot svg` 보다 약한 선택자로 숨기면 안 먹는다(우선순위) — 반드시 `.mk-pot` 를 앞에 붙일 것 */
+.mk-pot .mk-pot-line { display:block; }
+.mk-pot .mk-pot-steam,
+.mk-pot .mk-pot-fill,
+.mk-pot .mk-pot-fill-steam { display:none; }
+.mk-pot .mk-pot-steam { color:var(--brand-red); }
+.mk-pot.has-item .mk-pot-steam { display:block; }
+/* 누름 = 즐겨찾기와 같은 방식(채워진 도형 + 브랜드 빨강) */
+.mk-icon-btn:active .mk-pot .mk-pot-line,
+.mk-icon-btn:active .mk-pot .mk-pot-steam { display:none; }
+.mk-icon-btn:active .mk-pot { color:var(--brand-red); }
+.mk-icon-btn:active .mk-pot .mk-pot-fill { display:block; }
+.mk-icon-btn:active .mk-pot.has-item .mk-pot-fill { display:none; }
+.mk-icon-btn:active .mk-pot.has-item .mk-pot-fill-steam { display:block; }
 
 /* 분류 탭 — 담은 목록 오른쪽에서 가로로 스크롤된다 */
 .mn-tabs {
   flex:1; min-width:0;
   display:flex; gap:20px; overflow-x:auto; white-space:nowrap;
-  padding:12px 20px 10px 0;
+  padding:12px 0 10px;
 }
 .mn-tab {
   flex:none; background:none; border:0; padding:0 0 4px;
@@ -206,7 +227,11 @@ body { background: var(--bg-card); }
    담으려다 잘못 눌러도 여기서 바로 담을 수 있게 **모달 안에도 담기 버튼**을 둔다.
    닫기 버튼은 앱의 다른 모달과 같은 것을 쓴다(.stamp-sheet-close · 18px X 아이콘). */
 .mn-zoom-dim {
-  position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+  /* 🔴 상단바를 덮지 않는다 — 앱의 모달·시트가 전부 이 규칙이다
+     (styles.css 의 .modal-overlay·.stamp-sheet-overlay 둘 다 @media 에서 top 을 내린다).
+     숫자를 박지 말 것 — 앱은 JS(syncTopbarH)가 --topbar-h 에 실제 높이를 넣어준다. */
+  position:fixed; top:var(--topbar-h, 65px); left:0; right:0; bottom:0; z-index:60;
+  display:flex; align-items:center; justify-content:center;
   padding:24px; background:rgba(45,34,28,.5);
 }
 .mn-zoom {
@@ -223,28 +248,11 @@ body { background: var(--bg-card); }
 }
 .mn-zoom-add.is-on { background:#fff; color:var(--brand-red); box-shadow:inset 0 0 0 2px var(--brand-red); }
 
-/* ── 전골(육수) 카드는 격자 그대로 ───────────────────────────
-   🔴 리스트로 안 바꾼다(2026-08-02 확정): 냄비째 그린 그림이라 80px 로 줄이면
-   스테인리스 테두리가 국물을 밀어내 마라끼리 구분이 안 된다. 육수는 12개뿐이라
-   격자로 둬도 스크롤이 길지 않고, 전골은 냄비를 고르는 다른 성격의 화면이다. */
-.mn-grid--pot { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.mn-card--pot {
-  position:relative; display:block; padding:0; overflow:hidden;
-  background:#fff; border:1px solid var(--card-border); border-radius:14px;
-}
-.mn-card--pot .mn-card-thumb { width:100%; height:auto; aspect-ratio:1/1; border-radius:0; background:#FBF4E6; }
-.mn-card--pot .mn-card-thumb img { object-fit:cover; }
-.mn-card--pot .mn-card-name {
-  display:block; padding:10px 12px 11px; background:#fff;
-  font-size:14px; font-weight:800; color:var(--text-dark); white-space:normal;
-}
-.mn-card--pot .mn-card-part {
-  position:absolute; top:7px; left:7px; padding:2px 7px; border-radius:9px;
-  background:rgba(255,255,255,.92); border:1px solid var(--card-border);
-  font-size:10.5px; font-weight:700;
-}
-.mn-card--pot .mn-card-part::before { content:''; }
-.mn-card--pot .mn-card-thumb.is-text.has-part { padding-top:34px; }
+/* ── 육수 줄 ────────────────────────────────────────────
+   🔴 전골도 리스트다(2026-08-02 사용자 확정). 격자를 남기지 않는다.
+   썸네일은 카드용(냄비째)을 쓴다 — 타일(국물만)로 해봤더니 냄비가 사라져
+   「고르는 화면」이라는 게 안 읽혔다. 타일은 위 냄비 칸 안에서만 쓴다. */
+.mn-card--broth:active { transform:scale(.99); }
 
 /* 「일부 매장」·「제주 한정」은 부제 자리에 붙는다(리스트라 배지를 얹을 자리가 없다) */
 .mn-card-part { color:#8A7468; }
@@ -284,16 +292,30 @@ body { background: var(--bg-card); }
       <img class="topbar-logo-mark" src="assets/icons/logo-mark-color-v2.png?v=1" width="25" height="22" alt="">
       <span class="topbar-title">하딜고고</span>
     </button>
-    <span class="mk-sec-title">메뉴</span>
+    <div class="mk-top-right">
+      <button class="mk-icon-btn" id="basketBtn" type="button" aria-label="담은 목록">
+        <!-- 🔴 훠궈 냄비(Flaticon · Magnific). 세 겹으로 상태를 만든다:
+             비었을 때=선만 / 담겼을 때=선+김(김만 빨강) / 눌렀을 때=채움(빨강).
+             원본 두께 그대로 쓴다 — 잉크 양을 재보니 공유 아이콘(24.86%)과 25.29%로 거의 같다. -->
+        <span class="mk-pot" id="potIcon">
+          <svg class="mk-pot-line" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><g transform="translate(0,24) scale(0.004687500,-0.004687500)">     <path d="M1877 4836 c-46 -17 -64 -32 -83 -68 -8 -16 -76 -332 -149 -701 -74     -370 -137 -682 -140 -694 l-5 -23 -700 0 c-470 0 -708 -3 -727 -11 -15 -6 -38     -20 -50 -31 -22 -21 -23 -27 -23 -234 0 -193 2 -220 25 -307 79 -303 245 -579     496 -822 170 -165 340 -288 550 -399 82 -43 106 -61 103 -74 -2 -9 -45 -224     -94 -477 -94 -479 -104 -567 -79 -674 26 -116 124 -243 226 -295 l52 -26 1284     0 1283 0 51 25 c158 79 254 262 240 459 -3 45 -46 288 -96 540 -50 253 -90     460 -88 461 1 1 50 27 110 58 450 236 805 606 971 1012 77 188 81 213 81 495     l0 254 -40 23 -40 23 -705 0 -705 0 -141 703 c-149 748 -149 746 -213 778 -39     21 -1338 25 -1394 5z m1152 -398 c6 -29 58 -286 115 -570 l103 -518 -684 0     c-647 0 -684 1 -679 18 3 9 53 258 111 552 58 294 108 543 111 553 5 16 36 17     459 17 l454 0 10 -52z m1736 -1480 c-14 -68 -64 -216 -97 -288 -219 -473 -746     -862 -1392 -1026 -238 -60 -450 -86 -706 -86 -520 -1 -1019 137 -1440 398     -288 178 -527 429 -659 693 -37 72 -111 285 -111 319 l0 22 2206 0 2206 0 -7     -32z m-3184 -1623 c128 -46 399 -101 614 -127 168 -19 627 -16 800 6 156 19     362 61 504 101 51 14 95 24 98 22 2 -3 43 -204 91 -446 l87 -442 -20 -37 c-11     -20 -36 -45 -55 -57 -35 -20 -48 -20 -1105 -23 -588 -2 -1089 0 -1112 3 -47 7     -96 42 -118 85 -13 25 -7 64 70 456 91 461 94 474 99 474 2 0 23 -7 47 -15z"/>   </g></svg>
+          <svg class="mk-pot-steam" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><g transform="translate(0,24) scale(0.004687500,-0.004687500)">     <path d="M266 5110 c-86 -26 -133 -141 -87 -215 10 -16 41 -52 68 -80 68 -68     86 -132 62 -220 -9 -30 -34 -62 -114 -138 -114 -108 -155 -172 -180 -278 -41     -175 7 -349 130 -475 71 -72 115 -97 171 -97 59 0 105 29 132 85 37 73 25 116     -52 198 -72 75 -86 103 -86 167 0 71 32 127 108 186 119 93 182 205 204 357     14 93 -6 203 -53 298 -53 109 -185 223 -254 221 -11 0 -33 -5 -49 -9z"/>     <path d="M1016 5110 c-59 -18 -106 -83 -106 -147 0 -45 21 -81 87 -149 111     -113 95 -233 -44 -347 -202 -166 -259 -419 -145 -646 48 -97 146 -189 224     -211 70 -21 157 33 177 108 17 63 0 110 -64 170 -65 61 -85 102 -85 169 1 73     29 124 102 181 144 114 210 246 211 422 0 76 -5 109 -25 166 -44 126 -130 232     -223 275 -43 20 -65 22 -109 9z"/>     <path d="M4013 5100 c-54 -28 -85 -76 -85 -134 0 -56 21 -96 71 -135 52 -42     81 -102 81 -173 0 -75 -29 -124 -114 -195 -131 -110 -196 -241 -197 -398 -1     -145 43 -257 139 -357 76 -80 112 -100 174 -100 105 0 176 107 138 208 -6 15     -37 52 -69 83 -47 46 -60 65 -70 108 -18 72 4 148 56 195 117 106 151 142 182     193 89 147 95 358 13 509 -32 58 -119 157 -166 185 -51 32 -104 36 -153 11z"/>     <path d="M4740 5098 c-60 -31 -95 -97 -85 -160 6 -34 20 -55 67 -103 69 -69     88 -108 88 -177 0 -64 -36 -132 -92 -173 -241 -178 -295 -500 -124 -733 80     -108 172 -162 245 -142 50 13 90 46 107 86 30 73 11 131 -67 201 -71 64 -93     138 -68 224 13 42 36 69 126 146 69 59 120 132 153 218 20 50 24 78 24 175 0     97 -4 125 -24 175 -59 153 -193 285 -290 285 -9 0 -36 -10 -60 -22z"/>   </g></svg>
+          <svg class="mk-pot-fill" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><g transform="translate(0,24) scale(0.004687500,-0.004687500)">     <path d="M1925 4821 c-102 -25 -100 -18 -220 -638 -58 -296 -107 -548 -110     -560 l-5 -23 960 0 c718 0 960 3 960 12 0 30 -213 1095 -224 1123 -8 18 -31     45 -52 61 l-37 29 -621 2 c-342 1 -634 -2 -651 -6z"/>     <path d="M90 3282 c-19 -9 -45 -32 -57 -51 -20 -29 -23 -47 -23 -126 0 -110     29 -288 65 -405 15 -47 55 -143 89 -215 100 -207 215 -364 397 -540 609 -589     1598 -858 2548 -694 637 110 1204 411 1565 830 112 130 173 220 247 364 102     196 150 365 171 587 11 130 11 135 -10 179 -15 30 -35 53 -61 67 l-39 22     -2428 0 c-2293 0 -2431 -1 -2464 -18z"/>     <path d="M1156 1179 c-19 -55 -136 -685 -136 -729 1 -220 167 -409 385 -440     91 -13 2206 -13 2295 0 91 13 194 67 259 135 89 94 141 242 125 354 -10 71     -133 684 -138 689 -3 2 -38 -9 -78 -26 -267 -111 -572 -191 -883 -232 -227     -29 -653 -29 -870 1 -299 41 -587 114 -830 211 -55 22 -106 42 -112 45 -7 3     -15 -1 -17 -8z"/>   </g></svg>
+          <svg class="mk-pot-fill-steam" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><g transform="translate(0,24) scale(0.004687500,-0.004687500)">     <path d="M267 5106 c-48 -18 -76 -42 -93 -83 -31 -73 -14 -121 73 -208 51 -51     73 -98 73 -161 0 -51 -45 -126 -100 -168 -218 -166 -280 -435 -158 -686 34     -71 121 -166 178 -195 79 -41 171 -10 210 70 34 69 22 114 -50 190 -71 74 -90     110 -90 171 0 67 32 126 95 178 99 80 151 155 189 268 67 200 24 400 -115 539     -87 87 -143 109 -212 85z"/>     <path d="M1015 5105 c-75 -26 -116 -99 -101 -179 4 -23 26 -54 69 -97 47 -48     67 -77 76 -111 22 -77 -1 -154 -61 -206 -135 -116 -177 -169 -217 -277 -31     -82 -38 -218 -17 -308 42 -180 185 -341 302 -339 100 1 168 93 142 190 -6 23     -31 57 -65 91 -65 64 -83 101 -83 171 0 72 28 120 108 184 141 114 207 254     205 436 -2 138 -49 257 -142 355 -83 88 -145 114 -216 90z"/>     <path d="M4013 5109 c-43 -12 -90 -62 -102 -107 -17 -59 2 -109 66 -170 63     -61 83 -102 83 -169 -1 -73 -29 -124 -102 -181 -145 -114 -213 -257 -211 -442     2 -167 76 -315 206 -414 123 -94 281 -1 253 148 -5 25 -26 54 -70 99 -52 52     -65 73 -76 115 -19 82 3 148 68 204 89 78 153 150 181 207 102 201 72 446 -74     609 -76 85 -155 121 -222 101z"/>     <path d="M4755 5105 c-76 -27 -117 -105 -96 -182 8 -29 26 -55 62 -87 64 -57     89 -105 89 -170 0 -74 -29 -124 -113 -193 -85 -70 -140 -147 -175 -247 -31     -88 -36 -239 -9 -324 37 -121 136 -255 218 -298 98 -50 214 11 226 119 7 56     -18 104 -79 156 -100 86 -104 218 -9 305 159 146 204 210 236 341 45 181 -23     404 -159 521 -75 65 -128 82 -191 59z"/>     <path d="M1925 4821 c-102 -25 -100 -18 -220 -638 -58 -296 -107 -548 -110     -560 l-5 -23 960 0 c718 0 960 3 960 12 0 30 -213 1095 -224 1123 -8 18 -31     45 -52 61 l-37 29 -621 2 c-342 1 -634 -2 -651 -6z"/>     <path d="M90 3282 c-19 -9 -45 -32 -57 -51 -20 -29 -23 -47 -23 -126 0 -110     29 -288 65 -405 15 -47 55 -143 89 -215 100 -207 215 -364 397 -540 609 -589     1598 -858 2548 -694 637 110 1204 411 1565 830 112 130 173 220 247 364 102     196 150 365 171 587 11 130 11 135 -10 179 -15 30 -35 53 -61 67 l-39 22     -2428 0 c-2293 0 -2431 -1 -2464 -18z"/>     <path d="M1156 1179 c-19 -55 -136 -685 -136 -729 1 -220 167 -409 385 -440     91 -13 2206 -13 2295 0 91 13 194 67 259 135 89 94 141 242 125 354 -10 71     -133 684 -138 689 -3 2 -38 -9 -78 -26 -267 -111 -572 -191 -883 -232 -227     -29 -653 -29 -870 1 -299 41 -587 114 -830 211 -55 22 -106 42 -112 45 -7 3     -15 -1 -17 -8z"/>   </g></svg>
+        </span>
+      </button>
+      <button class="mk-icon-btn" type="button" aria-label="친구에게 공유">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <path d="M8.6 10.6l6.8-3.8M8.6 13.4l6.8 3.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
 </header>
 
 <main class="main">
   <div class="mn-bar">
-    <button class="mn-basket" id="basketBar" type="button">
-      <span class="mn-basket-txt" id="basketTxt">담은 목록</span>
-      <span class="mn-basket-arrow">›</span>
-    </button>
     <div class="mn-tabs" id="mnTabs"></div>
   </div>
 
@@ -402,15 +424,21 @@ body { background: var(--bg-card); }
           }).join('')}
         </div>
       </div>
-      <div class="mn-grid mn-grid--pot">
+      <div class="mn-grid">
         ${D.broths.map(b => {
           // 🔴 담겨도 체크·빨간 테두리를 붙이지 않는다(2026-08-02 사용자 지시) —
           //    체크가 있으면 「이미 골랐으니 또 못 담는다」로 읽힌다. 중복해서 담을 수 있는 화면이다.
-          //    담긴 것은 위 냄비가 보여준다. 카드에는 누르는 반응(hover/press)만 준다.
-          return `<button class="mn-card mn-card--pot ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
-            ${b.jeju ? '<span class="mn-card-part">제주 한정</span>' : ''}
-            <div class="mn-card-thumb ${b.img ? '' : 'is-text'} ${!b.img && b.jeju ? 'has-part' : ''}">${b.img ? `<img src="${IMG(b.n)}" alt="">` : b.n}</div>
-            ${b.img ? `<span class="mn-card-name">${b.n}</span>` : ''}
+          //    담긴 것은 위 냄비가 보여준다. 줄에는 누르는 반응(press)만 준다.
+          // 🔴 썸네일은 **냄비째 그린 카드용**이다(2026-08-02 사용자 확정).
+          //    타일(국물만)로 바꿔봤더니 색 구분은 좋아졌지만 「냄비를 고르는 화면」이라는 게
+          //    안 읽혔다 — 사용자가 바로 「냄비 어디갔냐」고 했다. 타일은 냄비 칸 안에서만 쓴다.
+          return `<button class="mn-card mn-card--broth ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
+            <div class="mn-card-thumb ${b.img ? '' : 'is-text'}">${
+              b.img ? `<img src="${IMG(b.n)}" alt="">` : b.n}</div>
+            <span class="mn-card-body">
+              <span class="mn-card-name">${b.n}</span>
+              ${b.jeju ? '<span class="mn-card-sub">제주 한정</span>' : ''}
+            </span>
           </button>`;
         }).join('')}
       </div>`;
@@ -498,7 +526,7 @@ body { background: var(--bg-card); }
     renderSubs();
     const t = TABS[cur];
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
-    $('#basketTxt').classList.toggle('is-empty', !count());
+    $('#potIcon').classList.toggle('has-item', !!count());
     renderNext();
     window.scrollTo({ top: 0 });
   }
@@ -566,7 +594,7 @@ body { background: var(--bg-card); }
     const mc = e.target.closest('[data-menu]');
     if (mc) { toggle(mc.dataset.menu); return render(); }
 
-    if (e.target.closest('#basketBar')) {
+    if (e.target.closest('#basketBtn')) {
       renderSheet();
       $('#sheetDim').classList.add('open');
       return;
@@ -592,6 +620,9 @@ body { background: var(--bg-card); }
   });
 
   render();
+
+
+
 })();
 </script>
 </body>
