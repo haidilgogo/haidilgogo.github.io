@@ -684,6 +684,12 @@ window.MENU_DATA = {
      "jeju": false
     },
     {
+     "n": "쑥갓",
+     "img": false,
+     "part": true,
+     "jeju": false
+    },
+    {
      "n": "흰 무",
      "img": true,
      "part": true,
