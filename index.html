@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=636">
+<link rel="stylesheet" href="styles.css?v=638">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -357,10 +357,20 @@
         <button class="home-random-btn" id="homeRandomBtn" type="button">오늘의 소스</button>
       </section>
 
+      <!-- 🔴 순서(2026-08-03 사용자 확정): 윗줄 = 개수 + 검색창 + 닫기 / 아랫줄 = 카테고리 탭.
+           매장·메뉴 탭과 같이 「개수 줄이 위, 탭줄이 아래」로 맞췄다. 닫기(X)는 자리를 안 옮기고
+           윗줄 오른쪽 끝에 그대로 있고, 검색창이 그 왼쪽으로 들어왔다. 되돌리지 말 것. -->
       <div class="list-head">
         <div class="list-head-top">
-          <div class="tabs browse-cat-tabs" id="browseCatTabs">
-            <span class="tabs-underline" id="browseCatUnderline"></span>
+          <p class="count-line"><span id="listTitle">레시피</span> <span class="count-num" id="countNum">0</span>개</p>
+          <!-- 검색창(2026-07-25): 접기 폐지, 상시 노출. 돋보기는 장식용 아이콘(입력창 안) -->
+          <div class="search-box">
+            <svg class="search-box-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input class="search-input" id="searchInput" type="text" placeholder="검색">
+            <button class="search-clear" id="searchClear" type="button" aria-label="검색어 지우기">&times;</button>
           </div>
           <!-- 닫기(2026-07-25): 카테고리 탭이 전체 포함 항상 떠 있어 '뒤로가기' 대신 '이 화면 닫기'가 정확함 -->
           <button class="browse-close" id="browseClose" type="button" aria-label="닫기">
@@ -370,15 +380,8 @@
           </button>
         </div>
         <div class="list-head-bottom">
-          <p class="count-line"><span id="listTitle">레시피</span> <span class="count-num" id="countNum">0</span>개</p>
-          <!-- 검색창(2026-07-25): 접기 폐지, 개수 옆에 상시 노출. 돋보기는 장식용 아이콘(입력창 안) -->
-          <div class="search-box">
-            <svg class="search-box-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <input class="search-input" id="searchInput" type="text" placeholder="검색">
-            <button class="search-clear" id="searchClear" type="button" aria-label="검색어 지우기">&times;</button>
+          <div class="tabs browse-cat-tabs" id="browseCatTabs">
+            <span class="tabs-underline" id="browseCatUnderline"></span>
           </div>
         </div>
       </div>
@@ -415,15 +418,17 @@
 
     <!-- 매장 섹션 -->
     <div class="view" id="view-store" hidden>
-      <!-- 지역 탭: 상단바에서 이동(2026-07-23). 전국 N곳 위에 표시 -->
+      <!-- 🔴 순서: 개수·안내문 줄이 위, 지역 탭이 아래다(2026-08-03 사용자 확정) —
+           메뉴 탭(#view-menu)·레시피 탭(.list-head)과 같은 순서로 세 탭을 맞췄다. 되돌리지 말 것. -->
+      <div class="stores-head">
+        <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
+        <p class="stores-note">영업시간은 매장 사정에 따라 다를 수 있어요</p>
+      </div>
+      <!-- 지역 탭: 상단바에서 이동(2026-07-23) → 전국 N곳 아래로 이동(2026-08-03) -->
       <div class="store-region-tabs">
         <div class="tabs" id="storeTabs">
           <span class="tabs-underline" id="storeTabsUnderline"></span>
         </div>
-      </div>
-      <div class="stores-head">
-        <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
-        <p class="stores-note">영업시간은 매장 사정에 따라 다를 수 있어요</p>
       </div>
       <div class="stores" id="stores"></div>
     </div>
