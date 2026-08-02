@@ -4,9 +4,11 @@
 # 🔴 내부 문서는 비공개 저장소 haidilgogo/haidilgogo-docs 로 옮겼다 (2026-08-01).
 # 이 저장소는 GitHub Pages 무료 요금제라 반드시 공개여야 하고, _config.yml의 exclude는
 # 사이트 서빙만 막을 뿐 GitHub에서 읽히는 것은 못 막았다(raw 주소로 200이 떴다).
-# 아래 둘은 편의를 위한 바로가기(심볼릭 링크)이고 실체는 ../Haidilgogo-docs/ 에 있다.
+# 아래 셋은 편의를 위한 바로가기(심볼릭 링크)이고 실체는 ../docs/ 에 있다.
+# (AGENTS.md 도 ../docs/CLAUDE.md 를 가리킨다 — 코덱스가 여기서 작업할 때 규칙을 읽게)
 # ⚠️ 새 내부 문서를 여기 만들지 말 것 — 만들면 다시 공개된다.
 CLAUDE.md
+AGENTS.md
 HANDOVER.md
 REVIEW-SYNC-CODE*.md
 
