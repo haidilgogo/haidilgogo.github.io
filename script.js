@@ -4590,3 +4590,290 @@
 
   syncOnStart();
 })();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ── 메뉴 탭 ──  목업(_mockup-menu.html)에서 옮겨온 것이다. 앱의 다른 코드와 섞이지 않게
+   따로 감쌌다 — 이 안의 render/count 는 위쪽의 같은 이름과 아무 상관이 없다.
+   데이터는 menu-data.js(`node .claude/make_menu_data.mjs`가 메뉴.md 에서 만든다).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  const D = window.MENU_DATA;
+  if (!D || !document.getElementById('mnTabs')) return; // 데이터·화면이 없으면 조용히 빠진다
+
+  // 🔴 화면 분류는 공식 2단이다(메뉴.md 「화면 분류」). 상위 = 전골·육류·야채류·디저트.
+  //    D.tabs 의 7개 묶음은 자료 정리용이라 화면에 쓰지 않는다 — items 만 꺼내 쓴다.
+  const ALL = D.tabs.flatMap((t) => t.items);
+  const TABS = [{ name: '전골', pot: true }].concat(
+    D.cats.map((g) => ({ name: g.up, subs: g.subs }))
+  );
+  const 하위메뉴 = (up, sub) => ALL.filter((it) => it.up === up && it.sub === sub);
+  const IMG = (n) => 'assets/menu/' + n + '.webp';
+  // 냄비 칸은 타일(-타일)을 쓴다. 아직 안 들어온 육수는 카드용 그림을 임시로 쓴다(냄비 속 냄비로 보인다)
+  const TILE = new Set(D.broths.filter((b) => b.tile).map((b) => b.n));
+  const CELL_IMG = (n) => IMG(TILE.has(n) ? n + '-타일' : n);
+
+  let cur = 0;                    // 지금 탭
+  let curSub = 0;                 // 지금 하위 분류
+  let cells = 2;                  // 냄비 칸 수(1·2·4)
+  let broths = [];                // 고른 육수(칸 수만큼, 중복 허용)
+  const picked = new Map();       // 담은 메뉴
+
+  const $ = (s) => document.querySelector(s);
+  const sheetOverlay = $('#mnSheetOverlay');
+
+  function count() { return picked.size + (broths.length ? 1 : 0); }
+
+  function renderSubs() {
+    const t = TABS[cur];
+    const el = $('#mnSubs');
+    if (!t.subs) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    el.style.display = '';
+    el.innerHTML = t.subs.map((sub, i) =>
+      `<button class="mn-sub ${i === curSub ? 'is-on' : ''}" data-sub="${i}">${sub}</button>`
+    ).join('');
+  }
+
+  // 상위 탭 하나의 항목 수. 🔴 화면에 실제로 뜨는 것만 센다 — 하위 분류(subs)에 안 걸린 항목은
+  //    화면에 나오지 않으므로 데이터 총계가 아니라 하위 분류를 훑어 더한다.
+  //    하위 분류를 눌러도 숫자는 안 바뀐다(상위 카테고리 개수다).
+  const 탭개수 = (t) => t.pot
+    ? D.broths.length
+    : t.subs.reduce((a, sub) => a + 하위메뉴(t.name, sub).length, 0);
+
+  function renderHead() {
+    const t = TABS[cur];
+    $('#mnCountLabel').textContent = t.name;
+    $('#mnCountNum').textContent = 탭개수(t);
+  }
+
+  function renderTabs() {
+    // 🔴 탭에 숫자를 넣지 않는다 — 고른 카드에 이미 ✓가 있어 같은 정보가 두 번 나온다
+    $('#mnTabs').innerHTML = TABS.map((t, i) =>
+      `<button class="mn-tab ${i === cur ? 'is-on' : ''}" data-i="${i}">${t.name}</button>`
+    ).join('');
+  }
+
+  const POTS = [1, 2, 4];
+  // 「1 맛 / 2가지 맛」 대신 「1칸 / 2칸 / 4칸」으로 확정(2026-08-02 사용자)
+  const potLabel = (n) => n + '칸';
+
+  function renderPot() {
+    return `
+      <div class="mn-pot-seg">
+        ${POTS.map((n) => `<button data-pot="${n}" class="${n === cells ? 'is-on' : ''}">${potLabel(n)}</button>`).join('')}
+      </div>
+
+      <div class="mn-pot-wrap">
+        <div class="mn-pot">
+          <div class="mn-pot-inner" data-cells="${cells}">
+            ${Array.from({ length: cells }, (_, i) => {
+              const b = broths[i];
+              return b
+                ? `<div class="mn-cell is-filled" data-cell="${i}"><img src="${CELL_IMG(b)}" alt=""></div>`
+                : `<div class="mn-cell"></div>`;
+            }).join('')}
+            ${cells > 1 ? `<div class="mn-pot-nums" data-cells="${cells}">
+              ${Array.from({ length: cells }, (_, i) => `<span class="mn-pot-num">${i + 1}</span>`).join('')}
+            </div>` : ''}
+          </div>
+        </div>
+        <div class="mn-pot-side ${cells === 1 ? 'is-one' : ''}">
+          ${Array.from({ length: cells }, (_, i) => {
+            const b = broths[i];
+            return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
+                   (b ? `<button class="mn-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="mn-grid">
+        ${D.broths.map((b) => {
+          // 🔴 담겨도 체크·빨간 테두리를 붙이지 않는다(2026-08-02 사용자 지시) —
+          //    체크가 있으면 「이미 골랐으니 또 못 담는다」로 읽힌다. 중복해서 담을 수 있는 화면이다.
+          //    담긴 것은 위 냄비가 보여준다. 줄에는 누르는 반응(press)만 준다.
+          // 🔴 썸네일은 **냄비째 그린 카드용**이다 — 타일(국물만)로 바꿔봤더니 「냄비를 고르는
+          //    화면」이라는 게 안 읽혔다. 타일은 냄비 칸 안에서만 쓴다.
+          return `<button class="mn-card mn-card--broth ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
+            <div class="mn-card-thumb ${b.img ? '' : 'is-text'}">${
+              b.img ? `<img src="${IMG(b.n)}" alt="">` : b.n}</div>
+            <span class="mn-card-body">
+              <span class="mn-card-name">${b.n}</span>
+              ${b.jeju ? '<span class="mn-card-sub">제주 한정</span>' : ''}
+            </span>
+          </button>`;
+        }).join('')}
+      </div>`;
+  }
+
+  // 🔴 이름 규칙(2026-08-02 사용자 확정) — 화면에서만 나눈다. 데이터(메뉴.md)는 공식 이름 그대로 둔다.
+  //    ① 끝 괄호는 부제로 내린다        차돌박이(지방 적음) → 차돌박이 / 지방 적음
+  //    ② 앞의 「하이디라오」도 부제로     하이디라오 특제소고기 → 특제소고기 / 하이디라오
+  //    이렇게 해야 320px 에서 이름이 안 잘린다(그림 80px 기준으로 재서 정함).
+  function 이름나누기(n) {
+    let 이름 = n, 부제 = '';
+    const m = /^(.*?)\((.+)\)$/.exec(n);
+    if (m) { 이름 = m[1].trim(); 부제 = m[2]; }
+    if (/^하이디라오\s+/.test(이름)) {
+      부제 = '하이디라오' + (부제 ? ' · ' + 부제 : '');
+      이름 = 이름.replace(/^하이디라오\s+/, '');
+    }
+    return { 이름, 부제 };
+  }
+
+  function toggle(n) { picked.has(n) ? picked.delete(n) : picked.set(n, 1); }
+
+  // ── 그림 확대 모달 ── 그림(줄의 29%)을 누르면 뜨고, 나머지 71%는 바로 담긴다
+  function openZoom(n) {
+    const dim = document.createElement('div');
+    dim.className = 'mn-zoom-dim'; dim.id = 'mnZoomDim';
+    dim.innerHTML = `<div class="mn-zoom" data-menu="${n}">
+      <button class="stamp-sheet-close" id="mnZoomClose" type="button" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
+      </button>
+      <div class="mn-zoom-body"></div>
+    </div>`;
+    document.body.appendChild(dim);
+    renderZoom();
+  }
+  function closeZoom() {
+    const dim = $('#mnZoomDim');
+    if (dim) dim.remove();
+    render();
+  }
+  function renderZoom() {
+    const box = $('.mn-zoom'); if (!box) return;
+    const n = box.dataset.menu;
+    const { 이름, 부제 } = 이름나누기(n);
+    const on = picked.has(n);
+    box.querySelector('.mn-zoom-body').innerHTML =
+      `<img class="mn-zoom-img" src="${IMG(n)}" alt="">
+       <span class="mn-zoom-name">${이름}</span>
+       ${부제 ? `<span class="mn-zoom-sub">${부제}</span>` : ''}
+       <button class="mn-zoom-add ${on ? 'is-on' : ''}" type="button">${on ? '담음 ✓' : '담기'}</button>`;
+  }
+
+  function renderGrid(t) {
+    const items = 하위메뉴(t.name, t.subs[curSub]);
+    return `<div class="mn-grid">${items.map((it) => {
+      const on = picked.has(it.n);
+      const { 이름, 부제 } = 이름나누기(it.n);
+      const 꼬리 = it.part ? (it.jeju ? '제주 한정' : '일부 매장') : '';
+      const 아랫줄 = [부제, 꼬리].filter(Boolean).join(' · ');
+      return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
+        <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
+        <span class="mn-card-body">
+          <span class="mn-card-name">${이름}</span>
+          ${아랫줄 ? `<span class="mn-card-sub">${아랫줄}</span>` : ''}
+        </span>
+        <span class="mn-card-check">✓</span>
+      </button>`;
+    }).join('')}</div>`;
+  }
+
+  // 🔴 스크롤은 「사람이 탭을 눌렀을 때」만 위로 보낸다. 첫 렌더는 페이지가 뜨는 중이라
+  //    다른 탭(레시피)을 보고 있을 수 있고, 거기서 스크롤을 건드리면 남의 화면을 움직인다.
+  function render(scrollTop) {
+    renderTabs();
+    renderHead();
+    renderSubs();
+    const t = TABS[cur];
+    $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
+    $('#potIcon').classList.toggle('has-item', !!count());
+    if (scrollTop) window.scrollTo({ top: 0 });
+  }
+
+  function renderSheet() {
+    const rows = [];
+    if (broths.length) {
+      rows.push(`<p class="mn-sheet-group">전골 ${potLabel(cells)}</p>`);
+      broths.forEach((b, i) => rows.push(
+        `<div class="mn-sheet-item">${b}<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
+    }
+    // 담은 목록도 화면 분류대로 묶는다 — 「육류 › 내장류」처럼 어디서 담았는지 그대로 보이게
+    TABS.forEach((t) => {
+      if (t.pot) return;
+      t.subs.forEach((sub) => {
+        const on = 하위메뉴(t.name, sub).filter((it) => picked.has(it.n));
+        if (!on.length) return;
+        rows.push(`<p class="mn-sheet-group">${t.name} › ${sub}</p>`);
+        on.forEach((it) => rows.push(
+          `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
+      });
+    });
+    $('#mnSheetBody').innerHTML = rows.length ? rows.join('')
+      : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
+  }
+
+  function openSheet() {
+    renderSheet();
+    sheetOverlay.classList.add('open');
+    sheetOverlay.setAttribute('aria-hidden', 'false');
+  }
+  function closeSheet() {
+    sheetOverlay.classList.remove('open');
+    sheetOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', (e) => {
+    // 🔴 그림 클릭은 담기보다 먼저 본다 — 순서가 바뀌면 확대가 안 뜨고 담겨버린다
+    const th = e.target.closest('.mn-card-thumb');
+    if (th && th.querySelector('img') && th.closest('.mn-card[data-menu]')) {
+      return openZoom(th.closest('.mn-card').dataset.menu);
+    }
+    if (e.target.closest('.mn-zoom-add')) { toggle($('.mn-zoom').dataset.menu); return renderZoom(); }
+    if (e.target.closest('#mnZoomClose') || e.target.classList.contains('mn-zoom-dim')) {
+      if ($('#mnZoomDim')) return closeZoom();
+    }
+
+    const tab = e.target.closest('.mn-tab');
+    if (tab) { cur = +tab.dataset.i; curSub = 0; return render(true); }   // 상위를 옮기면 하위는 처음으로
+
+    const sub = e.target.closest('.mn-sub');
+    if (sub) { curSub = +sub.dataset.sub; return render(true); }
+
+    const seg = e.target.closest('[data-pot]');
+    if (seg) {
+      cells = +seg.dataset.pot;
+      if (broths.length > cells) broths = broths.slice(0, cells);   // 칸이 줄면 뒤에서 덜어낸다
+      return render();
+    }
+
+    // 냄비 칸을 누르거나 오른쪽 목록의 ✕ 를 눌러 뺀다
+    const cell = e.target.closest('[data-cell]');
+    if (cell) {
+      const i = +cell.dataset.cell;
+      if (i < broths.length) { broths.splice(i, 1); return render(); }
+      return;
+    }
+
+    // 🔴 육수는 중복해서 담을 수 있다 — 다시 눌러도 빠지지 않고 다음 칸에 또 들어간다.
+    //    빼는 것은 냄비 칸을 눌러서 한다(위). 안 그러면 「2칸에 같은 육수」를 만들 방법이 없다.
+    const bc = e.target.closest('[data-broth]');
+    if (bc) {
+      if (broths.length < cells) broths.push(bc.dataset.broth);
+      return render();
+    }
+
+    const mc = e.target.closest('[data-menu]');
+    if (mc) { toggle(mc.dataset.menu); return render(); }
+
+    if (e.target.closest('#potToggleBtn')) return openSheet();
+    // 어두운 배경이나 X 를 누르면 닫는다(시트 안쪽을 눌렀을 때는 안 닫힌다)
+    if (e.target.closest('#mnSheetClose') || e.target === sheetOverlay) return closeSheet();
+    if (e.target.closest('#mnSheetClear')) {
+      picked.clear(); broths = []; renderSheet(); return render();
+    }
+    const rm = e.target.closest('[data-rm]');
+    if (rm) { picked.delete(rm.dataset.rm); renderSheet(); return render(); }
+    const rmb = e.target.closest('[data-rm-broth]');
+    if (rmb) { broths.splice(+rmb.dataset.rmBroth, 1); renderSheet(); return render(); }
+  });
+
+  // Esc — 앱의 다른 시트·모달과 같게 (확대가 떠 있으면 확대부터 닫는다)
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if ($('#mnZoomDim')) return closeZoom();
+    if (sheetOverlay.classList.contains('open')) closeSheet();
+  });
+
+  render();
+})();

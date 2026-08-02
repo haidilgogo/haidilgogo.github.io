@@ -4778,3 +4778,271 @@ img {
 }
 .column-bottom-close:active,
 .modal-bottom-close:active { background: #F0EAE4; }
+
+/* ══════════════════════════════════════════════════════════════
+   ── 메뉴 탭 ──  목업(_mockup-menu.html)에서 옮겨온 것이다.
+   개수+안내문 줄은 매장 탭의 .stores-head / .count-line / .stores-note 를
+   그대로 함께 쓴다 — 값을 베껴 적으면 매장 쪽만 고쳐졌을 때 따로 논다.
+   ══════════════════════════════════════════════════════════════ */
+/* 담은 목록(냄비) 버튼은 메뉴 섹션에서만 — 즐겨찾기가 레시피 전용인 것과 같은 방식 */
+.page:not([data-section="menu"]) .pot-btn { display: none; }
+/* ── 담은 목록(왼쪽 고정) + 분류 탭(오른쪽 가로 스크롤) 한 줄 ────── */
+/* 🔴 붙박이(sticky)와 아래 구분선을 뗐다(2026-08-02 사용자 확정) — 매장 탭의 지역 탭줄과 같은 구조다.
+   앱에서 아래 구분선이 있는 곳은 상단바 하나뿐이고, 탭줄에는 어느 화면에도 선이 없다.
+   선은 붙박이 시절 「카드가 탭 밑으로 파고드는 것」을 가리려던 것이라 붙박이와 함께 사라진다. */
+.mn-bar {
+  display:flex; align-items:stretch;
+}
+/* 🔴 담은 목록은 상단바 오른쪽 장바구니 아이콘으로 옮겼다(2026-08-02 사용자 확정).
+   분류 탭 줄이 전체 폭을 쓰게 되어 320px 에서 여유가 65px 늘었다.
+   🔴 숫자는 여전히 안 넣는다(앞선 확정) — 담긴 게 있으면 점만 찍는다. */
+.pot-ic { position:relative; width:18px; height:18px; display:block; color:#4D4139; }
+.pot-ic svg { position:absolute; inset:0; }
+/* 기본 = 선만. 담기면 김이 빨갛게 켜지고, 누르면 채움으로 바뀐다
+   🔴 `.pot-ic svg` 보다 약한 선택자로 숨기면 안 먹는다(우선순위) — 반드시 `.pot-ic` 를 앞에 붙일 것 */
+.pot-ic .pot-ic-line { display:block; }
+.pot-ic .pot-ic-steam,
+.pot-ic .pot-ic-fill,
+.pot-ic .pot-ic-fill-steam { display:none; }
+.pot-ic .pot-ic-steam { color:var(--brand-red); }
+.pot-ic.has-item .pot-ic-steam { display:block; }
+/* 누름 = 즐겨찾기와 같은 방식(채워진 도형 + 브랜드 빨강) */
+.pot-btn:active .pot-ic .pot-ic-line,
+.pot-btn:active .pot-ic .pot-ic-steam { display:none; }
+.pot-btn:active .pot-ic { color:var(--brand-red); }
+.pot-btn:active .pot-ic .pot-ic-fill { display:block; }
+.pot-btn:active .pot-ic.has-item .pot-ic-fill { display:none; }
+.pot-btn:active .pot-ic.has-item .pot-ic-fill-steam { display:block; }
+
+/* 분류 탭 — 담은 목록 오른쪽에서 가로로 스크롤된다 */
+.mn-tabs {
+  flex:1; min-width:0;
+  display:flex; gap:20px; overflow-x:auto; white-space:nowrap;
+  padding:12px 0 10px;
+}
+.mn-tab {
+  flex:none; background:none; border:0; padding:0 0 4px;
+  font-size:15px; font-weight:600; color:var(--text-muted);
+  font-family:inherit; cursor:pointer; position:relative;
+}
+.mn-tab.is-on { color:var(--text-dark); font-weight:800; }
+.mn-tab.is-on::after {
+  content:''; position:absolute; left:0; right:0; bottom:0;
+  height:2px; border-radius:1px; background:var(--brand-red);
+}
+/* 하위 분류 줄 — 상위 탭 아래, 전체 폭을 쓴다.
+   🔴 밑줄을 쓰지 않는다: 위 상위 탭과 「1 맛/2가지 맛」이 이미 밑줄이라
+   세 줄이 다 같아 보이면 위아래가 안 읽힌다(2026-08-02 화면으로 대보고 정함). */
+.mn-subs {
+  display:flex; gap:14px; overflow-x:auto; white-space:nowrap;
+  padding:2px 20px 10px;
+}
+.mn-sub {
+  flex:none; background:none; border:0; padding:0;
+  font-size:14px; font-weight:500; color:var(--text-muted);
+  font-family:inherit; cursor:pointer;
+}
+.mn-sub.is-on { color:var(--brand-red); font-weight:800; }
+.mn-tab-dot {
+  display:inline-block; min-width:16px; height:16px; margin-left:4px; padding:0 4px;
+  border-radius:8px; background:var(--brand-red); color:#fff;
+  font-size:10px; font-weight:800; line-height:16px; text-align:center; vertical-align:1px;
+}
+
+/* ── 전골: 냄비 (CSS로 그린다 — 그림 파일 안 씀) ────────────────── */
+/* 칸 수는 화살표가 아니라 글씨를 눌러 고른다(2026-08-02 사용자 지시) */
+.mn-pot-seg { display:flex; justify-content:center; gap:26px; padding:20px 0 18px; }
+/* 🔴 알약(둥근 배경) 쓰지 않는다 — 앱의 탭과 같은 밑줄 방식으로 맞춘다 */
+.mn-pot-seg button {
+  border:0; background:none; font-family:inherit; position:relative;
+  font-size:15px; font-weight:600; color:var(--text-muted);
+  padding:0 0 5px; cursor:pointer;
+}
+.mn-pot-seg button.is-on { color:var(--text-dark); font-weight:800; }
+.mn-pot-seg button.is-on::after {
+  content:''; position:absolute; left:0; right:0; bottom:0;
+  height:2px; border-radius:1px; background:var(--brand-red);
+}
+/* 냄비는 가운데, 고른 육수 목록은 그 아래 (2026-08-02 사용자 제안).
+   🔴 옆에 두면 냄비와 글자가 폭을 나눠 써서 좁은 기기(360px 이하)에서 이름이 감겼다.
+   아래로 내리면 글자가 화면 폭을 다 쓰므로 어느 기기에서도 안 감긴다. */
+/* 아래 padding = 「비어 있음」 줄과 구분선 사이 간격. 4px 은 너무 좁았다(2026-08-02)
+   구분선 = 냄비(전골 짜는 곳)와 탕 목록을 나눈다. 색은 앱 상단바와 같은 은은한 회백색이다. */
+.mn-pot-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  padding:0 0 24px; margin:0 0 24px; border-bottom:1px solid #ECE5DC;
+}
+/* 2×2 배치 — 번호 자리가 냄비와 같아서 1번이 왼쪽 위라는 게 그대로 읽힌다.
+   ⚠️ 320px에서 한 칸 135px에 내용물이 약 125px이라 여유가 10px뿐이다.
+      지금보다 긴 육수 이름이 생기면 여기서 먼저 두 줄이 된다. */
+.mn-pot-side { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:14px 10px; }
+/* 1맛일 때는 줄이 하나뿐이라 2열 격자의 왼쪽에만 놓여 오른쪽이 비어 보인다 → 가운데로 */
+.mn-pot-side.is-one { grid-template-columns:auto; justify-content:center; }
+.mn-pot-row { display:flex; gap:7px; align-items:center; font-size:13px; line-height:1.35; }
+.mn-pot-row b {
+  /* 냄비 안 23px보다 작게 — 목록에서는 이름이 주인공이고 번호는 거들기만 하면 된다 */
+  flex:none; width:20px; height:20px; border-radius:5px;
+  background:rgba(28,12,8,.45); color:#fff; font-size:11px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.mn-pot-row.is-empty { color:var(--text-muted); }
+.mn-pot-row.is-empty b { background:#DED0C4; }
+/* ✕ 는 칸 수와 상관없이 이름 바로 옆에 붙인다(2026-08-02 사용자 확정).
+   전에는 2·4칸만 margin-left:auto 로 칸 오른쪽 끝에 떨어져 있어 1칸일 때와 모양이 달랐다. */
+.mn-row-x {
+  margin-left:2px; flex:none; border:0; background:none; padding:0 0 0 6px;
+  color:var(--text-muted); font-size:14px; cursor:pointer; font-family:inherit;
+}
+/* 🔴 이름 칸을 가장 긴 육수 이름에 맞춰 74px 로 고정했다(2026-08-02 사용자 확정) —
+   이름 길이와 상관없이 ✕ 가 늘 같은 자리에 오게 하려는 것이다.
+   74px = 「고수 듬뿍 훠궈」를 실제로 넣고 잰 폭(둘째로 긴 것들은 68px).
+   ⚠️ 이보다 긴 육수 이름이 생기면 이 값을 다시 재서 고칠 것. 320px·4칸에서 한 칸이 135px 이고
+      배지 20 + 사이 7 + 이름 74 + 2 + ✕ 17 = 120px 이라 여유는 15px 뿐이다. */
+.mn-pot-row span { min-width:74px; word-break:keep-all; color:var(--text-dark); font-weight:700; }
+.mn-pot-row.is-empty span { color:var(--text-muted); font-weight:600; }
+/* 🔴 실제 하이디라오 태블릿 화면을 따랐다(2026-08-02 사용자 사진).
+   흰 냄비 테 + 칸을 가르는 흰 선 + 가운데 모인 번호 배지. 칸마다 붙던 이름 띠는 뺐다. */
+.mn-pot {
+  /* 목록을 아래로 내려 폭 경쟁이 없어졌으므로 냄비를 키웠다(196 → 220px). */
+  width:220px; height:220px; flex:none; border-radius:28px; padding:12px;
+  background:#F3E9DA; border:1px solid #E0D0B4;   /* 바깥 테 = 크림 */
+}
+.mn-pot-inner {
+  position:relative;
+  width:100%; height:100%; border-radius:16px; overflow:hidden;
+  display:grid; gap:2px; background:#fff;   /* 안쪽 = 흰색. 이 색이 그대로 칸 구분선이 된다 */
+}
+/* 번호는 칸이 만나는 가운데에 모인다 */
+.mn-pot-nums {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  display:grid; gap:2px; pointer-events:none;
+}
+.mn-pot-nums[data-cells="2"] { grid-template-columns:1fr 1fr; }
+.mn-pot-nums[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+/* 🔴 번호 배지는 그림마다 색을 바꾸지 않는다(2026-08-02 사용자 지시).
+   태블릿처럼 반투명 검정 + 흰 글씨 하나로 통일한다 — 어떤 국물 위에서도 같게 보인다. */
+.mn-pot-num {
+  width:23px; height:23px; border-radius:5px;
+  background:rgba(28,12,8,.45); color:#fff; font-size:12.5px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.mn-pot-inner[data-cells="1"] { grid-template-columns:1fr; grid-template-rows:1fr; }
+.mn-pot-inner[data-cells="2"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
+.mn-pot-inner[data-cells="4"] { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+.mn-cell {
+  background:#E7D9C2; cursor:pointer;   /* 빈 칸 = 진한 크림 */
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+  position:relative;                    /* 🔴 padding 두지 말 것 — 그림이 모서리까지 안 찬다 */
+}
+.mn-cell img { display:block; }
+.mn-cell img { width:100%; height:100%; object-fit:cover; }
+.mn-cell-name {
+  position:absolute; left:0; right:0; bottom:0; padding:3px 4px;
+  background:rgba(0,0,0,.5); color:#fff; font-size:10px; font-weight:700;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mn-pot-label { text-align:center; font-size:15px; font-weight:800; color:var(--text-dark); }
+.mn-pot-list {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:6px 12px;
+  padding:10px 0 2px; font-size:12.5px; color:var(--text-dark);
+}
+.mn-pot-list b {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:17px; height:17px; margin-right:4px; border-radius:4px;
+  background:#A8823C; color:#fff; font-size:11px; vertical-align:-3px;
+}
+.mn-pot-hint  { text-align:center; font-size:12.5px; color:var(--text-muted); margin:0 0 8px; }
+
+/* ── 카드 2칸 ─────────────────────────────────────────────────── */
+/* ── 메뉴 줄(리스트) ─────────────────────────────────────
+   🔴 격자 2열이 아니라 리스트다(2026-08-02 사용자 확정).
+   이유: 이름 아래 부제를 넣기로 했는데 격자 카드엔 그 자리가 좁고,
+   320px에서 긴 이름이 두 줄로 감겼다. 리스트는 이름·부제·담기가 한 줄에 들어간다.
+   🔴 그림 80px 은 상한선이다 — 88px 로 키우면 320px 에서 「이베리코 흑돼지목살」이 잘린다(재서 확인). */
+.mn-grid { display:block; }
+.mn-card {
+  position:relative; display:flex; align-items:center; gap:12px;
+  width:100%; margin:0 0 8px; padding:10px 12px; text-align:left;
+  background:#fff; border:1px solid var(--card-border); border-radius:12px;
+  font-family:inherit; cursor:pointer;
+}
+.mn-card.is-on { border-color:var(--brand-red); border-width:2px; }
+.mn-card:active { transform:translateY(1px); }
+.mn-card[data-broth]:active { border-color:var(--brand-red); transform:scale(.97); }
+@media (hover:hover) { .mn-card[data-broth]:hover { border-color:var(--card-hover-border); } }
+.mn-card-thumb {
+  flex:none; width:80px; height:80px; border-radius:8px;
+  background:#FBF4E6; display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.mn-card-thumb img { width:100%; height:100%; object-fit:contain; }
+.mn-card-thumb.is-text { background:var(--bg-cream); font-size:12px; font-weight:800; color:#7C6A60; text-align:center; line-height:1.25; padding:6px; word-break:keep-all; }
+/* 글자 뭉치는 늘 세로 가운데 — 부제가 없어도 줄이 흔들리지 않는다(높이는 그림 80px 이 정한다) */
+.mn-card-body { flex:1; min-width:0; }
+.mn-card-name {
+  display:block; font-size:15px; font-weight:700; color:var(--text-dark);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mn-card-sub {
+  display:block; margin-top:2px; font-size:12px; color:var(--text-muted);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mn-card-check {
+  flex:none; width:28px; height:28px; border-radius:50%;
+  border:1.5px solid var(--card-border); display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:#C9BCA8;
+}
+.mn-card.is-on .mn-card-check { border-color:var(--brand-red); background:var(--brand-red); color:#fff; }
+/* ── 그림 확대 모달 ────────────────────────────────────────
+   🔴 그림(줄의 29%)을 누르면 뜨고, 나머지 71%는 바로 담긴다(2026-08-02 확정).
+   담으려다 잘못 눌러도 여기서 바로 담을 수 있게 **모달 안에도 담기 버튼**을 둔다.
+   닫기 버튼은 앱의 다른 모달과 같은 것을 쓴다(.stamp-sheet-close · 18px X 아이콘). */
+.mn-zoom-dim {
+  /* 🔴 상단바를 덮지 않는다 — 앱의 모달·시트가 전부 이 규칙이다
+     (styles.css 의 .modal-overlay·.stamp-sheet-overlay 둘 다 @media 에서 top 을 내린다).
+     숫자를 박지 말 것 — 앱은 JS(syncTopbarH)가 --topbar-h 에 실제 높이를 넣어준다. */
+  position:fixed; top:var(--topbar-h, 65px); left:0; right:0; bottom:0; z-index:60;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px; background:rgba(45,34,28,.5);
+}
+.mn-zoom {
+  position:relative; width:100%; max-width:300px; padding:16px 16px 18px;
+  background:#FBF4E6; border-radius:20px; text-align:center;
+  box-shadow:0 14px 44px rgba(0,0,0,.22);
+}
+.mn-zoom-img { width:100%; aspect-ratio:1/1; object-fit:contain; display:block; }
+.mn-zoom-name { display:block; margin-top:10px; font-size:17px; font-weight:800; color:var(--text-dark); word-break:keep-all; }
+.mn-zoom-sub { display:block; margin-top:3px; font-size:12.5px; color:var(--text-muted); }
+.mn-zoom-add {
+  margin-top:14px; width:100%; padding:12px 0; border:0; border-radius:12px;
+  background:var(--brand-red); color:#fff; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer;
+}
+.mn-zoom-add.is-on { background:#fff; color:var(--brand-red); box-shadow:inset 0 0 0 2px var(--brand-red); }
+
+/* ── 육수 줄 ────────────────────────────────────────────
+   🔴 전골도 리스트다(2026-08-02 사용자 확정). 격자를 남기지 않는다.
+   썸네일은 카드용(냄비째)을 쓴다 — 타일(국물만)로 해봤더니 냄비가 사라져
+   「고르는 화면」이라는 게 안 읽혔다. 타일은 위 냄비 칸 안에서만 쓴다. */
+.mn-card--broth:active { transform:scale(.99); }
+
+/* 「일부 매장」·「제주 한정」은 부제 자리에 붙는다(리스트라 배지를 얹을 자리가 없다) */
+.mn-card-part { color:#8A7468; }
+.mn-card-part::before { content:'· '; }
+.mn-card-sub:empty + .mn-card-part::before,
+.mn-card-name + .mn-card-part::before { content:''; }
+
+/* 개수+안내문 줄 — 모양은 앱의 .stores-head 를 그대로 쓰고, 메뉴에서만 다른 간격만 여기서 준다 */
+.mn-head { margin-bottom:10px; }
+.mn-head .stores-note { word-break:keep-all; }
+
+/* 🔴 하단 고정 「다음」 버튼은 뺐다(2026-08-02 사용자 확정) — 분류 탭이 위에 늘 있고
+   담은 것은 상단바 냄비 아이콘으로 보므로 아래 버튼이 하는 일이 없었다.
+   미정으로 남아 있던 「버튼 문구」도 이걸로 없어진 문제가 됐다. */
+
+/* ── 담은 목록 모달 (앱의 .stamp-sheet 를 그대로 쓴다) ─────────────── */
+.mn-sheet-head { display:flex; padding-right:34px; align-items:center; gap:8px; margin-bottom:10px; }
+.mn-sheet-title { font-size:16px; font-weight:800; color:var(--text-dark); }
+.mn-sheet-clear { margin-left:auto; background:none; border:0; font-family:inherit; font-size:13px; color:var(--text-muted); text-decoration:underline; cursor:pointer; }
+.mn-sheet-group { font-size:12.5px; font-weight:800; color:var(--text-muted); margin:12px 0 6px; }
+.mn-sheet-item { display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid #EFE4D6; font-size:14px; color:var(--text-dark); }
+.mn-sheet-x { margin-left:auto; background:none; border:0; color:var(--text-muted); font-size:15px; cursor:pointer; }
+.mn-sheet-empty { padding:26px 0; text-align:center; font-size:14px; color:var(--text-muted); }
