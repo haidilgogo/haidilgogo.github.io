@@ -73,7 +73,7 @@ window.MENU_DATA = {
     {
      "n": "차돌박이(지방 적음)",
      "img": true,
-     "part": true,
+     "part": false,
      "jeju": false
     },
     {
@@ -407,7 +407,7 @@ window.MENU_DATA = {
     {
      "n": "피쉬볼",
      "img": true,
-     "part": true,
+     "part": false,
      "jeju": false
     },
     {
@@ -441,6 +441,12 @@ window.MENU_DATA = {
     },
     {
      "n": "두부피",
+     "img": true,
+     "part": false,
+     "jeju": false
+    },
+    {
+     "n": "두유피",
      "img": true,
      "part": false,
      "jeju": false
