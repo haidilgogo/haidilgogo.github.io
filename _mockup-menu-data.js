@@ -173,6 +173,12 @@ window.MENU_DATA = {
      "jeju": false
     },
     {
+     "n": "소목심",
+     "img": true,
+     "part": true,
+     "jeju": false
+    },
+    {
      "n": "마라오리발",
      "img": true,
      "part": true,
@@ -192,6 +198,12 @@ window.MENU_DATA = {
     },
     {
      "n": "말고기",
+     "img": true,
+     "part": true,
+     "jeju": false
+    },
+    {
+     "n": "우아롱사태",
      "img": true,
      "part": true,
      "jeju": false
@@ -454,7 +466,7 @@ window.MENU_DATA = {
     {
      "n": "목면두부",
      "img": true,
-     "part": true,
+     "part": false,
      "jeju": false
     },
     {
