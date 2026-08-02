@@ -116,7 +116,7 @@
       ings: [['양파', '', '넉넉하게'], ['간장소스', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고추기름', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['중국식초', '1', '스푼'], ['참기름', '0.5', '스푼'], ['태국고추', '', '넉넉하게']],
       steps: [],
       tip: '' },
-    { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤(이 아는 동생)소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤 아는 동생소스', nameHtml: '라젤<span class="name-sub">(이 아는 동생)</span>소스', source: 'YouTube 라젤Razel', person: '라젤', desc: '유튜버 <b>라젤</b>이 <u>아는 동생이 진짜 건강하게 츠묵고 산다</u>며 소개한 소스이다.',
+    { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤(이 아는 동생)소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤(이 아는 동생)소스', nameHtml: '라젤<span class="name-sub">(이 아는 동생)</span>소스', source: 'YouTube 라젤Razel', person: '라젤', desc: '유튜버 <b>라젤</b>이 <u>아는 동생이 진짜 건강하게 츠묵고 산다</u>며 소개한 소스이다.',
       ings: [['참기름', '2', '스푼'], ['소금', '0.5', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['태국고추', '1', '스푼']],
       steps: [],
       tip: '' },
@@ -643,6 +643,8 @@
   const modalClose = document.getElementById('modalClose');
   const modalFavBtn = document.getElementById('modalFavBtn');
 
+  // 검색 보정: 괄호·공백을 뺀 형태로도 맞춘다(`라젤(이 아는 동생)소스` ↔ `라젤 아는 동생소스`)
+  const 검색꼴 = (s) => (s || '').replace(/[()\s]/g, '');
   function getFiltered() {
     const q = query.trim();
     // 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 이중 필터(AND)다(2026-07-25 확정) —
@@ -656,7 +658,10 @@
     }
     if (q) {
       filtered = filtered.filter((r) =>
-        r.name.includes(q) || (r.ings || []).some((i) => i[0].includes(q))
+        // 괄호·공백을 뺀 형태로도 맞춰본다 — 화면에 보이는 대로 쳐도, 빼고 쳐도 찾아진다
+        // (예: `라젤(이 아는 동생)소스` ↔ `라젤 아는 동생소스`)
+        r.name.includes(q) || 검색꼴(r.name).includes(검색꼴(q))
+        || (r.ings || []).some((i) => i[0].includes(q))
       );
     }
     // 정렬은 인기순 고정(2026-07-24 정렬 드롭다운 삭제 결정).
