@@ -50,6 +50,19 @@ body { background: var(--bg-card); }
   content:''; position:absolute; left:0; right:0; bottom:0;
   height:2px; border-radius:1px; background:var(--brand-red);
 }
+/* 하위 분류 줄 — 상위 탭 아래, 전체 폭을 쓴다.
+   🔴 밑줄을 쓰지 않는다: 위 상위 탭과 「1 맛/2가지 맛」이 이미 밑줄이라
+   세 줄이 다 같아 보이면 위아래가 안 읽힌다(2026-08-02 화면으로 대보고 정함). */
+.mn-subs {
+  display:flex; gap:14px; overflow-x:auto; white-space:nowrap;
+  padding:2px 20px 10px;
+}
+.mn-sub {
+  flex:none; background:none; border:0; padding:0;
+  font-size:14px; font-weight:500; color:var(--text-muted);
+  font-family:inherit; cursor:pointer;
+}
+.mn-sub.is-on { color:var(--brand-red); font-weight:800; }
 .mn-tab-dot {
   display:inline-block; min-width:16px; height:16px; margin-left:4px; padding:0 4px;
   border-radius:8px; background:var(--brand-red); color:#fff;
@@ -232,6 +245,8 @@ body { background: var(--bg-card); }
     <div class="mn-tabs" id="mnTabs"></div>
   </div>
 
+  <div class="mn-subs" id="mnSubs"></div>
+
   <p class="mn-notice">메뉴 구성과 판매 여부는 매장 사정에 따라 달라질 수 있어요</p>
 
   <div id="mnBody"></div>
@@ -265,7 +280,14 @@ body { background: var(--bg-card); }
 <script>
 (function () {
   const D = window.MENU_DATA;
-  const TABS = [{ name: '전골', pot: true }].concat(D.tabs.map(t => ({ name: t.name, items: t.items })));
+  // 🔴 화면 분류는 공식 2단이다(메뉴.md 「화면 분류」). 상위 = 전골·육류·야채류·디저트.
+  //    D.tabs 의 7개 묶음은 자료 정리용이라 화면에 쓰지 않는다 — items 만 꺼내 쓴다.
+  const ALL = D.tabs.flatMap(t => t.items);
+  const TABS = [{ name: '전골', pot: true }].concat(
+    D.cats.map(g => ({ name: g.up, subs: g.subs }))
+  );
+  const 하위메뉴 = (up, sub) => ALL.filter(it => it.up === up && it.sub === sub);
+  let curSub = 0;
   const IMG = n => 'assets/menu/' + n + '.webp';
   // 냄비 칸은 타일(-타일)을 쓴다. 아직 안 들어온 육수는 카드용 그림을 임시로 쓴다(냄비 속 냄비로 보인다)
   const TILE = new Set(D.broths.filter(b => b.tile).map(b => b.n));
@@ -279,6 +301,16 @@ body { background: var(--bg-card); }
   const $ = s => document.querySelector(s);
 
   function count() { return picked.size + (broths.length ? 1 : 0); }
+
+  function renderSubs() {
+    const t = TABS[cur];
+    const el = $('#mnSubs');
+    if (!t.subs) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    el.style.display = '';
+    el.innerHTML = t.subs.map((sub, i) =>
+      `<button class="mn-sub ${i === curSub ? 'is-on' : ''}" data-sub="${i}">${sub}</button>`
+    ).join('');
+  }
 
   function renderTabs() {
     $('#mnTabs').innerHTML = TABS.map((t, i) => {
@@ -333,7 +365,8 @@ body { background: var(--bg-card); }
   }
 
   function renderGrid(t) {
-    return `<div class="mn-grid">${t.items.map(it => {
+    const items = 하위메뉴(t.name, t.subs[curSub]);
+    return `<div class="mn-grid">${items.map(it => {
       const on = picked.has(it.n);
       return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
         <span class="mn-card-check">✓</span>
@@ -348,7 +381,8 @@ body { background: var(--bg-card); }
   //    건너뛸 방법이 이미 있다. 아무것도 안 골랐으면 버튼 자체를 안 보여준다.
   function renderNext() {
     const t = TABS[cur];
-    const has = t.pot ? broths.length > 0 : t.items.some(it => picked.has(it.n));
+    const has = t.pot ? broths.length > 0
+      : t.subs.some(sub => 하위메뉴(t.name, sub).some(it => picked.has(it.n)));
     const btn = $('#mnNext');
     const nx = TABS[cur + 1];
     $('.mn-next-wrap').style.display = has ? '' : 'none';
@@ -361,6 +395,7 @@ body { background: var(--bg-card); }
   //    1×1 캔버스에 줄여 그리면 그림 전체의 평균색이 나온다(같은 출처라 캔버스가 안 막힌다).
   function render() {
     renderTabs();
+    renderSubs();
     const t = TABS[cur];
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
     $('#basketTxt').classList.toggle('is-empty', !count());
@@ -375,13 +410,16 @@ body { background: var(--bg-card); }
       broths.forEach((b, i) => rows.push(
         `<div class="mn-sheet-item">${b}<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
     }
+    // 담은 목록도 화면 분류대로 묶는다 — 「육류 › 내장류」처럼 어디서 담았는지 그대로 보이게
     TABS.forEach(t => {
       if (t.pot) return;
-      const on = t.items.filter(it => picked.has(it.n));
-      if (!on.length) return;
-      rows.push(`<p class="mn-sheet-group">${t.name}</p>`);
-      on.forEach(it => rows.push(
-        `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
+      t.subs.forEach(sub => {
+        const on = 하위메뉴(t.name, sub).filter(it => picked.has(it.n));
+        if (!on.length) return;
+        rows.push(`<p class="mn-sheet-group">${t.name} › ${sub}</p>`);
+        on.forEach(it => rows.push(
+          `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
+      });
     });
     $('#sheetBody').innerHTML = rows.length ? rows.join('')
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
@@ -389,7 +427,10 @@ body { background: var(--bg-card); }
 
   document.addEventListener('click', e => {
     const tab = e.target.closest('.mn-tab');
-    if (tab) { cur = +tab.dataset.i; return render(); }
+    if (tab) { cur = +tab.dataset.i; curSub = 0; return render(); }   // 상위를 옮기면 하위는 처음으로
+
+    const sub = e.target.closest('.mn-sub');
+    if (sub) { curSub = +sub.dataset.sub; return render(); }
 
     const seg = e.target.closest('[data-pot]');
     if (seg) {
