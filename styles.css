@@ -333,16 +333,14 @@ img {
 }
 /* 검색창(2026-07-25 최종 확정: 크림 배경 박스, 고정폭 우측정렬 — 밑줄(D)로 갔다가 박스로 재확정) —
    접기/펼침 없이 상시 노출. 돋보기는 안쪽 장식 아이콘.
-   🔴 폭 = 화면 폭 − 56px (2026-08-03 사용자 확정). 56px 은 왼쪽 뒤로가기(32px)와 사이 여백(24px)
-   자리다. 개수가 아랫줄로 내려가면서 윗줄을 검색창이 통째로 쓰게 됐고, 여백은 뒤로가기와 너무
-   붙어 보여 12 → 24px 로 벌렸다(화살표 끝에서 검색창까지 눈에 보이는 간격 26.5 → 38.5px).
-   기기별로 393px 폰 297px · 320px 폰 224px · 최대(본문 400px) 344px. 상태가 바뀌어도 안 변한다. */
+   🔴 폭 = 줄 전체(2026-08-03) — 뒤로가기·개수가 차례로 빠지면서 이 줄에 혼자 남았다.
+   393px 폰 353px · 320px 폰 280px. 메뉴 탭 검색창(.mn-searchline)도 같은 값이다. */
 .search-box {
   display: flex;
   align-items: center;
   gap: 6px;
   flex: none;
-  width: calc(100% - 56px); /* 옛 고정 180px — 윗줄을 혼자 쓰게 되면서 화면 폭 기준으로 바뀜 */
+  width: 100%;
   height: 36px;
   padding: 0 12px;
   background: var(--bg-cream);
@@ -559,32 +557,21 @@ img {
   margin: 0 0 16px;
 }
 
-/* 윗줄 — 뒤로가기(왼쪽 끝) + 검색창(오른쪽 끝).
-   🔴 space-between 을 쓰지 않는다: 뒤로가기가 숨겨질 때(즐겨찾기) 검색창이 왼쪽으로 밀린다.
-   검색창에 margin-left:auto 를 줘 오른쪽에 붙여 두면 어떤 상태에서도 자리가 안 변한다. */
+/* 검색창 한 줄 — 카테고리가 상단바로, 개수가 검색 중 전용으로 빠지면서 이 줄엔 검색창만 남았다 */
 .list-head-top {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.list-head-top .search-box { margin-left: auto; }
 
-/* 아랫줄 — 카테고리 탭(왼쪽) + 개수(오른쪽 끝) */
-.list-head-bottom {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* 검색 중에만 뜨는 결과 수 — 카드 바로 위 회색 한 줄 */
+.search-count {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #AD8177;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
-.list-head-bottom .count-line {
-  margin-left: auto;
-  /* 개수는 줄어들지 않지만, 혹시 더 긴 제목이 생겨도 줄바꿈·넘침 대신 말줄임이 되게 막아둔다.
-     320px 에서 탭 4개(181px) + 개수 최장(80px, `검색 결과 33개`)이면 19px 남는다. */
-  flex: 0 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.search-count[hidden] { display: none; }
 .count-line {
   flex: none;
   margin: 0;
@@ -2320,6 +2307,23 @@ img {
 }
 
 /* 상단바 섹션 제목 (메뉴·스탬프 섹션일 때 탭 자리에 표시) */
+/* 🔴 상단바 규칙(2026-08-03 사용자 확정)
+   왼쪽 = 그 탭에서 가장 자주 쓰는 것(레시피 = 카테고리 탭). 놓을 게 없으면 로고 → 홈에만 남는다.
+   오른쪽 = 그 탭 전용 아이콘 하나. 공유·설치는 검색창·카테고리가 올라간 탭에서는 자리를 비켜준다
+   (넷을 다 넣으면 320px 에서 넘친다). 공유·설치는 목록을 훑는 중이 아니라 홈에서 쓰는 것들이다. */
+.topbar-cat { display: none; flex: none; min-width: 0; }
+.page[data-section="recipe"] .topbar-cat { display: block; }
+.page[data-section="recipe"] .topbar-brand,
+.page[data-section="recipe"] #topShareBtn,
+.page[data-section="recipe"] #topInstallBtn { display: none; }
+/* 🔴 상단바 높이가 탭을 옮겨도 안 변해야 한다 — 로고와 같은 44px 을 여기서도 잡는다.
+   (안 잡으면 레시피 탭만 상단바가 얇아져 화면이 위아래로 튄다) */
+.topbar-cat .tabs {
+  min-height: 44px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
 /* 레시피 전용 상단바 그룹은 레시피에서만.
    🔴 검색창은 여기서 안 건드린다(2026-08-03) — 레시피·메뉴 검색창이 각자 뷰(#view-recipe/#view-menu)
    안에 있어서, 그 뷰가 숨으면 같이 숨는다. */
