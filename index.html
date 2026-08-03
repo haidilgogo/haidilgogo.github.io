@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=654">
+<link rel="stylesheet" href="styles.css?v=655">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -427,6 +427,9 @@
            윗줄 = 검색창 / 아랫줄 = 분류 탭 + 개수. 안내문은 맨 아래 푸터로 내려갔다.
            검색창은 레시피 탭과 같은 모양이되, 메뉴 탭엔 뒤로가기가 없어 폭을 꽉 채운다.
            🔴 아직 「자리」만이다 — 쳐도 걸러지지 않는다(검색 대상 미정, 2026-08-03). -->
+      <!-- 하위 분류 — 상위(상단바) 바로 아래여야 둘이 짝인 게 읽힌다(2026-08-03 사용자 지적).
+           붙박이라 스크롤해도 상단바 밑에 그대로 남는다. -->
+      <div class="mn-subs" id="mnSubs"></div>
       <div class="mn-searchline">
         <div class="search-box" id="mnSearchBox">
           <svg class="search-box-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -439,7 +442,6 @@
       </div>
       <!-- 개수 — 레시피 탭과 같은 자리(검색창 아래 왼쪽). 상위 분류 기준이다(하위를 눌러도 안 바뀐다) -->
       <p class="list-count"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
-      <div class="mn-subs" id="mnSubs"></div>
       <div id="mnBody"></div>
       <!-- 맨 위로 — 메뉴는 130개라 특히 필요하다. 푸터 구분선 「위」(2026-08-03 사용자 확정) -->
       <button class="to-top-btn" type="button">맨 위로</button>

@@ -4835,7 +4835,7 @@ img {
   top: var(--topbar-h, 0px);
   z-index: 30;
   background: #FCF9F5;              /* 상단바와 같은 배경색 */
-  margin: 0 -20px;
+  margin: 0 -20px 12px;             /* 아래 12px = 검색창까지 */
   display:flex; gap:14px; overflow-x:auto; white-space:nowrap;
   padding:8px 20px 10px;
 }
