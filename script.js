@@ -4597,6 +4597,10 @@
   function renderSubs() {
     const t = TABS[cur];
     const el = $('#mnSubs');
+    // 🔴 하위 줄이 있을 때는 상단바 구분선을 끄고 하위 줄 아래에만 선을 둔다(2026-08-03 사용자 지적).
+    //    선이 없으면 카드가 붙박이 하위 줄 밑에서 잘린 채 붙어 보인다. 선이 둘이면 답답하니
+    //    상단바 + 하위 줄을 한 덩어리로 묶고 그 아래에 선 하나만 남긴다.
+    document.querySelector('.page').classList.toggle('mn-has-subs', !!t.subs);
     if (!t.subs) { el.innerHTML = ''; el.style.display = 'none'; return; }
     el.style.display = '';
     el.innerHTML = t.subs.map((sub, i) =>

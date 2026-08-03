@@ -4835,11 +4835,15 @@ img {
   top: var(--topbar-h, 0px);
   z-index: 30;
   background: #FCF9F5;              /* 상단바와 같은 배경색 */
+  border-bottom: 1px solid #ECE5DC; /* 상단바에서 옮겨온 구분선 — 아래 .mn-has-subs 규칙과 짝 */
   margin: 0 -20px 12px;             /* 아래 12px = 검색창까지 */
   display:flex; gap:14px; overflow-x:auto; white-space:nowrap;
   padding:8px 20px 10px;
 }
 .mn-subs:empty { display: none; }   /* 전골 탭은 하위가 없다 — 줄이 통째로 사라진다 */
+/* 하위 줄이 있으면 상단바 선을 끈다 — 상단바 + 하위 줄이 한 덩어리로 보이고 선은 아래 하나만 남는다.
+   전골 탭처럼 하위가 없으면 이 클래스가 빠져 상단바 선이 되살아난다(JS renderSubs 가 토글). */
+.page.mn-has-subs[data-section="menu"] .topbar { border-bottom-color: transparent; }
 .mn-sub {
   flex:none; background:none; border:0; padding:0;
   font-size:14px; font-weight:500; color:var(--text-muted);
