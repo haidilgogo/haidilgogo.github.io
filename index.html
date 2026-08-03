@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=644">
+<link rel="stylesheet" href="styles.css?v=647">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -205,7 +205,6 @@
         <img class="topbar-logo-mark" src="assets/icons/logo-mark-color-v2.png?v=1" width="25" height="22" draggable="false" alt="">
         <span class="topbar-title">하딜고고</span>
       </button>
-      <span class="topbar-section-title" id="sectionTitle"></span>
       <!-- 카테고리 필터 탭 제거(2026-07-21 홈 7단 개편) — 카테고리는 홈 섹션으로 이동.
            즐겨찾기 버튼은 topbar-right로 이사, 이 그룹은 숨김(favShareBtn 등은 script 참조 때문에 DOM 유지) -->
       <div class="tabs-group tabs-group--recipe">
@@ -303,7 +302,9 @@
     <h1 class="sr-only">하딜고고 — 하이디라오 훠궈 소스 레시피와 첫 방문 가이드</h1>
 
     <!-- 레시피 섹션 — 기본은 홈(7단 섹션), 검색·즐겨찾기·전체보기 땐 is-home 해제되고 그리드 뷰 -->
-    <div class="view is-home" id="view-recipe">
+    <!-- 홈 섹션 — 하단바 다섯 탭 중 첫째(2026-08-03 분리).
+         예전엔 레시피 탭 안에 `is-home` 스위치로 함께 들어 있었다. 이제 탭이 갈렸으니 그 스위치는 없다. -->
+    <div class="view" id="view-home">
       <!-- 이 달의 레시피 — 월간 큐레이션 히어로(29CM식). 가로 스와이프 3-5개. 기본 화면(전체·검색X·즐겨찾기X)에서만 보임 -->
       <section class="monthly-feature" id="monthlyFeature" hidden>
         <!-- "이 달의 레시피" 타이틀 제거(2026-07-21 사용자 요청) — 히어로가 바로 시작. CSS(.mf-kicker)는 되살릴 수 있게 유지 -->
@@ -357,20 +358,25 @@
         <button class="home-random-btn" id="homeRandomBtn" type="button">오늘의 소스</button>
       </section>
 
-      <!-- 🔴 배치(2026-08-03 사용자 확정): 윗줄 = 뒤로가기 + 검색창 / 아랫줄 = 카테고리 탭 + 개수.
-           검색창 옆에 아이콘이 붙어 답답해 보이던 것을 풀려고, 나가는 버튼을 왼쪽 끝으로 보내고
-           개수는 「탭을 눌러 정해지는 숫자」라 탭과 같은 줄로 내렸다. 검색창이 윗줄을 통째로 쓴다. -->
+      <!-- 홈 푸터 — 문구 + 링크. 「맨 위로」 버튼은 두지 않는다(2026-08-03 사용자 확정) -->
+      <footer class="footer">
+        <span class="footer-title"><span class="footer-brand">하딜고고</span>는 하이디라오 소스바 앞에서 매번 건희소스를 <br class="footer-break-mobile">검색하는 (나 같은) 사람들을 위해 만들어졌습니다</span>
+        <div class="footer-links">
+          <a class="footer-report" id="footerReport" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <a class="footer-credit" href="credits.html"><svg class="footer-credit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/></svg>이미지 출처</a>
+        </div>
+      </footer>
+    </div>
+
+    <!-- 레시피 섹션 — 검색 + 카테고리 탭 + 카드 목록, 한 겹이다(2026-08-03).
+         나가는 길은 하단바이므로 뒤로가기(←)·「홈으로」 버튼은 없앴다. -->
+    <div class="view" id="view-recipe" hidden>
+      <!-- 🔴 배치(2026-08-03 사용자 확정): 윗줄 = 검색창 / 아랫줄 = 카테고리 탭 + 개수.
+           개수는 「탭을 눌러 정해지는 숫자」라 탭과 같은 줄에 둔다. 검색창이 윗줄을 통째로 쓴다.
+           홈이 탭으로 갈라지면서 왼쪽 위 뒤로가기(←)는 없앴다 — 나가는 길은 하단바다. -->
       <div class="list-head">
         <div class="list-head-top">
-          <!-- 홈으로(2026-08-03): 7/25에 ←를 X로 바꿨다가 되돌렸다 — 왼쪽 위라는 표준 자리로 가면서
-               '닫기'보다 '뒤로가기'가 다시 맞게 됐다. 하는 일은 그대로 goHome() 이다. -->
-          <button class="browse-back" id="browseBack" type="button" aria-label="홈으로">
-            <!-- 화살표 글리프가 24 viewBox를 덜 채워 모달 닫기(X, 15px)보다 작아 보임(10.5px, 재서 확인) →
-                 중앙 기준 1.43배 확대해 15px로 맞추고, 확대분만큼 stroke를 1.7→1.19로 보정한다
-                 (1.19×1.43 = 1.7 = 18px 아이콘군 공통 굵기. 모달 X의 1.02×1.667과 같은 문법).
-                 터치 타겟은 .browse-back 44px 고정이라 영향 없음(2026-08-03) -->
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.43) translate(-12 -12)"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
-          </button>
           <!-- 검색창(2026-07-25): 접기 폐지, 상시 노출. 돋보기는 장식용 아이콘(입력창 안) -->
           <div class="search-box">
             <svg class="search-box-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -390,18 +396,13 @@
         </div>
       </div>
       <div class="recipe-grid" id="recipeGrid"></div>
-      <!-- 브라우즈에서만. 카드를 끝까지 내렸을 때 되올라가지 않고 빠져나오는 길
-           (레시피 모달·아티클 하단 「닫기」와 같은 모양·같은 뜻). 하는 일은 왼쪽 위 ←와 같은 goHome.
-           🔴 푸터 「밖」이다(2026-08-03 사용자 확정) — 이 버튼은 목록에 딸린 것이라 푸터 구분선 위에 있어야 하고,
-           선 아래는 사이트 전체 푸터(제보·문의 / 이미지 출처)다. 푸터 안에 넣으면 선이 버튼 위로 올라온다. -->
-      <button class="browse-home-btn" id="browseHomeBtn" type="button">홈으로</button>
-
-      <!-- FOOTER (레시피 섹션에만) — 🔴 홈과 브라우즈가 다르다(2026-08-03 사용자 확정):
-           홈 = 문구 + 링크 / 브라우즈 = 「홈으로」 버튼 + 링크. 가르는 것은 #view-recipe.is-home 이다. -->
+      <!-- 맨 위로(2026-08-03 사용자 확정) — 목록이 길어 끝까지 내려간 뒤 되올라가는 길.
+           🔴 푸터 구분선 「위」다. 하단바에서 지금 탭을 한 번 더 눌러도 같은 일이 일어난다.
+           플로팅은 쓰지 않는다 — 하단바가 이미 떠 있어 떠 있는 것이 둘이 된다. -->
+      <button class="to-top-btn" type="button">맨 위로</button>
       <footer class="footer">
-        <span class="footer-title"><span class="footer-brand">하딜고고</span>는 하이디라오 소스바 앞에서 매번 건희소스를 <br class="footer-break-mobile">검색하는 (나 같은) 사람들을 위해 만들어졌습니다</span>
         <div class="footer-links">
-          <a class="footer-report" id="footerReport" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
+          <a class="footer-report" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
           <span class="footer-sep" aria-hidden="true"></span>
           <a class="footer-credit" href="credits.html"><svg class="footer-credit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/></svg>이미지 출처</a>
         </div>
@@ -434,6 +435,9 @@
       </div>
       <div class="mn-subs" id="mnSubs"></div>
       <div id="mnBody"></div>
+      <!-- 맨 위로 — 메뉴는 130개라 특히 필요하다. 푸터 구분선 「위」(2026-08-03 사용자 확정) -->
+      <button class="to-top-btn" type="button">맨 위로</button>
+
       <!-- 메뉴 탭 푸터(2026-08-03 사용자 확정): 구분선 → 안내문 → 제보·문의 / 이미지 출처.
            레시피 푸터와 같은 .footer 를 쓴다. 링크의 id 는 레시피 쪽에만 둔다(중복 id 금지). -->
       <footer class="footer">
@@ -450,9 +454,6 @@
     <div class="view" id="view-store" hidden>
       <!-- 🔴 순서: 개수·안내문 줄이 위, 지역 탭이 아래다(2026-08-03 사용자 확정) —
            메뉴 탭(#view-menu)·레시피 탭(.list-head)과 같은 순서로 세 탭을 맞췄다. 되돌리지 말 것. -->
-      <div class="stores-head">
-        <p class="stores-note">영업시간은 매장 사정에 따라 다를 수 있어요</p>
-      </div>
       <!-- 지역 탭 + 개수 한 줄(2026-08-03 사용자 확정) — 레시피·메뉴 탭과 같이 개수는 탭줄 오른쪽 끝이다.
            탭만 가로로 스크롤되고 개수는 스크롤 밖에 고정된다(.tabs-scroll). -->
       <div class="tabline">
@@ -464,6 +465,17 @@
         <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
       </div>
       <div class="stores" id="stores"></div>
+      <!-- 매장 푸터(2026-08-03 사용자 확정): 구분선 → 안내문 → 제보·문의 / 이미지 출처.
+           안내문은 옛날에 지역 탭 위에 있던 그 줄이다 — 메뉴 탭과 같은 방식으로 아래로 내렸다.
+           「맨 위로」는 두지 않는다(레시피·메뉴 탭에만). -->
+      <footer class="footer">
+        <span class="footer-note">영업시간은 매장 사정에 따라 다를 수 있어요</span>
+        <div class="footer-links">
+          <a class="footer-report" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <a class="footer-credit" href="credits.html"><svg class="footer-credit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/></svg>이미지 출처</a>
+        </div>
+      </footer>
     </div>
 
     <!-- 발도장 섹션 — 다녀온 매장을 기록하는 방문 일기(수집 아님: 진행바·총계 없음) -->
@@ -492,6 +504,15 @@
       <!-- ⚠️ 여기 있던 '다른 기기에서 내 기록 보기' 링크는 지웠다(2026-07-31 사용자 요청) —
            위 띠의 버튼 하나로 합쳤다. 시트 안에 '내 코드'와 '불러오기'가 둘 다 있어서
            입구가 둘일 이유가 없었다. -->
+      <!-- 스티커 푸터(2026-08-03): 링크만. 🔴 안내문은 아직 미정이다 —
+           「이 기기에만 저장된다」 띠(#codeNotice)를 어떻게 할지 정해지면 함께 정한다. -->
+      <footer class="footer">
+        <div class="footer-links">
+          <a class="footer-report" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <a class="footer-credit" href="credits.html"><svg class="footer-credit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/></svg>이미지 출처</a>
+        </div>
+      </footer>
     </div>
 
   </main>
@@ -501,7 +522,17 @@
 <!-- 하단 플로팅 탭바 -->
 <nav class="tabbar" id="tabbar" aria-label="섹션 이동">
   <span class="tabbar-indicator" id="tabbarIndicator" aria-hidden="true"></span>
-  <button class="tabbar-btn active" type="button" data-section="recipe" aria-current="page">
+  <!-- 홈 — 하단바 첫 자리(2026-08-03). 아이콘은 「문 있는 집」(_mockup-home-icon.html 의 B).
+       선 굵기 1.7 = 상단바 18px 아이콘군과 같은 값 -->
+  <button class="tabbar-btn active" type="button" data-section="home" aria-current="page">
+    <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.2 10.8 12 3.8l8.8 7"/>
+      <path d="M5.6 9.4V20.2h12.8V9.4"/>
+      <path d="M9.8 20.2v-5.2h4.4v5.2"/>
+    </svg>
+    <span class="tabbar-label">홈</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-section="recipe">
     <svg class="tabbar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H18a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6.5A1.5 1.5 0 0 1 5 18.5v-14z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M5 17.5A1.5 1.5 0 0 1 6.5 16H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -982,7 +1013,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=541"></script>
+<script src="script.js?v=543"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

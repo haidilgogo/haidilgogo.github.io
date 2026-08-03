@@ -319,10 +319,9 @@
     }
   })();
 
-  // 2026-07-25 확정: 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 필터(AND) — 홈/브라우즈 구분은
-  // activeCat 등 필터값으로 유추하지 않고 이 browsing 플래그로 직접 관리한다(전체 탭 선택 상태와 홈이 값만으로는
-  // 구분 안 되기 때문). 브라우즈 진입 = enterBrowse/즐겨찾기버튼, 탈출 = 헤더 X(닫기) 버튼뿐.
-  let browsing = false;
+  // 2026-07-25 확정: 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 필터(AND).
+  // 🔴 옛 `browsing` 플래그는 없앴다(2026-08-03) — 홈이 탭으로 갈라져서 「지금 어느 화면인가」는
+  //    하단바 탭(activeSection)이 곧 답이다. 한 탭 안에서 두 화면을 오가던 시절의 장치였다.
   let activeCat = '전체';       // 브라우즈 중 선택된 카테고리 탭('전체' 포함)
   let personFilter = null;      // 셀럽 레일에서 인물을 고르면 그 사람 레시피만(다른 필터와 겹침)
   let query = '';
@@ -1293,6 +1292,7 @@
       pill.style.transform = 'translateX(' + (base + frac * stride - pill.offsetWidth / 2) + 'px)';
     }
     monthlyUpdatePill = updatePill; // 섹션이 보이게 될 때(syncMonthlyFeature) 재배치용
+    syncMonthlyFeature();           // 만들었으면 편다 — 옛날엔 renderGrid 가 불러줬다(2026-08-03 홈 분리)
     mfScroll.addEventListener('scroll', updatePill, { passive: true });
     window.addEventListener('resize', updatePill);
     updatePill();
@@ -1343,16 +1343,6 @@
   const viewRecipeEl = document.getElementById('view-recipe');
   const listTitleEl = document.getElementById('listTitle');
 
-  function isHome() {
-    return !browsing;
-  }
-  function syncHome() {
-    const home = isHome();
-    viewRecipeEl.classList.toggle('is-home', home);
-    if (home) requestAnimationFrame(() => fitPopularTitles(popularRailEl));
-    // 검색창·카테고리탭·닫기버튼이 전부 list-head 안(개수 옆·윗줄)에 있어 홈에서는 list-head 자체가
-    // 숨겨지며 함께 숨음(2026-07-25) — 개별 요소 hidden 토글 불필요
-  }
   function browseTitle() {
     if (query.trim()) return '검색 결과';
     if (showFavoritesOnly) return '즐겨찾기';
@@ -1360,10 +1350,9 @@
     if (activeCat !== '전체') return activeCat;
     return '레시피';
   }
-  // 홈 섹션(전체 ›·아바타)에서 브라우즈로 들어감(cat/person) — 항상 홈에서만 호출되므로
-  // 즐겨찾기·검색은 이미 꺼져 있는 게 보장되지만 방어적으로 한 번 더 초기화
+  // 홈의 「전체보기」에서 레시피 탭으로 넘어감(2026-08-03) — 카테고리를 지정해 열고 하단바 표시도 바뀐다.
+  // 즐겨찾기·검색은 홈에서 켤 수 없지만 방어적으로 한 번 더 초기화한다.
   function enterBrowse(cat, person) {
-    browsing = true;
     activeCat = cat || '전체';
     personFilter = person || null;
     if (showFavoritesOnly) {
@@ -1376,29 +1365,14 @@
       searchBox.classList.remove('has-value');
     }
     renderGrid();
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    switchSection('recipe');   // 하단바 활성 표시까지 함께 바뀌고, 스크롤은 맨 위로 간다
   }
-  // 헤더 X(닫기) — 브라우즈의 유일한 탈출구. 탭·즐겨찾기·검색을 전부 리셋하고 홈으로.
-  function goHome() {
-    browsing = false;
-    activeCat = '전체';
-    personFilter = null;
-    if (showFavoritesOnly) {
-      showFavoritesOnly = false;
-      favToggleBtn.classList.remove('active');
-    }
-    if (query) {
-      query = '';
-      searchInput.value = '';
-      searchBox.classList.remove('has-value');
-    }
-    renderGrid();
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }
+  // 🔴 옛 goHome() 은 없앴다(2026-08-03) — 홈으로 가는 길은 하단바이고,
+  //    로고를 누르면 강제 새로고침(?_r=)이라 어차피 홈부터 다시 시작한다.
 
   function syncMonthlyFeature() {
-    // 홈에서만 노출 — 필터 중엔 결과에 집중
-    monthlyFeatureEl.hidden = !isHome();
+    // 이 배너는 #view-home 안에 있어 홈 탭에서만 보인다(2026-08-03). 데이터가 있을 때만 편다.
+    monthlyFeatureEl.hidden = false;
     // 보이게 된 직후 인디케이터 막대 재배치(숨김일 때 측정한 0값 교정)
     if (!monthlyFeatureEl.hidden && monthlyUpdatePill) monthlyUpdatePill();
   }
@@ -1411,7 +1385,6 @@
   const browseCatTabsEl = document.getElementById('browseCatTabs');
   const browseCatUnderlineEl = document.getElementById('browseCatUnderline');
   const browseCardCache = new Map(); // 브라우즈 그리드 카드(clean card) 캐시
-  const browseBackEl = document.getElementById('browseBack');
 
   function updateBrowseCatUnderline() {
     const active = browseCatTabsEl.querySelector('.tab-btn.active');
@@ -1420,9 +1393,9 @@
       browseCatUnderlineEl.style.transform = 'translateX(' + active.offsetLeft + 'px)';
     }
   }
-  // list-head가 홈에서는 통째로 숨겨지므로 브라우즈 중일 때만 다시 그리면 충분
+  // 뷰가 숨어 있어도 그려 둔다 — 탭을 눌러 레시피로 넘어오는 순간 이미 맞아 있어야 한다(2026-08-03).
+  // 숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡으므로 switchSection 에서 한 번 더 부른다.
   function renderBrowseCatTabs() {
-    if (!browsing) return;
     browseCatTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
     BROWSE_TABS.forEach((cat) => {
       const btn = document.createElement('button');
@@ -1516,14 +1489,10 @@
   }
 
   function renderGrid() {
-    syncHome();
-    syncMonthlyFeature();
     const filtered = getFiltered();
     listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
     renderBrowseCatTabs();
-    // 즐겨찾기 켜져 있는 동안엔 뒤로가기(←) 숨김 — 나가는 길은 즐겨찾기 버튼 하나로 통일(2026-07-25)
-    browseBackEl.hidden = showFavoritesOnly;
     gridEl.innerHTML = '';
     if (filtered.length === 0) {
       const empty = document.createElement('p');
@@ -2284,23 +2253,13 @@
     searchBox.classList.toggle('has-value', query.length > 0);
     renderGrid();
   });
-  // 즐겨찾기도 카테고리 탭과 겹치는 필터 — 홈에서 켜면 브라우즈 진입, 브라우즈 중 켜면 현재 탭 유지.
-  // 끌 때는 "켰던 자리"로: 홈에서 켰으면 꺼질 때 홈으로, 브라우즈 중 켰으면 꺼져도 그 브라우즈에 남음(2026-07-25 수정).
-  let favEnteredFromHome = false;
+  // 즐겨찾기도 카테고리 탭과 겹치는 필터다. 🔴 버튼이 레시피 탭 상단바에만 있으므로(2026-08-03
+  // 상단바 규칙) 「켰던 자리로 돌아가기」 장치는 없앴다 — 켜고 끄는 곳이 언제나 레시피 탭이다.
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
     setPressedState(favToggleBtn, showFavoritesOnly);
-    if (showFavoritesOnly) {
-      favEnteredFromHome = !browsing;
-      browsing = true;
-    } else if (favEnteredFromHome) {
-      browsing = false;
-      favEnteredFromHome = false;
-    }
     renderGrid();
-    // 화면이 통째로 바뀌므로 맨 위로. enterBrowse()·헤더 X에는 이미 있는데 여기만 빠져 있어서,
-    // 홈에서 스크롤한 뒤 즐겨찾기를 켜면 목록 중간부터 보였다(2026-07-25).
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    scrollToTop();   // 목록이 통째로 바뀌므로 맨 위로
   });
 
   // ===== 오늘의 소스 가챠 =====
@@ -2667,11 +2626,19 @@
 
   // ===== 섹션(뷰) 전환: 레시피 · 메뉴 · 매장 · 스탬프 =====
   const pageEl = document.querySelector('.page');
-  const sectionTitleEl = document.getElementById('sectionTitle');
   const tabbarEl = document.getElementById('tabbar');
   const tabbarIndicator = document.getElementById('tabbarIndicator');
-  const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '스티커' };
-  let activeSection = 'recipe';
+  const SECTIONS = ['home', 'recipe', 'menu', 'store', 'stamp'];
+  let activeSection = 'home';   // 시작은 홈 탭(2026-08-03 분리)
+  // 🔴 탭마다 스크롤 위치를 기억한다(2026-08-03 사용자 확정). 예전엔 「맨 위로」를 의도했는데
+  //    그 방식(scroll-behavior 를 잠깐 auto 로 바꿔치기)이 안 먹어 우연히 유지되고 있었다.
+  //    우연에 기대지 않고 여기서 직접 저장·복원한다.
+  const sectionScroll = Object.create(null);
+  const scrollTopNow = () => (document.scrollingElement || document.documentElement).scrollTop;
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    sectionScroll[activeSection] = 0;
+  }
 
   // 인디케이터 2상태(배민식): 정지=불투명 필(활성 버튼에 딱 맞음) / 이동=유리구슬(원형 76px).
   // 크기·위치는 여기서 인라인으로, 질감(필↔유리)은 CSS .tabbar-indicator(--glass)가 담당.
@@ -2784,15 +2751,15 @@
     requestAnimationFrame(() => { tabbarIndicator.style.transition = ''; });
   }
   function switchSection(name) {
-    if (!SECTION_TITLES[name] && name !== 'recipe') return;
+    if (!SECTIONS.includes(name) || name === activeSection) return;
+    sectionScroll[activeSection] = scrollTopNow();   // 떠나는 탭의 자리를 적어 둔다
     activeSection = name;
     // 뷰 보이기/숨기기
     document.querySelectorAll('.view').forEach((v) => {
       v.hidden = v.id !== 'view-' + name;
     });
-    // 상단바: 레시피만 탭·검색 노출, 그 외엔 섹션 제목으로 교체
+    // 상단바: 탭마다 전용 아이콘 하나만 보이게 하는 판정에 쓴다(2026-08-03 규칙)
     pageEl.dataset.section = name;
-    sectionTitleEl.textContent = SECTION_TITLES[name] || '';
     // 하단 탭바 활성 표시
     tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
       const on = btn.dataset.section === name;
@@ -2800,19 +2767,16 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
-    // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
+    // 상세가 열려 있으면 닫기
     if (modalOverlay.classList.contains('open')) closeModal();
-    // 스크롤만 맨 위로 — 이 프로그램 스크롤이 축소/펼침 판정에 끼어들지 않게 다음 스크롤 이벤트 1회 무시.
-    // (iOS는 같은 점프에도 스크롤 이벤트가 여러 번 오지만, 아래에서 이미 펼친 뒤라 나머지는 무해한 no-op)
+    // 🔴 그 탭에서 보던 자리로 되돌린다(2026-08-03). 프로그램 스크롤이 축소/펼침 판정에 끼어들지
+    //    않게 다음 스크롤 이벤트 1회는 무시한다.
+    //    behavior:'instant' 를 쓴다 — 전역 scroll-behavior:smooth 를 확실히 우회하는 방법이고,
+    //    옛 방식(스타일을 잠깐 auto 로 바꿔치기)은 실제로 안 먹었다(2026-08-03 실측).
     ignoreScrollOnce = true;
-    // 전역 scroll-behavior:smooth를 우회해 즉시 맨 위로.
-    // 부드러운 스크롤이면 수백 ms 동안 iOS 주소창 변화 → resize → placeIndicator 스냅이
-    // 진행 중인 원 슬라이드를 죽여서 "어떨 땐 애니메이션 없는" 복불복이 생김.
-    const se = document.scrollingElement || document.documentElement;
-    se.style.scrollBehavior = 'auto';
-    window.scrollTo(0, 0);
-    se.style.scrollBehavior = '';
-    lastScrollY = 0;
+    const y = sectionScroll[name] || 0;
+    window.scrollTo({ top: y, behavior: 'instant' });
+    lastScrollY = y;
     requestAnimationFrame(() => { ignoreScrollOnce = false; });
     // 탭 전환은 항상 바를 펼침(상태 플래그 정리).
     // 과거엔 축소 상태 전환 시 스냅으로 우회했지만(iOS 합성기 레이스), 축소 시각효과(compact CSS)를
@@ -2821,6 +2785,7 @@
     slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
+    if (name === 'recipe') { updateBrowseCatUnderline(); requestAnimationFrame(updateBrowseCatUnderline); }
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
     // 메뉴도 같은 이유(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다, 2026-08-03)
     if (name === 'menu' && window.mnSyncUnderline) { window.mnSyncUnderline(); requestAnimationFrame(window.mnSyncUnderline); }
@@ -2830,10 +2795,12 @@
   tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (suppressClick) return; // 드래그로 끝난 제스처의 잔여 click 무시
+      // 지금 보고 있는 탭을 한 번 더 누르면 맨 위로(2026-08-03 사용자 확정) — 여러 앱의 관례다
+      if (btn.dataset.section === activeSection) return scrollToTop();
       switchSection(btn.dataset.section);
     });
   });
-  pageEl.dataset.section = 'recipe';
+  pageEl.dataset.section = 'home';   // 시작 탭(2026-08-03)
 
   // ── 탭바 드래그(배민식) ── 버블을 손가락으로 끌면 따라오고, 놓으면 가장 가까운 탭으로 전환.
   // 놓는 순간의 이동은 기존 switchSection→slideIndicator를 그대로 탐 — slideIndicator가
@@ -3775,9 +3742,8 @@
   });
 
   // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
-  browseBackEl.addEventListener('click', goHome);
-  // 브라우즈 푸터의 「홈으로」 — 왼쪽 위 ←와 같은 일을 한다(끝까지 내려갔을 때의 나가는 길, 2026-08-03)
-  document.getElementById('browseHomeBtn').addEventListener('click', goHome);
+  // 「맨 위로」 — 레시피·메뉴 탭 목록 끝의 버튼(2026-08-03). 하단바 재탭과 같은 일을 한다.
+  document.querySelectorAll('.to-top-btn').forEach((btn) => btn.addEventListener('click', scrollToTop));
   // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderGrid에서 자동 적용됨)
   document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
@@ -4337,7 +4303,6 @@
       if (typeof refreshStampView === 'function') refreshStampView();
       if (typeof renderGrid === 'function') renderGrid();
       if (typeof renderHomePopular === 'function') renderHomePopular();
-      if (typeof syncHome === 'function') syncHome();
     } catch (e) { /* 그리기 실패해도 데이터는 이미 저장됐다 */ }
   }
 

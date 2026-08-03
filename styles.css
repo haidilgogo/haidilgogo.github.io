@@ -939,7 +939,7 @@ img {
   white-space: nowrap;
 }
 /* 메뉴 탭 푸터의 안내문(2026-08-03) — 브랜드 문구(.footer-title)와 달리 참고성 회색 작은 글씨다.
-   윗자리(개수 줄 오른쪽)에 있을 때의 .stores-note 와 같은 크기·색으로 맞춘다. */
+   옛날 개수 줄 오른쪽에 있던 안내문과 같은 크기·색이다(12px 회색). */
 .footer-note {
   font-size: 12px;
   line-height: 1.4;
@@ -1161,7 +1161,7 @@ img {
   align-items: center;
   gap: 26px; /* 13+13 — 두 버튼의 44px 터치 타겟이 정확히 맞닿고 겹치지 않는 최소값(2026-07-25) */
   /* 상하 여백 확대(2026-07-25) — 즐겨찾기·닫기 터치가 너무 좁았음.
-     오른쪽 24px(20+4, 2026-07-25 재조정) — 브라우즈 뒤로가기(.browse-back, .main 패딩 20px 기준)와
+     오른쪽 24px(20+4, 2026-07-25 재조정) — 옛 브라우즈 뒤로가기(2026-08-03 삭제, .main 패딩 20px 기준)와
      오른쪽 끝 x좌표를 맞추려면 20px이 기준이지만, 아래 .modal-close가 오른쪽(바깥쪽) 패딩을
      13→16px로 늘리며 3px 더 튀어나왔고 원래도 1px 차이가 있었음(실측) → 20+3+1=24px로 보정해
      getBoundingClientRect() 기준 두 닫기 버튼의 오른쪽 끝 x좌표를 정확히 일치시킴(367px, 2026-07-25). */
@@ -1221,7 +1221,7 @@ img {
 }
 /* 🔴 좌우 패딩은 반드시 대칭(13px)으로 둘 것.
    한때 터치 타겟 겹침을 없애려고 비대칭(바깥16/안쪽10)으로 나눴는데, 그러면 44px 박스 안에서
-   아이콘이 3px 치우쳐 브라우즈 뒤로가기(.browse-back, 44px 안에 가운데 정렬)와 눈으로 어긋나 보였다.
+   아이콘이 3px 치우쳐 옛 브라우즈 뒤로가기(2026-08-03 삭제, 44px 안에 가운데 정렬)와 눈으로 어긋나 보였다.
    박스 오른쪽 끝만 맞추면 안 되고 '보이는 아이콘' 위치가 같아야 한다(2026-07-25).
    겹침은 패딩이 아니라 .modal-topline의 gap(26px = 13+13)으로 푼다. */
 
@@ -1337,7 +1337,7 @@ img {
   color: #4D4139;
 }
 
-/* 다른 아이콘 버튼(.modal-close/.browse-back)과 동일: 배경 없이 색만 브랜드 빨강으로(2026-07-25,
+/* 다른 아이콘 버튼(.modal-close)과 동일: 배경 없이 색만 브랜드 빨강으로(2026-07-25,
    눌렀을 때 생기던 #EDE4DF 음영 제거). hover는 터치기기 눌어붙음 방지를 위해 반드시 media 안에. */
 @media (hover: hover) {
   .gacha-close:hover { color: var(--brand-red); }
@@ -2096,46 +2096,9 @@ img {
 }
 
 /* ===== 매장(지점) 목록 ===== */
-/* 매장 안내문 줄 — 🔴 2026-08-03부터 개수가 빠지고 안내문만 남았다(개수는 아래 .tabline 오른쪽 끝).
-   메뉴 탭은 같은 안내문을 아예 푸터로 내렸는데(사용자 확정), 매장은 지시가 없어 이 자리에 그대로 둔다.
-   옛 min-height 36px 도 같은 날 풀었다 — 글자는 17px 뿐이라 위아래가 19px 비어 보였다. */
-/* 🔴 탭줄 = 탭(왼쪽) + 개수(오른쪽 끝). 매장·메뉴가 함께 쓴다(2026-08-03 사용자 확정,
-   옛 .store-region-tabs 를 이 둘로 나눴다). 레시피 탭 .list-head-bottom 과 같은 얼개다.
-   개수는 스크롤 밖에 있어야 한다 — 안에 넣으면 탭을 밀 때 숫자도 같이 밀린다. */
-.tabline {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 12px;
-}
-.tabline .count-line { margin-left: auto; flex: none; white-space: nowrap; }
-.tabs-scroll {
-  min-width: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.tabs-scroll .tabs {
-  flex-wrap: nowrap;                /* 스크롤하므로 감기지 않는다 */
-  justify-content: flex-start;      /* 왼쪽 정렬 — 첫 탭이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
-}
-.stores-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 0;
-  margin: 0 0 10px;
-}
+/* 🔴 옛 .stores-head(개수+안내문 줄)는 없앴다(2026-08-03) — 개수는 .tabline 오른쪽 끝으로,
+   안내문은 맨 아래 푸터(.footer-note)로 갔다. 메뉴 탭과 같은 방식이다. */
 .stores-count { margin: 0; padding: 0; flex: none; } /* 개수는 왼쪽 고정폭(줄어들지 않음) */
-/* 안내문 = 박스 없이 회색 작은 글씨로 오른쪽 정렬(참고성 문구). 길면 줄어들며 왼쪽 개수를 안 밀침. */
-.stores-note {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text-muted);
-  text-align: right;
-  flex: 0 1 auto;
-}
 .stores {
   display: grid;
   /* 최소폭 420px → 데스크탑(콘텐츠 ~1080px)에서 최대 2칸(길게) — 발도장 기록 카드와 결 통일.
@@ -2167,7 +2130,6 @@ img {
    #view-store에 별도 패딩을 줬으나, JS 버그를 고쳐 .main이 탭바 회피를 제대로 하므로 더는 불필요. */
 /* 모바일: 한 줄에 하나(주소·버튼 있는 카드라 2열은 답답함) */
 @media all {
-  .stores-head { margin-bottom: 10px; } /* 안내문↔지역탭. 레시피 .list-head gap(10px)과 동일 */
   .stores { grid-template-columns: 1fr; row-gap: 12px; }
   .store-region { margin: 8px 4px 0; }
   .store-region:first-child { margin-top: 0; }
@@ -2358,22 +2320,10 @@ img {
 }
 
 /* 상단바 섹션 제목 (메뉴·스탬프 섹션일 때 탭 자리에 표시) */
-.topbar-section-title {
-  display: none;
-  flex: none;
-  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  color: var(--text-darkest);
-  letter-spacing: -.01em;
-  white-space: nowrap;
-}
-
-/* 레시피 카테고리 탭·검색: 레시피에서만.
-   🔴 .search-box 를 통째로 숨기지 않는다(2026-08-03) — 메뉴 탭에도 같은 모양의 검색창이 생겼다.
-   숨겨야 하는 건 레시피 툴바 안의 것 하나뿐이고, 메뉴 쪽은 #view-menu 가 통째로 숨겨져 문제없다. */
-.page:not([data-section="recipe"]) .tabs-group--recipe,
-.page:not([data-section="recipe"]) .list-head .search-box {
+/* 레시피 전용 상단바 그룹은 레시피에서만.
+   🔴 검색창은 여기서 안 건드린다(2026-08-03) — 레시피·메뉴 검색창이 각자 뷰(#view-recipe/#view-menu)
+   안에 있어서, 그 뷰가 숨으면 같이 숨는다. */
+.page:not([data-section="recipe"]) .tabs-group--recipe {
   display: none;
 }
 /* 매장 지역 탭 제거(2026-07-23 사용자 요청) — 상단바는 로고 줄만. 항상 숨김(모든 지점 노출) */
@@ -2381,10 +2331,6 @@ img {
 /* 발도장 기록하기 버튼 — 뷰 안 '다녀온 매장 N곳' 줄 오른쪽 끝에 배치(2026-07-23) */
 .stamp-write-btn { flex: none; gap: 5px; } /* 연필 SVG 아이콘 ↔ 글자 간격 */
 /* 섹션 제목: 어느 섹션에도 상단바에 표시 안 함(로고만) — 메뉴 '메뉴' 글자도 제거(2026-07-24) */
-.page:not([data-section="recipe"]):not([data-section="store"]):not([data-section="stamp"]):not([data-section="menu"]) .topbar-section-title {
-  display: inline-block;
-}
-
 /* ===== 하단 플로팅 탭바 ===== */
 /* 배민식 떠 있는 알약 탭바(2026-07-20). 반투명 블러 알약 + 활성 탭 위 "유리 렌즈 버블".
    버블은 바 위아래로 살짝 삐져나오고(overflow:visible), 드래그로 끌어서 탭 전환 가능(script.js 탭바 드래그).
@@ -2500,6 +2446,13 @@ img {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color .15s, min-width .24s ease, padding .24s ease;
+}
+
+/* 🔴 다섯 개가 되면서(2026-08-03) 366px 보다 좁은 화면에서는 버튼을 줄여야 한다.
+   계산: 버튼 5개 + 사이 8px + 바 좌우 20px = 338px 이 필요한데, 바 폭은 화면폭 - 28px 이다.
+   320px 폰에서 min-width 52 / 좌우 8 이면 288px — 4px 남는다(라벨 「레시피」 28.2px 은 들어간다). */
+@media (max-width: 365px) {
+  .tabbar-btn { min-width: 52px; padding: 4px 8px; }
 }
 .tabbar-icon {
   display: block;
@@ -3396,43 +3349,13 @@ img {
 }
 
 /* ═══════════ 홈 7단 섹션 (2026-07-21 확정 구조) ═══════════
-   홈 = #view-recipe.is-home(필터 없음): 히어로→셀럽레일→인기소스→가이드→탕→히든메뉴→랜덤뽑기.
-   그리드 뷰 = is-home 해제(검색·즐겨찾기·전체보기·인물보기): 기존 list-head + recipe-grid.
+   홈 = #view-home(2026-08-03 분리): 히어로→셀럽레일→인기소스→가이드→탕→히든메뉴→랜덤뽑기.
+   레시피 = #view-recipe: list-head + recipe-grid.
    가로 패딩은 .main의 고정 20px을 따르고, 레일은 full-bleed(-20px)로 화면 끝까지 스크롤. */
-#view-recipe.is-home .list-head,
-#view-recipe.is-home .recipe-grid { display: none; }
-#view-recipe:not(.is-home) .home-sec { display: none; }
+/* 🔴 옛 `#view-recipe.is-home` 분기는 없앴다(2026-08-03) — 홈이 탭으로 갈라지면서
+   한 탭 안에 두 화면을 넣을 이유가 사라졌다. 홈 7단은 #view-home, 목록은 #view-recipe 다. */
 
-/* 브라우즈 헤더 뒤로가기(←) — 홈으로 복귀. 2026-07-25 에 ←를 X로 바꿨다가 2026-08-03 에 되돌렸다:
-   왼쪽 위라는 표준 자리로 옮기면서 '닫기'보다 '뒤로가기'가 다시 맞게 됐고, 검색창 옆에 아이콘이
-   붙어 답답해 보이던 것도 풀렸다. 터치 타겟 44px, 시각 위치는 화면 왼쪽 가장자리(.main 패딩 20px)에
-   맞추되 탭 영역만 넉넉하게 — 음수 margin 으로 상쇄(왼쪽으로 방향만 반전). */
-.browse-back {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: -12px 0 -12px -12px;
-  background: none;
-  border: none;
-  color: #4D4139; /* 아이콘 액션 버튼(공유·즐겨찾기)과 동일 색으로(2026-07-25, 탭 비활성색에서 변경) */
-  cursor: pointer;
-  transition: color .15s;
-  -webkit-tap-highlight-color: transparent;
-}
-/* 전체보기 버튼(.home-sec-more)과 동일한 인터랙션 — 호버·터치 시 브랜드 빨강 */
-.browse-back:hover,
-.browse-back:active {
-  color: var(--brand-red);
-}
-/* display:inline-flex가 [hidden]의 UA display:none보다 우선순위 높아 명시적으로 재선언 필요
-   (즐겨찾기 켜진 동안 뒤로가기 숨김 — 나가는 길을 즐겨찾기 버튼 하나로 통일, 2026-07-25)
-   자리는 안 남겨도 된다: 검색창이 margin-left:auto 로 오른쪽에 붙어 있어 왼쪽이 비어도 안 밀린다. */
-.browse-back[hidden] {
-  display: none;
-}
+/* 🔴 브라우즈 뒤로가기(.browse-back)는 없앴다(2026-08-03) — 홈이 탭이 되어 나가는 길이 하단바다. */
 
 /* ── 공통 섹션 헤더 ── */
 .home-sec { margin-top: 34px; }
@@ -4401,6 +4324,8 @@ img {
 /* 탭 제거 후 레시피용 탭줄 그룹은 항상 숨김(내용물은 script 참조용으로만 DOM 유지) */
 .tabs-group--recipe { display: none !important; }
 /* 즐겨찾기 버튼(topbar-right로 이사)은 레시피 섹션에서만 표시 */
+/* 상단바 규칙(2026-08-03): 그 탭 전용 아이콘 하나 + 공유·설치.
+   즐겨찾기는 레시피 목록을 거르는 버튼이라 레시피 탭에서만 뜻이 있다(홈에는 거를 목록이 없다). */
 .page:not([data-section="recipe"]) .fav-toggle-btn { display: none; }
 
 /* ── 초심자 가이드 패널(뼈대) ── */
@@ -4798,9 +4723,9 @@ img {
 .modal-footer {
   padding: 14px 0 calc(20px + env(safe-area-inset-bottom));
 }
-/* 브라우즈 맨 아래 「홈으로」도 같은 모양에 얹는다(2026-08-03) — 나가는 버튼이 화면마다 달라 보이면 안 된다 */
+/* 목록 맨 아래 「맨 위로」도 같은 모양에 얹는다(2026-08-03) — 화면 아래쪽 버튼이 저마다 달라 보이면 안 된다 */
 .column-bottom-close,
-.browse-home-btn,
+.to-top-btn,
 .modal-bottom-close {
   width: 100%;
   height: 48px;
@@ -4816,26 +4741,23 @@ img {
 }
 @media (hover: hover) {
   .column-bottom-close:hover,
-  .browse-home-btn:hover,
+  .to-top-btn:hover,
   .modal-bottom-close:hover { background: #F7F3EF; }
 }
 .column-bottom-close:active,
-.browse-home-btn:active,
+.to-top-btn:active,
 .modal-bottom-close:active { background: #F0EAE4; }
-/* 🔴 맨 아래 모습이 홈과 브라우즈가 다르다(2026-08-03 사용자 확정).
-   홈 = 문구 + 링크 / 브라우즈 = 「홈으로」 버튼 + (구분선) + 링크.
-   제보·문의와 이미지 출처는 양쪽 다 남는다. 가르는 것은 #view-recipe.is-home 이다. */
-#view-recipe.is-home .browse-home-btn { display: none; }
-#view-recipe:not(.is-home) .footer-title { display: none; }
-/* 🔴 버튼은 푸터 구분선 「위」다 — 그래서 카드↔버튼 여백(36px)을 버튼이 직접 갖고,
-   푸터의 위 여백(36px)은 브라우즈에서만 0으로 만든다. 안 그러면 버튼과 선이 36px 벌어진다. */
-.browse-home-btn { display: block; margin: 36px 0 24px; }
-#view-recipe:not(.is-home) .footer { margin-top: 0; }
+/* 🔴 푸터는 탭마다 다르다(2026-08-03 사용자 확정).
+   홈 = 문구 + 링크 / 레시피 = 「맨 위로」 + 링크 / 메뉴 = 안내문 + 「맨 위로」 + 링크 /
+   매장 = 안내문 + 링크 / 스티커 = 링크. 제보·문의와 이미지 출처는 어디에나 있다.
+   🔴 「맨 위로」는 푸터 구분선 「위」다 — 그래서 목록↔버튼 여백(36px)을 버튼이 직접 갖고,
+   버튼이 있는 화면에서는 푸터의 위 여백(36px)을 0으로 만든다. 안 그러면 버튼과 선이 36px 벌어진다. */
+.to-top-btn { display: block; margin: 36px 0 24px; }
+.to-top-btn + .footer { margin-top: 0; }
 
 /* ══════════════════════════════════════════════════════════════
    ── 메뉴 탭 ──  목업(_mockup-menu.html)에서 옮겨온 것이다.
-   개수+안내문 줄은 매장 탭의 .stores-head / .count-line / .stores-note 를
-   그대로 함께 쓴다 — 값을 베껴 적으면 매장 쪽만 고쳐졌을 때 따로 논다.
+   개수 줄은 매장 탭과 같은 .tabline / .count-line 을 함께 쓴다 — 값을 베껴 적으면 따로 논다.
    ══════════════════════════════════════════════════════════════ */
 /* 담은 목록(냄비) 버튼은 메뉴 섹션에서만 — 즐겨찾기가 레시피 전용인 것과 같은 방식 */
 .page:not([data-section="menu"]) .pot-btn { display: none; }
@@ -5068,9 +4990,6 @@ img {
 .mn-card-sub:empty + .mn-card-part::before,
 .mn-card-name + .mn-card-part::before { content:''; }
 
-/* 개수+안내문 줄 — 모양은 앱의 .stores-head 를 그대로 쓰고, 메뉴에서만 다른 간격만 여기서 준다 */
-/* 🔴 min-height 를 푼다(2026-08-03) — 매장 탭에서 물려받은 36px 은 글자(17px)보다 19px 커서
-   메뉴 탭에서는 개수 줄 위아래가 통째로 벌어져 보였다. 매장 탭은 그대로 36px 이다. */
 /* 🔴 옛 .mn-head(개수+안내문 줄)는 없앴다(2026-08-03 사용자 확정) —
    개수는 분류 탭 줄 오른쪽(.tabline)으로, 안내문은 맨 아래 푸터(.footer-note)로 갔다. */
 /* 검색창 줄 — 레시피 탭과 같은 모양이되 뒤로가기가 없어 폭을 꽉 채운다 */
