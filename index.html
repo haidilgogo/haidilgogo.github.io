@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=662">
+<link rel="stylesheet" href="styles.css?v=663">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -295,7 +295,9 @@
           <path d="M8.6 10.6l6.8-3.8M8.6 13.4l6.8 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
         </svg>
       </button>
-      <button class="topbar-icon-btn" id="topInstallBtn" type="button" aria-label="앱 설치하기" style="display:none;">
+      <!-- 🔴 인라인 style 로 숨기지 않는다(2026-08-04) — 표시는 CSS 가 정한다.
+           인라인을 쓰면 「레시피·메뉴에서는 감춘다」 규칙을 인라인이 이겨서 두 탭에도 나왔다. -->
+      <button class="topbar-icon-btn" id="topInstallBtn" type="button" aria-label="앱 설치하기">
         <!-- 공유 아이콘(기준)보다 살짝 작아 중앙 기준 1.053배 확대, stroke 1.7→1.615로 보정(2026-07-25) -->
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g transform="translate(12 12) scale(1.053) translate(-12 -12)">
@@ -1023,7 +1025,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=2"></script>
-<script src="script.js?v=557"></script>
+<script src="script.js?v=558"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

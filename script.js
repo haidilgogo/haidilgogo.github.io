@@ -3929,13 +3929,17 @@
   const topInstallBtn = document.getElementById('topInstallBtn');
   const tabsInstallBtns = [...document.querySelectorAll('.tabs-install-btn')];
   const installBtns = [topInstallBtn].concat(tabsInstallBtns);
+  // 🔴 인라인 display 로 켜지 않는다(2026-08-04) — 「레시피·메뉴에서는 설치를 감춘다」는
+  //    CSS 규칙을 인라인이 이겨서 두 탭에도 나왔다(사용자가 실기기에서 발견).
+  //    켜고 끄는 것은 클래스로만 하고, 어디에 보일지는 CSS 가 정한다.
   function showInstallBtns() {
-    topInstallBtn.style.display = 'flex';
+    document.querySelector('.page').classList.add('can-install');
     // 탭줄 아이콘은 인라인만 걷어내면 CSS가 표시를 결정(모바일 flex / 데스크탑 none — 공유 버튼과 동일 규칙)
     tabsInstallBtns.forEach((b) => { b.style.display = ''; });
   }
   function hideInstallBtns() {
-    installBtns.forEach((b) => { b.style.display = 'none'; });
+    document.querySelector('.page').classList.remove('can-install');
+    tabsInstallBtns.forEach((b) => { b.style.display = 'none'; });
   }
 
   // ADD TO HOME SCREEN (iOS Safari — no install API exists, so we guide manually)
