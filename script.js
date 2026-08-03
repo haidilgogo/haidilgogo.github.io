@@ -4725,13 +4725,37 @@
         </div>
       </div>`;
   }
+  // 🔴 육수 카드에 「몇 번 칸에 담겼는지」를 붙인다(2026-08-04 사용자 제안).
+  //    체크(✓)를 안 쓰는 이유가 「이미 골라서 또 못 담는다」로 읽혀서였는데(2026-08-02),
+  //    번호는 **여러 개가 붙을 수 있어** 중복해 담는 이 화면의 동작을 그대로 보여준다.
+  //    규격은 냄비 옆 목록의 번호(.mn-pot-row b)와 같은 것을 쓴다 — 값을 새로 정하지 않았다.
+  function 칸번호HTML(n) {
+    const 칸 = [];
+    broths.forEach((x, i) => { if (x === n) 칸.push(i + 1); });
+    return 칸.map((i) => `<span class="mn-card-num">${i}</span>`).join('');
+  }
+  // 번호가 셋 이상이면 두 줄로 접는다(아래 CSS) — 그래야 이름 자리를 안 뺏는다
+  function 칸번호칸수(n) {
+    return broths.filter((x) => x === n).length;
+  }
+  // 육수를 담고 뺄 때 카드의 번호만 갈아 끼운다 — 카드를 다시 그리면 그림이 깜빡인다
+  function refreshBrothNums() {
+    document.querySelectorAll('#mnBody .mn-card--broth').forEach((el) => {
+      const box = el.querySelector('.mn-card-nums');
+      if (!box) return;
+      box.innerHTML = 칸번호HTML(el.dataset.broth);
+      box.dataset.n = 칸번호칸수(el.dataset.broth);
+    });
+  }
+
   function renderPot() {
     return `<div id="mnPotTop">${renderPotTop()}</div>
       <div class="mn-grid">
         ${D.broths.map((b) => {
-          // 🔴 담겨도 체크·빨간 테두리를 붙이지 않는다(2026-08-02 사용자 지시) —
-          //    체크가 있으면 「이미 골랐으니 또 못 담는다」로 읽힌다. 중복해서 담을 수 있는 화면이다.
-          //    담긴 것은 위 냄비가 보여준다. 줄에는 누르는 반응(press)만 준다.
+          // 🔴 체크(✓)는 여전히 안 붙인다(2026-08-02 사용자 지시) —
+          //    「이미 골랐으니 또 못 담는다」로 읽히기 때문이다. 중복해서 담을 수 있는 화면이다.
+          //    대신 **몇 번 칸에 담겼는지 번호**를 붙인다(2026-08-04 사용자 제안).
+          //    번호는 여러 개가 붙을 수 있어 중복 담기를 그대로 보여준다 — 체크로는 못 하던 것이다.
           // 🔴 썸네일은 **냄비째 그린 카드용**이다 — 타일(국물만)로 바꿔봤더니 「냄비를 고르는
           //    화면」이라는 게 안 읽혔다. 타일은 냄비 칸 안에서만 쓴다.
           return `<button class="mn-card mn-card--broth ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
@@ -4741,6 +4765,7 @@
               <span class="mn-card-name">${b.n}</span>
               ${b.jeju ? '<span class="mn-card-sub">제주 한정</span>' : ''}
             </span>
+            <span class="mn-card-nums" data-n="${칸번호칸수(b.n)}">${칸번호HTML(b.n)}</span>
           </button>`;
         }).join('')}
       </div>`;
@@ -4862,6 +4887,7 @@
   function refreshPot() {
     const top = $('#mnPotTop');
     if (top) top.innerHTML = renderPotTop();
+    refreshBrothNums();          // 아래 육수 카드의 번호도 같이 맞춘다(카드는 다시 안 그린다)
     $('#potIcon').classList.toggle('has-item', !!count());
   }
 
