@@ -403,7 +403,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -411,7 +411,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -419,7 +419,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "가공육"
     },
     {
@@ -435,7 +435,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -443,7 +443,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -459,7 +459,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "가공육"
     },
     {
@@ -467,7 +467,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -475,7 +475,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -483,7 +483,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -491,7 +491,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -507,7 +507,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "가공육"
     },
     {
@@ -515,7 +515,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -523,7 +523,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -531,7 +531,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -539,7 +539,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -547,7 +547,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     },
     {
@@ -555,7 +555,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "완자·가공",
+     "up": "완자·가공류",
      "sub": "완자류"
     }
    ]
@@ -1172,7 +1172,7 @@ window.MENU_DATA = {
    ]
   },
   {
-   "up": "완자·가공",
+   "up": "완자·가공류",
    "subs": [
     "완자류",
     "가공육"
