@@ -2787,7 +2787,6 @@
     slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
-    pageEl.classList.remove('subs-hidden');   // 탭을 옮기면 하위 줄은 다시 보이는 상태로
     if (name === 'recipe') { updateBrowseCatUnderline(); requestAnimationFrame(updateBrowseCatUnderline); }
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
     // 메뉴도 같은 이유(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다, 2026-08-03)
@@ -2913,19 +2912,9 @@
   }
   // 스크롤 중엔 인디케이터가 반응하지 않는다(2026-07-21 확정) — 채워진 필이 탭 위에 그대로.
   // 구슬 변신·이동은 오직 "탭 이동(클릭·드래그)" 때만. (스크롤 출렁임을 넣었다가 제거한 이력: e853805)
-  // 🔴 메뉴 탭 하위 분류 줄은 「내리면 숨고, 올리면 나온다」(2026-08-03 사용자 확정).
-  //    하단바가 쓰던 방향 감지와 같은 방식이라 앱 안에서 낯설지 않다.
-  //    맨 위 근처(80px 이내)에서는 늘 보인다. 손 떨림으로 깜빡이지 않게 6px 둔감 구간을 둔다.
-  const SUBS_DEADZONE = 6, SUBS_TOP_KEEP = 80;
-  function syncSubsHidden(y, dy) {
-    if (Math.abs(dy) <= SUBS_DEADZONE) return;
-    const hide = dy > 0 && y > SUBS_TOP_KEEP;
-    pageEl.classList.toggle('subs-hidden', hide);
-  }
   function onScroll() {
     const y = window.scrollY;
-    if (ignoreScrollOnce) { ignoreScrollOnce = false; lastScrollY = y; return; }
-    syncSubsHidden(y, y - lastScrollY);
+    if (ignoreScrollOnce) { ignoreScrollOnce = false; }
     lastScrollY = y;
   }
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -4595,7 +4584,6 @@
   const CELL_IMG = (n) => IMG(TILE.has(n) ? n + '-타일' : n);
 
   let cur = 0;                    // 지금 탭
-  let curSub = 0;                 // 지금 하위 분류
   let cells = 2;                  // 냄비 칸 수(1·2·4)
   let broths = [];                // 고른 육수(칸 수만큼, 중복 허용)
   const picked = new Map();       // 담은 메뉴
@@ -4604,20 +4592,6 @@
   const sheetOverlay = $('#mnSheetOverlay');
 
   function count() { return picked.size + (broths.length ? 1 : 0); }
-
-  function renderSubs() {
-    const t = TABS[cur];
-    const el = $('#mnSubs');
-    // 🔴 하위 줄이 있을 때는 상단바 구분선을 끄고 하위 줄 아래에만 선을 둔다(2026-08-03 사용자 지적).
-    //    선이 없으면 카드가 붙박이 하위 줄 밑에서 잘린 채 붙어 보인다. 선이 둘이면 답답하니
-    //    상단바 + 하위 줄을 한 덩어리로 묶고 그 아래에 선 하나만 남긴다.
-    document.querySelector('.page').classList.toggle('mn-has-subs', !!t.subs);
-    if (!t.subs) { el.innerHTML = ''; el.style.display = 'none'; return; }
-    el.style.display = '';
-    el.innerHTML = t.subs.map((sub, i) =>
-      `<button class="mn-sub ${i === curSub ? 'is-on' : ''}" data-sub="${i}">${sub}</button>`
-    ).join('');
-  }
 
   // 상위 탭 하나의 항목 수. 🔴 화면에 실제로 뜨는 것만 센다 — 하위 분류(subs)에 안 걸린 항목은
   //    화면에 나오지 않으므로 데이터 총계가 아니라 하위 분류를 훑어 더한다.
@@ -4753,8 +4727,11 @@
        <button class="mn-zoom-add ${on ? 'is-on' : ''}" type="button">${on ? '담음 ✓' : '담기'}</button>`;
   }
 
+  // 🔴 하위 분류를 화면에서 걷어냈다(2026-08-03 사용자 확정) — 상위 하나를 누르면 그 안의 것이 전부 나온다.
+  //    하위 줄 하나 때문에 붙박이·구분선·방향 감지까지 세 겹을 쌓게 돼서 접었다.
+  //    데이터의 하위 분류는 그대로 살아 있고(정렬 순서를 그게 정한다), 화면에만 안 나온다.
   function renderGrid(t) {
-    const items = 하위메뉴(t.name, t.subs[curSub]);
+    const items = t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
     return `<div class="mn-grid">${items.map((it) => {
       const on = picked.has(it.n);
       const { 이름, 부제 } = 이름나누기(it.n);
@@ -4773,20 +4750,15 @@
 
   // 🔴 스크롤은 「사람이 탭을 눌렀을 때」만 위로 보낸다. 첫 렌더는 페이지가 뜨는 중이라
   //    다른 탭(레시피)을 보고 있을 수 있고, 거기서 스크롤을 건드리면 남의 화면을 움직인다.
-  // 하위 줄(붙박이) 바로 아래가 목록 첫 줄이 되도록 맞춘다. 이미 그보다 위에 있으면 그대로 둔다.
-  function scrollUnderSubs() {
-    const subs = $('#mnSubs'), body = $('#mnBody');
-    if (!subs || !body) return;
-    const topbarH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h')) || 0;
-    const y = body.getBoundingClientRect().top + window.scrollY - topbarH - subs.getBoundingClientRect().height;
-    if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
-  }
-
   function render(scrollTop) {
     renderTabs();
     renderHead();
-    renderSubs();
     const t = TABS[cur];
+    // 🔴 전골은 목록이 아니라 냄비를 고르는 화면이다 — 검색창·개수를 감춘다(2026-08-03 사용자 확정).
+    //    🔴 pageEl 은 이 모듈 밖(위쪽 IIFE)의 변수라 여기서 쓰면 안 된다 — 쓰면 렌더가 통째로 멈춘다.
+    //    🔴 이름을 'mn-pot' 으로 쓰면 안 된다 — 그건 냄비 그림(.mn-pot)의 클래스라
+    //       .page 가 그 규칙(폭·모양)을 통째로 뒤집어써서 화면이 194px 로 쪼그라든다(실제로 그랬다).
+    document.querySelector('.page').classList.toggle('mn-pot-tab', !!t.pot);
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
     $('#potIcon').classList.toggle('has-item', !!count());
     if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
@@ -4837,12 +4809,7 @@
 
     // 🔴 반드시 #mnTabs 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다
     const tab = e.target.closest('#mnTabs .tab-btn');
-    if (tab) { cur = +tab.dataset.i; curSub = 0; return render(true); }   // 상위를 옮기면 하위는 처음으로
-
-    const sub = e.target.closest('.mn-sub');
-    // 🔴 하위를 바꿀 때는 맨 위가 아니라 「붙박이 하위 줄 바로 아래」로 간다(2026-08-03).
-    //    맨 위로 보내면 방금 누른 칩이 아래로 내려가 버려 어지럽다. 목록만 새로 시작하게 한다.
-    if (sub) { curSub = +sub.dataset.sub; render(); return scrollUnderSubs(); }
+    if (tab) { cur = +tab.dataset.i; return render(true); }
 
     const seg = e.target.closest('[data-pot]');
     if (seg) {
