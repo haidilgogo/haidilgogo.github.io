@@ -3774,6 +3774,8 @@
 
   // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
   browseBackEl.addEventListener('click', goHome);
+  // 브라우즈 푸터의 「홈으로」 — 왼쪽 위 ←와 같은 일을 한다(끝까지 내려갔을 때의 나가는 길, 2026-08-03)
+  document.getElementById('footerHomeBtn').addEventListener('click', goHome);
   // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderGrid에서 자동 적용됨)
   document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
