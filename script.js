@@ -4757,12 +4757,14 @@
   function toggle(n) { picked.has(n) ? picked.delete(n) : picked.set(n, 1); }
 
   // ── 그림 확대 모달 ── 그림(줄의 29%)을 누르면 뜨고, 나머지 71%는 바로 담긴다
-  function openZoom(n) {
+  // kind = 'menu' | 'broth'. 전골(육수)도 사진을 누르면 뜬다(2026-08-04 사용자 확정) —
+  // 예전엔 여는 조건이 `.mn-card[data-menu]` 라 `data-broth` 인 전골만 확대가 안 떴다.
+  function openZoom(n, kind) {
     const dim = document.createElement('div');
     dim.className = 'mn-zoom-dim'; dim.id = 'mnZoomDim';
     // 🔴 `data-menu` 를 쓰지 않는다(2026-08-04) — 아래 담기 처리가 `[data-menu]` 를 범위 없이 찾아서
     //    모달 자신이 걸렸다. 모달 안 사진을 누르면 그 메뉴가 담겼다 빠졌다 하고 뒤 목록이 다시 그려졌다.
-    dim.innerHTML = `<div class="mn-zoom" data-zoom="${n}">
+    dim.innerHTML = `<div class="mn-zoom" data-zoom="${n}" data-kind="${kind === 'broth' ? 'broth' : 'menu'}">
       <button class="stamp-sheet-close" id="mnZoomClose" type="button" aria-label="닫기">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
       </button>
@@ -4783,13 +4785,23 @@
   function renderZoom() {
     const box = $('.mn-zoom'); if (!box) return;
     const n = box.dataset.zoom;
-    const { 이름, 부제 } = 이름나누기(n);
+    const 육수 = box.dataset.kind === 'broth';
+    // 🔴 전골은 담기 규칙이 다르다 — 중복해서 담기고, 칸 수만큼만 들어가고, 다시 눌러도 안 빠진다.
+    //    그래서 「담음 ✓」가 없다. 대신 칸이 다 차면 버튼이 「냄비가 찼어요」로 잠긴다.
+    const { 이름, 부제 } = 육수
+      ? { 이름: n, 부제: (D.broths.find((b) => b.n === n) || {}).jeju ? '제주 한정' : '' }
+      : 이름나누기(n);
     const on = picked.has(n);
+    const 버튼 = 육수
+      ? (broths.length < cells
+          ? '<button class="mn-zoom-add" type="button">담기</button>'
+          : '<button class="mn-zoom-add" type="button" disabled>냄비가 찼어요</button>')
+      : `<button class="mn-zoom-add ${on ? 'is-on' : ''}" type="button">${on ? '담음 ✓' : '담기'}</button>`;
     box.querySelector('.mn-zoom-body').innerHTML =
       `<img class="mn-zoom-img" src="${IMG(n)}" alt="">
        <span class="mn-zoom-name">${이름}</span>
        ${부제 ? `<span class="mn-zoom-sub">${부제}</span>` : ''}
-       <button class="mn-zoom-add ${on ? 'is-on' : ''}" type="button">${on ? '담음 ✓' : '담기'}</button>`;
+       ${버튼}`;
   }
 
   // 🔴 하위 분류를 화면에서 걷어냈다(2026-08-03 사용자 확정) — 상위 하나를 누르면 그 안의 것이 전부 나온다.
@@ -4881,10 +4893,20 @@
   document.addEventListener('click', (e) => {
     // 🔴 그림 클릭은 담기보다 먼저 본다 — 순서가 바뀌면 확대가 안 뜨고 담겨버린다
     const th = e.target.closest('.mn-card-thumb');
-    if (th && th.querySelector('img') && th.closest('.mn-card[data-menu]')) {
-      return openZoom(th.closest('.mn-card').dataset.menu);
+    if (th && th.querySelector('img')) {
+      const card = th.closest('.mn-card[data-menu], .mn-card[data-broth]');
+      if (card && card.dataset.menu) return openZoom(card.dataset.menu, 'menu');
+      if (card && card.dataset.broth) return openZoom(card.dataset.broth, 'broth');
     }
-    if (e.target.closest('.mn-zoom-add')) { toggle($('.mn-zoom').dataset.zoom); return renderZoom(); }
+    if (e.target.closest('.mn-zoom-add')) {
+      const box = $('.mn-zoom');
+      if (box.dataset.kind === 'broth') {
+        if (broths.length < cells) broths.push(box.dataset.zoom);
+        refreshPot();               // 뒤 냄비가 바로 채워지는 게 보인다
+        return renderZoom();        // 마지막 칸을 채웠으면 버튼이 「냄비가 찼어요」로 잠긴다
+      }
+      toggle(box.dataset.zoom); return renderZoom();
+    }
     if (e.target.closest('#mnZoomClose') || e.target.classList.contains('mn-zoom-dim')) {
       if ($('#mnZoomDim')) return closeZoom();
     }
