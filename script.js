@@ -45,7 +45,7 @@
     { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 현대타워랜드 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
     { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
     // 오픈 예정(2026-07-24 추가) — 안산점과 같은 방식으로 STORE_CATCH만 'soon'을 둔다(제목 옆 배지는 사용자가 뺐음).
-    // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 발도장 매장 선택 비활성이 동시에 걸린다.
+    // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 스티커 매장 선택 비활성이 동시에 걸린다.
     // 🔴 주소는 도로명까지만 확정 — 건물명은 오픈 확정 후 사용자가 알려주면 채운다. 영업시간·전화도 그때.
     { region: '부산', name: '부산점',    addr: '부산 부산진구 중앙대로 654',                     hours: '미정' },
     { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
@@ -68,7 +68,7 @@
     '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
     '안산점': 'soon', // 2026-07-25 오픈 예정 — 캐치테이블 아직 안 열림. 열리면 'soon'을 실제 URL로 교체.
-    '부산점': 'soon', // 오픈 예정(서면) — 이 값이 발도장 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
+    '부산점': 'soon', // 오픈 예정(서면) — 이 값이 스티커 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
   };
 
   // 재료 표시 순서: SAUCE_BAR 배열 순서를 기준으로 자동 정렬(렌더 시에만 정렬, 원본 데이터는 그대로).
@@ -2252,7 +2252,7 @@
   syncTopbarH();
   window.addEventListener('resize', syncTopbarH);
 
-  // 데스크톱 우클릭으로 이미지 저장·복사 막기 — 사이트 모든 <img>(로고·카드/모달 썸네일·발도장 스티커 등)에
+  // 데스크톱 우클릭으로 이미지 저장·복사 막기 — 사이트 모든 <img>(로고·카드/모달 썸네일·스티커 등)에
   // 컨텍스트 메뉴 차단. 문서 위임이라 나중에 동적 생성되는 이미지도 자동 적용.
   // ⚠️ 완벽한 보호 아님(개발자도구·네트워크 탭으로 우회 가능) — 무심코 저장하는 것만 억제.
   document.addEventListener('contextmenu', (e) => {
@@ -2260,7 +2260,7 @@
   });
 
   // 상세/모달이 열린 채 상단바(탭·검색·즐겨찾기 등)를 누르면 닫고 그 동작을 그대로 실행
-  // (발도장 보기 모달도 지역 탭 누르면 닫히고 그 지역으로 필터 — 레시피 상세와 동일 규칙)
+  // (스티커 보기 모달도 지역 탭 누르면 닫히고 그 지역으로 필터 — 레시피 상세와 동일 규칙)
   // ⚠️ 공유 버튼(#topShareBtn)은 화면/섹션을 바꾸지 않으므로 예외 — 캡처 단계라 이 리스너가 버튼 자체의
   // 클릭 핸들러보다 먼저 실행돼, 예외 없이는 모달이 열린 채 공유를 눌러도 모달이 먼저 닫혀버렸다(2026-07-25 버그 수정).
   topbarEl.addEventListener('click', (e) => {
@@ -3187,7 +3187,7 @@
     document.body.removeChild(ta);
   }
 
-  // ===== 발도장 (방문 스티커 기록장) =====
+  // ===== 스티커 (방문 기록장) =====
   // 저장 = 이 기기 localStorage에만(즐겨찾기와 동일, 로그인 없음). 나중에 서버 이전이 쉽게
   // 버전 있는 JSON 한 덩어리로 보관: { version: 1, stamps: { 지점명: { date, memo } } }
   const STAMPS_KEY = 'haidilao_stamps';
@@ -3254,7 +3254,7 @@
     return card;
   }
 
-  // 발도장 지역 탭은 쓰지 않는다(2026-07-24 사용자 확정). 상단바에서 UI를 뺀 뒤 남아 있던
+  // 스티커 지역 탭은 쓰지 않는다(2026-07-24 사용자 확정). 상단바에서 UI를 뺀 뒤 남아 있던
   // 필터 코드(activeStampRegion·STAMP_REGION_OF·renderStampTabs·밑줄 계산)를 전부 제거했다.
   // 기록은 지역 구분 없이 항상 전체가 최신순으로 보인다. 되살릴 일이 생기면 매장 탭 지역탭을 참고할 것.
 
@@ -3328,7 +3328,7 @@
     stampCardCache.forEach((_, id) => { if (!liveIds.has(id)) stampCardCache.delete(id); });
   }
 
-  // ── 발도장 입력 시트: 점선 슬롯 → 지점 선택 → "발도장 찍기" → 스티커 탁!(stampPop) ──
+  // ── 스티커 입력 시트: 점선 슬롯 → 지점 선택 → "기록하기" → 스티커 탁!(stampPop) ──
   const stampSheetOverlay = document.getElementById('stampSheetOverlay');
   const stampSheetEl = stampSheetOverlay.querySelector('.stamp-sheet'); // 시트 안쪽 스크롤 컨테이너
   const stampSheetClose = document.getElementById('stampSheetClose');
@@ -3351,7 +3351,7 @@
     const n = new Date();
     return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
   }
-  // 발도장 = 방문 기록이라 미래 날짜는 무의미 → 오늘 이후 선택 금지. max로 달력에서 미래를 비활성화하고,
+  // 스티커 = 방문 기록이라 미래 날짜는 무의미 → 오늘 이후 선택 금지. max로 달력에서 미래를 비활성화하고,
   // 혹시 미래 값이 들어오면(직접 입력·기존 데이터) 오늘로 되돌린다.
   function clampStampDate() {
     const max = todayIso();
@@ -3642,7 +3642,7 @@
     }
   });
 
-  // ── 발도장 보기 모달 (카드 탭 시, 읽기 전용 + 수정/삭제) ──
+  // ── 스티커 보기 모달 (카드 탭 시, 읽기 전용 + 수정/삭제) ──
   const stampViewOverlay = document.getElementById('stampViewOverlay');
   const stampViewSticker = document.getElementById('stampViewSticker');
   const stampViewInfo = document.getElementById('stampViewInfo');
@@ -3775,7 +3775,7 @@
     renderStamps();
   });
 
-  // 상단바 ✏️ 기록하기(발도장 섹션 전용) → 새로 찍기 시트
+  // 상단바 ✏️ 기록하기(스티커 섹션 전용) → 새로 찍기 시트
   const stampWriteBtn = document.getElementById('stampWriteBtn');
   if (stampWriteBtn) stampWriteBtn.addEventListener('click', () => {
     if (stampSheetOverlay.classList.contains('open')) return; // 이미 작성 중이면 무시 — 다시 누르면 입력 리셋되던 것 방지
@@ -4045,7 +4045,7 @@
   favShareBtn.addEventListener('click', shareSite);
   topShareBtn.addEventListener('click', shareSite);
   if (storeShareBtn) storeShareBtn.addEventListener('click', shareSite);
-  const stampShareBtn = document.getElementById('stampShareBtn'); // 발도장 섹션(모바일) 공유 버튼
+  const stampShareBtn = document.getElementById('stampShareBtn'); // 스티커 섹션(모바일) 공유 버튼
   if (stampShareBtn) stampShareBtn.addEventListener('click', shareSite);
 
   // ════════════════════════════════════════════════════════════════════════

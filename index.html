@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
-// iOS 사파리: 16px 미만 입력칸(발도장 메모 등)을 누르면 화면이 자동 확대되는 것 방지.
+// iOS 사파리: 16px 미만 입력칸(스티커 메모 등)을 누르면 화면이 자동 확대되는 것 방지.
 // maximum-scale=1은 iOS(10+)에선 이 자동 확대만 막고 손가락 핀치줌은 그대로 허용됨.
 // 안드로이드에선 핀치줌까지 막아버리므로(접근성 문제) iOS 기기에서만 적용.
 (function () {
@@ -47,8 +47,8 @@
 <!-- 🔴 og:description은 위 description(74자)과 일부러 다르게 짧게 둔다. 이건 카톡·트위터
      공유 카드에 뜨는 설명이고, 카톡은 두 줄쯤에서 잘라버린다. 긴 문장을 넣으면 문장 중간이
      잘려 카드가 지저분해진다. 검색용은 길게, 공유 카드용은 짧게 — 역할이 다르다.
-     ⚠️ `꿀팁`은 쓰지 말 것 (2026-07-30 사용자 지시로 제거). `발도장`도 화면 문구로 쓰지 않는다 —
-        탭 라벨은 `스티커`다(코드 주석·내부 변수명에만 발도장이 남아 있다). -->
+     ⚠️ `꿀팁`은 쓰지 말 것 (2026-07-30 사용자 지시로 제거). `스티커`도 화면 문구로 쓰지 않는다 —
+        탭 라벨은 `스티커`다(코드 주석·내부 변수명에만 스티커이 남아 있다). -->
 <meta property="og:description" content="하이디라오(훠궈) 소스·레시피 모음">
 <meta property="og:image" content="https://haidilgogo.com/assets/icons/og-image-v6.jpg?v=1">
 <meta property="og:image:type" content="image/jpeg">
@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=680">
+<link rel="stylesheet" href="styles.css?v=681">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -490,7 +490,7 @@
       </footer>
     </div>
 
-    <!-- 발도장 섹션 — 다녀온 매장을 기록하는 방문 일기(수집 아님: 진행바·총계 없음) -->
+    <!-- 스티커 섹션 — 다녀온 매장을 기록하는 방문 일기(수집 아님: 진행바·총계 없음) -->
     <div class="view" id="view-stamp" hidden>
       <div class="stamps-head">
         <p class="count-line stamps-count">다녀온 하이디라오 매장 <span class="count-num" id="stampCountNum">0</span>곳</p>
@@ -599,7 +599,7 @@
   </button>
 </nav>
 
-<!-- 담은 목록 시트 — 상단바 냄비 아이콘에서 열림. 발도장 시트(.stamp-sheet)와 같은 껍데기를 쓴다 -->
+<!-- 담은 목록 시트 — 상단바 냄비 아이콘에서 열림. 스티커 시트(.stamp-sheet)와 같은 껍데기를 쓴다 -->
 <div class="stamp-sheet-overlay" id="mnSheetOverlay" aria-hidden="true">
   <div class="stamp-sheet" role="dialog" aria-modal="true" aria-label="담은 목록">
     <button class="stamp-sheet-close" id="mnSheetClose" type="button" aria-label="닫기">
@@ -613,7 +613,7 @@
   </div>
 </div>
 
-<!-- 발도장 입력 시트 — ➕에서 열림. 점선 슬롯에 지점 고르고 찍으면 스티커가 탁! 붙음 -->
+<!-- 스티커 입력 시트 — ➕에서 열림. 점선 슬롯에 지점 고르고 찍으면 스티커가 탁! 붙음 -->
 <div class="stamp-sheet-overlay" id="stampSheetOverlay" aria-hidden="true" inert>
   <div class="stamp-sheet" role="dialog" aria-modal="true" aria-label="스티커 붙이기">
     <button class="stamp-sheet-close" id="stampSheetClose" type="button" aria-label="닫기">
@@ -741,7 +741,7 @@
   </div>
 </div>
 
-<!-- 발도장 보기 모달 — 카드 탭 시(읽기 전용). 아래 수정/삭제, 수정 누르면 위 입력 시트가 뜸 -->
+<!-- 스티커 보기 모달 — 카드 탭 시(읽기 전용). 아래 수정/삭제, 수정 누르면 위 입력 시트가 뜸 -->
 <div class="stamp-view-overlay" id="stampViewOverlay" aria-hidden="true" inert>
   <div class="stamp-view" role="dialog" aria-modal="true" aria-label="스티커 기록">
     <button class="stamp-view-close" id="stampViewClose" type="button" aria-label="닫기">
@@ -1025,7 +1025,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=3"></script>
-<script src="script.js?v=567"></script>
+<script src="script.js?v=568"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
