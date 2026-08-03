@@ -4974,8 +4974,11 @@ img {
   font-family:inherit; cursor:pointer;
 }
 .mn-card.is-on { border-color:var(--brand-red); border-width:2px; }
+/* 🔴 누르는 반응은 전골이든 아니든 똑같다(2026-08-04 사용자 지적).
+   예전엔 전골 카드만 `border-color:빨강 + scale(.97)` 이라 눌렀을 때 느낌이 달랐다.
+   빨간 테두리는 특히 안 된다 — 전골 카드에 빨강을 안 붙이기로 한 결정(2026-08-02)과 정면으로 어긋난다.
+   「이미 골라서 또 못 담는다」로 읽히는 걸 피하려던 것인데, 누를 때만 잠깐 그 색이 됐던 셈이다. */
 .mn-card:active { transform:translateY(1px); }
-.mn-card[data-broth]:active { border-color:var(--brand-red); transform:scale(.97); }
 @media (hover:hover) { .mn-card[data-broth]:hover { border-color:var(--card-hover-border); } }
 .mn-card-thumb {
   flex:none; width:80px; height:80px; border-radius:8px;
@@ -5033,7 +5036,8 @@ img {
    🔴 전골도 리스트다(2026-08-02 사용자 확정). 격자를 남기지 않는다.
    썸네일은 카드용(냄비째)을 쓴다 — 타일(국물만)로 해봤더니 냄비가 사라져
    「고르는 화면」이라는 게 안 읽혔다. 타일은 위 냄비 칸 안에서만 쓴다. */
-.mn-card--broth:active { transform:scale(.99); }
+/* (여기 있던 `.mn-card--broth:active { scale(.99) }` 는 지웠다 — 특정도가 낮아 위 규칙에 늘 져서
+   한 번도 화면에 나온 적이 없는 죽은 규칙이었다) */
 
 /* 「일부 매장」·「제주 한정」은 부제 자리에 붙는다(리스트라 배지를 얹을 자리가 없다) */
 .mn-card-part { color:#8A7468; }

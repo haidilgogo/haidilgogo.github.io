@@ -4687,7 +4687,9 @@
   // 「1 맛 / 2가지 맛」 대신 「1칸 / 2칸 / 4칸」으로 확정(2026-08-02 사용자)
   const potLabel = (n) => n + '칸';
 
-  function renderPot() {
+  // 🔴 냄비 영역과 육수 목록을 따로 그린다(2026-08-04) — 육수를 담을 때마다 통째로 다시 그렸더니
+  //    아래 육수 카드 12장의 <img> 가 매번 새로 만들어져 그림이 깜빡였다. 바뀌는 것은 냄비뿐이다.
+  function renderPotTop() {
     return `
       <div class="mn-pot-seg">
         ${POTS.map((n) => `<button data-pot="${n}" class="${n === cells ? 'is-on' : ''}">${potLabel(n)}</button>`).join('')}
@@ -4714,7 +4716,10 @@
                    (b ? `<button class="mn-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
           }).join('')}
         </div>
-      </div>
+      </div>`;
+  }
+  function renderPot() {
+    return `<div id="mnPotTop">${renderPotTop()}</div>
       <div class="mn-grid">
         ${D.broths.map((b) => {
           // 🔴 담겨도 체크·빨간 테두리를 붙이지 않는다(2026-08-02 사용자 지시) —
@@ -4773,7 +4778,7 @@
     const dim = $('#mnZoomDim');
     if (dim) dim.remove();
     document.documentElement.style.overflow = '';
-    render();
+    refreshCards();   // 통째로 다시 그리지 않는다 — 닫을 때도 그림이 깜빡였다
   }
   function renderZoom() {
     const box = $('.mn-zoom'); if (!box) return;
@@ -4822,6 +4827,23 @@
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
     $('#potIcon').classList.toggle('has-item', !!count());
     if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
+  }
+
+  // 🔴 담기·빼기는 **다시 그리지 않는다**(2026-08-04 사용자 지적) — `#mnBody` 를 통째로 새로 쓰면
+  //    그 안의 <img> 가 전부 새로 만들어져 그림 64장이 한꺼번에 깜빡였다.
+  //    바뀌는 것은 카드의 테두리(is-on)와 냄비 아이콘뿐이라 클래스만 갈아 끼운다.
+  //    (레시피 탭이 browseCardCache 로 푼 것과 같은 문제다)
+  function refreshCards() {
+    document.querySelectorAll('#mnBody .mn-card[data-menu]').forEach((el) => {
+      el.classList.toggle('is-on', picked.has(el.dataset.menu));
+    });
+    $('#potIcon').classList.toggle('has-item', !!count());
+  }
+  // 전골 화면 — 냄비만 다시 그린다. 아래 육수 카드 12장은 손대지 않는다.
+  function refreshPot() {
+    const top = $('#mnPotTop');
+    if (top) top.innerHTML = renderPotTop();
+    $('#potIcon').classList.toggle('has-item', !!count());
   }
 
   function renderSheet() {
@@ -4879,18 +4901,19 @@
       return render(true);
     }
 
+    // 🔴 아래 넷은 render() 를 부르지 않는다(2026-08-04) — 통째로 다시 그리면 그림이 깜빡인다.
     const seg = e.target.closest('[data-pot]');
     if (seg) {
       cells = +seg.dataset.pot;
       if (broths.length > cells) broths = broths.slice(0, cells);   // 칸이 줄면 뒤에서 덜어낸다
-      return render();
+      return refreshPot();
     }
 
     // 냄비 칸을 누르거나 오른쪽 목록의 ✕ 를 눌러 뺀다
     const cell = e.target.closest('[data-cell]');
     if (cell) {
       const i = +cell.dataset.cell;
-      if (i < broths.length) { broths.splice(i, 1); return render(); }
+      if (i < broths.length) { broths.splice(i, 1); return refreshPot(); }
       return;
     }
 
@@ -4899,24 +4922,24 @@
     const bc = e.target.closest('[data-broth]');
     if (bc) {
       if (broths.length < cells) broths.push(bc.dataset.broth);
-      return render();
+      return refreshPot();
     }
 
     // 🔴 반드시 `.mn-card` 안으로 좁힌다 — 위 #mnTabs .tab-btn 과 같은 이유다.
     //    범위 없이 `[data-menu]` 만 찾으면 목록 밖에 있는 것까지 담기 처리로 빨려 들어간다.
     const mc = e.target.closest('.mn-card[data-menu]');
-    if (mc) { toggle(mc.dataset.menu); return render(); }
+    if (mc) { toggle(mc.dataset.menu); return refreshCards(); }
 
     if (e.target.closest('#potToggleBtn')) return openSheet();
     // 어두운 배경이나 X 를 누르면 닫는다(시트 안쪽을 눌렀을 때는 안 닫힌다)
     if (e.target.closest('#mnSheetClose') || e.target === sheetOverlay) return closeSheet();
     if (e.target.closest('#mnSheetClear')) {
-      picked.clear(); broths = []; renderSheet(); return render();
+      picked.clear(); broths = []; renderSheet(); refreshCards(); return refreshPot();
     }
     const rm = e.target.closest('[data-rm]');
-    if (rm) { picked.delete(rm.dataset.rm); renderSheet(); return render(); }
+    if (rm) { picked.delete(rm.dataset.rm); renderSheet(); return refreshCards(); }
     const rmb = e.target.closest('[data-rm-broth]');
-    if (rmb) { broths.splice(+rmb.dataset.rmBroth, 1); renderSheet(); return render(); }
+    if (rmb) { broths.splice(+rmb.dataset.rmBroth, 1); renderSheet(); return refreshPot(); }
   });
 
   // Esc — 앱의 다른 시트·모달과 같게 (확대가 떠 있으면 확대부터 닫는다)
