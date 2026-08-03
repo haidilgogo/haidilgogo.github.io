@@ -4773,9 +4773,12 @@ img {
 .column-footer {
   padding: 22px 22px calc(34px + env(safe-area-inset-bottom));
 }
-/* 레시피 상세 하단 닫기도 같은 모양 — 두 패널의 '나가기'가 달라 보이면 안 된다(2026-07-28) */
+/* 레시피 상세 하단 닫기도 같은 모양 — 두 패널의 '나가기'가 달라 보이면 안 된다(2026-07-28)
+   🔴 좌우 여백을 뗐다(2026-08-03) — .modal 이 이미 20px 을 갖고 있어서 여기서 16px 을 더 주면
+   버튼만 36px 안쪽이 됐다(321px). 모달 본문(설명·재료 상자)은 353px 이라 버튼만 좁아 보였다.
+   버튼은 그 화면의 본문선에 맞춘다 — 브라우즈 353·아티클 349 도 각자 본문선과 같다. */
 .modal-footer {
-  padding: 14px 16px calc(20px + env(safe-area-inset-bottom));
+  padding: 14px 0 calc(20px + env(safe-area-inset-bottom));
 }
 /* 브라우즈 맨 아래 「홈으로」도 같은 모양에 얹는다(2026-08-03) — 나가는 버튼이 화면마다 달라 보이면 안 된다 */
 .column-bottom-close,
