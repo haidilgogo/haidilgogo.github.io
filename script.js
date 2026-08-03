@@ -4617,9 +4617,13 @@
   // 🔴 화면 분류는 공식 2단이다(메뉴.md 「화면 분류」). 상위 = 전골·육류·야채류·디저트.
   //    D.tabs 의 7개 묶음은 자료 정리용이라 화면에 쓰지 않는다 — items 만 꺼내 쓴다.
   const ALL = D.tabs.flatMap((t) => t.items);
-  const TABS = [{ name: '전골', pot: true }].concat(
+  // 🔴 탭은 성격이 다른 셋이 한 줄에 있다(2026-08-04 사용자 확정):
+  //    전골(냄비 고르기) │ 전체메뉴(130개 훑기) · 상위 분류 7개.
+  //    전골과 나머지 사이에만 세로 구분선을 넣는다 — 전골만 「목록」이 아니라서다(renderTabs 참고).
+  const TABS = [{ name: '전골', pot: true }, { name: '전체메뉴', all: true }].concat(
     D.cats.map((g) => ({ name: g.up, subs: g.subs }))
   );
+  const 분류탭 = () => TABS.filter((t) => t.subs);   // 전골·전체메뉴를 뺀 상위 7개
   const 하위메뉴 = (up, sub) => ALL.filter((it) => it.up === up && it.sub === sub);
   // 상위 하나에 딸린 항목 전부. 🔴 순서는 하위 분류가 정한다 — 하위는 화면에 안 나오지만
   //    「소양돈고기 다음 닭고기」 같은 줄 세우기는 그대로 살아 있다(2026-08-03 확정 참고).
@@ -4650,9 +4654,9 @@
   // 상위 탭 하나의 항목 수. 🔴 화면에 실제로 뜨는 것만 센다 — 하위 분류(subs)에 안 걸린 항목은
   //    화면에 나오지 않으므로 데이터 총계가 아니라 하위 분류를 훑어 더한다.
   //    하위 분류를 눌러도 숫자는 안 바뀐다(상위 카테고리 개수다).
-  const 탭개수 = (t) => t.pot
-    ? D.broths.length
-    : t.subs.reduce((a, sub) => a + 하위메뉴(t.name, sub).length, 0);
+  const 탭개수 = (t) => t.pot ? D.broths.length
+    : t.all ? 분류탭().reduce((a, x) => a + 상위메뉴(x).length, 0)
+    : 상위메뉴(t).length;
 
   function renderHead() {
     // 검색 중에는 분류가 아니라 「검색 결과 N개」다 — 레시피 탭의 목록 제목과 같은 문구를 쓴다
@@ -4688,7 +4692,8 @@
     // 🔴 밑줄(.tabs-underline)은 지우지 않는다 — 버튼만 갈아 끼운다(레시피 renderBrowseCatTabs 와 같은 방식).
     //    통째로 새로 그리면 밑줄이 옛 위치를 잃어 0 에서 다시 미끄러진다.
     const wrap = $('#mnTabs');
-    wrap.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    // 구분선도 같이 걷어낸다 — 안 그러면 다시 그릴 때마다 한 줄씩 쌓인다
+    wrap.querySelectorAll('.tab-btn, .mn-tab-div').forEach((b) => b.remove());
     TABS.forEach((t, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -4696,6 +4701,13 @@
       btn.dataset.i = i;
       btn.textContent = t.name;
       wrap.appendChild(btn);
+      // 전골 다음에만 세로 구분선 — 전골은 목록이 아니라 냄비를 고르는 화면이라 성격이 다르다
+      if (t.pot) {
+        const div = document.createElement('span');
+        div.className = 'mn-tab-div';
+        div.setAttribute('aria-hidden', 'true');
+        wrap.appendChild(div);
+      }
     });
     updateMenuUnderline();
   }
@@ -4870,13 +4882,29 @@
     return `<div class="mn-list">${상위메뉴(t).map(카드HTML).join('')}</div>`;
   }
 
+  // 묶음 소제목이 붙은 목록. 🔴 「전체메뉴」와 「검색 결과」가 같은 것을 쓴다 — 둘 다
+  //    여러 분류가 한 화면에 섞이는 목록이라, 값을 두 벌로 두면 저절로 어긋난다.
+  function 묶음목록HTML(groups) {
+    return `<div class="mn-list">${groups.map((g) =>
+      `<p class="mn-group">${g.up}</p>${g.items.map(카드HTML).join('')}`
+    ).join('')}</div>`;
+  }
+
+  // 전체메뉴 — 육수를 뺀 130개를 상위 일곱 덩이로 끊어 보여준다(2026-08-04 사용자 확정).
+  // 소제목 없이 이으면 한 덩이가 대략 17,000px 이라 지금 어디를 보는지 알 수 없다.
+  function renderAllMenus() {
+    return 묶음목록HTML(분류탭().map((t) => ({ up: t.name, items: 상위메뉴(t) })));
+  }
+
   /* ── 검색 ──────────────────────────────────────────────────────────────────
      🔴 대상은 **화면에 보이는 이름 + 부제**다(2026-08-03 확정). 즉 이름나누기()를 거친 값이라
         `하이디라오 특제소고기` 는 `특제소고기` 로도, `하이디라오` 로도 걸린다.
         「제주 한정」·「일부 매장」 꼬리표는 **대상이 아니다** — 그건 메뉴 이름이 아니라 상태 표시다.
-     🔴 범위는 **8개 분류 전체**다(2026-08-04 사용자 확정). 레시피 탭처럼 분류와 겹치는 AND 가
-        아니다 — 메뉴 탭엔 「전체」 탭이 없어서 AND 로 하면 다른 분류의 메뉴를 찾을 길이 없다.
-        대신 결과에 「고기 › 소고기」 소제목을 붙여 어디 것인지 보인다.
+     🔴 범위는 **분류를 가로지른다**(2026-08-04 사용자 확정). 어느 탭에서 치든 130개 전부에서
+        찾는다 — 레시피 탭처럼 분류와 겹치는 AND 가 **아니다**.
+        ⚠️ 나중에 「전체메뉴」 탭이 생겼지만 이 규칙은 그대로 두기로 했다(같은 날 재확인) —
+        AND 로 바꾸면 「전체메뉴로 먼저 가야 한다」를 모르는 사람이 막힌다.
+        대신 결과에 상위 분류 소제목을 붙여 어디 것인지 보인다.
      🔴 전골(육수 12개)은 대상에서 뺀다(2026-08-04 사용자 확정) — 전골은 목록이 아니라 냄비를
         고르는 화면이고, 담는 규칙(칸 번호·중복 담기)이 달라 결과 안에서 따로 논다.
      🔴 묶음 소제목은 **상위 한 단만** 쓴다(2026-08-04 사용자 지적). 화면에서 하위 분류는
@@ -4893,7 +4921,7 @@
   //    검색창에 걸려 목록이 이상하다」가 되므로, 여기 한 곳에서 함께 막는다.
   const 검색중 = () => !!query.trim() && !TABS[cur].pot;
 
-  // 상위 › 하위 묶음 배열을 돌려준다. 화면 순서는 탭 순서 그대로다(전골은 건너뛴다).
+  // 상위별 묶음 배열을 돌려준다. 화면 순서는 탭 순서 그대로다(전골·전체메뉴는 분류가 아니라 건너뛴다).
   function 검색결과() {
     const q = query.trim();
     const nq = 검색꼴(q);
@@ -4903,8 +4931,7 @@
       return 대상.includes(q) || (nq && 검색꼴(대상).includes(nq));
     };
     const out = [];
-    TABS.forEach((t) => {
-      if (t.pot) return;
+    분류탭().forEach((t) => {
       const items = 상위메뉴(t).filter(걸린다);
       if (items.length) out.push({ up: t.name, items });
     });
@@ -4914,9 +4941,7 @@
   function renderSearch() {
     const groups = 검색결과();
     if (!groups.length) return `<p class="empty-state">검색 결과가 없어요</p>`;
-    return `<div class="mn-list">${groups.map((g) =>
-      `<p class="mn-group">${g.up}</p>${g.items.map(카드HTML).join('')}`
-    ).join('')}</div>`;
+    return 묶음목록HTML(groups);
   }
 
   // 🔴 스크롤은 「사람이 탭을 눌렀을 때」만 위로 보낸다. 첫 렌더는 페이지가 뜨는 중이라
@@ -4932,6 +4957,7 @@
     document.querySelector('.page').classList.toggle('mn-pot-tab', !!t.pot);
     $('#mnBody').innerHTML = t.pot ? renderPot()
       : 검색중() ? renderSearch()
+      : t.all ? renderAllMenus()
       : renderMenuList(t);
     $('#potIcon').classList.toggle('has-item', !!count());
     if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
@@ -4967,8 +4993,7 @@
     //    적었는데, 그건 상위가 `육류`이던 4분류 시절 것이다. 오늘 8분류로 다시 묶으면서
     //    「내장 › 내장류」처럼 같은 말이 두 번 나오는 자리가 됐고, 하위는 애초에 화면에서
     //    걷어낸 단이다(2026-08-03 확정). 검색 결과 소제목과 같은 규칙을 쓴다.
-    TABS.forEach((t) => {
-      if (t.pot) return;
+    분류탭().forEach((t) => {
       const on = 상위메뉴(t).filter((it) => picked.has(it.n));
       if (!on.length) return;
       rows.push(`<p class="mn-sheet-group">${t.name}</p>`);

@@ -4976,6 +4976,10 @@ img {
    320px에서 긴 이름이 두 줄로 감겼다. 리스트는 이름·부제·담기가 한 줄에 들어간다.
    🔴 그림 80px 은 상한선이다 — 88px 로 키우면 320px 에서 「이베리코 흑돼지목살」이 잘린다(재서 확인). */
 .mn-list { display:block; }
+/* 전골과 나머지 분류 사이 세로 구분선(2026-08-04 사용자 제안) — 전골만 목록이 아니라
+   냄비를 고르는 화면이라 성격이 다르다. 색은 푸터 구분선(#F0DCD4)과 같은 것을 쓴다.
+   🔴 탭줄(.tabs)의 gap 이 22px 이라 선 좌우로 22px 씩 벌어진다. 선 자체엔 여백을 주지 않는다. */
+.mn-tab-div { flex:none; align-self:center; width:1px; height:14px; background:#F0DCD4; }
 .mn-card {
   position:relative; display:flex; align-items:center; gap:12px;
   width:100%; margin:0 0 8px; padding:10px 12px; text-align:left;
