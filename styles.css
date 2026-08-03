@@ -5034,12 +5034,13 @@ img {
 .mn-card-check {
   flex:none; width:28px; height:28px; border-radius:50%;
   /* 🔴 테두리와 ✓ 는 같은 색이다(2026-08-04 사용자 확정) — currentColor 로 묶어 두 값이 안 갈리게 한다.
-     색은 **앱 공통 아이콘색 #4D4139**(하단바 비활성 탭·상단바 아이콘과 같은 값).
-     옛 색은 카드 테두리(--card-border #E6D4BA)를 그냥 가져다 쓴 것이었는데 왜 그랬는지 정한 기록이 없었고,
-     흰 카드 위 대비가 1.45:1 이라 「담기 전」이 거의 안 보였다(→ 9.86:1).
+     옛 테두리는 카드 테두리(--card-border #E6D4BA)를 그냥 가져다 쓴 것이었는데 왜 그랬는지 정한 기록이 없었고,
+     흰 카드 위 대비가 1.45:1 이라 「담기 전」이 거의 안 보였다.
+     ⚠️ 앱 공통 아이콘색 #4D4139(9.86:1)로도 해봤는데 **너무 진했다**(2026-08-04 사용자 판단) —
+        21개 카드에 진한 동그라미가 전부 서니 목록이 시끄러웠다. 되돌리지 말 것.
      담기면 아래 규칙이 테두리·배경을 브랜드 빨강으로 덮으므로 이 색은 담기 전에만 쓰인다. */
   border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center;
-  color:#4D4139;
+  color:#C9BCA8;   /* 대비 1.87 : 1 */
 }
 .mn-card.is-on .mn-card-check { border-color:var(--brand-red); background:var(--brand-red); color:#fff; }
 /* 🔴 전골 육수 카드의 「몇 번 칸」 번호(2026-08-04 사용자 제안).
