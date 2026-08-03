@@ -1342,7 +1342,6 @@
   // 홈 = 필터가 하나도 없는 기본 상태. 검색·즐겨찾기·카테고리 전체보기·인물 보기가 켜지면 그리드 뷰.
   const viewRecipeEl = document.getElementById('view-recipe');
   const listTitleEl = document.getElementById('listTitle');
-  const searchCountEl = document.getElementById('searchCount');
 
   function browseTitle() {
     if (query.trim()) return '검색 결과';
@@ -1493,8 +1492,6 @@
     const filtered = getFiltered();
     listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
-    // 개수 줄은 검색 중에만 보인다(2026-08-03) — 평소엔 바로 아래 카드가 보여 숫자가 할 일이 없다
-    searchCountEl.hidden = !query.trim();
     renderBrowseCatTabs();
     gridEl.innerHTML = '';
     if (filtered.length === 0) {

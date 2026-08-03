@@ -553,8 +553,8 @@ img {
 .list-head {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* 개수줄↔탭줄. 매장·메뉴 탭과 통일(2026-08-03, 기존 16px) */
-  margin: 0 0 16px;
+  gap: 10px; /* 옛 개수줄↔탭줄 간격. 지금 이 안엔 검색창 한 줄뿐이라 쓰이지 않는다 */
+  margin: 0 0 18px; /* 검색창 → 개수 줄. 아래 6px 과 짝 — 개수는 카드의 머리말이라 카드 쪽에 붙인다 */
 }
 
 /* 검색창 한 줄 — 카테고리가 상단바로, 개수가 검색 중 전용으로 빠지면서 이 줄엔 검색창만 남았다 */
@@ -564,14 +564,14 @@ img {
   gap: 12px;
 }
 
-/* 검색 중에만 뜨는 결과 수 — 카드 바로 위 회색 한 줄 */
-.search-count {
-  margin: 0 0 10px;
+/* 개수 — 검색창 아래 왼쪽 정렬 한 줄(2026-08-03 사용자 확정).
+   카드와 같은 왼쪽 선(20px)에서 시작한다. */
+.list-count {
+  margin: 0 0 6px;   /* 🔴 위 18px 과 짝이다 — 위아래가 같으면 이 줄이 검색창 것인지 카드 것인지 애매해진다 */
   font-size: 13px;
   color: #AD8177;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
 }
-.search-count[hidden] { display: none; }
 .count-line {
   flex: none;
   margin: 0;
@@ -889,7 +889,7 @@ img {
   }
 
   .list-head {
-    margin-bottom: 12px; /* 툴바~그리드도 카드 간격과 동일하게 */
+    margin-bottom: 18px; /* 검색창 → 개수 줄(2026-08-03). 개수 → 카드는 6px 이라 소속이 분명해진다 */
   }
 
   .recipe-grid {

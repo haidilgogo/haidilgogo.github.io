@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=648">
+<link rel="stylesheet" href="styles.css?v=650">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -397,9 +397,9 @@
           </div>
         </div>
       </div>
-      <!-- 검색 중일 때만 보인다 — 「몇 개 걸렸나」는 검색에서만 궁금한 값이다(2026-08-03).
-           0개일 때는 아래 「검색 결과가 없어요」 화면이 대신 말해준다. -->
-      <p class="search-count" id="searchCount" hidden><span id="listTitle">검색 결과</span> <span class="count-num" id="countNum">0</span>개</p>
+      <!-- 개수 — 검색창 아래 왼쪽 정렬로 늘 보인다(2026-08-03 사용자 확정).
+           카테고리에 따라 `레시피 33개`·`소스 20개`로 바뀌고, 검색 중엔 `검색 결과 4개`가 된다. -->
+      <p class="list-count" id="listCount"><span id="listTitle">레시피</span> <span class="count-num" id="countNum">0</span>개</p>
       <div class="recipe-grid" id="recipeGrid"></div>
       <!-- 맨 위로(2026-08-03 사용자 확정) — 목록이 길어 끝까지 내려간 뒤 되올라가는 길.
            🔴 푸터 구분선 「위」다. 하단바에서 지금 탭을 한 번 더 눌러도 같은 일이 일어난다.
@@ -1018,7 +1018,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=545"></script>
+<script src="script.js?v=546"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
