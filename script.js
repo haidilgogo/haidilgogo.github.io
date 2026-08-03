@@ -4913,14 +4913,18 @@
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
   }
 
+  // 🔴 창이 떠 있는 동안 상단바 냄비를 눌린 모습(빨강)으로 둔다(2026-08-04 사용자 확정) —
+  //    「이 창이 이 아이콘에서 나왔다」가 보여야 한다. 표시는 CSS 가 하고 여기선 클래스만 붙인다.
   function openSheet() {
     renderSheet();
     sheetOverlay.classList.add('open');
     sheetOverlay.setAttribute('aria-hidden', 'false');
+    $('#potToggleBtn').classList.add('is-open');
   }
   function closeSheet() {
     sheetOverlay.classList.remove('open');
     sheetOverlay.setAttribute('aria-hidden', 'true');
+    $('#potToggleBtn').classList.remove('is-open');
   }
 
   document.addEventListener('click', (e) => {

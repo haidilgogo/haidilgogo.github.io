@@ -1230,9 +1230,13 @@ img {
   }
 }
 
+/* 🔴 닫기 X 는 앱 어디서나 똑같이 반응한다(2026-08-04 사용자 확정) — 빨강 + scale(.9).
+   예전엔 발도장 계열(.stamp-view-close · .stamp-sheet-close)만 크기가 줄고
+   레시피·가챠·아티클 X 는 색만 바뀌어서, 같은 모양 아이콘인데 손끝 느낌이 달랐다. */
 .modal-close:active,
 .modal-fav-btn:active {
   color: var(--brand-red);
+  transform: scale(.9);
 }
 
 /* 손가락으로 연 모달의 자동 초점에만 iOS 파란 네모를 숨긴다.
@@ -1343,6 +1347,7 @@ img {
 
 .gacha-close:active {
   color: var(--brand-red);
+  transform: scale(.9);   /* 닫기 X 공통(2026-08-04) */
 }
 
 .gacha-title {
@@ -1892,6 +1897,9 @@ img {
   color: #C9A79F;
   cursor: pointer;
 }
+/* 이 닫기만 아무 반응이 없었다(2026-08-04) — 다른 닫기 X 와 같게 맞춘다 */
+@media (hover: hover) { .a2hs-close:hover { color: var(--brand-red); } }
+.a2hs-close:active { color: var(--brand-red); transform: scale(.9); }
 
 .a2hs-icon {
   width: 56px;
@@ -4429,6 +4437,7 @@ img {
 .guide-close:active,
 .column-close:active {
   color: var(--brand-red);
+  transform: scale(.9);   /* 닫기 X 공통(2026-08-04) */
 }
 .column-sheet--light-close .column-close {
   color: #fff;
@@ -4440,8 +4449,9 @@ img {
   }
 }
 .column-sheet--light-close .column-close:active {
-  color: #fff;
+  color: #fff;            /* 사진 위에 얹히는 흰 X — 빨강 대신 옅어지는 것으로 대신한다 */
   opacity: .72;
+  transform: scale(.9);   /* 크기 반응은 다른 닫기 X 와 같다(2026-08-04) */
 }
 .guide-sheet-ic { font-size: 34px; line-height: 1; display: block; }
 .guide-sheet-title {
@@ -4830,12 +4840,21 @@ img {
 .pot-ic .pot-ic-steam { color:var(--brand-red); }
 .pot-ic.has-item .pot-ic-steam { display:block; }
 /* 누름 = 즐겨찾기와 같은 방식(채워진 도형 + 브랜드 빨강) */
+/* 🔴 `.is-open` = 담은 목록 창이 떠 있는 동안(2026-08-04 사용자 확정).
+   예전엔 누르는 순간에만 빨개져서, 창이 열려 있어도 아이콘은 그대로였다 —
+   「이 창이 이 아이콘에서 나왔다」는 게 안 보였다. 눌림과 같은 모습을 창이 닫힐 때까지 유지한다. */
 .pot-btn:active .pot-ic .pot-ic-line,
-.pot-btn:active .pot-ic .pot-ic-steam { display:none; }
-.pot-btn:active .pot-ic { color:var(--brand-red); }
-.pot-btn:active .pot-ic .pot-ic-fill { display:block; }
-.pot-btn:active .pot-ic.has-item .pot-ic-fill { display:none; }
-.pot-btn:active .pot-ic.has-item .pot-ic-fill-steam { display:block; }
+.pot-btn:active .pot-ic .pot-ic-steam,
+.pot-btn.is-open .pot-ic .pot-ic-line,
+.pot-btn.is-open .pot-ic .pot-ic-steam { display:none; }
+.pot-btn:active .pot-ic,
+.pot-btn.is-open .pot-ic { color:var(--brand-red); }
+.pot-btn:active .pot-ic .pot-ic-fill,
+.pot-btn.is-open .pot-ic .pot-ic-fill { display:block; }
+.pot-btn:active .pot-ic.has-item .pot-ic-fill,
+.pot-btn.is-open .pot-ic.has-item .pot-ic-fill { display:none; }
+.pot-btn:active .pot-ic.has-item .pot-ic-fill-steam,
+.pot-btn.is-open .pot-ic.has-item .pot-ic-fill-steam { display:block; }
 
 /* 분류 탭 — 담은 목록 오른쪽에서 가로로 스크롤된다 */
 /* 🔴 상위 분류 탭은 레시피 카테고리 탭 서식(.tabs / .tab-btn / .tabs-underline)을 그대로 쓴다
@@ -4858,18 +4877,17 @@ img {
 
 /* ── 전골: 냄비 (CSS로 그린다 — 그림 파일 안 씀) ────────────────── */
 /* 칸 수는 화살표가 아니라 글씨를 눌러 고른다(2026-08-02 사용자 지시) */
-.mn-pot-seg { display:flex; justify-content:center; gap:26px; padding:20px 0 18px; }
-/* 🔴 알약(둥근 배경) 쓰지 않는다 — 앱의 탭과 같은 밑줄 방식으로 맞춘다 */
+/* 🔴 위아래 여백을 맞춘다(2026-08-04 사용자 지적) — 예전엔 상단바 아래 32px · 냄비 위 18px 로
+   어긋나 있어 줄이 위로 붙어 보였다. 위쪽은 뷰가 이미 12px 을 갖고 있어 여기선 12px 만 더한다. */
+.mn-pot-seg { display:flex; justify-content:center; gap:26px; padding:12px 0 24px; }
+/* 🔴 밑줄을 쓰지 않는다(2026-08-04 사용자 확정) — 바로 위 상단바 분류 탭이 이미 밑줄이라
+   같은 신호가 두 줄 연속으로 겹쳤다. 고른 것은 **빨간 글씨**로 나타낸다. */
 .mn-pot-seg button {
   border:0; background:none; font-family:inherit; position:relative;
   font-size:15px; font-weight:600; color:var(--text-muted);
-  padding:0 0 5px; cursor:pointer;
+  padding:0; cursor:pointer;
 }
-.mn-pot-seg button.is-on { color:var(--text-dark); font-weight:800; }
-.mn-pot-seg button.is-on::after {
-  content:''; position:absolute; left:0; right:0; bottom:0;
-  height:2px; border-radius:1px; background:var(--brand-red);
-}
+.mn-pot-seg button.is-on { color:var(--brand-red); font-weight:800; }
 /* 냄비는 가운데, 고른 육수 목록은 그 아래 (2026-08-02 사용자 제안).
    🔴 옆에 두면 냄비와 글자가 폭을 나눠 써서 좁은 기기(360px 이하)에서 이름이 감겼다.
    아래로 내리면 글자가 화면 폭을 다 쓰므로 어느 기기에서도 안 감긴다. */
