@@ -4622,6 +4622,13 @@
   );
   const 하위메뉴 = (up, sub) => ALL.filter((it) => it.up === up && it.sub === sub);
   const IMG = (n) => 'assets/menu/' + n + '.webp';
+  // 🔴 담긴 표시 ✓ 는 SVG 다(2026-08-04 사용자 확정). 옛 글자 `✓`(U+2713)는 폰트가 그려주는 것이라
+  //    굵기·모양이 앱의 다른 아이콘(전부 SVG, 「18px 통일」 규격)과 따로 놀았다.
+  //    18px + stroke 2.2 = 화면에서 획 약 1.65px — 상단바 아이콘들과 같은 굵기다.
+  const 체크아이콘 =
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"' +
+    ' stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M5 12.5l4.5 4.5L19 7"/></svg>';
   // 냄비 칸은 타일(-타일)을 쓴다. 아직 안 들어온 육수는 카드용 그림을 임시로 쓴다(냄비 속 냄비로 보인다)
   const TILE = new Set(D.broths.filter((b) => b.tile).map((b) => b.n));
   const CELL_IMG = (n) => IMG(TILE.has(n) ? n + '-타일' : n);
@@ -4820,7 +4827,7 @@
           <span class="mn-card-name">${이름}</span>
           ${아랫줄 ? `<span class="mn-card-sub">${아랫줄}</span>` : ''}
         </span>
-        <span class="mn-card-check">✓</span>
+        <span class="mn-card-check">${체크아이콘}</span>
       </button>`;
     }).join('')}</div>`;
   }

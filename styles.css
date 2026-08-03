@@ -5004,10 +5004,12 @@ img {
   display:block; margin-top:2px; font-size:12px; color:var(--text-muted);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
+/* 🔴 안의 ✓ 는 SVG 다(2026-08-04) — script.js 의 `체크아이콘`. 색은 currentColor 로 따라온다.
+   옛 글자 ✓ 때 있던 font-size 는 이제 아무것도 안 해서 뺐다. */
 .mn-card-check {
   flex:none; width:28px; height:28px; border-radius:50%;
   border:1.5px solid var(--card-border); display:flex; align-items:center; justify-content:center;
-  font-size:14px; color:#C9BCA8;
+  color:#C9BCA8;
 }
 .mn-card.is-on .mn-card-check { border-color:var(--brand-red); background:var(--brand-red); color:#fff; }
 /* ── 그림 확대 모달 ────────────────────────────────────────
