@@ -2025,9 +2025,11 @@
   }
 
   function openModal(r) {
-    // 카드는 레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
+    // 카드는 홈·레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
     // "메뉴/매장 위에 레시피 모달이 뜨는" desync(모달·섹션 어긋남)를 원천 차단(2026-07-21).
-    if (pageEl.dataset.section !== 'recipe') return;
+    // 🔴 홈이 탭으로 갈라지면서 'home' 을 넣어야 한다(2026-08-03) — 안 넣으면 홈의 인기소스·히든메뉴·
+    //    탕 카드, 스토리·가챠의 「레시피 보기」가 전부 눌러도 아무 일이 안 일어난다(실제로 그랬다).
+    if (pageEl.dataset.section !== 'recipe' && pageEl.dataset.section !== 'home') return;
     const wasOpen = modalOverlay.classList.contains('open');
     currentModalRecipe = r;
     if (!wasOpen) {
