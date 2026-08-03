@@ -365,8 +365,11 @@
           <!-- 홈으로(2026-08-03): 7/25에 ←를 X로 바꿨다가 되돌렸다 — 왼쪽 위라는 표준 자리로 가면서
                '닫기'보다 '뒤로가기'가 다시 맞게 됐다. 하는 일은 그대로 goHome() 이다. -->
           <button class="browse-back" id="browseBack" type="button" aria-label="홈으로">
-            <!-- 18px 아이콘군(공유·즐겨찾기)과 같은 굵기 1.7 -->
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <!-- 화살표 글리프가 24 viewBox를 덜 채워 모달 닫기(X, 15px)보다 작아 보임(10.5px, 재서 확인) →
+                 중앙 기준 1.43배 확대해 15px로 맞추고, 확대분만큼 stroke를 1.7→1.19로 보정한다
+                 (1.19×1.43 = 1.7 = 18px 아이콘군 공통 굵기. 모달 X의 1.02×1.667과 같은 문법).
+                 터치 타겟은 .browse-back 44px 고정이라 영향 없음(2026-08-03) -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.43) translate(-12 -12)"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
           </button>
           <!-- 검색창(2026-07-25): 접기 폐지, 상시 노출. 돋보기는 장식용 아이콘(입력창 안) -->
           <div class="search-box">
