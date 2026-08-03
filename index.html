@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=641">
+<link rel="stylesheet" href="styles.css?v=642">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -390,13 +390,15 @@
         </div>
       </div>
       <div class="recipe-grid" id="recipeGrid"></div>
+      <!-- 브라우즈에서만. 카드를 끝까지 내렸을 때 되올라가지 않고 빠져나오는 길
+           (레시피 모달·아티클 하단 「닫기」와 같은 모양·같은 뜻). 하는 일은 왼쪽 위 ←와 같은 goHome.
+           🔴 푸터 「밖」이다(2026-08-03 사용자 확정) — 이 버튼은 목록에 딸린 것이라 푸터 구분선 위에 있어야 하고,
+           선 아래는 사이트 전체 푸터(제보·문의 / 이미지 출처)다. 푸터 안에 넣으면 선이 버튼 위로 올라온다. -->
+      <button class="browse-home-btn" id="browseHomeBtn" type="button">홈으로</button>
 
       <!-- FOOTER (레시피 섹션에만) — 🔴 홈과 브라우즈가 다르다(2026-08-03 사용자 확정):
            홈 = 문구 + 링크 / 브라우즈 = 「홈으로」 버튼 + 링크. 가르는 것은 #view-recipe.is-home 이다. -->
       <footer class="footer">
-        <!-- 브라우즈에서만. 카드를 끝까지 내렸을 때 되올라가지 않고 빠져나오는 길
-             (레시피 모달·아티클 하단 「닫기」와 같은 모양·같은 뜻). 하는 일은 왼쪽 위 ←와 같은 goHome -->
-        <button class="footer-home-btn" id="footerHomeBtn" type="button">홈으로</button>
         <span class="footer-title"><span class="footer-brand">하딜고고</span>는 하이디라오 소스바 앞에서 매번 건희소스를 <br class="footer-break-mobile">검색하는 (나 같은) 사람들을 위해 만들어졌습니다</span>
         <div class="footer-links">
           <a class="footer-report" id="footerReport" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
@@ -957,7 +959,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=539"></script>
+<script src="script.js?v=540"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
