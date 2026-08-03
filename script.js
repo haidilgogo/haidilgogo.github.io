@@ -5103,12 +5103,18 @@
     if (searchInput) searchInput.value = '';
     if (searchBox) searchBox.classList.remove('has-value');
   }
+  const 전체메뉴자리 = TABS.findIndex((t) => t.all);
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       query = e.target.value;
       searchBox.classList.toggle('has-value', query.length > 0);
+      // 🔴 치기 시작하면 「전체메뉴」 탭으로 옮긴다(2026-08-04 사용자 확정).
+      //    검색은 분류를 가로지르는데 밑줄이 「고기」에 남아 있으면 결과에 해산물·완자가 섞여 나와
+      //    규칙이 어긋나 보인다. 이 앱엔 「활성 탭 없음」 상태가 없어서(레시피 탭도 검색 중 「전체」가
+      //    활성이다) 밑줄만 떼는 대신, 실제로 전부에 해당하는 탭으로 보낸다.
+      //    ⚠️ 그래서 검색을 지우면 원래 보던 분류가 아니라 전체메뉴에 남는다 — 아는 값이다.
+      if (query.trim() && cur !== 전체메뉴자리) cur = 전체메뉴자리;
       // 🔴 render() 를 쓴다(refreshCards 가 아니다) — 목록에 뜨는 카드가 통째로 바뀌는 일이다.
-      //    글자를 지워 검색을 끄면 원래 분류 목록으로 돌아온다.
       render();
     });
   }
