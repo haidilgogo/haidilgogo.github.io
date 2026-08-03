@@ -4972,13 +4972,17 @@ img {
   width:100%; margin:0 0 8px; padding:10px 12px; text-align:left;
   background:#fff; border:1px solid var(--card-border); border-radius:12px;
   font-family:inherit; cursor:pointer;
+  transition:transform .18s ease;   /* 누름 반응 — 아래 :active 와 한 벌이다 */
 }
 .mn-card.is-on { border-color:var(--brand-red); border-width:2px; }
-/* 🔴 누르는 반응은 전골이든 아니든 똑같다(2026-08-04 사용자 지적).
-   예전엔 전골 카드만 `border-color:빨강 + scale(.97)` 이라 눌렀을 때 느낌이 달랐다.
-   빨간 테두리는 특히 안 된다 — 전골 카드에 빨강을 안 붙이기로 한 결정(2026-08-02)과 정면으로 어긋난다.
-   「이미 골라서 또 못 담는다」로 읽히는 걸 피하려던 것인데, 누를 때만 잠깐 그 색이 됐던 셈이다. */
-.mn-card:active { transform:translateY(1px); }
+/* 🔴 누르는 반응은 앱 공통 규칙을 따른다 — 「틀이 살짝 작아진다」(2026-07-28 확정, 위 .hc-card 절 참고).
+   옛 `translateY(1px)` 은 이 카드만 쓰던 방식인 데다 트랜지션도 없어 눌린 느낌이 흐렸다(2026-08-04 사용자 지적).
+   🔴 값이 .97 이 아니라 .985 인 이유 — 규칙이 「큰 요소는 살짝만」이라 배너가 .985 를 쓴다.
+      메뉴 카드는 폭이 353px 로 **배너와 같다**(작은 카드는 153~171px). 재보면 줄어드는 폭이
+      배너 5.3px · 레시피 카드 5.1px · 인기소스 4.6px 로 다 비슷한데, 여기에 .97 을 쓰면 10.6px 로 혼자 두 배가 된다.
+   🔴 전골이든 아니든 똑같이 준다. 예전엔 전골만 `border-color:빨강 + scale(.97)` 이었는데,
+      빨간 테두리는 전골 카드에 빨강을 안 붙이기로 한 결정(2026-08-02)과 정면으로 어긋났다. */
+.mn-card:active { transform:scale(.985); }
 @media (hover:hover) { .mn-card[data-broth]:hover { border-color:var(--card-hover-border); } }
 .mn-card-thumb {
   flex:none; width:80px; height:80px; border-radius:8px;
