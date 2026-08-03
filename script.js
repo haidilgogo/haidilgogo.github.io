@@ -1566,12 +1566,18 @@
   // 가로 레일 마우스 드래그 스크롤(데스크탑용). 트랙패드·휠로만 되던 걸 손으로 끌 수 있게.
   //  - 컨테이너에 한 번만 붙임(레일은 innerHTML만 다시 그려도 컨테이너 자체는 유지됨).
   //  - 4px 넘게 끌면 dragMoved → 캡처 단계에서 자식 카드 클릭(이동)을 무효화.
+  //  - 🔴 끌 게 없으면 손 모양 커서를 안 준다(2026-08-04). 탭줄에도 쓰게 되면서 필요해졌다 —
+  //    레시피 카테고리는 넷이라 안 넘칠 때가 있는데, 그때 grab 커서만 뜨면 끌리는 줄 알고 헛손질한다.
+  //    레일(셀럽·인기소스)은 늘 넘치므로 지금까지와 똑같이 동작한다.
   function enableDragScroll(el) {
     if (!el) return;
-    el.classList.add('drag-scroll');
+    const 넘치나 = () => el.scrollWidth > el.clientWidth + 1;
+    const 커서맞추기 = () => el.classList.toggle('drag-scroll', 넘치나());
+    커서맞추기();
+    el.addEventListener('mouseenter', 커서맞추기);
     let down = false, startX = 0, startScroll = 0, moved = false;
     el.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
+      if (e.button !== 0 || !넘치나()) return;
       down = true; moved = false;
       startX = e.pageX;
       startScroll = el.scrollLeft;
@@ -1595,6 +1601,10 @@
   }
   enableDragScroll(celebRailEl);
   enableDragScroll(popularRailEl);
+  // 탭줄도 데스크탑에서 손으로 끌 수 있게(2026-08-04 사용자 요청) — 분류가 8개가 되면서 필요해졌다.
+  // 🔴 버튼이 아니라 **컨테이너**에 건다 — 탭 버튼은 다시 그려져도 `.tabs` 자체는 남는다.
+  enableDragScroll(browseCatTabsEl);
+  window.enableDragScroll = enableDragScroll;   // 매장 탭줄·메뉴 탭줄은 아래에서 붙인다(선언이 여기보다 뒤다)
   // 회색(#5F5E5A) 제외 — 'seen=회색 링'과 헷갈려서 안 본 셀럽이 꺼져 보이는 착시 방지(2026-07-22). 대신 베리로즈.
   const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#B85575', '#A3612E', '#3E7C8A', '#8A5FB0'];
 
@@ -2977,6 +2987,7 @@
       keepTabVisible(active);   // 320px 에서 「제주」가 44px 밀려 있다 — 고르면 따라 들어온다
     }
   }
+  enableDragScroll(storeTabsEl);   // 데스크탑에서 손으로 끌기(2026-08-04)
   function renderStoreTabs() {
     if (!storeTabsEl) return;
     storeTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
@@ -4653,6 +4664,7 @@
     }
   }
   window.mnSyncUnderline = updateMenuUnderline;   // 섹션 전환 때 switchSection 이 부른다
+  if (window.enableDragScroll) window.enableDragScroll($('#mnTabs'));   // 데스크탑에서 손으로 끌기(2026-08-04)
 
   function renderTabs() {
     // 🔴 탭에 숫자를 넣지 않는다 — 고른 카드에 이미 ✓가 있어 같은 정보가 두 번 나온다
@@ -4750,11 +4762,15 @@
       <div class="mn-zoom-body"></div>
     </div>`;
     document.body.appendChild(dim);
+    // 🔴 뒤가 스크롤되지 않게 잠근다(2026-08-04 사용자 요청). body 가 아니라 html 에 건다 —
+    //    body 를 스크롤 컨테이너로 만들면 상단바 sticky 가 깨진다(가챠·레시피 상세와 같은 방식).
+    document.documentElement.style.overflow = 'hidden';
     renderZoom();
   }
   function closeZoom() {
     const dim = $('#mnZoomDim');
     if (dim) dim.remove();
+    document.documentElement.style.overflow = '';
     render();
   }
   function renderZoom() {

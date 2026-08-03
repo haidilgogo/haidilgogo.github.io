@@ -5004,12 +5004,16 @@ img {
    담으려다 잘못 눌러도 여기서 바로 담을 수 있게 **모달 안에도 담기 버튼**을 둔다.
    닫기 버튼은 앱의 다른 모달과 같은 것을 쓴다(.stamp-sheet-close · 18px X 아이콘). */
 .mn-zoom-dim {
-  /* 🔴 상단바를 덮지 않는다 — 앱의 모달·시트가 전부 이 규칙이다
-     (styles.css 의 .modal-overlay·.stamp-sheet-overlay 둘 다 @media 에서 top 을 내린다).
-     숫자를 박지 말 것 — 앱은 JS(syncTopbarH)가 --topbar-h 에 실제 높이를 넣어준다. */
-  position:fixed; top:var(--topbar-h, 65px); left:0; right:0; bottom:0; z-index:60;
+  /* 🔴 여기만은 상단바까지 덮는다(2026-08-04 사용자 요청) — 다른 모달·시트는 상단바를 비워 두지만,
+     그것들은 상단바를 누르면 스스로 닫히고 그 동작을 실행하는 처리가 있다(레시피 상세).
+     확대 모달엔 그 처리가 없어서 뒤의 분류 탭이 그냥 눌렸다. 덮는 편이 맞다.
+     ⚠️ 그래서 z-index 가 상단바(40)·탭바(50)보다 위여야 한다 — 60 이 그 값이다.
+     🔴 딤 색은 앱 공통값을 쓴다(.modal-overlay 와 같은 rgba(58,12,8,.55) + blur 4px).
+     옛 rgba(45,34,28,.5) 는 이 모달만 쓰던 회갈색이라 뒤 목록이 탁하게 비쳤다. */
+  position:fixed; inset:0; z-index:60;
   display:flex; align-items:center; justify-content:center;
-  padding:24px; background:rgba(45,34,28,.5);
+  padding:24px; background:rgba(58,12,8,.55);
+  -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
 }
 .mn-zoom {
   position:relative; width:100%; max-width:300px; padding:16px 16px 18px;
