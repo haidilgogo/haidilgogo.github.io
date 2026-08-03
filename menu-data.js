@@ -9,15 +9,15 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "고기",
+     "sub": "닭고기"
     },
     {
      "n": "돈 삼겹살",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -25,7 +25,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -33,7 +33,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -41,7 +41,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -49,7 +49,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -57,7 +57,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -65,7 +65,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -73,7 +73,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -81,7 +81,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -89,7 +89,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -97,7 +97,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -105,7 +105,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -113,7 +113,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -121,7 +121,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -129,7 +129,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -137,7 +137,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -145,7 +145,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -153,7 +153,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -161,7 +161,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -169,15 +169,15 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "고기",
+     "sub": "닭고기"
     },
     {
      "n": "돼지뇌",
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -185,7 +185,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -193,7 +193,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -201,7 +201,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -209,7 +209,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "내장",
      "sub": "내장류"
     },
     {
@@ -217,7 +217,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -225,7 +225,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -233,7 +233,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -241,7 +241,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "조림류"
     },
     {
@@ -249,7 +249,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "조림류"
     },
     {
@@ -257,7 +257,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "조림류"
     },
     {
@@ -265,7 +265,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -273,7 +273,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     },
     {
@@ -281,7 +281,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "고기",
      "sub": "소양돈고기"
     }
    ]
@@ -294,7 +294,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -302,7 +302,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -310,7 +310,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -318,7 +318,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -326,7 +326,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -334,7 +334,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -342,7 +342,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -350,7 +350,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -358,7 +358,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -366,7 +366,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -374,7 +374,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -382,7 +382,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     },
     {
@@ -390,7 +390,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "해산물",
      "sub": "해산물"
     }
    ]
@@ -403,7 +403,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -411,7 +411,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -419,23 +419,23 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "완자·가공",
+     "sub": "가공육"
     },
     {
      "n": "날계란",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "사이드·디저트",
+     "sub": "계란류"
     },
     {
      "n": "날치알 복주머니",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -443,7 +443,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -451,23 +451,23 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "사이드·디저트",
+     "sub": "계란류"
     },
     {
      "n": "비엔나 소시지",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "완자·가공",
+     "sub": "가공육"
     },
     {
      "n": "새우계란만두",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -475,7 +475,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -483,7 +483,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -491,7 +491,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -499,23 +499,23 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "사이드·디저트",
+     "sub": "계란류"
     },
     {
      "n": "햄",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "완자·가공",
+     "sub": "가공육"
     },
     {
      "n": "훠궈추천메뉴모둠",
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -523,15 +523,15 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
-     "sub": "콩제품과 면류"
+     "up": "완자·가공",
+     "sub": "완자류"
     },
     {
      "n": "완자모둠",
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -539,7 +539,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -547,7 +547,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
+     "up": "완자·가공",
      "sub": "완자류"
     },
     {
@@ -555,8 +555,8 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "육류",
-     "sub": "기타육류"
+     "up": "완자·가공",
+     "sub": "완자류"
     }
    ]
   },
@@ -568,7 +568,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -576,7 +576,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -584,7 +584,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -592,7 +592,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -600,7 +600,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -608,7 +608,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -616,7 +616,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -624,7 +624,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -632,7 +632,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     }
    ]
@@ -645,7 +645,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -653,7 +653,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -661,7 +661,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -669,7 +669,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -677,7 +677,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -685,7 +685,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -693,7 +693,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -701,7 +701,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -709,7 +709,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -717,7 +717,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     },
     {
@@ -725,7 +725,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "두부·면",
      "sub": "콩제품과 면류"
     }
    ]
@@ -738,7 +738,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -746,7 +746,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -754,7 +754,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경과 버섯"
     },
     {
@@ -762,7 +762,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -770,7 +770,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경과 버섯"
     },
     {
@@ -778,7 +778,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경과 버섯"
     },
     {
@@ -786,7 +786,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -794,7 +794,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -802,7 +802,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -810,7 +810,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -818,7 +818,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -826,7 +826,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -834,7 +834,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경과 버섯"
     },
     {
@@ -842,7 +842,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -850,7 +850,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -858,7 +858,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -866,7 +866,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -874,7 +874,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -882,7 +882,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -890,7 +890,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     },
     {
@@ -898,7 +898,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경과 버섯"
     },
     {
@@ -906,7 +906,7 @@ window.MENU_DATA = {
      "img": false,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "잎채류"
     },
     {
@@ -914,7 +914,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "야채류",
+     "up": "채소·버섯",
      "sub": "근경류"
     }
    ]
@@ -927,7 +927,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "메인 디쉬"
     },
     {
@@ -935,7 +935,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -943,7 +943,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -951,7 +951,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "메인 디쉬"
     },
     {
@@ -959,7 +959,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "메인 디쉬"
     },
     {
@@ -967,7 +967,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -975,7 +975,7 @@ window.MENU_DATA = {
      "img": true,
      "part": false,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -983,7 +983,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -991,7 +991,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -999,7 +999,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "메인 디쉬"
     },
     {
@@ -1007,7 +1007,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "디저트"
     },
     {
@@ -1015,7 +1015,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "디저트"
     },
     {
@@ -1023,7 +1023,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -1031,7 +1031,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -1039,7 +1039,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -1047,7 +1047,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
     {
@@ -1055,7 +1055,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "디저트"
     },
     {
@@ -1063,7 +1063,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "디저트"
     },
     {
@@ -1071,7 +1071,7 @@ window.MENU_DATA = {
      "img": true,
      "part": true,
      "jeju": false,
-     "up": "디저트",
+     "up": "사이드·디저트",
      "sub": "사이드메뉴"
     }
    ]
@@ -1153,31 +1153,53 @@ window.MENU_DATA = {
  ],
  "cats": [
   {
-   "up": "육류",
+   "up": "고기",
    "subs": [
     "소양돈고기",
-    "해산물",
-    "완자류",
-    "내장류",
-    "기타육류"
+    "닭고기"
    ]
   },
   {
-   "up": "야채류",
+   "up": "내장",
    "subs": [
-    "콩제품과 면류",
+    "내장류"
+   ]
+  },
+  {
+   "up": "해산물",
+   "subs": [
+    "해산물"
+   ]
+  },
+  {
+   "up": "완자·가공",
+   "subs": [
+    "완자류",
+    "가공육"
+   ]
+  },
+  {
+   "up": "채소·버섯",
+   "subs": [
     "잎채류",
     "근경류",
     "근경과 버섯"
    ]
   },
   {
-   "up": "디저트",
+   "up": "두부·면",
+   "subs": [
+    "콩제품과 면류"
+   ]
+  },
+  {
+   "up": "사이드·디저트",
    "subs": [
     "사이드메뉴",
     "메인 디쉬",
+    "조림류",
     "디저트",
-    "조림류"
+    "계란류"
    ]
   }
  ]
