@@ -938,6 +938,15 @@ img {
   text-align: center;
   white-space: nowrap;
 }
+/* 메뉴 탭 푸터의 안내문(2026-08-03) — 브랜드 문구(.footer-title)와 달리 참고성 회색 작은 글씨다.
+   윗자리(개수 줄 오른쪽)에 있을 때의 .stores-note 와 같은 크기·색으로 맞춘다. */
+.footer-note {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-align: center;
+  word-break: keep-all;
+}
 .footer-brand { /* 푸터 문구 속 '하딜고고' = 로고와 동일하게 Paperlogy + 로고 색(2026-07-24) */
   font-family: 'Paperlogy', 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-weight: 500; /* Paperlogy는 5Medium 서브셋만 있음 — 로고와 동일 굵기 */
@@ -2087,20 +2096,27 @@ img {
 }
 
 /* ===== 매장(지점) 목록 ===== */
-/* 매장 헤더 줄 = 레시피 툴바(.list-head)와 같은 구조: 왼쪽 개수 + 오른쪽 안내문, space-between.
-   🔴 옛 min-height 36px 을 풀었다(2026-08-03 사용자 확정) — 글자는 17px 뿐이라 위아래가 19px 비어
-   보였다. 메뉴 탭(.mn-head)에서 먼저 푼 것과 같은 이유이고, 이제 세 탭이 같다. */
-/* 지역 탭 바(상단바에서 매장 뷰로 이동, 2026-07-23) — 🔴 2026-08-03부터 전국 N곳 「아래」다.
-   아래 여백은 옛 개수줄→카드 간격(12px)을 그대로 물려받는다. 밑줄 슬라이더는 하단 구분선 위를 미끄러짐 */
-.store-region-tabs {
+/* 매장 안내문 줄 — 🔴 2026-08-03부터 개수가 빠지고 안내문만 남았다(개수는 아래 .tabline 오른쪽 끝).
+   메뉴 탭은 같은 안내문을 아예 푸터로 내렸는데(사용자 확정), 매장은 지시가 없어 이 자리에 그대로 둔다.
+   옛 min-height 36px 도 같은 날 풀었다 — 글자는 17px 뿐이라 위아래가 19px 비어 보였다. */
+/* 🔴 탭줄 = 탭(왼쪽) + 개수(오른쪽 끝). 매장·메뉴가 함께 쓴다(2026-08-03 사용자 확정,
+   옛 .store-region-tabs 를 이 둘로 나눴다). 레시피 탭 .list-head-bottom 과 같은 얼개다.
+   개수는 스크롤 밖에 있어야 한다 — 안에 넣으면 탭을 밀 때 숫자도 같이 밀린다. */
+.tabline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0 0 12px;
+}
+.tabline .count-line { margin-left: auto; flex: none; white-space: nowrap; }
+.tabs-scroll {
+  min-width: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-.store-region-tabs .tabs {
-  flex-wrap: nowrap;
-  gap: 22px;                        /* 지역 탭 간격 */
-  justify-content: flex-start;      /* 왼쪽 정렬 — 전국이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
+.tabs-scroll .tabs {
+  flex-wrap: nowrap;                /* 스크롤하므로 감기지 않는다 */
+  justify-content: flex-start;      /* 왼쪽 정렬 — 첫 탭이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
 }
 .stores-head {
   display: flex;
@@ -2151,7 +2167,7 @@ img {
    #view-store에 별도 패딩을 줬으나, JS 버그를 고쳐 .main이 탭바 회피를 제대로 하므로 더는 불필요. */
 /* 모바일: 한 줄에 하나(주소·버튼 있는 카드라 2열은 답답함) */
 @media all {
-  .stores-head { margin-bottom: 10px; } /* 개수줄↔지역탭. 레시피(.list-head gap)·메뉴(.mn-head)와 동일 */
+  .stores-head { margin-bottom: 10px; } /* 안내문↔지역탭. 레시피 .list-head gap(10px)과 동일 */
   .stores { grid-template-columns: 1fr; row-gap: 12px; }
   .store-region { margin: 8px 4px 0; }
   .store-region:first-child { margin-top: 0; }
@@ -2353,9 +2369,11 @@ img {
   white-space: nowrap;
 }
 
-/* 레시피 카테고리 탭·검색: 레시피에서만 */
+/* 레시피 카테고리 탭·검색: 레시피에서만.
+   🔴 .search-box 를 통째로 숨기지 않는다(2026-08-03) — 메뉴 탭에도 같은 모양의 검색창이 생겼다.
+   숨겨야 하는 건 레시피 툴바 안의 것 하나뿐이고, 메뉴 쪽은 #view-menu 가 통째로 숨겨져 문제없다. */
 .page:not([data-section="recipe"]) .tabs-group--recipe,
-.page:not([data-section="recipe"]) .search-box {
+.page:not([data-section="recipe"]) .list-head .search-box {
   display: none;
 }
 /* 매장 지역 탭 제거(2026-07-23 사용자 요청) — 상단바는 로고 줄만. 항상 숨김(모든 지점 노출) */
@@ -4825,9 +4843,6 @@ img {
 /* 🔴 붙박이(sticky)와 아래 구분선을 뗐다(2026-08-02 사용자 확정) — 매장 탭의 지역 탭줄과 같은 구조다.
    앱에서 아래 구분선이 있는 곳은 상단바 하나뿐이고, 탭줄에는 어느 화면에도 선이 없다.
    선은 붙박이 시절 「카드가 탭 밑으로 파고드는 것」을 가리려던 것이라 붙박이와 함께 사라진다. */
-.mn-bar {
-  display:flex; align-items:stretch;
-}
 /* 🔴 담은 목록은 상단바 오른쪽 장바구니 아이콘으로 옮겼다(2026-08-02 사용자 확정).
    분류 탭 줄이 전체 폭을 쓰게 되어 320px 에서 여유가 65px 늘었다.
    🔴 숫자는 여전히 안 넣는다(앞선 확정) — 담긴 게 있으면 점만 찍는다. */
@@ -4850,21 +4865,9 @@ img {
 .pot-btn:active .pot-ic.has-item .pot-ic-fill-steam { display:block; }
 
 /* 분류 탭 — 담은 목록 오른쪽에서 가로로 스크롤된다 */
-.mn-tabs {
-  flex:1; min-width:0;
-  display:flex; gap:20px; overflow-x:auto; white-space:nowrap;
-  padding:12px 0 10px;
-}
-.mn-tab {
-  flex:none; background:none; border:0; padding:0 0 4px;
-  font-size:15px; font-weight:600; color:var(--text-muted);
-  font-family:inherit; cursor:pointer; position:relative;
-}
-.mn-tab.is-on { color:var(--text-dark); font-weight:800; }
-.mn-tab.is-on::after {
-  content:''; position:absolute; left:0; right:0; bottom:0;
-  height:2px; border-radius:1px; background:var(--brand-red);
-}
+/* 🔴 상위 분류 탭은 레시피 카테고리 탭 서식(.tabs / .tab-btn / .tabs-underline)을 그대로 쓴다
+   (2026-08-03 사용자 확정) — 옛 .mn-tabs/.mn-tab 은 지웠다. 글자·간격·밑줄이 레시피와 같아야 해서
+   값을 베껴 적지 않고 같은 클래스를 쓴다. 밑줄이 미끄러지는 것까지 매장 지역 탭과 같은 방식이다. */
 /* 하위 분류 줄 — 상위 탭 아래, 전체 폭을 쓴다.
    🔴 밑줄을 쓰지 않는다: 위 상위 탭과 「1 맛/2가지 맛」이 이미 밑줄이라
    세 줄이 다 같아 보이면 위아래가 안 읽힌다(2026-08-02 화면으로 대보고 정함). */
@@ -5068,8 +5071,11 @@ img {
 /* 개수+안내문 줄 — 모양은 앱의 .stores-head 를 그대로 쓰고, 메뉴에서만 다른 간격만 여기서 준다 */
 /* 🔴 min-height 를 푼다(2026-08-03) — 매장 탭에서 물려받은 36px 은 글자(17px)보다 19px 커서
    메뉴 탭에서는 개수 줄 위아래가 통째로 벌어져 보였다. 매장 탭은 그대로 36px 이다. */
-.mn-head { min-height:0; margin-bottom:10px; }
-.mn-head .stores-note { word-break:keep-all; }
+/* 🔴 옛 .mn-head(개수+안내문 줄)는 없앴다(2026-08-03 사용자 확정) —
+   개수는 분류 탭 줄 오른쪽(.tabline)으로, 안내문은 맨 아래 푸터(.footer-note)로 갔다. */
+/* 검색창 줄 — 레시피 탭과 같은 모양이되 뒤로가기가 없어 폭을 꽉 채운다 */
+.mn-searchline { margin: 0 0 10px; }
+.mn-searchline .search-box { width: 100%; margin-left: 0; }
 
 /* 🔴 하단 고정 「다음」 버튼은 뺐다(2026-08-02 사용자 확정) — 분류 탭이 위에 늘 있고
    담은 것은 상단바 냄비 아이콘으로 보므로 아래 버튼이 하는 일이 없었다.

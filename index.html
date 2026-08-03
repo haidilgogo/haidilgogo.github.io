@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=643">
+<link rel="stylesheet" href="styles.css?v=644">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -413,17 +413,37 @@
 
     <!-- 메뉴 섹션 (준비 중) -->
     <div class="view" id="view-menu" hidden>
-      <!-- 개수(왼쪽) + 안내문(오른쪽) 한 줄 — 매장 탭(.stores-head)과 같은 서식을 함께 쓴다 -->
-      <div class="stores-head mn-head">
-        <p class="count-line stores-count"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
-        <p class="stores-note">메뉴는 매장 사정에 따라 달라질 수 있어요</p>
+      <!-- 🔴 배치(2026-08-03 사용자 확정) — 레시피 탭과 같은 얼개다:
+           윗줄 = 검색창 / 아랫줄 = 분류 탭 + 개수. 안내문은 맨 아래 푸터로 내려갔다.
+           검색창은 레시피 탭과 같은 모양이되, 메뉴 탭엔 뒤로가기가 없어 폭을 꽉 채운다.
+           🔴 아직 「자리」만이다 — 쳐도 걸러지지 않는다(검색 대상 미정, 2026-08-03). -->
+      <div class="mn-searchline">
+        <div class="search-box" id="mnSearchBox">
+          <svg class="search-box-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input class="search-input" id="mnSearchInput" type="text" placeholder="검색">
+          <button class="search-clear" id="mnSearchClear" type="button" aria-label="검색어 지우기">&times;</button>
+        </div>
       </div>
-      <!-- 상위 분류 탭(전골·육류·야채류·디저트). 매장 지역탭처럼 붙박이가 아니고 아래 구분선도 없다 -->
-      <div class="mn-bar">
-        <div class="mn-tabs" id="mnTabs"></div>
+      <!-- 상위 분류 탭(전골·육류·야채류·디저트) + 개수. 서식은 레시피 카테고리 탭(.tabs/.tab-btn)과 같다 -->
+      <div class="tabline">
+        <div class="tabs-scroll"><div class="tabs" id="mnTabs"></div></div>
+        <p class="count-line"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
       </div>
       <div class="mn-subs" id="mnSubs"></div>
       <div id="mnBody"></div>
+      <!-- 메뉴 탭 푸터(2026-08-03 사용자 확정): 구분선 → 안내문 → 제보·문의 / 이미지 출처.
+           레시피 푸터와 같은 .footer 를 쓴다. 링크의 id 는 레시피 쪽에만 둔다(중복 id 금지). -->
+      <footer class="footer">
+        <span class="footer-note">메뉴는 매장 사정에 따라 달라질 수 있어요</span>
+        <div class="footer-links">
+          <a class="footer-report" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <a class="footer-credit" href="credits.html"><svg class="footer-credit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/></svg>이미지 출처</a>
+        </div>
+      </footer>
     </div>
 
     <!-- 매장 섹션 -->
@@ -431,14 +451,17 @@
       <!-- 🔴 순서: 개수·안내문 줄이 위, 지역 탭이 아래다(2026-08-03 사용자 확정) —
            메뉴 탭(#view-menu)·레시피 탭(.list-head)과 같은 순서로 세 탭을 맞췄다. 되돌리지 말 것. -->
       <div class="stores-head">
-        <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
         <p class="stores-note">영업시간은 매장 사정에 따라 다를 수 있어요</p>
       </div>
-      <!-- 지역 탭: 상단바에서 이동(2026-07-23) → 전국 N곳 아래로 이동(2026-08-03) -->
-      <div class="store-region-tabs">
-        <div class="tabs" id="storeTabs">
-          <span class="tabs-underline" id="storeTabsUnderline"></span>
+      <!-- 지역 탭 + 개수 한 줄(2026-08-03 사용자 확정) — 레시피·메뉴 탭과 같이 개수는 탭줄 오른쪽 끝이다.
+           탭만 가로로 스크롤되고 개수는 스크롤 밖에 고정된다(.tabs-scroll). -->
+      <div class="tabline">
+        <div class="tabs-scroll">
+          <div class="tabs" id="storeTabs">
+            <span class="tabs-underline" id="storeTabsUnderline"></span>
+          </div>
         </div>
+        <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
       </div>
       <div class="stores" id="stores"></div>
     </div>
@@ -959,7 +982,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=540"></script>
+<script src="script.js?v=541"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

@@ -2822,6 +2822,8 @@
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
+    // 메뉴도 같은 이유(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다, 2026-08-03)
+    if (name === 'menu' && window.mnSyncUnderline) { window.mnSyncUnderline(); requestAnimationFrame(window.mnSyncUnderline); }
     syncTopbarH();
   }
 
@@ -4648,11 +4650,27 @@
     $('#mnCountNum').textContent = 탭개수(t);
   }
 
+  // 🔴 서식은 레시피 카테고리 탭과 똑같이 쓴다(.tabs/.tab-btn/.tabs-underline, 2026-08-03 사용자 확정).
+  //    밑줄이 미끄러지는 것까지 매장 지역 탭(updateStoreUnderline)과 같은 방식이다.
+  function updateMenuUnderline() {
+    const wrap = $('#mnTabs');
+    if (!wrap) return;
+    const active = wrap.querySelector('.tab-btn.active');
+    const line = wrap.querySelector('.tabs-underline');
+    // 메뉴 섹션이 숨겨져 있으면 offsetWidth=0 → 위치를 못 잡는다. 보일 때 다시 불린다(switchSection)
+    if (active && line && active.offsetWidth) {
+      line.style.width = active.offsetWidth + 'px';
+      line.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    }
+  }
+  window.mnSyncUnderline = updateMenuUnderline;   // 섹션 전환 때 switchSection 이 부른다
+
   function renderTabs() {
     // 🔴 탭에 숫자를 넣지 않는다 — 고른 카드에 이미 ✓가 있어 같은 정보가 두 번 나온다
-    $('#mnTabs').innerHTML = TABS.map((t, i) =>
-      `<button class="mn-tab ${i === cur ? 'is-on' : ''}" data-i="${i}">${t.name}</button>`
+    $('#mnTabs').innerHTML = '<span class="tabs-underline"></span>' + TABS.map((t, i) =>
+      `<button class="tab-btn ${i === cur ? 'active' : ''}" data-i="${i}">${t.name}</button>`
     ).join('');
+    updateMenuUnderline();
   }
 
   const POTS = [1, 2, 4];
@@ -4826,7 +4844,8 @@
       if ($('#mnZoomDim')) return closeZoom();
     }
 
-    const tab = e.target.closest('.mn-tab');
+    // 🔴 반드시 #mnTabs 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다
+    const tab = e.target.closest('#mnTabs .tab-btn');
     if (tab) { cur = +tab.dataset.i; curSub = 0; return render(true); }   // 상위를 옮기면 하위는 처음으로
 
     const sub = e.target.closest('.mn-sub');
