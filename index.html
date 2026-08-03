@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=659">
+<link rel="stylesheet" href="styles.css?v=662">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -209,12 +209,15 @@
            카드를 한참 내려도 카테고리가 늘 손에 닿는다. 로고는 홈 탭에만 보인다.
            8/2에 탭줄을 붙박이로 만들려다 되돌린 적이 있는데(카드가 탭 밑으로 파고드는 걸 가릴 선이
            필요했다), 상단바 안으로 들어오면 이미 있는 상단바 구분선이 그 일을 한다. -->
+      <!-- 🔴 가로 스크롤 껍데기(.tabs-scroll)를 따로 두지 않는다(2026-08-04) —
+           `.tabs` 자체가 이미 overflow-x: auto 다(styles.css 의 @media all 블록). 감싸면 빈 스크롤 상자가
+           하나 더 생길 뿐이다. 탭이 늘어도 상단바가 안 깨지게 하는 건 `.topbar-cat` 의 flex 값이다. -->
       <div class="topbar-cat topbar-cat--recipe">
         <div class="tabs browse-cat-tabs" id="browseCatTabs">
           <span class="tabs-underline" id="browseCatUnderline"></span>
         </div>
       </div>
-      <!-- 메뉴 탭 상위 분류(전골·육류·야채류·디저트) — 레시피와 같은 자리, 같은 부품 -->
+      <!-- 메뉴 탭 상위 분류 — 레시피와 같은 자리, 같은 부품 -->
       <div class="topbar-cat topbar-cat--menu">
         <!-- 🔴 밑줄(span)은 마크업에 둔다 — 레시피와 같은 방식. JS 가 매번 새로 만들면
              옛 위치를 잃어버려 미끄러지지 못하고 0 에서 다시 그려진다(2026-08-03 실기기 영상으로 발견). -->
@@ -1020,7 +1023,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=555"></script>
+<script src="script.js?v=557"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

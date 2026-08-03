@@ -2335,9 +2335,20 @@ img {
    왼쪽 = 그 탭에서 가장 자주 쓰는 것(레시피 = 카테고리 탭). 놓을 게 없으면 로고 → 홈에만 남는다.
    오른쪽 = 그 탭 전용 아이콘 하나. 공유·설치는 검색창·카테고리가 올라간 탭에서는 자리를 비켜준다
    (넷을 다 넣으면 320px 에서 넘친다). 공유·설치는 목록을 훑는 중이 아니라 홈에서 쓰는 것들이다. */
-.topbar-cat { display: none; flex: none; min-width: 0; }
+/* 🔴 flex: 1 1 0 (2026-08-04) — basis 는 반드시 0 이어야 한다.
+   상단바(.topbar-inner)가 flex-wrap: wrap 이라, basis 가 auto(=내용 폭)면 탭이 늘어난 순간
+   줄이 넘친다고 판단해 **줄어들기 전에 아랫줄로 내려간다** — 상단바가 44 → 94px 로 벌어진다.
+   basis 0 이면 줄바꿈을 유발하지 않고 남는 폭만 받아, 넘치는 것은 안쪽 .tabs-scroll 이 가로로 민다.
+   (옆의 .topbar-right 에 붙은 「basis 0 = 줄바꿈 유발 안 함」과 같은 이유다. 320px 에서 실측 확인) */
+.topbar-cat { display: none; flex: 1 1 0; min-width: 0; }
 .page[data-section="recipe"] .topbar-cat--recipe,
 .page[data-section="menu"] .topbar-cat--menu { display: block; }
+/* 카테고리가 올라간 탭에서는 남는 폭을 탭줄이 다 갖는다 —
+   오른쪽 아이콘(flex: 1 1 0)과 빈칸(flex: 1)이 그대로면 셋이 남는 폭을 나눠 가져 탭줄이 좁아진다 */
+.page[data-section="recipe"] .topbar-right,
+.page[data-section="menu"] .topbar-right { flex: 0 0 auto; }
+.page[data-section="recipe"] .topbar-spacer,
+.page[data-section="menu"] .topbar-spacer { display: none; }
 /* 카테고리가 올라간 탭에서는 로고·공유·설치가 자리를 비켜준다 */
 .page[data-section="recipe"] .topbar-brand,
 .page[data-section="recipe"] #topShareBtn,

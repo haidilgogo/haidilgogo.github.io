@@ -1386,11 +1386,32 @@
   const browseCatUnderlineEl = document.getElementById('browseCatUnderline');
   const browseCardCache = new Map(); // 브라우즈 그리드 카드(clean card) 캐시
 
+  // 🔴 고른 탭이 가로 스크롤 밖에 있으면 보이는 자리로 밀어준다(2026-08-04).
+  //    이 사이트는 스크롤바를 안 보여주므로(CLAUDE.md), 밀려 있는 탭은 스스로 나타나야 한다.
+  //    옆 탭이 살짝 걸치게 16px 을 남긴다 — "옆에 더 있다"는 유일한 신호다.
+  //    별도 IIFE 인 메뉴 코드도 써야 해서 window 에 건다(mnSyncUnderline 과 같은 방식).
+  function keepTabVisible(btn) {
+    // 🔴 스크롤되는 것은 `.tabs` 자신이다(styles.css @media all 의 overflow-x: auto).
+    //    감싼 .tabs-scroll 이 아니다 — 매장 탭에서도 실제로 미는 것은 `.tabs` 쪽이다(실측).
+    const box = btn && btn.closest('.tabs');
+    if (!box || box.scrollWidth <= box.clientWidth) return;   // 넘치지 않으면 할 일이 없다
+    const pad = 16;
+    const left = btn.offsetLeft;                              // .tabs 가 position:relative 라 이 값이 스크롤 좌표다
+    const right = left + btn.offsetWidth;
+    if (left - pad < box.scrollLeft) {
+      box.scrollTo({ left: Math.max(0, left - pad), behavior: 'smooth' });
+    } else if (right + pad > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: right + pad - box.clientWidth, behavior: 'smooth' });
+    }
+  }
+  window.keepTabVisible = keepTabVisible;
+
   function updateBrowseCatUnderline() {
     const active = browseCatTabsEl.querySelector('.tab-btn.active');
     if (active && active.offsetWidth) {
       browseCatUnderlineEl.style.width = active.offsetWidth + 'px';
       browseCatUnderlineEl.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      keepTabVisible(active);
     }
   }
   // 뷰가 숨어 있어도 그려 둔다 — 탭을 눌러 레시피로 넘어오는 순간 이미 맞아 있어야 한다(2026-08-03).
@@ -2953,6 +2974,7 @@
     if (active && active.offsetWidth) {
       storeUnderline.style.width = active.offsetWidth + 'px';
       storeUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      keepTabVisible(active);   // 320px 에서 「제주」가 44px 밀려 있다 — 고르면 따라 들어온다
     }
   }
   function renderStoreTabs() {
@@ -4623,6 +4645,7 @@
     if (active && line && active.offsetWidth) {
       line.style.width = active.offsetWidth + 'px';
       line.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      if (window.keepTabVisible) window.keepTabVisible(active);
     }
   }
   window.mnSyncUnderline = updateMenuUnderline;   // 섹션 전환 때 switchSection 이 부른다
