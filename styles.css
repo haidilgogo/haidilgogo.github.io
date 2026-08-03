@@ -333,16 +333,15 @@ img {
 }
 /* 검색창(2026-07-25 최종 확정: 크림 배경 박스, 고정폭 우측정렬 — 밑줄(D)로 갔다가 박스로 재확정) —
    접기/펼침 없이 상시 노출. 돋보기는 안쪽 장식 아이콘.
-   🔴 폭 = 화면 폭 − 140px (2026-08-03 사용자 확정). 140px 은 왼쪽에 남겨두는 자리다:
-   개수 글자 최장 80px(`검색 결과 33개`) + 사이 여백 24px + 닫기(X)가 차지하는 32px + 여유 4px.
-   한 기기 안에서는 절대 안 변한다 — 카테고리를 눌러 개수 글자수가 달라져도 그대로다.
-   기기별로는 393px 폰 213px · 320px 폰 140px · 최대(본문 400px) 260px. */
+   🔴 폭 = 화면 폭 − 44px (2026-08-03 사용자 확정). 44px 은 왼쪽 뒤로가기(32px)와 사이 여백(12px)
+   자리다. 개수가 아랫줄로 내려가면서 윗줄을 검색창이 통째로 쓰게 됐다.
+   기기별로 393px 폰 309px · 320px 폰 236px · 최대(본문 400px) 356px. 상태가 바뀌어도 안 변한다. */
 .search-box {
   display: flex;
   align-items: center;
   gap: 6px;
   flex: none;
-  width: calc(100% - 140px); /* 옛 고정 180px — 닫기(X)가 같은 줄로 오면서 화면 폭 기준으로 바뀜 */
+  width: calc(100% - 44px); /* 옛 고정 180px — 윗줄을 혼자 쓰게 되면서 화면 폭 기준으로 바뀜 */
   height: 36px;
   padding: 0 12px;
   background: var(--bg-cream);
@@ -559,29 +558,31 @@ img {
   margin: 0 0 16px;
 }
 
-/* 윗줄 — 개수(왼쪽) + 검색창(오른쪽, 폭 고정) + 닫기(맨 오른쪽).
-   🔴 space-between 을 쓰지 않는다: 개수 글자수가 달라질 때마다 남는 폭이 재분배되어
-   검색창이 좌우로 밀린다. 검색창에 margin-left:auto 를 줘 오른쪽에 붙여 두면 위치가 고정된다. */
+/* 윗줄 — 뒤로가기(왼쪽 끝) + 검색창(오른쪽 끝).
+   🔴 space-between 을 쓰지 않는다: 뒤로가기가 숨겨질 때(즐겨찾기) 검색창이 왼쪽으로 밀린다.
+   검색창에 margin-left:auto 를 줘 오른쪽에 붙여 두면 어떤 상태에서도 자리가 안 변한다. */
 .list-head-top {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 .list-head-top .search-box { margin-left: auto; }
-/* 개수는 줄어들지 않지만, 혹시 더 긴 제목이 생겨도 줄바꿈·넘침 대신 말줄임이 되게 막아둔다 */
-.list-head-top .count-line {
+
+/* 아랫줄 — 카테고리 탭(왼쪽) + 개수(오른쪽 끝) */
+.list-head-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.list-head-bottom .count-line {
+  margin-left: auto;
+  /* 개수는 줄어들지 않지만, 혹시 더 긴 제목이 생겨도 줄바꿈·넘침 대신 말줄임이 되게 막아둔다.
+     320px 에서 탭 4개(181px) + 개수 최장(80px, `검색 결과 33개`)이면 19px 남는다. */
   flex: 0 1 auto;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* 아랫줄 — 카테고리 탭 한 줄 */
-.list-head-bottom {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 .count-line {
   flex: none;
@@ -1150,7 +1151,7 @@ img {
   align-items: center;
   gap: 26px; /* 13+13 — 두 버튼의 44px 터치 타겟이 정확히 맞닿고 겹치지 않는 최소값(2026-07-25) */
   /* 상하 여백 확대(2026-07-25) — 즐겨찾기·닫기 터치가 너무 좁았음.
-     오른쪽 24px(20+4, 2026-07-25 재조정) — 브라우즈 닫기(.browse-close, .main 패딩 20px 기준)와
+     오른쪽 24px(20+4, 2026-07-25 재조정) — 브라우즈 뒤로가기(.browse-back, .main 패딩 20px 기준)와
      오른쪽 끝 x좌표를 맞추려면 20px이 기준이지만, 아래 .modal-close가 오른쪽(바깥쪽) 패딩을
      13→16px로 늘리며 3px 더 튀어나왔고 원래도 1px 차이가 있었음(실측) → 20+3+1=24px로 보정해
      getBoundingClientRect() 기준 두 닫기 버튼의 오른쪽 끝 x좌표를 정확히 일치시킴(367px, 2026-07-25). */
@@ -1210,7 +1211,7 @@ img {
 }
 /* 🔴 좌우 패딩은 반드시 대칭(13px)으로 둘 것.
    한때 터치 타겟 겹침을 없애려고 비대칭(바깥16/안쪽10)으로 나눴는데, 그러면 44px 박스 안에서
-   아이콘이 3px 치우쳐 브라우즈 닫기(.browse-close, 44px 안에 가운데 정렬)와 눈으로 어긋나 보였다.
+   아이콘이 3px 치우쳐 브라우즈 뒤로가기(.browse-back, 44px 안에 가운데 정렬)와 눈으로 어긋나 보였다.
    박스 오른쪽 끝만 맞추면 안 되고 '보이는 아이콘' 위치가 같아야 한다(2026-07-25).
    겹침은 패딩이 아니라 .modal-topline의 gap(26px = 13+13)으로 푼다. */
 
@@ -1326,7 +1327,7 @@ img {
   color: #4D4139;
 }
 
-/* 다른 닫기 버튼(.modal-close/.browse-close)과 동일: 배경 없이 색만 브랜드 빨강으로(2026-07-25,
+/* 다른 아이콘 버튼(.modal-close/.browse-back)과 동일: 배경 없이 색만 브랜드 빨강으로(2026-07-25,
    눌렀을 때 생기던 #EDE4DF 음영 제거). hover는 터치기기 눌어붙음 방지를 위해 반드시 media 안에. */
 @media (hover: hover) {
   .gacha-close:hover { color: var(--brand-red); }
@@ -3383,17 +3384,18 @@ img {
 #view-recipe.is-home .recipe-grid { display: none; }
 #view-recipe:not(.is-home) .home-sec { display: none; }
 
-/* 브라우즈 헤더 닫기(X) — 홈으로 복귀. 카테고리 탭이 항상(전체 포함) 떠 있어 '뒤로가기'보다
-   '이 화면 닫기'가 정확함(2026-07-25, 화살표→X로 교체). 터치 타겟 44px, 시각 위치는 화면 오른쪽
-   가장자리에 맞추되 탭 영역만 넉넉하게 — 음수 margin으로 상쇄(오른쪽으로 방향만 반전). */
-.browse-close {
+/* 브라우즈 헤더 뒤로가기(←) — 홈으로 복귀. 2026-07-25 에 ←를 X로 바꿨다가 2026-08-03 에 되돌렸다:
+   왼쪽 위라는 표준 자리로 옮기면서 '닫기'보다 '뒤로가기'가 다시 맞게 됐고, 검색창 옆에 아이콘이
+   붙어 답답해 보이던 것도 풀렸다. 터치 타겟 44px, 시각 위치는 화면 왼쪽 가장자리(.main 패딩 20px)에
+   맞추되 탭 영역만 넉넉하게 — 음수 margin 으로 상쇄(왼쪽으로 방향만 반전). */
+.browse-back {
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  margin: -12px -12px -12px 0;
+  margin: -12px 0 -12px -12px;
   background: none;
   border: none;
   color: #4D4139; /* 아이콘 액션 버튼(공유·즐겨찾기)과 동일 색으로(2026-07-25, 탭 비활성색에서 변경) */
@@ -3402,18 +3404,15 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 /* 전체보기 버튼(.home-sec-more)과 동일한 인터랙션 — 호버·터치 시 브랜드 빨강 */
-.browse-close:hover,
-.browse-close:active {
+.browse-back:hover,
+.browse-back:active {
   color: var(--brand-red);
 }
 /* display:inline-flex가 [hidden]의 UA display:none보다 우선순위 높아 명시적으로 재선언 필요
-   (즐겨찾기 켜진 동안 닫기 숨김, 2026-07-25)
-   🔴 자리는 남긴다(2026-08-03) — 같은 줄에 검색창이 생겨서, 닫기가 통째로 사라지면
-   검색창이 오른쪽으로 44px 튄다. 보이지만 않게 하고 자리는 그대로 둔다. */
-.browse-close[hidden] {
-  display: inline-flex;
-  visibility: hidden;
-  pointer-events: none;
+   (즐겨찾기 켜진 동안 뒤로가기 숨김 — 나가는 길을 즐겨찾기 버튼 하나로 통일, 2026-07-25)
+   자리는 안 남겨도 된다: 검색창이 margin-left:auto 로 오른쪽에 붙어 있어 왼쪽이 비어도 안 밀린다. */
+.browse-back[hidden] {
+  display: none;
 }
 
 /* ── 공통 섹션 헤더 ── */
