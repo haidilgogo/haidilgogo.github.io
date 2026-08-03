@@ -2336,10 +2336,15 @@ img {
    오른쪽 = 그 탭 전용 아이콘 하나. 공유·설치는 검색창·카테고리가 올라간 탭에서는 자리를 비켜준다
    (넷을 다 넣으면 320px 에서 넘친다). 공유·설치는 목록을 훑는 중이 아니라 홈에서 쓰는 것들이다. */
 .topbar-cat { display: none; flex: none; min-width: 0; }
-.page[data-section="recipe"] .topbar-cat { display: block; }
+.page[data-section="recipe"] .topbar-cat--recipe,
+.page[data-section="menu"] .topbar-cat--menu { display: block; }
+/* 카테고리가 올라간 탭에서는 로고·공유·설치가 자리를 비켜준다 */
 .page[data-section="recipe"] .topbar-brand,
 .page[data-section="recipe"] #topShareBtn,
-.page[data-section="recipe"] #topInstallBtn { display: none; }
+.page[data-section="recipe"] #topInstallBtn,
+.page[data-section="menu"] .topbar-brand,
+.page[data-section="menu"] #topShareBtn,
+.page[data-section="menu"] #topInstallBtn { display: none; }
 /* 🔴 상단바 높이가 탭을 옮겨도 안 변해야 한다 — 로고와 같은 44px 을 여기서도 잡는다.
    (안 잡으면 레시피 탭만 상단바가 얇아져 화면이 위아래로 튄다) */
 .topbar-cat .tabs {
@@ -4821,10 +4826,20 @@ img {
 /* 하위 분류 줄 — 상위 탭 아래, 전체 폭을 쓴다.
    🔴 밑줄을 쓰지 않는다: 위 상위 탭과 「1 맛/2가지 맛」이 이미 밑줄이라
    세 줄이 다 같아 보이면 위아래가 안 읽힌다(2026-08-02 화면으로 대보고 정함). */
+/* 🔴 붙박이다(2026-08-03 사용자 확정) — 목록 한가운데서도 다른 하위로 바로 갈 수 있어야 한다.
+   8/2에 붙박이를 포기했던 이유(카드가 줄 밑으로 파고드는 걸 가릴 선이 필요)는 배경색으로 푼다 —
+   상단바 바로 아래 붙으니 상단바 구분선과 한 덩어리로 보이고 새 선은 필요 없다.
+   좌우 음수 여백 = 배경을 화면 끝까지. 칩은 카드·탭과 같은 20px 선에서 시작한다. */
 .mn-subs {
+  position: sticky;
+  top: var(--topbar-h, 0px);
+  z-index: 30;
+  background: #FCF9F5;              /* 상단바와 같은 배경색 */
+  margin: 0 -20px;
   display:flex; gap:14px; overflow-x:auto; white-space:nowrap;
-  padding:2px 20px 10px;
+  padding:8px 20px 10px;
 }
+.mn-subs:empty { display: none; }   /* 전골 탭은 하위가 없다 — 줄이 통째로 사라진다 */
 .mn-sub {
   flex:none; background:none; border:0; padding:0;
   font-size:14px; font-weight:500; color:var(--text-muted);
@@ -5021,7 +5036,7 @@ img {
 /* 🔴 옛 .mn-head(개수+안내문 줄)는 없앴다(2026-08-03 사용자 확정) —
    개수는 분류 탭 줄 오른쪽(.tabline)으로, 안내문은 맨 아래 푸터(.footer-note)로 갔다. */
 /* 검색창 줄 — 레시피 탭과 같은 모양이되 뒤로가기가 없어 폭을 꽉 채운다 */
-.mn-searchline { margin: 0 0 10px; }
+.mn-searchline { margin: 0 0 18px; }   /* 검색창 → 개수. 레시피 탭(.list-head)과 같은 값 */
 .mn-searchline .search-box { width: 100%; margin-left: 0; }
 
 /* 🔴 하단 고정 「다음」 버튼은 뺐다(2026-08-02 사용자 확정) — 분류 탭이 위에 늘 있고

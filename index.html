@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=653">
+<link rel="stylesheet" href="styles.css?v=654">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -209,10 +209,14 @@
            카드를 한참 내려도 카테고리가 늘 손에 닿는다. 로고는 홈 탭에만 보인다.
            8/2에 탭줄을 붙박이로 만들려다 되돌린 적이 있는데(카드가 탭 밑으로 파고드는 걸 가릴 선이
            필요했다), 상단바 안으로 들어오면 이미 있는 상단바 구분선이 그 일을 한다. -->
-      <div class="topbar-cat">
+      <div class="topbar-cat topbar-cat--recipe">
         <div class="tabs browse-cat-tabs" id="browseCatTabs">
           <span class="tabs-underline" id="browseCatUnderline"></span>
         </div>
+      </div>
+      <!-- 메뉴 탭 상위 분류(전골·육류·야채류·디저트) — 레시피와 같은 자리, 같은 부품 -->
+      <div class="topbar-cat topbar-cat--menu">
+        <div class="tabs" id="mnTabs"></div>
       </div>
       <!-- 카테고리 필터 탭 제거(2026-07-21 홈 7단 개편) — 카테고리는 홈 섹션으로 이동.
            즐겨찾기 버튼은 topbar-right로 이사, 이 그룹은 숨김(favShareBtn 등은 script 참조 때문에 DOM 유지) -->
@@ -433,11 +437,8 @@
           <button class="search-clear" id="mnSearchClear" type="button" aria-label="검색어 지우기">&times;</button>
         </div>
       </div>
-      <!-- 상위 분류 탭(전골·육류·야채류·디저트) + 개수. 서식은 레시피 카테고리 탭(.tabs/.tab-btn)과 같다 -->
-      <div class="tabline">
-        <div class="tabs-scroll"><div class="tabs" id="mnTabs"></div></div>
-        <p class="count-line"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
-      </div>
+      <!-- 개수 — 레시피 탭과 같은 자리(검색창 아래 왼쪽). 상위 분류 기준이다(하위를 눌러도 안 바뀐다) -->
+      <p class="list-count"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
       <div class="mn-subs" id="mnSubs"></div>
       <div id="mnBody"></div>
       <!-- 맨 위로 — 메뉴는 130개라 특히 필요하다. 푸터 구분선 「위」(2026-08-03 사용자 확정) -->
@@ -1018,7 +1019,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=546"></script>
+<script src="script.js?v=547"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

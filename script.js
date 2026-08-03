@@ -4758,6 +4758,15 @@
 
   // 🔴 스크롤은 「사람이 탭을 눌렀을 때」만 위로 보낸다. 첫 렌더는 페이지가 뜨는 중이라
   //    다른 탭(레시피)을 보고 있을 수 있고, 거기서 스크롤을 건드리면 남의 화면을 움직인다.
+  // 하위 줄(붙박이) 바로 아래가 목록 첫 줄이 되도록 맞춘다. 이미 그보다 위에 있으면 그대로 둔다.
+  function scrollUnderSubs() {
+    const subs = $('#mnSubs'), body = $('#mnBody');
+    if (!subs || !body) return;
+    const topbarH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h')) || 0;
+    const y = body.getBoundingClientRect().top + window.scrollY - topbarH - subs.getBoundingClientRect().height;
+    if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
+  }
+
   function render(scrollTop) {
     renderTabs();
     renderHead();
@@ -4765,7 +4774,7 @@
     const t = TABS[cur];
     $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
     $('#potIcon').classList.toggle('has-item', !!count());
-    if (scrollTop) window.scrollTo({ top: 0 });
+    if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
   }
 
   function renderSheet() {
@@ -4816,7 +4825,9 @@
     if (tab) { cur = +tab.dataset.i; curSub = 0; return render(true); }   // 상위를 옮기면 하위는 처음으로
 
     const sub = e.target.closest('.mn-sub');
-    if (sub) { curSub = +sub.dataset.sub; return render(true); }
+    // 🔴 하위를 바꿀 때는 맨 위가 아니라 「붙박이 하위 줄 바로 아래」로 간다(2026-08-03).
+    //    맨 위로 보내면 방금 누른 칩이 아래로 내려가 버려 어지럽다. 목록만 새로 시작하게 한다.
+    if (sub) { curSub = +sub.dataset.sub; render(); return scrollUnderSubs(); }
 
     const seg = e.target.closest('[data-pot]');
     if (seg) {
