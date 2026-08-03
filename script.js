@@ -1403,9 +1403,12 @@
       btn.className = 'tab-btn' + (cat === activeCat ? ' active' : '');
       btn.textContent = cat;
       btn.addEventListener('click', () => {
+        // 같은 탭이면 아무 일도 하지 않는다(밑줄이 다시 그려지는 것을 막는다).
+        // 🔴 다른 탭이면 맨 위로 — 목록이 통째로 바뀌므로(2026-08-03 사용자 확정). 메뉴 탭도 같다.
         if (activeCat === cat) return;
         activeCat = cat;
         renderGrid();
+        window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
       });
       browseCatTabsEl.appendChild(btn);
     });
@@ -4819,13 +4822,13 @@
     // 🔴 반드시 #mnTabs 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다
     const tab = e.target.closest('#mnTabs .tab-btn');
     if (tab) {
-      // 🔴 레시피 탭에 맞춘다(2026-08-03 사용자 확정):
+      // 🔴 레시피 탭과 같다(2026-08-03 사용자 확정):
       //    같은 탭을 누르면 아무 일도 하지 않고(밑줄이 다시 그려지는 것을 막는다),
-      //    탭을 바꿔도 스크롤은 건드리지 않는다.
+      //    다른 탭이면 목록이 통째로 바뀌므로 맨 위로 간다.
       const i = +tab.dataset.i;
       if (i === cur) return;
       cur = i;
-      return render();
+      return render(true);
     }
 
     const seg = e.target.closest('[data-pot]');
