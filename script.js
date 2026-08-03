@@ -2640,8 +2640,11 @@
   //    우연에 기대지 않고 여기서 직접 저장·복원한다.
   const sectionScroll = Object.create(null);
   const scrollTopNow = () => (document.scrollingElement || document.documentElement).scrollTop;
+  // 🔴 「맨 위로」 버튼과 탭 재탭은 **부드럽게** 올라간다(2026-08-03 사용자 확정) —
+  //    사람이 「올려달라」고 누른 것이라 올라가는 게 보여야 한다.
+  //    반대로 카테고리를 바꿀 때는 instant 다 — 목록이 통째로 바뀌는 자리라 훑고 지나갈 이유가 없다.
   function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     sectionScroll[activeSection] = 0;
   }
 
