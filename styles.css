@@ -356,10 +356,7 @@ img {
   padding: 10px 2px;
   background: none;
   border: none;
-  /* 🔴 비활성 = 진한 글자색(2026-08-03 사용자 확정, 옛 #8B6F68 흐린 갈색).
-     상단바로 올라오니 흐린 갈색이 흘려 보였다. 값은 하단바 비활성(#4D4139)과 같은 따뜻한 진회색이다
-     — 순검정(#000)은 이 앱에서 안 쓴다(활성 빨강과 대비가 죽는다, 하단바 주석 참고). */
-  color: #4D4139;
+  color: #8B6F68;   /* 비활성 = 흐린 갈색. 활성(검정)과 대비를 만드는 쪽이라 진하게 하면 안 된다 */
   transition: color .15s, font-weight .15s;
   -webkit-tap-highlight-color: transparent;
   outline: none;
@@ -369,8 +366,12 @@ img {
   color: #C77A6E;
 }
 
+/* 🔴 활성 = 검정(2026-08-03 사용자 확정, 옛 브랜드 빨강).
+   메뉴 탭에는 상위 분류와 하위 분류가 함께 있는데, 둘 다 빨강이면 어느 줄이 위인지 안 읽힌다.
+   그래서 상위(.tab-btn)는 검정 + 빨간 밑줄, 하위(.mn-sub)는 빨강으로 역할을 나눈다.
+   브랜드 색은 밑줄이 담당하므로 활성 표시가 약해지지 않는다. */
 .tab-btn.active {
-  color: var(--brand-red);
+  color: var(--text-dark);
   font-weight: 700;
 }
 
@@ -2086,6 +2087,26 @@ img {
 }
 
 /* ===== 매장(지점) 목록 ===== */
+/* 🔴 탭줄 = 탭(왼쪽) + 개수(오른쪽 끝). 매장·메뉴가 함께 쓴다(2026-08-03 사용자 확정.
+   옛 .store-region-tabs 를 .tabline + .tabs-scroll 둘로 나눈 것이다).
+   개수는 스크롤 「밖」에 있어야 한다 — 안에 넣으면 탭을 밀 때 숫자도 같이 밀린다. */
+.tabline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+.tabline .count-line { margin-left: auto; flex: none; white-space: nowrap; }
+.tabs-scroll {
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs-scroll .tabs {
+  flex-wrap: nowrap;                /* 스크롤하므로 감기지 않는다 */
+  justify-content: flex-start;      /* 왼쪽 정렬 — 첫 탭이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
+}
+
 /* 🔴 옛 .stores-head(개수+안내문 줄)는 없앴다(2026-08-03) — 개수는 .tabline 오른쪽 끝으로,
    안내문은 맨 아래 푸터(.footer-note)로 갔다. 메뉴 탭과 같은 방식이다. */
 .stores-count { margin: 0; padding: 0; flex: none; } /* 개수는 왼쪽 고정폭(줄어들지 않음) */
