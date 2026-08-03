@@ -4986,8 +4986,15 @@ img {
       배너 5.3px · 레시피 카드 5.1px · 인기소스 4.6px 로 다 비슷한데, 여기에 .97 을 쓰면 10.6px 로 혼자 두 배가 된다.
    🔴 전골이든 아니든 똑같이 준다. 예전엔 전골만 `border-color:빨강 + scale(.97)` 이었는데,
       빨간 테두리는 전골 카드에 빨강을 안 붙이기로 한 결정(2026-08-02)과 정면으로 어긋났다. */
-.mn-card:active { transform:scale(.985); }
-@media (hover:hover) { .mn-card[data-broth]:hover { border-color:var(--card-hover-border); } }
+/* 🔴 올리면 로즈, 누르면 로즈 + 살짝 작아짐 — 메뉴 탭 카드 전부 같다(2026-08-04 사용자 확정).
+      전골 육수 카드도 같은 `.mn-card` 라 함께 적용된다. 예전엔 호버 로즈가 전골에만 붙어 있었다.
+   🔴 테두리는 **굵기를 안 건드리고 색만** 바꾼다 — 1px 그대로라 카드가 한 픽셀도 안 움직인다.
+      담김 표시가 1px→2px 로 굵어지며 내용이 밀리던 문제(2026-08-04에 없앰)와 다른 방식이다.
+   🔴 색은 브랜드 빨강이 아니라 로즈다. 브랜드 빨강은 담긴 ✓ 가 쓰는 색이라 「담겼다」로 읽힌다.
+      로즈(--card-hover-border)는 앱이 「카드 hover/누름 테두리」로 예약해 둔 색이고,
+      매장 전화 버튼 :active 가 이미 쓴다 — 앱에서 테두리 색이 바뀌는 유일한 선례다. */
+@media (hover:hover) { .mn-card:hover { border-color:var(--card-hover-border); } }
+.mn-card:active { transform:scale(.985); border-color:var(--card-hover-border); }
 .mn-card-thumb {
   flex:none; width:80px; height:80px; border-radius:8px;
   background:#FBF4E6; display:flex; align-items:center; justify-content:center; overflow:hidden;
