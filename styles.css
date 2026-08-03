@@ -4888,6 +4888,9 @@ img {
   padding:0; cursor:pointer;
 }
 .mn-pot-seg button.is-on { color:var(--brand-red); font-weight:800; }
+/* 호버 — 앱의 탭(.tab-btn:hover:not(.active))이 쓰는 값 #C77A6E 를 그대로 쓴다(2026-08-04 사용자 요청).
+   고른 것에는 안 준다. 이미 빨간 글씨라 더 줄 게 없다. */
+@media (hover:hover) { .mn-pot-seg button:not(.is-on):hover { color:#C77A6E; } }
 /* 냄비는 가운데, 고른 육수 목록은 그 아래 (2026-08-02 사용자 제안).
    🔴 옆에 두면 냄비와 글자가 폭을 나눠 써서 좁은 기기(360px 이하)에서 이름이 감겼다.
    아래로 내리면 글자가 화면 폭을 다 쓰므로 어느 기기에서도 안 감긴다. */
