@@ -4623,9 +4623,18 @@
 
   function renderTabs() {
     // 🔴 탭에 숫자를 넣지 않는다 — 고른 카드에 이미 ✓가 있어 같은 정보가 두 번 나온다
-    $('#mnTabs').innerHTML = '<span class="tabs-underline"></span>' + TABS.map((t, i) =>
-      `<button class="tab-btn ${i === cur ? 'active' : ''}" data-i="${i}">${t.name}</button>`
-    ).join('');
+    // 🔴 밑줄(.tabs-underline)은 지우지 않는다 — 버튼만 갈아 끼운다(레시피 renderBrowseCatTabs 와 같은 방식).
+    //    통째로 새로 그리면 밑줄이 옛 위치를 잃어 0 에서 다시 미끄러진다.
+    const wrap = $('#mnTabs');
+    wrap.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    TABS.forEach((t, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (i === cur ? ' active' : '');
+      btn.dataset.i = i;
+      btn.textContent = t.name;
+      wrap.appendChild(btn);
+    });
     updateMenuUnderline();
   }
 
@@ -4809,7 +4818,15 @@
 
     // 🔴 반드시 #mnTabs 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다
     const tab = e.target.closest('#mnTabs .tab-btn');
-    if (tab) { cur = +tab.dataset.i; return render(true); }
+    if (tab) {
+      // 🔴 레시피 탭에 맞춘다(2026-08-03 사용자 확정):
+      //    같은 탭을 누르면 아무 일도 하지 않고(밑줄이 다시 그려지는 것을 막는다),
+      //    탭을 바꿔도 스크롤은 건드리지 않는다.
+      const i = +tab.dataset.i;
+      if (i === cur) return;
+      cur = i;
+      return render();
+    }
 
     const seg = e.target.closest('[data-pot]');
     if (seg) {

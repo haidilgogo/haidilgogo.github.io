@@ -216,7 +216,9 @@
       </div>
       <!-- 메뉴 탭 상위 분류(전골·육류·야채류·디저트) — 레시피와 같은 자리, 같은 부품 -->
       <div class="topbar-cat topbar-cat--menu">
-        <div class="tabs" id="mnTabs"></div>
+        <!-- 🔴 밑줄(span)은 마크업에 둔다 — 레시피와 같은 방식. JS 가 매번 새로 만들면
+             옛 위치를 잃어버려 미끄러지지 못하고 0 에서 다시 그려진다(2026-08-03 실기기 영상으로 발견). -->
+        <div class="tabs" id="mnTabs"><span class="tabs-underline" id="mnTabsUnderline"></span></div>
       </div>
       <!-- 카테고리 필터 탭 제거(2026-07-21 홈 7단 개편) — 카테고리는 홈 섹션으로 이동.
            즐겨찾기 버튼은 topbar-right로 이사, 이 그룹은 숨김(favShareBtn 등은 script 참조 때문에 DOM 유지) -->
@@ -1018,7 +1020,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=1"></script>
-<script src="script.js?v=552"></script>
+<script src="script.js?v=553"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
