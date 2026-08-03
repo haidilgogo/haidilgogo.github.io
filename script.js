@@ -4755,7 +4755,9 @@
   function openZoom(n) {
     const dim = document.createElement('div');
     dim.className = 'mn-zoom-dim'; dim.id = 'mnZoomDim';
-    dim.innerHTML = `<div class="mn-zoom" data-menu="${n}">
+    // 🔴 `data-menu` 를 쓰지 않는다(2026-08-04) — 아래 담기 처리가 `[data-menu]` 를 범위 없이 찾아서
+    //    모달 자신이 걸렸다. 모달 안 사진을 누르면 그 메뉴가 담겼다 빠졌다 하고 뒤 목록이 다시 그려졌다.
+    dim.innerHTML = `<div class="mn-zoom" data-zoom="${n}">
       <button class="stamp-sheet-close" id="mnZoomClose" type="button" aria-label="닫기">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
       </button>
@@ -4775,7 +4777,7 @@
   }
   function renderZoom() {
     const box = $('.mn-zoom'); if (!box) return;
-    const n = box.dataset.menu;
+    const n = box.dataset.zoom;
     const { 이름, 부제 } = 이름나누기(n);
     const on = picked.has(n);
     box.querySelector('.mn-zoom-body').innerHTML =
@@ -4860,7 +4862,7 @@
     if (th && th.querySelector('img') && th.closest('.mn-card[data-menu]')) {
       return openZoom(th.closest('.mn-card').dataset.menu);
     }
-    if (e.target.closest('.mn-zoom-add')) { toggle($('.mn-zoom').dataset.menu); return renderZoom(); }
+    if (e.target.closest('.mn-zoom-add')) { toggle($('.mn-zoom').dataset.zoom); return renderZoom(); }
     if (e.target.closest('#mnZoomClose') || e.target.classList.contains('mn-zoom-dim')) {
       if ($('#mnZoomDim')) return closeZoom();
     }
@@ -4900,7 +4902,9 @@
       return render();
     }
 
-    const mc = e.target.closest('[data-menu]');
+    // 🔴 반드시 `.mn-card` 안으로 좁힌다 — 위 #mnTabs .tab-btn 과 같은 이유다.
+    //    범위 없이 `[data-menu]` 만 찾으면 목록 밖에 있는 것까지 담기 처리로 빨려 들어간다.
+    const mc = e.target.closest('.mn-card[data-menu]');
     if (mc) { toggle(mc.dataset.menu); return render(); }
 
     if (e.target.closest('#potToggleBtn')) return openSheet();
