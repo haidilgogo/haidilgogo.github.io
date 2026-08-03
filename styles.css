@@ -356,7 +356,10 @@ img {
   padding: 10px 2px;
   background: none;
   border: none;
-  color: #8B6F68;
+  /* 🔴 비활성 = 진한 글자색(2026-08-03 사용자 확정, 옛 #8B6F68 흐린 갈색).
+     상단바로 올라오니 흐린 갈색이 흘려 보였다. 값은 하단바 비활성(#4D4139)과 같은 따뜻한 진회색이다
+     — 순검정(#000)은 이 앱에서 안 쓴다(활성 빨강과 대비가 죽는다, 하단바 주석 참고). */
+  color: #4D4139;
   transition: color .15s, font-weight .15s;
   -webkit-tap-highlight-color: transparent;
   outline: none;

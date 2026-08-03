@@ -20,3 +20,4 @@ assets/*.jpeg
 
 # 아이콘 원본 작업 폴더 (SVG 경로는 script.js에 인라인, 사이트는 src-bubble.png만 참조)
 assets/icons/src/
+_before-*
