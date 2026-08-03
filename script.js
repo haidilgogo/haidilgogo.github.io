@@ -591,7 +591,7 @@
         saveLikeCounts(); // ⚠️ saveLikes()를 쓰면 안 된다 — 위 주석 참고(하트 초기화 버그)
         if (!likesInitialSorted) {
           // 첫 도착: 인기순 그리드 재정렬 + 홈 인기소스 순위도 실데이터로 다시 그림
-          renderGrid();
+          renderList();
           if (typeof renderHomePopular === 'function') renderHomePopular();
           // 🔴 홈 탕·히든메뉴도 반드시 다시 그릴 것 (2026-07-30).
           //    이 둘도 byPopular로 정렬하는데 여기서 빠져 있어서, 첫 방문(localStorage 캐시가
@@ -1292,7 +1292,7 @@
       pill.style.transform = 'translateX(' + (base + frac * stride - pill.offsetWidth / 2) + 'px)';
     }
     monthlyUpdatePill = updatePill; // 섹션이 보이게 될 때(syncMonthlyFeature) 재배치용
-    syncMonthlyFeature();           // 만들었으면 편다 — 옛날엔 renderGrid 가 불러줬다(2026-08-03 홈 분리)
+    syncMonthlyFeature();           // 만들었으면 편다 — 옛날엔 renderList 가 불러줬다(2026-08-03 홈 분리)
     mfScroll.addEventListener('scroll', updatePill, { passive: true });
     window.addEventListener('resize', updatePill);
     updatePill();
@@ -1364,7 +1364,7 @@
       searchInput.value = '';
       searchBox.classList.remove('has-value');
     }
-    renderGrid();
+    renderList();
     switchSection('recipe');   // 하단바 활성 표시까지 함께 바뀌고, 스크롤은 맨 위로 간다
   }
   // 🔴 옛 goHome() 은 없앴다(2026-08-03) — 홈으로 가는 길은 하단바이고,
@@ -1428,7 +1428,7 @@
         // 🔴 다른 탭이면 맨 위로 — 목록이 통째로 바뀌므로(2026-08-03 사용자 확정). 메뉴 탭도 같다.
         if (activeCat === cat) return;
         activeCat = cat;
-        renderGrid();
+        renderList();
         window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
       });
       browseCatTabsEl.appendChild(btn);
@@ -1512,7 +1512,7 @@
     }
   }
 
-  function renderGrid() {
+  function renderList() {
     const filtered = getFiltered();
     listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
@@ -2279,7 +2279,7 @@
     }
     saveFavorites();
     setPressedState(modalFavBtn, favorites.has(id));
-    renderGrid();
+    renderList();
   });
 
   // 검색은 카테고리 탭과 겹치는 필터(AND, 2026-07-25 확정) — activeCat을 건드리지 않는다.
@@ -2287,14 +2287,14 @@
   searchInput.addEventListener('input', (e) => {
     query = e.target.value;
     searchBox.classList.toggle('has-value', query.length > 0);
-    renderGrid();
+    renderList();
   });
   // 즐겨찾기도 카테고리 탭과 겹치는 필터다. 🔴 버튼이 레시피 탭 상단바에만 있으므로(2026-08-03
   // 상단바 규칙) 「켰던 자리로 돌아가기」 장치는 없앴다 — 켜고 끄는 곳이 언제나 레시피 탭이다.
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
     setPressedState(favToggleBtn, showFavoritesOnly);
-    renderGrid();
+    renderList();
     scrollToTop();   // 목록이 통째로 바뀌므로 맨 위로
   });
 
@@ -2656,7 +2656,7 @@
     query = '';
     searchInput.value = '';
     searchBox.classList.remove('has-value');
-    renderGrid();
+    renderList();
     searchInput.focus();
   });
 
@@ -3785,7 +3785,7 @@
   // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
   // 「맨 위로」 — 레시피·메뉴 탭 목록 끝의 버튼(2026-08-03). 하단바 재탭과 같은 일을 한다.
   document.querySelectorAll('.to-top-btn').forEach((btn) => btn.addEventListener('click', scrollToTop));
-  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderGrid에서 자동 적용됨)
+  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderList에서 자동 적용됨)
   document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
   document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
@@ -3809,7 +3809,7 @@
 
   // 같은 사이트를 여러 창에서 열었거나 iOS가 bfcache 화면을 복원했을 때, 메모리에 남은
   // 옛 상태가 localStorage의 최신값을 덮지 않도록 저장값을 다시 읽고 필요한 부분만 갱신한다.
-  // 전체 renderGrid()는 즐겨찾기 필터에서 항목이 빠져야 할 때만 호출해 스크롤 위치를 보존한다.
+  // 전체 renderList()는 즐겨찾기 필터에서 항목이 빠져야 할 때만 호출해 스크롤 위치를 보존한다.
   function syncExternalState(key) {
     const syncAll = !key;
 
@@ -3821,7 +3821,7 @@
       if (currentModalRecipe) {
         setPressedState(modalFavBtn, favorites.has(currentModalRecipe.id));
       }
-      if (showFavoritesOnly) renderGrid();
+      if (showFavoritesOnly) renderList();
     }
 
     if (syncAll || key === LIKED_KEY) {
@@ -3877,7 +3877,7 @@
 
   renderHomeSections();
   initMonthlyFeature();
-  renderGrid();
+  renderList();
   renderStoreTabs();
   renderStores();
   renderStamps();
@@ -4346,7 +4346,7 @@
       //   메모를 그대로 들고 있어 **같은 화면 안에서 두 값이 어긋났다.** 지워진 기록이면 닫는다
       //   (그대로 두면 `수정`을 눌렀을 때 빈 새 기록 화면이 뜬다).
       if (typeof refreshStampView === 'function') refreshStampView();
-      if (typeof renderGrid === 'function') renderGrid();
+      if (typeof renderList === 'function') renderList();
       if (typeof renderHomePopular === 'function') renderHomePopular();
     } catch (e) { /* 그리기 실패해도 데이터는 이미 저장됐다 */ }
   }
@@ -4716,11 +4716,11 @@
             </div>` : ''}
           </div>
         </div>
-        <div class="mn-pot-side ${cells === 1 ? 'is-one' : ''}">
+        <div class="mn-pot-list ${cells === 1 ? 'is-one' : ''}">
           ${Array.from({ length: cells }, (_, i) => {
             const b = broths[i];
             return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
-                   (b ? `<button class="mn-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
+                   (b ? `<button class="mn-pot-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
           }).join('')}
         </div>
       </div>`;
@@ -4750,7 +4750,7 @@
 
   function renderPot() {
     return `<div id="mnPotTop">${renderPotTop()}</div>
-      <div class="mn-grid">
+      <div class="mn-list">
         ${D.broths.map((b) => {
           // 🔴 체크(✓)는 여전히 안 붙인다(2026-08-02 사용자 지시) —
           //    「이미 골랐으니 또 못 담는다」로 읽히기 때문이다. 중복해서 담을 수 있는 화면이다.
@@ -4839,9 +4839,11 @@
   // 🔴 하위 분류를 화면에서 걷어냈다(2026-08-03 사용자 확정) — 상위 하나를 누르면 그 안의 것이 전부 나온다.
   //    하위 줄 하나 때문에 붙박이·구분선·방향 감지까지 세 겹을 쌓게 돼서 접었다.
   //    데이터의 하위 분류는 그대로 살아 있고(정렬 순서를 그게 정한다), 화면에만 안 나온다.
-  function renderGrid(t) {
+  // 🔴 이름에 Menu 를 붙인다 — 레시피 탭에도 `renderList()` 가 따로 있다(script.js 위쪽 IIFE).
+  //    별개 IIFE 라 충돌은 안 나지만, 같은 이름이 둘이면 찾을 때 헷갈린다(2026-08-04 정리).
+  function renderMenuList(t) {
     const items = t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
-    return `<div class="mn-grid">${items.map((it) => {
+    return `<div class="mn-list">${items.map((it) => {
       const on = picked.has(it.n);
       const { 이름, 부제 } = 이름나누기(it.n);
       const 꼬리 = it.part ? (it.jeju ? '제주 한정' : '일부 매장') : '';
@@ -4868,7 +4870,7 @@
     //    🔴 이름을 'mn-pot' 으로 쓰면 안 된다 — 그건 냄비 그림(.mn-pot)의 클래스라
     //       .page 가 그 규칙(폭·모양)을 통째로 뒤집어써서 화면이 194px 로 쪼그라든다(실제로 그랬다).
     document.querySelector('.page').classList.toggle('mn-pot-tab', !!t.pot);
-    $('#mnBody').innerHTML = t.pot ? renderPot() : renderGrid(t);
+    $('#mnBody').innerHTML = t.pot ? renderPot() : renderMenuList(t);
     $('#potIcon').classList.toggle('has-item', !!count());
     if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
   }
