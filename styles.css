@@ -4837,13 +4837,18 @@ img {
   background: #FCF9F5;              /* 상단바와 같은 배경색 */
   border-bottom: 1px solid #ECE5DC; /* 상단바에서 옮겨온 구분선 — 아래 .mn-has-subs 규칙과 짝 */
   margin: 0 -20px 12px;             /* 아래 12px = 검색창까지 */
+  transition: transform .22s ease;  /* 숨김/나타남 — 아래 .subs-hidden */
   display:flex; gap:14px; overflow-x:auto; white-space:nowrap;
   padding:8px 20px 10px;
 }
 .mn-subs:empty { display: none; }   /* 전골 탭은 하위가 없다 — 줄이 통째로 사라진다 */
 /* 하위 줄이 있으면 상단바 선을 끈다 — 상단바 + 하위 줄이 한 덩어리로 보이고 선은 아래 하나만 남는다.
    전골 탭처럼 하위가 없으면 이 클래스가 빠져 상단바 선이 되살아난다(JS renderSubs 가 토글). */
-.page.mn-has-subs[data-section="menu"] .topbar { border-bottom-color: transparent; }
+.page.mn-has-subs[data-section="menu"]:not(.subs-hidden) .topbar { border-bottom-color: transparent; }
+/* 🔴 내리면 숨고 올리면 나온다(2026-08-03 사용자 확정) — 하단바와 같은 방향 감지(JS onScroll).
+   숨을 때는 상단바 뒤로 밀려 올라간다(z-index 30 < 상단바 40, 상단바 배경이 불투명해 가려진다).
+   이때는 상단바 선이 되살아나야 경계가 남는다 — 위 :not(.subs-hidden) 이 그 일을 한다. */
+.page.subs-hidden .mn-subs { transform: translateY(-100%); }
 .mn-sub {
   flex:none; background:none; border:0; padding:0;
   font-size:14px; font-weight:500; color:var(--text-muted);

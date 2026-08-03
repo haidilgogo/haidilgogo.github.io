@@ -2787,6 +2787,7 @@
     slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
+    pageEl.classList.remove('subs-hidden');   // 탭을 옮기면 하위 줄은 다시 보이는 상태로
     if (name === 'recipe') { updateBrowseCatUnderline(); requestAnimationFrame(updateBrowseCatUnderline); }
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
     // 메뉴도 같은 이유(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다, 2026-08-03)
@@ -2912,9 +2913,19 @@
   }
   // 스크롤 중엔 인디케이터가 반응하지 않는다(2026-07-21 확정) — 채워진 필이 탭 위에 그대로.
   // 구슬 변신·이동은 오직 "탭 이동(클릭·드래그)" 때만. (스크롤 출렁임을 넣었다가 제거한 이력: e853805)
+  // 🔴 메뉴 탭 하위 분류 줄은 「내리면 숨고, 올리면 나온다」(2026-08-03 사용자 확정).
+  //    하단바가 쓰던 방향 감지와 같은 방식이라 앱 안에서 낯설지 않다.
+  //    맨 위 근처(80px 이내)에서는 늘 보인다. 손 떨림으로 깜빡이지 않게 6px 둔감 구간을 둔다.
+  const SUBS_DEADZONE = 6, SUBS_TOP_KEEP = 80;
+  function syncSubsHidden(y, dy) {
+    if (Math.abs(dy) <= SUBS_DEADZONE) return;
+    const hide = dy > 0 && y > SUBS_TOP_KEEP;
+    pageEl.classList.toggle('subs-hidden', hide);
+  }
   function onScroll() {
     const y = window.scrollY;
-    if (ignoreScrollOnce) { ignoreScrollOnce = false; }
+    if (ignoreScrollOnce) { ignoreScrollOnce = false; lastScrollY = y; return; }
+    syncSubsHidden(y, y - lastScrollY);
     lastScrollY = y;
   }
   window.addEventListener('scroll', onScroll, { passive: true });
