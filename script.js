@@ -4621,9 +4621,9 @@
     D.cats.map((g) => ({ name: g.up, subs: g.subs }))
   );
   const 하위메뉴 = (up, sub) => ALL.filter((it) => it.up === up && it.sub === sub);
-  // 묶음 소제목 — 담은 목록과 검색 결과가 같은 것을 쓴다.
-  // 🔴 상위·하위 이름이 같으면 한 번만 쓴다 — 「해산물 › 해산물」이 그대로 나오던 것을 막는다.
-  const 묶음이름 = (up, sub) => (up === sub ? up : up + ' › ' + sub);
+  // 상위 하나에 딸린 항목 전부. 🔴 순서는 하위 분류가 정한다 — 하위는 화면에 안 나오지만
+  //    「소양돈고기 다음 닭고기」 같은 줄 세우기는 그대로 살아 있다(2026-08-03 확정 참고).
+  const 상위메뉴 = (t) => t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
   const IMG = (n) => 'assets/menu/' + n + '.webp';
   // 🔴 담긴 표시 ✓ 는 SVG 다(2026-08-04 사용자 확정). 옛 글자 `✓`(U+2713)는 폰트가 그려주는 것이라
   //    굵기·모양이 앱의 다른 아이콘(전부 SVG, 「18px 통일」 규격)과 따로 놀았다.
@@ -4867,8 +4867,7 @@
   }
 
   function renderMenuList(t) {
-    const items = t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
-    return `<div class="mn-list">${items.map(카드HTML).join('')}</div>`;
+    return `<div class="mn-list">${상위메뉴(t).map(카드HTML).join('')}</div>`;
   }
 
   /* ── 검색 ──────────────────────────────────────────────────────────────────
@@ -4880,6 +4879,8 @@
         대신 결과에 「고기 › 소고기」 소제목을 붙여 어디 것인지 보인다.
      🔴 전골(육수 12개)은 대상에서 뺀다(2026-08-04 사용자 확정) — 전골은 목록이 아니라 냄비를
         고르는 화면이고, 담는 규칙(칸 번호·중복 담기)이 달라 결과 안에서 따로 논다.
+     🔴 묶음 소제목은 **상위 한 단만** 쓴다(2026-08-04 사용자 지적). 화면에서 하위 분류는
+        2026-08-03에 걷어내기로 확정된 것이라, 검색 결과에만 되살리면 화면마다 단 수가 달라진다.
      ────────────────────────────────────────────────────────────────────────── */
   const searchBox = $('#mnSearchBox');
   const searchInput = $('#mnSearchInput');
@@ -4904,10 +4905,8 @@
     const out = [];
     TABS.forEach((t) => {
       if (t.pot) return;
-      t.subs.forEach((sub) => {
-        const items = 하위메뉴(t.name, sub).filter(걸린다);
-        if (items.length) out.push({ up: t.name, sub, items });
-      });
+      const items = 상위메뉴(t).filter(걸린다);
+      if (items.length) out.push({ up: t.name, items });
     });
     return out;
   }
@@ -4916,7 +4915,7 @@
     const groups = 검색결과();
     if (!groups.length) return `<p class="empty-state">검색 결과가 없어요</p>`;
     return `<div class="mn-list">${groups.map((g) =>
-      `<p class="mn-group">${묶음이름(g.up, g.sub)}</p>${g.items.map(카드HTML).join('')}`
+      `<p class="mn-group">${g.up}</p>${g.items.map(카드HTML).join('')}`
     ).join('')}</div>`;
   }
 
@@ -4963,16 +4962,18 @@
       broths.forEach((b, i) => rows.push(
         `<div class="mn-sheet-item">${b}<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
     }
-    // 담은 목록도 화면 분류대로 묶는다 — 「육류 › 내장류」처럼 어디서 담았는지 그대로 보이게
+    // 담은 목록도 화면 분류대로 묶는다 — 어느 탭에서 담았는지 그대로 보이게.
+    // 🔴 소제목은 상위 한 단이다(2026-08-04 사용자 지적). 옛 코드는 「육류 › 내장류」처럼 하위까지
+    //    적었는데, 그건 상위가 `육류`이던 4분류 시절 것이다. 오늘 8분류로 다시 묶으면서
+    //    「내장 › 내장류」처럼 같은 말이 두 번 나오는 자리가 됐고, 하위는 애초에 화면에서
+    //    걷어낸 단이다(2026-08-03 확정). 검색 결과 소제목과 같은 규칙을 쓴다.
     TABS.forEach((t) => {
       if (t.pot) return;
-      t.subs.forEach((sub) => {
-        const on = 하위메뉴(t.name, sub).filter((it) => picked.has(it.n));
-        if (!on.length) return;
-        rows.push(`<p class="mn-sheet-group">${묶음이름(t.name, sub)}</p>`);
-        on.forEach((it) => rows.push(
-          `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
-      });
+      const on = 상위메뉴(t).filter((it) => picked.has(it.n));
+      if (!on.length) return;
+      rows.push(`<p class="mn-sheet-group">${t.name}</p>`);
+      on.forEach((it) => rows.push(
+        `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
     });
     $('#mnSheetBody').innerHTML = rows.length ? rows.join('')
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
