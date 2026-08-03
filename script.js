@@ -4621,6 +4621,9 @@
     D.cats.map((g) => ({ name: g.up, subs: g.subs }))
   );
   const 하위메뉴 = (up, sub) => ALL.filter((it) => it.up === up && it.sub === sub);
+  // 묶음 소제목 — 담은 목록과 검색 결과가 같은 것을 쓴다.
+  // 🔴 상위·하위 이름이 같으면 한 번만 쓴다 — 「해산물 › 해산물」이 그대로 나오던 것을 막는다.
+  const 묶음이름 = (up, sub) => (up === sub ? up : up + ' › ' + sub);
   const IMG = (n) => 'assets/menu/' + n + '.webp';
   // 🔴 담긴 표시 ✓ 는 SVG 다(2026-08-04 사용자 확정). 옛 글자 `✓`(U+2713)는 폰트가 그려주는 것이라
   //    굵기·모양이 앱의 다른 아이콘(전부 SVG, 「18px 통일」 규격)과 따로 놀았다.
@@ -4636,6 +4639,7 @@
   let cur = 0;                    // 지금 탭
   let cells = 2;                  // 냄비 칸 수(1·2·4)
   let broths = [];                // 고른 육수(칸 수만큼, 중복 허용)
+  let query = '';                 // 검색어 (아래 「검색」 절)
   const picked = new Map();       // 담은 메뉴
 
   const $ = (s) => document.querySelector(s);
@@ -4651,6 +4655,12 @@
     : t.subs.reduce((a, sub) => a + 하위메뉴(t.name, sub).length, 0);
 
   function renderHead() {
+    // 검색 중에는 분류가 아니라 「검색 결과 N개」다 — 레시피 탭의 목록 제목과 같은 문구를 쓴다
+    if (검색중()) {
+      $('#mnCountLabel').textContent = '검색 결과';
+      $('#mnCountNum').textContent = 검색결과().reduce((a, g) => a + g.items.length, 0);
+      return;
+    }
     const t = TABS[cur];
     $('#mnCountLabel').textContent = t.name;
     $('#mnCountNum').textContent = 탭개수(t);
@@ -4841,22 +4851,73 @@
   //    데이터의 하위 분류는 그대로 살아 있고(정렬 순서를 그게 정한다), 화면에만 안 나온다.
   // 🔴 이름에 Menu 를 붙인다 — 레시피 탭에도 `renderList()` 가 따로 있다(script.js 위쪽 IIFE).
   //    별개 IIFE 라 충돌은 안 나지만, 같은 이름이 둘이면 찾을 때 헷갈린다(2026-08-04 정리).
+  function 카드HTML(it) {
+    const on = picked.has(it.n);
+    const { 이름, 부제 } = 이름나누기(it.n);
+    const 꼬리 = it.part ? (it.jeju ? '제주 한정' : '일부 매장') : '';
+    const 아랫줄 = [부제, 꼬리].filter(Boolean).join(' · ');
+    return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
+      <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
+      <span class="mn-card-body">
+        <span class="mn-card-name">${이름}</span>
+        ${아랫줄 ? `<span class="mn-card-sub">${아랫줄}</span>` : ''}
+      </span>
+      <span class="mn-card-check">${체크아이콘}</span>
+    </button>`;
+  }
+
   function renderMenuList(t) {
     const items = t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
-    return `<div class="mn-list">${items.map((it) => {
-      const on = picked.has(it.n);
+    return `<div class="mn-list">${items.map(카드HTML).join('')}</div>`;
+  }
+
+  /* ── 검색 ──────────────────────────────────────────────────────────────────
+     🔴 대상은 **화면에 보이는 이름 + 부제**다(2026-08-03 확정). 즉 이름나누기()를 거친 값이라
+        `하이디라오 특제소고기` 는 `특제소고기` 로도, `하이디라오` 로도 걸린다.
+        「제주 한정」·「일부 매장」 꼬리표는 **대상이 아니다** — 그건 메뉴 이름이 아니라 상태 표시다.
+     🔴 범위는 **8개 분류 전체**다(2026-08-04 사용자 확정). 레시피 탭처럼 분류와 겹치는 AND 가
+        아니다 — 메뉴 탭엔 「전체」 탭이 없어서 AND 로 하면 다른 분류의 메뉴를 찾을 길이 없다.
+        대신 결과에 「고기 › 소고기」 소제목을 붙여 어디 것인지 보인다.
+     🔴 전골(육수 12개)은 대상에서 뺀다(2026-08-04 사용자 확정) — 전골은 목록이 아니라 냄비를
+        고르는 화면이고, 담는 규칙(칸 번호·중복 담기)이 달라 결과 안에서 따로 논다.
+     ────────────────────────────────────────────────────────────────────────── */
+  const searchBox = $('#mnSearchBox');
+  const searchInput = $('#mnSearchInput');
+
+  // 괄호·공백을 뺀 형태로도 맞춘다 — 레시피 탭의 검색꼴()과 같은 규칙이다(script.js 위쪽 IIFE).
+  // 🔴 괄호·공백만 친 경우 빈 문자열이 되는데, 빈 문자열은 아무 이름에나 들어 있어 그대로 쓰면
+  //    전부가 걸린다. 쓰는 쪽에서 반드시 비었는지 본다(레시피 탭이 실제로 당했던 함정이다).
+  const 검색꼴 = (s) => (s || '').replace(/[()\s]/g, '');
+  // 🔴 전골 탭은 검색창 자체가 없다(CSS 가 감춘다). 그 탭에서 검색 상태가 살아 있으면 「보이지 않는
+  //    검색창에 걸려 목록이 이상하다」가 되므로, 여기 한 곳에서 함께 막는다.
+  const 검색중 = () => !!query.trim() && !TABS[cur].pot;
+
+  // 상위 › 하위 묶음 배열을 돌려준다. 화면 순서는 탭 순서 그대로다(전골은 건너뛴다).
+  function 검색결과() {
+    const q = query.trim();
+    const nq = 검색꼴(q);
+    const 걸린다 = (it) => {
       const { 이름, 부제 } = 이름나누기(it.n);
-      const 꼬리 = it.part ? (it.jeju ? '제주 한정' : '일부 매장') : '';
-      const 아랫줄 = [부제, 꼬리].filter(Boolean).join(' · ');
-      return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
-        <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
-        <span class="mn-card-body">
-          <span class="mn-card-name">${이름}</span>
-          ${아랫줄 ? `<span class="mn-card-sub">${아랫줄}</span>` : ''}
-        </span>
-        <span class="mn-card-check">${체크아이콘}</span>
-      </button>`;
-    }).join('')}</div>`;
+      const 대상 = 이름 + ' ' + 부제;   // 꼬리표는 넣지 않는다
+      return 대상.includes(q) || (nq && 검색꼴(대상).includes(nq));
+    };
+    const out = [];
+    TABS.forEach((t) => {
+      if (t.pot) return;
+      t.subs.forEach((sub) => {
+        const items = 하위메뉴(t.name, sub).filter(걸린다);
+        if (items.length) out.push({ up: t.name, sub, items });
+      });
+    });
+    return out;
+  }
+
+  function renderSearch() {
+    const groups = 검색결과();
+    if (!groups.length) return `<p class="empty-state">검색 결과가 없어요</p>`;
+    return `<div class="mn-list">${groups.map((g) =>
+      `<p class="mn-group">${묶음이름(g.up, g.sub)}</p>${g.items.map(카드HTML).join('')}`
+    ).join('')}</div>`;
   }
 
   // 🔴 스크롤은 「사람이 탭을 눌렀을 때」만 위로 보낸다. 첫 렌더는 페이지가 뜨는 중이라
@@ -4870,7 +4931,9 @@
     //    🔴 이름을 'mn-pot' 으로 쓰면 안 된다 — 그건 냄비 그림(.mn-pot)의 클래스라
     //       .page 가 그 규칙(폭·모양)을 통째로 뒤집어써서 화면이 194px 로 쪼그라든다(실제로 그랬다).
     document.querySelector('.page').classList.toggle('mn-pot-tab', !!t.pot);
-    $('#mnBody').innerHTML = t.pot ? renderPot() : renderMenuList(t);
+    $('#mnBody').innerHTML = t.pot ? renderPot()
+      : 검색중() ? renderSearch()
+      : renderMenuList(t);
     $('#potIcon').classList.toggle('has-item', !!count());
     if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
   }
@@ -4906,7 +4969,7 @@
       t.subs.forEach((sub) => {
         const on = 하위메뉴(t.name, sub).filter((it) => picked.has(it.n));
         if (!on.length) return;
-        rows.push(`<p class="mn-sheet-group">${t.name} › ${sub}</p>`);
+        rows.push(`<p class="mn-sheet-group">${묶음이름(t.name, sub)}</p>`);
         on.forEach((it) => rows.push(
           `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
       });
@@ -4959,6 +5022,10 @@
       const i = +tab.dataset.i;
       if (i === cur) return;
       cur = i;
+      // 🔴 분류를 누르면 검색을 지운다 — 검색은 8개 분류를 가로지르므로(위 「검색」 절), 검색을 켠 채
+      //    분류를 눌러도 결과가 안 바뀐다. 그러면 밑줄만 움직이고 목록은 그대로여서 고장으로 보인다.
+      //    「이 분류를 보겠다」는 뜻으로 받아 검색을 끄고 그 분류를 보여준다.
+      clearSearch();
       return render(true);
     }
 
@@ -5002,6 +5069,31 @@
     const rmb = e.target.closest('[data-rm-broth]');
     if (rmb) { broths.splice(+rmb.dataset.rmBroth, 1); renderSheet(); return refreshPot(); }
   });
+
+  // ── 검색창 배선 ── 레시피 탭(searchInput/searchClear)과 같은 방식이다.
+  //    ✕ 는 CSS 가 `.search-box.has-value` 일 때만 보여준다 — 클래스를 반드시 같이 갈아 끼운다.
+  function clearSearch() {
+    query = '';
+    if (searchInput) searchInput.value = '';
+    if (searchBox) searchBox.classList.remove('has-value');
+  }
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      query = e.target.value;
+      searchBox.classList.toggle('has-value', query.length > 0);
+      // 🔴 render() 를 쓴다(refreshCards 가 아니다) — 목록에 뜨는 카드가 통째로 바뀌는 일이다.
+      //    글자를 지워 검색을 끄면 원래 분류 목록으로 돌아온다.
+      render();
+    });
+  }
+  const searchClearBtn = $('#mnSearchClear');
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', () => {
+      clearSearch();
+      render();
+      searchInput.focus();
+    });
+  }
 
   // Esc — 앱의 다른 시트·모달과 같게 (확대가 떠 있으면 확대부터 닫는다)
   document.addEventListener('keydown', (e) => {

@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=681">
+<link rel="stylesheet" href="styles.css?v=682">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -433,7 +433,8 @@
       <!-- 🔴 배치(2026-08-03 사용자 확정) — 레시피 탭과 같은 얼개다:
            윗줄 = 검색창 / 아랫줄 = 분류 탭 + 개수. 안내문은 맨 아래 푸터로 내려갔다.
            검색창은 레시피 탭과 같은 모양이되, 메뉴 탭엔 뒤로가기가 없어 폭을 꽉 채운다.
-           🔴 아직 「자리」만이다 — 쳐도 걸러지지 않는다(검색 대상 미정, 2026-08-03). -->
+           🔴 동작은 2026-08-04에 붙였다 — 대상은 화면의 이름 + 부제, 범위는 8개 분류 전체다.
+           자세한 규칙과 이유는 script.js 메뉴 탭 IIFE 의 「검색」 절에 있다. -->
       <div class="mn-searchline">
         <div class="search-box" id="mnSearchBox">
           <svg class="search-box-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1025,7 +1026,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=3"></script>
-<script src="script.js?v=568"></script>
+<script src="script.js?v=569"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
