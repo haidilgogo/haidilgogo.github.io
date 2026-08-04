@@ -1445,16 +1445,11 @@
     //    감싼 .tabs-scroll 이 아니다 — 매장 탭에서도 실제로 미는 것은 `.tabs` 쪽이다(실측).
     const box = btn && btn.closest('.tabs');
     if (!box || box.scrollWidth <= box.clientWidth) return;   // 넘치지 않으면 할 일이 없다
-    // 🔴 붙박인 탭(메뉴 탭의 전골, position:sticky)이 있으면 그 폭만큼 왼쪽 여백을 더 준다 —
-    //    안 그러면 고른 탭을 화면 안으로 끌어오면서 **붙박이 밑에 숨겨 놓는다**(2026-08-05).
-    //    자기 자신이 붙박이일 땐 더할 것이 없다.
-    const pinned = box.querySelector('.tab-btn.is-pot');
-    const padLeft = 16 + (pinned && pinned !== btn ? pinned.offsetWidth : 0);
     const pad = 16;
     const left = btn.offsetLeft;                              // .tabs 가 position:relative 라 이 값이 스크롤 좌표다
     const right = left + btn.offsetWidth;
-    if (left - padLeft < box.scrollLeft) {
-      box.scrollTo({ left: Math.max(0, left - padLeft), behavior: 'smooth' });
+    if (left - pad < box.scrollLeft) {
+      box.scrollTo({ left: Math.max(0, left - pad), behavior: 'smooth' });
     } else if (right + pad > box.scrollLeft + box.clientWidth) {
       box.scrollTo({ left: right + pad - box.clientWidth, behavior: 'smooth' });
     }
@@ -4934,14 +4929,17 @@
   function updateMenuUnderline() {
     const wrap = $('#mnTabs');
     if (!wrap) return;
-    const active = wrap.querySelector('.tab-btn.active');
     const line = wrap.querySelector('.tabs-underline');
+    if (!line) return;
+    // 🔴 전골은 탭줄 **밖**(#mnPotTab)에 있다 — 그래서 고른 탭을 두 곳에서 찾아야 한다.
+    //    전골이 골라져 있으면 공용 밑줄은 숨기고 자기 밑줄(CSS .tab-btn.is-pot.active::before)에 맡긴다.
+    //    공용 밑줄은 탭줄 안 요소라 밖으로 못 나간다.
+    const pot = $('#mnPotTab .tab-btn.active');
+    if (pot) { line.hidden = true; return; }
+    line.hidden = false;
+    const active = wrap.querySelector('.tab-btn.active');
     // 메뉴 섹션이 숨겨져 있으면 offsetWidth=0 → 위치를 못 잡는다. 보일 때 다시 불린다(switchSection)
-    if (active && line && active.offsetWidth) {
-      // 🔴 전골은 자기 밑줄을 갖는다(CSS `.tab-btn.is-pot.active::before`) — 붙박여 있어서
-      //    같이 밀리는 공용 밑줄로는 자리를 못 맞춘다. 그동안 공용 밑줄은 숨긴다.
-      //    ⚠️ 숨기면서도 자리는 그대로 옮겨 둔다 — 다음에 다른 탭을 고르면 전골 밑에서 미끄러져 나온다.
-      line.hidden = active.classList.contains('is-pot');
+    if (active && active.offsetWidth) {
       line.style.width = active.offsetWidth + 'px';
       line.style.transform = 'translateX(' + active.offsetLeft + 'px)';
       if (window.keepTabVisible) window.keepTabVisible(active);
@@ -4955,18 +4953,19 @@
     // 🔴 밑줄(.tabs-underline)은 지우지 않는다 — 버튼만 갈아 끼운다(레시피 renderBrowseCatTabs 와 같은 방식).
     //    통째로 새로 그리면 밑줄이 옛 위치를 잃어 0 에서 다시 미끄러진다.
     const wrap = $('#mnTabs');
+    const pin = $('#mnPotTab');
     wrap.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    pin.replaceChildren();
     TABS.forEach((t, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      // 🔴 전골은 왼쪽에 붙박인다(2026-08-05 사용자 확정) — 탭줄이 375px 에서 316px 넘쳐서
-      //    옆으로 밀면 전골이 제일 먼저 사라졌다. 붙박이·구분선·전용 밑줄은 전부 CSS 의
-      //    `.tab-btn.is-pot` 가 맡는다(styles.css). 세로 구분선도 거기 ::after 로 옮겨서
-      //    따로 있던 `.mn-tab-div` 요소는 없앴다 — 전골만 붙박고 선은 안 붙박으면 선이 미끄러져 사라진다.
       btn.className = 'tab-btn' + (t.pot ? ' is-pot' : '') + (i === cur ? ' active' : '');
       btn.dataset.i = i;
       btn.textContent = t.name;
-      wrap.appendChild(btn);
+      // 🔴 전골만 **스크롤 영역 밖**(#mnPotTab)에 담는다(2026-08-05 사용자 확정) — 탭줄 안에
+      //    position:sticky 로 붙여 뒀더니 왼쪽 끝에서 튕길 때 같이 딸려갔다. 자세한 경위는 styles.css
+      //    `.tab-btn.is-pot` 주석. 구분선·전용 밑줄도 거기서 맡는다(따로 있던 `.mn-tab-div` 는 없앴다).
+      (t.pot ? pin : wrap).appendChild(btn);
     });
     updateMenuUnderline();
   }
@@ -5361,8 +5360,10 @@
   }
 
   document.addEventListener('click', (e) => {
-    // 🔴 반드시 #mnTabs 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다
-    const tab = e.target.closest('#mnTabs .tab-btn');
+    // 🔴 반드시 메뉴 탭줄 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다.
+    //    🔴 두 곳을 다 적는다 — 전골은 탭줄 밖(#mnPotTab)에 있다(2026-08-05). 여기를 빠뜨리면
+    //       전골을 눌러도 아무 일도 안 일어난다.
+    const tab = e.target.closest('#mnTabs .tab-btn, #mnPotTab .tab-btn');
     if (tab) {
       // 🔴 레시피 탭과 같다(2026-08-03 사용자 확정):
       //    같은 탭을 누르면 아무 일도 하지 않고(밑줄이 다시 그려지는 것을 막는다),

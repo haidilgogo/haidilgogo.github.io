@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=718">
+<link rel="stylesheet" href="styles.css?v=719">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -230,9 +230,19 @@
       </div>
       <!-- 메뉴 탭 상위 분류 — 레시피와 같은 자리, 같은 부품 -->
       <div class="topbar-cat topbar-cat--menu">
-        <!-- 🔴 밑줄(span)은 마크업에 둔다 — 레시피와 같은 방식. JS 가 매번 새로 만들면
-             옛 위치를 잃어버려 미끄러지지 못하고 0 에서 다시 그려진다(2026-08-03 실기기 영상으로 발견). -->
-        <div class="tabs" id="mnTabs"><span class="tabs-underline" id="mnTabsUnderline"></span></div>
+        <!-- 🔴 전골은 **스크롤 영역 밖**에 둔다(2026-08-05 사용자 확정). 처음엔 탭줄 안에서
+             position:sticky 로 붙여 뒀는데, 왼쪽 끝에서 튕길 때 **전골이 같이 딸려갔다**(실기기 확인).
+             붙박이는 「스크롤 영역 왼쪽 끝보다 왼쪽으로는 안 간다」만 지킬 뿐, 영역이 통째로
+             튕기는 것은 못 막는다. 아예 밖에 두면 구조적으로 못 움직인다.
+             ⚠️ 왼쪽 끝 튕김 자체를 끄는 방법(overscroll-behavior-x)은 **양쪽에 다 걸려서**
+                오른쪽 끝 튕김까지 없어진다. 이 사이트는 스크롤바를 전역으로 껐기 때문에
+                「뒤에 더 있다」는 신호가 그 튕김뿐이다 — 그래서 안 쓴다. -->
+        <div class="mn-tabs-row">
+          <div class="mn-tabs-pin" id="mnPotTab"></div>
+          <!-- 🔴 밑줄(span)은 마크업에 둔다 — 레시피와 같은 방식. JS 가 매번 새로 만들면
+               옛 위치를 잃어버려 미끄러지지 못하고 0 에서 다시 그려진다(2026-08-03 실기기 영상으로 발견). -->
+          <div class="tabs" id="mnTabs"><span class="tabs-underline" id="mnTabsUnderline"></span></div>
+        </div>
       </div>
       <!-- 매장 지역 탭 — 레시피·메뉴와 같은 자리, 같은 부품(2026-08-04).
            2026-07-23에 상단바 아래로 내렸던 것을 도로 올린 것이다. 그때는 세 탭이 제각각이었지만
@@ -1113,7 +1123,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=612"></script>
+<script src="script.js?v=613"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
