@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=709">
+<link rel="stylesheet" href="styles.css?v=711">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -240,6 +240,14 @@
            🔴 감싸개(.tabs-scroll)를 두지 않는다 — `.tabs` 자체가 이미 overflow-x: auto 다. -->
       <div class="topbar-cat topbar-cat--store">
         <div class="tabs" id="storeTabs"><span class="tabs-underline" id="storeTabsUnderline"></span></div>
+      </div>
+      <!-- 스티커 지역 탭 — 매장과 같은 부품·같은 자리(2026-08-04 사용자 지시).
+           🔴 2026-07-24 에 「스티커에 지역 탭 안 씀」으로 지웠던 것을 되살린 것이다.
+              그때 지운 코드(activeStampRegion·renderStampTabs·밑줄 계산)를 매장 것을 본떠 다시 만들었다.
+           🔴 탭은 **다녀온 지역만** 나온다(매장은 항상 6개 고정). 스티커는 내 기록이라
+              안 가본 지역 탭을 눌러 빈 화면을 보는 게 의미가 없다. 기록이 없으면 탭 줄 자체가 안 뜬다. -->
+      <div class="topbar-cat topbar-cat--stamp">
+        <div class="tabs" id="stampTabs"><span class="tabs-underline" id="stampTabsUnderline"></span></div>
       </div>
       <!-- 카테고리 필터 탭 제거(2026-07-21 홈 7단 개편) — 카테고리는 홈 섹션으로 이동.
            즐겨찾기 버튼은 topbar-right로 이사, 이 그룹은 숨김(favShareBtn 등은 script 참조 때문에 DOM 유지) -->
@@ -1089,7 +1097,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=601"></script>
+<script src="script.js?v=603"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

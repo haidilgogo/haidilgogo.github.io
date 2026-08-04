@@ -3356,9 +3356,53 @@
     return card;
   }
 
-  // 스티커 지역 탭은 쓰지 않는다(2026-07-24 사용자 확정). 상단바에서 UI를 뺀 뒤 남아 있던
-  // 필터 코드(activeStampRegion·STAMP_REGION_OF·renderStampTabs·밑줄 계산)를 전부 제거했다.
-  // 기록은 지역 구분 없이 항상 전체가 최신순으로 보인다. 되살릴 일이 생기면 매장 탭 지역탭을 참고할 것.
+  // ── 스티커 지역 탭(2026-08-04 사용자 지시로 되살림) ──
+  // 🔴 2026-07-24 에 「스티커에 지역 탭 안 씀」으로 지웠던 기능이다. 그때 주석에 「되살릴 일이 생기면
+  //    매장 탭 지역탭을 참고할 것」이라 적어 뒀고, 실제로 그것을 본떠 다시 만들었다(같은 .tab-btn + 밑줄).
+  // 🔴 매장과 다른 점 하나: **다녀온 지역만** 탭으로 만든다. 매장은 항상 6곳이 있어 고정 6탭이지만,
+  //    스티커는 내 기록이라 안 가본 지역 탭을 눌러 빈 화면을 보는 게 의미가 없다.
+  //    기록이 없으면 탭 줄 자체가 비고, 한 지역만 다녀왔으면 「전체」와 그 지역 둘만 뜬다.
+  let activeStampRegion = '전체';
+  const STAMP_REGION_OF = (name) => (STORES.find((s) => s.name === name) || {}).region || '';
+  const stampTabsEl = document.getElementById('stampTabs');
+  const stampUnderline = document.getElementById('stampTabsUnderline');
+  function updateStampUnderline() {
+    if (!stampTabsEl || !stampUnderline) return;
+    const active = stampTabsEl.querySelector('.tab-btn.active');
+    if (active && active.offsetWidth) {
+      stampUnderline.style.width = active.offsetWidth + 'px';
+      stampUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      keepTabVisible(active);
+    }
+  }
+  if (stampTabsEl) enableDragScroll(stampTabsEl);
+  function renderStampTabs() {
+    if (!stampTabsEl) return;
+    stampTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    // 다녀온 지역만 — STORES 의 지역 순서를 그대로 따라 순서가 매번 흔들리지 않게 한다
+    const 다녀온 = [];
+    STORES.forEach((s) => {
+      if (다녀온.includes(s.region)) return;
+      if (stampData.records.some((r) => r.name === s.name)) 다녀온.push(s.region);
+    });
+    // 지역이 하나뿐이면 탭이 「전체 · 서울」 둘뿐이라 고를 게 없다 → 아예 안 그린다
+    if (다녀온.length < 2) { activeStampRegion = '전체'; stampUnderline.style.width = '0px'; return; }
+    if (activeStampRegion !== '전체' && !다녀온.includes(activeStampRegion)) activeStampRegion = '전체';
+    ['전체'].concat(다녀온).forEach((reg) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (reg === activeStampRegion ? ' active' : '');
+      btn.textContent = reg;
+      btn.addEventListener('click', () => {
+        if (activeStampRegion === reg) return;
+        activeStampRegion = reg;
+        renderStampTabs();
+        renderStamps();
+      });
+      stampTabsEl.appendChild(btn);
+    });
+    updateStampUnderline();
+  }
 
   // 기록 카드 노드 캐시(id→카드 DOM). 지역 탭 전환·삭제 때 카드를 새로 안 만들고 재사용해
   // 스티커 <img>가 매번 재생성돼 재디코딩·깜빡이던 것 방지(레시피 그리드 browseCardCache와 같은 원리).
@@ -3401,9 +3445,15 @@
   function renderStamps() {
     const grid = document.getElementById('stampGrid');
     if (!grid) return;
-    const list = stampData.records.slice(); // 지역 필터 없음 — 항상 전체(위 주석 참고)
-    // "다녀온 매장 N곳" = 고유 매장 수(같은 매장 여러 번 기록해도 1곳으로 셈 — 라벨과 의미 일치)
-    document.getElementById('stampCountNum').textContent = new Set(list.map((r) => r.name)).size;
+    renderStampTabs();   // 기록이 늘고 줄 때마다 「다녀온 지역」이 달라진다
+    const 전체 = stampData.records.slice();
+    const list = activeStampRegion === '전체'
+      ? 전체
+      : 전체.filter((r) => STAMP_REGION_OF(r.name) === activeStampRegion);
+    // 🔴 "다녀온 매장 N곳"은 **거른 결과가 아니라 늘 전체** 기준이다 — 이 줄은 「내가 다녀온 곳이 몇 곳인가」를
+    //    말하는 것이라 지역 탭을 눌렀다고 숫자가 줄면 다른 뜻이 되어 버린다.
+    //    (매장 탭의 개수는 반대로 「지금 보고 있는 목록의 개수」라 지역에 따라 바뀐다 — 뜻이 다르다.)
+    document.getElementById('stampCountNum').textContent = new Set(전체.map((r) => r.name)).size;
     // 일기라 최신이 먼저: 날짜 최근순, 같은 날짜면 나중에 기록한 것(addedAt)이 위.
     // addedAt 없는 옛 기록은 0 취급 → 같은 날짜 안에서 맨 아래(정렬 안 깨짐).
     list.sort((a, b) => {
@@ -4580,8 +4630,13 @@
   if (homeCodeBox) homeCodeBox.addEventListener('click', () => openSyncSheet());
   // 상단바 아이콘(홈 전용, 공유 왼쪽) — 같은 시트를 연다. 홈 박스와 입구가 둘이지만 역할이 다르다:
   // 아이콘은 「상시 손 닿는 곳」, 박스는 「무엇인지 설명이 있는 곳」.
+  // 🔴 다시 누르면 닫힌다(2026-08-04 사용자 지시) — 메뉴 탭의 냄비 버튼과 같은 규칙이다.
+  //    아이콘이 제자리에 그대로 보이는데 다시 눌러도 안 닫히면 갇힌 느낌이 든다.
   const topCodeBtn = document.getElementById('topCodeBtn');
-  if (topCodeBtn) topCodeBtn.addEventListener('click', () => openSyncSheet());
+  if (topCodeBtn) topCodeBtn.addEventListener('click', () => {
+    if (syncOverlay && syncOverlay.classList.contains('open')) closeSyncSheet();
+    else openSyncSheet();
+  });
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
   const syncCloseBtn = document.getElementById('syncSheetClose');
   if (syncCloseBtn) syncCloseBtn.addEventListener('click', closeSyncSheet);

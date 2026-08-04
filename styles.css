@@ -494,8 +494,15 @@ img {
   -webkit-tap-highlight-color: transparent; /* 기본 검정 음영은 끄고, 아래 :active로 눌림 반응 */
 }
 
-.topbar-icon-btn:hover {
-  color: var(--brand-red);
+/* 🔴 hover 는 반드시 @media (hover: hover) 안에 둘 것(2026-08-04 실기기에서 발견).
+   손가락 기기는 탭한 뒤에도 :hover 가 그대로 남는다 — 내 코드 아이콘을 눌러 시트를 닫아도
+   아이콘이 계속 빨갛게 남아 있었다(사용자 보고). 공유·설치·냄비도 같은 상태였는데,
+   그쪽은 누르면 화면이 바뀌어서 눈에 안 띄었을 뿐이다.
+   앱의 다른 곳(.modal-close · .a2hs-close · .home-guide)은 원래부터 이 감싸개를 쓰고 있었다. */
+@media (hover: hover) {
+  .topbar-icon-btn:hover {
+    color: var(--brand-red);
+  }
 }
 .topbar-icon-btn:active {
   color: var(--brand-red);
@@ -2356,7 +2363,8 @@ img {
 .topbar-cat { display: none; flex: 1 1 0; min-width: 0; }
 .page[data-section="recipe"] .topbar-cat--recipe,
 .page[data-section="menu"] .topbar-cat--menu,
-.page[data-section="store"] .topbar-cat--store { display: block; }
+.page[data-section="store"] .topbar-cat--store,
+.page[data-section="stamp"] .topbar-cat--stamp { display: block; }
 /* 카테고리가 올라간 탭에서는 남는 폭을 탭줄이 다 갖는다 —
    오른쪽 아이콘(flex: 1 1 0)과 빈칸(flex: 1)이 그대로면 셋이 남는 폭을 나눠 가져 탭줄이 좁아진다 */
 .page[data-section="recipe"] .topbar-right,
