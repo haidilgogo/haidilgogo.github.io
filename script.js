@@ -65,6 +65,26 @@
   //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
   //    ⚠️ 오픈 예정(안산점·부산점)은 네이버에 아직 없어서 번호가 없다. 그 둘은 지도 버튼 자체가
   //       비활성이라 필요 없다. (부산점은 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
+  // 🔴 지점별 카카오 장소번호(2026-08-04). 네이버와 **번호 체계가 다르다** — 서로 못 바꿔 쓴다.
+  //    뽑는 법: m.map.kakao.com/actions/searchView?q=하이디라오+<지점> 의 HTML 안
+  //            <li class="search_item base" data-id="<번호>"> 에 들어 있다.
+  //    ⚠️ 카카오 등록명이 우리와 다른 곳이 있다(번호로 걸어서 화면엔 영향 없다):
+  //       홍대점→홍대지점 · 코엑스점→COEX점 · 제주점→제주도점
+  //    ⚠️ 오픈 예정(안산점·부산점)은 번호가 없다. 지도 버튼 자체가 비활성이라 필요 없다.
+  const STORE_KAKAO_ID = {
+    '명동점': '1820258951',
+    '서초점': '1372079546',
+    '홍대점': '1622865435',
+    '건대점': '1026281815',
+    '영등포점': '1214126801',
+    '대학로점': '731469845',
+    '코엑스점': '576159166',
+    '가산점': '670610672',
+    '부천점': '481359274',
+    '부산역점': '957408853',
+    '대구점': '1203829931',
+    '제주점': '1143177072',
+  };
   const STORE_NAVER_ID = {
     '명동점': '1501495669',
     '서초점': '38314432',
@@ -3163,9 +3183,15 @@
               href: STORE_NAVER_ID[s.name]
                 ? 'https://m.map.naver.com/map.naver?pinId=' + STORE_NAVER_ID[s.name] + '&pinType=site&menu=location'
                 : 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
-            // ⚠️ 카카오도 폰에서 앱으로 튄다(applink.map.kakao.com) — 앱이 없으면 같은 문제다.
-            //    아직 안 고쳤다. 고칠 때는 네이버처럼 실기기에서 확인하고 바꿀 것.
-            { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1', href: 'https://map.kakao.com/?q=' + q },
+            // 🔴 카카오는 해시(#!/<번호>/map/place)가 핀을 찍는다(2026-08-04 실기기 확인).
+            //    ⚠️ 네이버와 정반대다 — 네이버의 #map/<번호> 는 새 탭으로 열면 오류가 나는데,
+            //       카카오의 #!/… 는 새 탭으로 열어도 핀 찍힌 지도가 뜬다. 한쪽 결론을 다른 쪽에 옮기지 말 것.
+            //    ⚠️ 옛 map.kakao.com/?q=… 는 쓰면 안 된다 — 폰에서 applink.map.kakao.com 으로 앱에 튄다.
+            //    ⚠️ place.map.kakao.com/<번호> 는 열리지만 지도가 아니라 매장정보 페이지다.
+            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다.
+            { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1',
+              href: 'https://m.map.kakao.com/actions/searchView?q=' + qPlus +
+                    (STORE_KAKAO_ID[s.name] ? '#!/' + STORE_KAKAO_ID[s.name] + '/map/place' : '') },
           ].forEach((o) => {
             const a = document.createElement('a');
             a.className = 'map-dd-item';
