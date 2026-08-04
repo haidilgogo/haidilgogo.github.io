@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=705">
+<link rel="stylesheet" href="styles.css?v=706">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -393,13 +393,6 @@
         </div>
         <div class="home-grid" id="tangGrid"></div>
       </section>
-      <section class="home-sec home-random" id="homeRandom">
-        <span class="home-random-dice"><img src="assets/icons/dice.png?v=1" alt="주사위" width="76" height="76" loading="lazy" draggable="false"></span>
-        <p class="home-random-title">아, 소스 뭐 먹지?</p>
-        <p class="home-random-sub">오늘 먹을 소스를 가챠로 뽑아보세요</p>
-        <button class="home-random-btn" id="homeRandomBtn" type="button">오늘의 소스</button>
-      </section>
-
       <!-- 내 코드 — 스티커 탭 안에 있던 띠를 홈으로 옮겼다(2026-08-04 사용자 확정).
            🔴 홈이 맞는 자리다: 이 안내가 가장 필요한 사람은 **아무것도 없는 새 기기에서 처음 연 사람**인데,
               스티커 탭까지 들어가야 보이면 늦는다. 홈은 그 사람이 반드시 보는 화면이다.
@@ -407,6 +400,12 @@
            🔴 색은 따라가지 않는다. 가이드는 빨강 그라데이션이라 홈 아래쪽에 빨간 덩어리가 둘이 되고,
               매일 쓰는 기능도 아닌데 너무 커진다. 옛 띠의 연분홍을 그대로 잇는다.
            🔴 접기는 없앴다 — 통째로 누르는 박스에는 접을 자리가 없다.
+
+           🔴 자리 = 탕 다음, 가챠 **앞**이다(2026-08-04 사용자 확정). 이유 둘:
+              ① 가이드 박스와 **떨어뜨린다** — 얼개가 같아서 나란히 두면 「같은 것 두 개」로 읽히고
+                 가이드도 특별해 보이지 않는다(사용자 지적).
+              ② **가챠가 홈의 마무리**다 — 「아, 소스 뭐 먹지?」로 끝나는 게 자연스러운데,
+                 그 뒤에 안내 박스가 붙으면 마무리를 끊는다.
            부제는 코드 유무에 따라 바뀐다(script.js renderCodeNotice). -->
       <button class="home-code home-sec" id="homeCode" type="button">
         <span class="home-code-txt">
@@ -415,6 +414,13 @@
         </span>
         <svg class="home-code-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+
+      <section class="home-sec home-random" id="homeRandom">
+        <span class="home-random-dice"><img src="assets/icons/dice.png?v=1" alt="주사위" width="76" height="76" loading="lazy" draggable="false"></span>
+        <p class="home-random-title">아, 소스 뭐 먹지?</p>
+        <p class="home-random-sub">오늘 먹을 소스를 가챠로 뽑아보세요</p>
+        <button class="home-random-btn" id="homeRandomBtn" type="button">오늘의 소스</button>
+      </section>
 
       <!-- 홈 푸터 — 문구 + 링크. 「맨 위로」 버튼은 두지 않는다(2026-08-03 사용자 확정) -->
       <footer class="footer">
