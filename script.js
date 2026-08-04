@@ -4899,17 +4899,29 @@
           「제주한정」이 실제로 있다(제주도점에만). 메뉴 6개 + 육수 `고수 듬뿍 훠궈` 1개.
        ⚠️ 데이터의 `part`·판매 지점 기록은 그대로 둔다 — 조사 자료로는 쓸모가 있고
           `메뉴.md` 가 원본이다. 화면에만 안 쓴다. */
-    // 🔴 「제주 한정」은 이름 **위 배지**다(2026-08-04 사용자 확정). 부제 자리(이름 아래)가 아니다.
-    //    한라봉 아이콘은 코덱스가 하딜고고용으로 새로 그린 것이다 — 원본은 저장소 밖
-    //    `data/brand/icon/svg/jeju/hallabong-16px-color.svg` 이고 앱에는 복사본을 쓴다.
-    //    ⚠️ 16px 로만 쓸 것. 12px 로 줄이면 꼭지 혹이 뭉개져 그냥 귤로 보인다(재서 확인).
+    /* 🔴 「제주 한정」은 **부제 자리(이름 아래)에 한라봉 아이콘 + 주황 글씨**다(2026-08-04 사용자 확정).
+       거쳐 온 안들과 왜 이걸로 정했는지 —
+       · 이름 **위** 배지로 올려 봤더니 **이름이 12.5px 내려갔다.** 부제 있는 카드(위로 8px)와
+         반대로 움직여서 목록을 내리면 이름 줄이 20.7px 폭으로 튀었다(재서 확인)
+       · 썸네일 **위**에 아이콘만 얹는 안도 봤다. 이름은 안 움직이지만 아이콘과 「제주 한정」
+         글자가 왼쪽 위·오른쪽 아래로 떨어져 서로 안 묶인다. `.mn-card-thumb img` 규칙이
+         썸네일 안 모든 그림을 100%로 늘리는 함정도 있다
+       · 지금 방식은 이름 이동이 **부제 있는 카드와 똑같아서**(위로 8px) 새 어긋남이 없다
+       ⚠️ 아이콘 13px 이다 — 부제 글자 12px 과 키를 맞춘 값이다. 16px 은 아이콘만 도드라진다.
+       ⚠️ 「제주 한정」은 **띄어 쓴다.** 「한정」이 명사라 명사구는 띄어 쓰는 게 원칙이고,
+          CLAUDE.md 에 「관형형+명사는 어법대로 띄어 씀」이 이미 있다.
+          (메뉴.md 의 `🍊제주한정` 은 문서 안 표식이라 붙여 쓴 것이고 화면 문구가 아니다)
+       아이콘은 코덱스가 하딜고고용으로 새로 그렸다 — 원본은 저장소 밖
+       `data/brand/icon/svg/jeju/hallabong-16px-color.svg`, 앱에는 복사본을 쓴다. */
     const 제주 = !!(it.part && it.jeju);
+    const 아랫줄 = 제주
+      ? `<span class="mn-card-sub mn-card-sub--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정${부제 ? ` · ${부제}` : ''}</span>`
+      : (부제 ? `<span class="mn-card-sub">${부제}</span>` : '');
     return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
       <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
       <span class="mn-card-body">
-        ${제주 ? `<span class="mn-jeju"><img src="assets/icons/hallabong.svg" alt="" width="16" height="16">제주 한정</span>` : ''}
         <span class="mn-card-name">${이름}</span>
-        ${부제 ? `<span class="mn-card-sub">${부제}</span>` : ''}
+        ${아랫줄}
       </span>
       <span class="mn-card-check">${체크아이콘}</span>
     </button>`;
