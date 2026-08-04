@@ -5023,11 +5023,16 @@
     sheetOverlay.classList.add('open');
     sheetOverlay.setAttribute('aria-hidden', 'false');
     $('#potToggleBtn').classList.add('is-open');
+    // 🔴 뒤 화면이 밀리지 않게 잠근다(2026-08-04 사용자 지적) — 예전엔 시트를 열고 밀면
+    //    뒤 목록이 400px 그대로 움직였다. body 가 아니라 html 에 건다 — body 를 스크롤
+    //    컨테이너로 만들면 상단바 sticky 가 깨진다(레시피 상세·가챠와 같은 방식).
+    document.documentElement.style.overflow = 'hidden';
   }
   function closeSheet() {
     sheetOverlay.classList.remove('open');
     sheetOverlay.setAttribute('aria-hidden', 'true');
     $('#potToggleBtn').classList.remove('is-open');
+    document.documentElement.style.overflow = '';
   }
 
   document.addEventListener('click', (e) => {
