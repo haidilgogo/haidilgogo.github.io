@@ -4993,12 +4993,18 @@
     });
   }
 
+  // 담은 줄의 그림 24px. 🔴 카드용 그림(IMG)을 쓴다 — 목록 카드가 이미 받아 둔 파일이라 새로 안 받는다.
+  //    전골도 카드용이다(냄비 칸의 `-타일`이 아니다 — 그건 담는 순간 따로 받는 파일이다).
+  //    그림이 없는 항목은 자리만 비운다(지금은 130장 다 있지만 데이터에 없음 표시가 남아 있을 수 있다).
+  const 줄그림 = (n, 있나) => (있나 ? `<img src="${IMG(n)}" alt="">` : '');
+
   function renderSheet() {
     const rows = [];
     if (broths.length) {
       rows.push(`<p class="mn-sheet-group">전골 ${potLabel(cells)}</p>`);
       broths.forEach((b, i) => rows.push(
-        `<div class="mn-sheet-item">${b}<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
+        `<div class="mn-sheet-item">${줄그림(b, (D.broths.find((x) => x.n === b) || {}).img)}${b}` +
+        `<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
     }
     // 담은 목록도 화면 분류대로 묶는다 — 어느 탭에서 담았는지 그대로 보이게.
     // 🔴 소제목은 상위 한 단이다(2026-08-04 사용자 지적). 옛 코드는 「육류 › 내장류」처럼 하위까지
@@ -5010,7 +5016,8 @@
       if (!on.length) return;
       rows.push(`<p class="mn-sheet-group">${t.name}</p>`);
       on.forEach((it) => rows.push(
-        `<div class="mn-sheet-item">${it.n}<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
+        `<div class="mn-sheet-item">${줄그림(it.n, it.img)}${it.n}` +
+        `<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
     });
     $('#mnSheetBody').innerHTML = rows.length ? rows.join('')
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
