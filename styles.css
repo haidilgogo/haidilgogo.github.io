@@ -2401,11 +2401,9 @@ img {
 .page[data-section="stamp"] .topbar-brand,
 .page[data-section="stamp"] #topShareBtn,
 .page[data-section="stamp"] #topInstallBtn { display: none; }
-/* 🔴 로고를 숨기면 상단바가 얇아진다 — 스티커만 57px 이 되어 탭을 옮길 때 화면이 위아래로 튄다
-   (실측 후 발견). 로고가 잡아 주던 44px 을 여기서 대신 잡는다. 위 .topbar-cat .tabs 가
-   레시피·메뉴·매장에 대해 같은 일을 하는 것과 같은 이유·같은 값이다.
-   ⚠️ 버튼 자체를 키우지 않는다 — 줄 높이만 잡아서 「기록하기」 모양은 그대로 둔다. */
-.page[data-section="stamp"] .topbar-right { min-height: 44px; align-items: center; }
+/* (여기 있던 `.page[data-section="stamp"] .topbar-right { min-height: 44px }` 는 지웠다 —
+   로고도 기록하기도 없어 상단바가 57px 로 얇아지던 것을 막으려던 값인데, 지금은 상단바에
+   지역 탭이 있어서 위 `.topbar-cat .tabs { min-height: 44px }` 가 같은 일을 한다.) */
 /* 🔴 상단바 높이가 탭을 옮겨도 안 변해야 한다 — 로고와 같은 44px 을 여기서도 잡는다.
    (안 잡으면 레시피 탭만 상단바가 얇아져 화면이 위아래로 튄다) */
 .topbar-cat .tabs {
@@ -4878,8 +4876,8 @@ img {
    ══════════════════════════════════════════════════════════════ */
 /* 담은 목록(냄비) 버튼은 메뉴 섹션에서만 — 즐겨찾기가 레시피 전용인 것과 같은 방식 */
 .page:not([data-section="menu"]) .pot-btn { display: none; }
-/* 기록하기는 스티커 섹션에서만 — 위 냄비와 같은 방식(2026-08-04, 본문 머리줄에서 상단바로 옮김) */
-.page:not([data-section="stamp"]) .stamp-write-btn { display: none; }
+/* (여기 있던 「기록하기는 스티커에서만」 규칙은 지웠다 — 2026-08-04에 버튼을 상단바로 올렸다가
+   같은 날 본문 머리줄로 되돌렸다. 이제 버튼이 #view-stamp 안에 있어 다른 탭에서는 뷰째로 숨는다.) */
 /* 내 코드는 홈에서만 — 공유 버튼 왼쪽에 선다(2026-08-04 사용자 지시).
    🔴 공유가 홈에만 남아 있으므로 이것도 홈에만 둔다. 다른 탭에 두면 상단바 규칙이 또 갈라진다.
    ⚠️ 입구가 둘이 된다(홈 박스 .home-code + 이 아이콘). 2026-07-31 에 「입구는 하나뿐」으로

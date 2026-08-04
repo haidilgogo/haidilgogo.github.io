@@ -2878,6 +2878,10 @@
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
     // 메뉴도 같은 이유(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다, 2026-08-03)
     if (name === 'menu' && window.mnSyncUnderline) { window.mnSyncUnderline(); requestAnimationFrame(window.mnSyncUnderline); }
+    // 🔴 스티커도 마찬가지다(2026-08-04 사용자 발견) — 이 줄이 없어서 새로고침 뒤 처음 스티커 탭에
+    //    들어가면 「전체」 밑에 밑줄이 없었고, 지역을 한 번 눌러야 그때 생겼다.
+    //    상단바는 늘 보이지만 .topbar-cat--stamp 는 스티커일 때만 display 되므로, 그 전엔 폭이 0이다.
+    if (name === 'stamp' && window.updateStampUnderline) { window.updateStampUnderline(); requestAnimationFrame(window.updateStampUnderline); }
     syncTopbarH();
   }
 
@@ -3375,6 +3379,10 @@
       keepTabVisible(active);
     }
   }
+  // switchSection 에서도 부른다(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다).
+  // 🔴 window 에 얹는 이유: switchSection 이 이 함수보다 위에 있어서, 스코프가 갈리면 직접 못 부른다.
+  //    메뉴 탭이 window.mnSyncUnderline 을 쓰는 것과 같은 방식이다.
+  window.updateStampUnderline = updateStampUnderline;
   if (stampTabsEl) enableDragScroll(stampTabsEl);
   function renderStampTabs() {
     if (!stampTabsEl) return;
