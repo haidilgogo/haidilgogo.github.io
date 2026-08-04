@@ -5068,7 +5068,8 @@
     //    분명한 고지(「하이디라오 주문과는 연동되지 않아요」)는 메뉴 탭 푸터가 맡는다 — 역할을 나눴다.
     //    ⚠️ 「담아두고」가 성립하려면 저장이 있어야 한다 — 그래서 같은 날 이 기기 저장을 붙였다(위 saveMenu).
     //    담은 게 없을 때는 안 보여준다 — 빈 화면에 안내만 남으면 이상하다.
-    if (rows.length) rows.push(`<p class="mn-sheet-note">여기에 담아두고 매장에서 편하게 주문해보세요.</p>`);
+    //    🔴 마침표를 안 쓴다 — 앱의 다른 문구도 안 쓴다(「아직 담은 것이 없어요」·푸터 안내).
+    if (rows.length) rows.push(`<p class="mn-sheet-note">여기에 담아두고 매장에서 편하게 주문해보세요</p>`);
     $('#mnSheetBody').innerHTML = rows.length ? rows.join('')
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
   }

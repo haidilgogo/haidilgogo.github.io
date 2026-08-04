@@ -64,7 +64,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg?v=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=691">
+<link rel="stylesheet" href="styles.css?v=692">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -455,8 +455,13 @@
            레시피 푸터와 같은 .footer 를 쓴다. 링크의 id 는 레시피 쪽에만 둔다(중복 id 금지). -->
       <footer class="footer">
         <!-- 🔴 고지가 들어간 문구다(2026-08-04 사용자 확정) — 옛 문구 「메뉴는 매장 사정에 따라
-             달라질 수 있어요」에 「연동되지 않는다」를 합쳤다. 실제 주문으로 오해되면 곤란하다. -->
-        <span class="footer-note">매장·시기에 따라 메뉴가 다를 수 있어요. 주문 전에 미리 보는 용도이고, 하이디라오 주문과는 연동되지 않아요.</span>
+             달라질 수 있어요」에 「연동되지 않는다」를 합쳤다. 실제 주문으로 오해되면 곤란하다.
+             🔴 마침표를 안 쓴다 — 앱의 다른 푸터도 안 쓴다(매장 탭 「영업시간은 매장 사정에 …」).
+             🔴 그래서 문장 사이를 <br> 로 나눈다. 저절로 감기게 두면 문장 한가운데서 끊겼다(재서 확인).
+             ⚠️ 「주문 전에 미리 보는 용도」는 뺐다 — 내 메뉴 안내(「여기에 담아두고 매장에서
+                편하게 주문해보세요」)가 이미 그 말을 해서 겹쳤고, 넣으면 3줄이 됐다.
+                지금은 41자 2줄이다(매장 탭 푸터는 24자 1줄). -->
+        <span class="footer-note">매장·시기에 따라 메뉴가 다를 수 있어요<br>하이디라오 주문과는 연동되지 않아요</span>
         <div class="footer-links">
           <a class="footer-report" href="https://forms.gle/GbuAfw2U9UNt2n53A" target="_blank" rel="noopener"><svg class="footer-report-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</a>
           <span class="footer-sep" aria-hidden="true"></span>
