@@ -251,6 +251,9 @@
   display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px;
   align-items: center;
 }
+/* 그림 없는 항목(2026-08-04) — 아이콘 절에 쓴다. 아이콘은 앱 안에 SVG 로 박혀 있어
+   따로 띄울 그림 파일이 없다. 앞의 40px 칸을 없애 글이 줄 전체를 쓰게 한다. */
+.credit-item--noimg { grid-template-columns: minmax(0, 1fr); }
 .credit-thumb {
   width: 40px; height: 40px;
   border-radius: 50%; object-fit: cover;
