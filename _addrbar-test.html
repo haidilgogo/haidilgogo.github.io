@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCF9F5">
+<title>주소창 — 얼개 하나씩 켜 보기</title>
+<style>
+  /* 🔴 1차 시험(잠금/풀기 다섯 가지)에서는 **전부 투명**이었다 — 재현 자체가 안 됐다.
+     openSheet 도 시험 페이지와 똑같았다. 그러면 차이는 시트가 아니라 **페이지 얼개**에 있다.
+     앱에는 있고 1차 시험 페이지엔 없던 것 넷을 하나씩 켜 본다.
+     잠금 방식은 다섯 칸 모두 앱과 같다(html overflow hidden → 닫을 때 빈 값). */
+  * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
+  body { margin: 0; background: #FCF9F5; color: #2B120D;
+         font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', sans-serif; }
+
+  /* ── 앱에서 가져온 조각들. data-on 에 든 것만 켜진다 ── */
+  body[data-on~="overscroll"] { overscroll-behavior-y: none; }
+
+  .top { display: none; padding: 12px 16px; background: #FCF9F5; border-bottom: 1px solid #EFE3D6; font-weight: 800; }
+  body[data-on~="topbar"] .top { display: block; position: sticky; top: 0; z-index: 40; }
+
+  .page { }
+  body[data-on~="svh"] .page { min-height: 100svh; }
+
+  .tabbar { display: none; }
+  body[data-on~="tabbar"] .tabbar {
+    display: flex; justify-content: space-around; align-items: center;
+    position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
+    width: calc(100% - 28px); max-width: 412px; z-index: 50;
+    padding: 10px; border-radius: 24px;
+    background: rgba(252,249,245,.55); border: 1px solid rgba(43,18,13,.06);
+    box-shadow: 0 1px 3px rgba(43,18,13,.18), 0 3px 9px rgba(43,18,13,.22);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15); backdrop-filter: blur(18px) saturate(1.15);
+    font-size: 11px; font-weight: 700; color: #4D4139;
+  }
+
+  .wrap { padding: 14px 16px 120px; }
+  h1 { margin: 6px 0 4px; font-size: 18px; }
+  .lead { margin: 0 0 14px; font-size: 12.5px; line-height: 1.65; color: #7A6459; }
+  .lead b { color: #C0392B; }
+  .now { margin: 0 0 12px; padding: 9px 12px; border-radius: 10px; background: #FFF3D6;
+         font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+  .btns { display: grid; gap: 8px; }
+  .btns button { padding: 13px 15px; border: 1px solid #E7DACE; border-radius: 12px;
+                 background: #fff; font-family: inherit; text-align: left; }
+  .btns button b { display: block; font-size: 15px; margin-bottom: 3px; }
+  .btns button span { display: block; font-size: 12px; line-height: 1.5; color: #8A7A70; }
+  .filler { margin-top: 20px; }
+  .filler div { height: 64px; margin-bottom: 8px; border-radius: 12px; background: #F1E6DC; }
+
+  .sheet { position: fixed; inset: 0; z-index: 60; display: none; background: #FCF9F5; padding: 20px; }
+  .sheet.on { display: block; }
+  .sheet h2 { margin: 8px 0 6px; font-size: 17px; }
+  .sheet p { margin: 0 0 16px; font-size: 13px; line-height: 1.6; color: #7A6459; }
+  .sheet button { padding: 12px 18px; border: none; border-radius: 10px;
+                  background: #E0301E; color: #fff; font-family: inherit; font-size: 15px; font-weight: 700; }
+</style>
+</head>
+<body data-on="">
+<div class="top">하딜고고</div>
+<div class="page">
+  <div class="wrap">
+    <h1>얼개 하나씩 켜 보기</h1>
+    <p class="lead">
+      1차 시험(잠금 방식 다섯)에서는 <b>전부 투명</b>이라 재현이 안 됐습니다.<br>
+      이번엔 <b>앱에는 있고 그 시험엔 없던 것</b>을 하나씩 켭니다. 잠금 방식은 다섯 칸 모두 앱과 같습니다.<br>
+      번호를 누르면 시트가 열립니다 — <b>닫은 뒤 주소창</b>을 봐 주세요.<br>
+      ⚠️ 하나 볼 때마다 <b>새로고침</b>하고 시작해 주세요.
+    </p>
+    <p class="now" id="now">지금 켜진 것: (없음)</p>
+    <div class="btns" id="btns"></div>
+    <div class="filler" id="filler"></div>
+  </div>
+</div>
+
+<div class="tabbar"><span>홈</span><span>레시피</span><span>메뉴</span><span>매장</span><span>스티커</span></div>
+
+<div class="sheet" id="sheet">
+  <h2 id="sheetTitle">시트</h2>
+  <p id="sheetDesc"></p>
+  <button type="button" id="sheetClose">닫기</button>
+</div>
+
+<script>
+var 칸 = [
+  { 이름: '1 · 아무것도 안 켬', 켬: '',
+    설명: '1차 시험과 같은 상태. 여기서 불투명해지면 앞 시험이 잘못된 것이다.' },
+  { 이름: '2 · 붙박이 상단바만', 켬: 'topbar',
+    설명: 'position:sticky 상단바를 켠다.' },
+  { 이름: '3 · 떠 있는 하단바만', 켬: 'tabbar',
+    설명: 'position:fixed 하단바(유리 블러 포함)를 켠다.' },
+  { 이름: '4 · overscroll-behavior 만', 켬: 'overscroll',
+    설명: 'body 에 overscroll-behavior-y:none — 앱이 고무줄 튐을 막으려고 쓰는 값이다.' },
+  { 이름: '5 · min-height:100svh 만', 켬: 'svh',
+    설명: '본문 칸에 min-height:100svh 를 준다.' },
+  { 이름: '6 · 넷 다 켬', 켬: 'topbar tabbar overscroll svh',
+    설명: '앱과 같은 조건. 여기서만 불투명하면 하나가 아니라 조합이 원인이다.' }
+];
+
+var sheet = document.getElementById('sheet');
+document.getElementById('btns').innerHTML = 칸.map(function (m, i) {
+  return '<button type="button" data-i="' + i + '"><b>' + m.이름 + '</b><span>' + m.설명 + '</span></button>';
+}).join('');
+
+document.getElementById('btns').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  var m = 칸[+b.dataset.i];
+  document.body.dataset.on = m.켬;
+  document.getElementById('now').textContent = '지금 켜진 것: ' + (m.켬 || '(없음)');
+  document.getElementById('sheetTitle').textContent = m.이름;
+  document.getElementById('sheetDesc').textContent = m.설명 + '  ▸ 닫은 뒤 주소창을 봐 주세요.';
+  document.documentElement.style.overflow = 'hidden';   // 앱과 같은 잠금
+  sheet.classList.add('on');
+});
+
+document.getElementById('sheetClose').addEventListener('click', function () {
+  sheet.classList.remove('on');
+  document.documentElement.style.overflow = '';          // 앱과 같은 풀기
+});
+
+var f = document.getElementById('filler'), h = '';
+for (var i = 0; i < 30; i++) h += '<div></div>';
+f.innerHTML = h;
+</script>
+</body>
+</html>
