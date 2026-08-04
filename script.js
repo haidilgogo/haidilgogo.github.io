@@ -3113,8 +3113,20 @@
           const menu = document.createElement('div');
           menu.className = 'map-dd-menu';
           const q = encodeURIComponent('하이디라오 ' + s.name);
+          // 🔴 네이버는 공백을 %20 이 아니라 + 로 받는다(2026-08-04 실기기 확인).
+          //    %20 으로 보내면 「명동점」이 통째로 잘려 나가고 「하이디라오」만 검색돼서
+          //    명동점·대학로점·홍대점이 다 나오거나, 지도만 뜨고 아무 데도 안 찍혔다.
+          const qPlus = q.replace(/%20/g, '+');
           [
-            { label: '네이버지도', img: 'assets/icons/navermap.png?v=1', href: 'https://map.naver.com/p/search/' + q },
+            // 🔴 map.naver.com/p/search/ 를 쓰면 안 된다 — 폰에서 열면 네이버가 앱 실행 페이지
+            //    (app.map.naver.com, appSchemeName=nmap&appmarket=N)로 넘겨서, 네이버지도 앱이
+            //    없으면 「앱 설치」 화면만 뜨고 지도를 못 본다(실기기 캡처로 확인).
+            //    m.map.naver.com/search + mapMode=0 은 앱으로 안 튀고 웹 지도에 핀을 찍는다.
+            //    이 주소는 사용자가 검색 결과의 「지도」 버튼을 눌러 얻은 실제 주소에서 왔다
+            //    (원본에 붙어 있던 #map/<장소번호> 는 없어도 된다 — 장소 번호를 따로 안 모아도 된다).
+            { label: '네이버지도', img: 'assets/icons/navermap.png?v=1', href: 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
+            // ⚠️ 카카오도 폰에서 앱으로 튄다(applink.map.kakao.com) — 앱이 없으면 같은 문제다.
+            //    아직 안 고쳤다. 고칠 때는 네이버처럼 실기기에서 확인하고 바꿀 것.
             { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1', href: 'https://map.kakao.com/?q=' + q },
           ].forEach((o) => {
             const a = document.createElement('a');
