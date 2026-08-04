@@ -3172,12 +3172,13 @@
             //    (app.map.naver.com, appSchemeName=nmap&appmarket=N)로 넘겨서, 네이버지도 앱이
             //    없으면 「앱 설치」 화면만 뜨고 지도를 못 본다(실기기 캡처로 확인).
             //    m.map.naver.com/search + mapMode=0 은 앱으로 안 튀고 웹 지도에 핀을 찍는다.
-            //    🔴 핀 찍힌 지도는 포기했다(2026-08-04). pinId+pinType=site+menu=location 까지 넣어 봤지만,
-            //       사용자가 주소를 직접 열었을 땐 핀이 나오고 **우리 사이트에서 눌러 열면 안 나온다**
-            //       (시청역 기본 지도만 뜬다). 링크 미리보기로 주소가 정확한 것은 확인했으니 주소 문제가 아니다.
-            //       네이버 모바일 웹이 바깥에서 들어오는 딥링크를 그렇게 막아 둔 것으로 보인다.
-            //       그래서 확실히 되는 검색 형태로 둔다 — 매장 하나만 잡히고 그 카드에
-            //       지도·전화·길찾기 버튼이 붙어서, 핀 지도는 한 번 더 누르면 나온다.
+            //    🔴 핀은 pinId + pinType=site + menu=location 이 찍는다.
+            //    🔴🔴 그런데 그것만으로는 안 됐다 — **rel 에 noreferrer 가 있어야 한다**(아래 a.rel 참고).
+            //       네이버·카카오가 「어디서 왔는지」를 읽고 바깥에서 들어온 링크에는 핀을 안 내줬다.
+            //       주소를 직접 열면 핀이 나오고 우리 사이트에서 누르면 안 나오던 것이 이 차이였다.
+            //       ⚠️ 서버가 보내는 주소만 봐서는 안 보인다(curl 로는 referrer 있든 없든 같은 곳으로 간다).
+            //          페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
+            //          _map-test.html 로 여덟 가지를 눌러 보고 가려냈다(커밋 3f43f04 다음).
             //    ⚠️ 여기까지 오는 데 다섯 번 틀렸다. 다음에 손댈 때 같은 길로 다시 가지 말 것:
             //       · map.naver.com/p/search/…        폰에서 앱 설치 화면으로 튄다(appmarket=N 이라 아무 일도 안 남)
             //       · …/search?query=…&mapMode=0#map/<번호>  이미 열린 화면 안에서만 통한다.
@@ -3185,14 +3186,15 @@
             //       · m.map.naver.com/entry/place/<번호>     오류
             //       · m.place.naver.com/restaurant/<번호>/home  열리긴 하나 지도가 아니라 매장정보 페이지
             //       · map.naver.com/p/entry/place/<번호>     앱으로 튄다
-            //       · …/map.naver?pinId=…&pinType=site&menu=location
-            //                                        주소를 직접 열면 핀이 나오는데 링크로 누르면 안 나온다
+            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다 — 매장 하나만 잡히므로 쓸 만하다.
             { label: '네이버지도', img: 'assets/icons/navermap.png?v=1',
-              href: 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
-            // 🔴 해시(#!/<번호>/map/place)는 **우리 사이트에서 눌러 열면 무시된다**(2026-08-04 실기기 확인).
-            //    주소를 직접 열면 핀 지도가 뜨지만, 링크로 누르면 검색 결과 화면이 나온다 — 네이버와 같은 벽이다.
-            //    그래도 남겨 둔다: 무시돼도 해가 없고, 직접 열 때는 핀이 나온다.
-            //    링크로 눌렀을 때 나오는 검색 결과도 매장 하나만 잡히고 지도·길찾기 버튼이 붙어서 쓸 만하다.
+              href: STORE_NAVER_ID[s.name]
+                ? 'https://m.map.naver.com/map.naver?pinId=' + STORE_NAVER_ID[s.name] + '&pinType=site&menu=location'
+                : 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
+            // 🔴 카카오는 해시(#!/<번호>/map/place)가 핀을 찍는다. 네이버와 마찬가지로
+            //    rel 의 noreferrer 가 있어야 한다 — 없으면 해시가 무시되고 검색 결과만 나온다.
+            //    ⚠️ 카카오는 핀 지도가 뜨기 전에 「앱에서 볼까요」 안내가 한 번 뜬다(네이버는 안 뜬다).
+            //       같은 탭으로 열면(=target 없이) 안 뜨지만, 앱을 떠나게 되므로 새 탭을 유지한다.
             //    ⚠️ 옛 map.kakao.com/?q=… 는 쓰면 안 된다 — 폰에서 applink.map.kakao.com 으로 앱에 튄다.
             //    ⚠️ place.map.kakao.com/<번호> 는 열리지만 지도가 아니라 매장정보 페이지다.
             //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다.
@@ -3204,7 +3206,13 @@
             a.className = 'map-dd-item';
             a.href = o.href;
             a.target = '_blank';
-            a.rel = 'noopener';
+            // 🔴🔴 noreferrer 를 빼면 지도에 핀이 안 찍힌다(2026-08-04 실기기로 가려냄).
+            //    네이버·카카오가 「어디서 왔는지」(document.referrer)를 읽고, 바깥 사이트에서 들어온
+            //    링크에는 핀 대신 기본 지도나 검색 결과를 준다. noreferrer 가 그 값을 지워서
+            //    주소창에 직접 친 것과 같아진다. 주소를 아무리 정확히 만들어도 이것 없이는 소용없다.
+            //    ⚠️ 이건 서버 응답으로는 안 보인다 — curl 로는 referrer 유무에 상관없이 같은 곳으로 간다.
+            //       페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
+            a.rel = 'noopener noreferrer';
             a.innerHTML = '<img class="map-dd-ic" src="' + o.img + '" alt="" draggable="false">' + o.label;
             a.addEventListener('click', closeAllMapDd);
             menu.appendChild(a);

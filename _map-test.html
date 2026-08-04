@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCF9F5">
+<title>지도 링크 시험 — 어떤 방식이 핀을 찍나</title>
+<style>
+  /* 🔴 목적: 「직접 열면 핀이 나오는데 눌러서 열면 안 나온다」의 원인을 한 번에 가린다.
+     주소는 전부 같고, **여는 방식만** 다르다. 눌러 보고 핀이 나온 번호를 알려 주면 된다. */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px 14px 40px; background: #FCF9F5; color: #2B120D;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  }
+  h1 { margin: 0 0 6px; font-size: 19px; }
+  .lead { margin: 0 0 18px; font-size: 13px; line-height: 1.6; color: #7A6459; }
+  .lead b { color: #E0301E; }
+  h2 { margin: 24px 0 8px; font-size: 14px; color: #8A7A70; }
+  a.row {
+    display: block; margin-bottom: 10px; padding: 14px 16px;
+    background: #fff; border: 1px solid #E7DACE; border-radius: 14px;
+    color: #2B120D; text-decoration: none;
+  }
+  a.row b { display: block; font-size: 16px; margin-bottom: 3px; }
+  a.row span { display: block; font-size: 12px; line-height: 1.5; color: #8A7A70; }
+  .note {
+    margin-top: 22px; padding: 12px 14px; border-radius: 12px;
+    background: #FFF3D6; font-size: 12.5px; line-height: 1.65;
+  }
+</style>
+</head>
+<body>
+
+<h1>지도 링크 시험</h1>
+<p class="lead">
+  전부 <b>하이디라오 명동점</b>이고 <b>주소도 똑같습니다</b>. 다른 것은 <b>여는 방식</b>뿐입니다.<br>
+  하나씩 눌러 보고 <b>핀이 찍힌 지도가 나온 번호</b>를 알려 주세요.<br>
+  뒤로 가기로 돌아오시면 됩니다.
+</p>
+
+<h2>네이버 — 핀 주소(pinId)</h2>
+
+<a class="row" id="n1" target="_blank" rel="noopener">
+  <b>1 · 지금 앱과 같은 방식</b>
+  <span>새 탭 · noopener — 이게 핀이 안 나오던 것입니다</span>
+</a>
+
+<a class="row" id="n2" target="_blank" rel="noopener noreferrer">
+  <b>2 · 어디서 왔는지 숨김</b>
+  <span>새 탭 · <b>noreferrer</b> — 직접 연 것처럼 보이게 합니다</span>
+</a>
+
+<a class="row" id="n3">
+  <b>3 · 같은 탭에서 열기</b>
+  <span>새 탭을 안 띄우고 이 페이지를 대신 넘깁니다</span>
+</a>
+
+<a class="row" id="n4" rel="noreferrer">
+  <b>4 · 같은 탭 + 어디서 왔는지 숨김</b>
+  <span>3번과 2번을 같이</span>
+</a>
+
+<h2>네이버 — 검색 주소(지금 앱에 들어간 것)</h2>
+
+<a class="row" id="n5" target="_blank" rel="noopener">
+  <b>5 · 기준</b>
+  <span>핀은 없고 매장 하나만 잡히는 검색 결과 — 이게 지금 상태입니다</span>
+</a>
+
+<h2>카카오 — 해시 주소</h2>
+
+<a class="row" id="k1" target="_blank" rel="noopener">
+  <b>6 · 지금 앱과 같은 방식</b>
+  <span>새 탭 · noopener</span>
+</a>
+
+<a class="row" id="k2" target="_blank" rel="noopener noreferrer">
+  <b>7 · 어디서 왔는지 숨김</b>
+  <span>새 탭 · <b>noreferrer</b></span>
+</a>
+
+<a class="row" id="k3" rel="noreferrer">
+  <b>8 · 같은 탭 + 숨김</b>
+  <span></span>
+</a>
+
+<div class="note">
+  <b>2·4·7·8 중에 핀이 나오면</b> 「어디서 왔는지」가 원인입니다 — 링크에 한 단어만 붙이면 끝납니다.<br>
+  <b>3·4·8에서만 나오면</b> 새 탭으로 여는 것이 원인입니다.<br>
+  <b>전부 안 나오면</b> 네이버·카카오가 바깥 링크를 아예 막아 둔 것이고, 5번(지금 상태)이 최선입니다.
+</div>
+
+<script>
+  // 주소는 한 곳에서만 만든다 — 시험 도중 서로 달라지지 않게.
+  var 이름 = encodeURIComponent('하이디라오 명동점').replace(/%20/g, '+');
+  var 네이버핀 = 'https://m.map.naver.com/map.naver?pinId=1501495669&pinType=site&menu=location';
+  var 네이버검색 = 'https://m.map.naver.com/search?query=' + 이름 + '&mapMode=0';
+  var 카카오 = 'https://m.map.kakao.com/actions/searchView?q=' + 이름 + '#!/1820258951/map/place';
+
+  ['n1','n2','n3','n4'].forEach(function (id) { document.getElementById(id).href = 네이버핀; });
+  document.getElementById('n5').href = 네이버검색;
+  ['k1','k2','k3'].forEach(function (id) { document.getElementById(id).href = 카카오; });
+</script>
+</body>
+</html>
