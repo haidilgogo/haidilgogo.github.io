@@ -4015,12 +4015,16 @@
   const shareToast = document.getElementById('shareToast');
   let shareToastTimer = null;
 
+  // 화면 아래(탭바 위 20px)에 뜨는 검은 알약. 2초 뒤 저절로 사라진다.
+  // 🔴 이름은 share- 로 시작하지만 공유 전용이 아니다 — 처음 쓴 곳이 공유였을 뿐이고,
+  //    지금은 메뉴 탭(냄비가 가득 찼을 때)도 쓴다. 알려만 주고 사라지는 모든 자리에 쓴다.
   function showShareToast(text) {
     shareToast.textContent = text;
     shareToast.classList.add('show');
     clearTimeout(shareToastTimer);
     shareToastTimer = setTimeout(() => shareToast.classList.remove('show'), 2000);
   }
+  window.showToast = showShareToast;   // 메뉴 탭 IIFE 는 따로 감싸여 있어 이걸로 건넨다
 
   async function shareSite() {
     const isLocalPreview = /^(localhost|127\.0\.0\.1|\d{1,3}(?:\.\d{1,3}){3})$/.test(location.hostname);
@@ -4720,6 +4724,10 @@
   //    (CLAUDE.md 「관형형+명사는 어법대로 띄어 씀」 — 다진 마늘·다진 파).
   const POT_LABEL = { 1: '한 칸', 2: '두 칸', 4: '네 칸' };
   const potLabel = (n) => POT_LABEL[n] || n + ' 칸';
+  // 🔴 「더는 못 담는다」를 말하는 곳이 둘이다 — 확대 모달의 잠긴 버튼과 카드 누름 토스트.
+  //    한 곳에 적어 두 곳이 저절로 같은 말을 하게 한다(2026-08-04 사용자 확정).
+  //    「찼어요」만 쓰면 「(물이) 찼어요」로도 읽혀서 「가득」을 넣었다.
+  const 냄비참 = '냄비가 가득 찼어요';
 
   // 🔴 냄비 영역과 육수 목록을 따로 그린다(2026-08-04) — 육수를 담을 때마다 통째로 다시 그렸더니
   //    아래 육수 카드 12장의 <img> 가 매번 새로 만들어져 그림이 깜빡였다. 바뀌는 것은 냄비뿐이다.
@@ -4848,7 +4856,7 @@
     const n = box.dataset.zoom;
     const 육수 = box.dataset.kind === 'broth';
     // 🔴 전골은 담기 규칙이 다르다 — 중복해서 담기고, 칸 수만큼만 들어가고, 다시 눌러도 안 빠진다.
-    //    그래서 「담음 ✓」가 없다. 대신 칸이 다 차면 버튼이 「냄비가 찼어요」로 잠긴다.
+    //    그래서 「담음 ✓」가 없다. 대신 칸이 다 차면 버튼이 「냄비가 가득 찼어요」로 잠긴다.
     const { 이름, 부제 } = 육수
       ? { 이름: n, 부제: (D.broths.find((b) => b.n === n) || {}).jeju ? '제주 한정' : '' }
       : 이름나누기(n);
@@ -4856,7 +4864,7 @@
     const 버튼 = 육수
       ? (broths.length < cells
           ? '<button class="mn-zoom-add" type="button">담기</button>'
-          : '<button class="mn-zoom-add" type="button" disabled>냄비가 찼어요</button>')
+          : `<button class="mn-zoom-add" type="button" disabled>${냄비참}</button>`)
       : `<button class="mn-zoom-add ${on ? 'is-on' : ''}" type="button">${on ? '담음 ✓' : '담기'}</button>`;
     box.querySelector('.mn-zoom-body').innerHTML =
       `<img class="mn-zoom-img" src="${IMG(n)}" alt="">
@@ -5070,7 +5078,7 @@
         if (broths.length >= cells) return;   // 찼으면 아무것도 하지 않는다(버튼도 이미 잠겨 있다)
         broths.push(box.dataset.zoom);
         refreshPot();               // 뒤 냄비가 바로 채워지는 게 보인다
-        return renderZoom();        // 마지막 칸을 채웠으면 버튼이 「냄비가 찼어요」로 잠긴다
+        return renderZoom();        // 마지막 칸을 채웠으면 버튼이 「냄비가 가득 찼어요」로 잠긴다
       }
       toggle(box.dataset.zoom); return renderZoom();
     }
@@ -5114,9 +5122,14 @@
     //    빼는 것은 냄비 칸을 눌러서 한다(위). 안 그러면 「2칸에 같은 육수」를 만들 방법이 없다.
     const bc = e.target.closest('[data-broth]');
     if (bc) {
-      // 🔴 냄비가 찼으면 **아무것도 하지 않는다**(2026-08-04 사용자 지적) — 예전엔 담기지 않는데도
+      // 🔴 냄비가 찼으면 냄비를 다시 그리지 않는다(2026-08-04 사용자 지적) — 예전엔 담기지 않는데도
       //    refreshPot() 을 불러서, 연타하면 바뀐 게 없는데 냄비가 깜빡였다.
-      if (broths.length >= cells) return;
+      //    대신 토스트로 알린다(2026-08-04 사용자 확정) — 아무 반응이 없으면 고장으로 보인다.
+      //    문구는 확대 모달의 잠긴 버튼과 **같은 말**을 쓴다(아래 renderZoom) — 같은 상황이다.
+      if (broths.length >= cells) {
+        if (window.showToast) window.showToast(냄비참);
+        return;
+      }
       broths.push(bc.dataset.broth);
       return refreshPot();
     }
