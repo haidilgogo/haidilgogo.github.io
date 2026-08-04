@@ -4594,12 +4594,18 @@
     if (syncInput) syncInput.value = '';
     syncOverlay.classList.add('open');
     syncOverlay.setAttribute('aria-hidden', 'false');
+    // 🔴 뒷화면 스크롤을 막는다(2026-08-04 사용자 발견) — 시트를 열고 손가락을 움직이면
+    //    뒤의 홈이 그대로 스크롤됐다. 내 메뉴 시트가 쓰는 것과 같은 방법이다.
+    //    ⚠️ body 가 아니라 **documentElement** 다 — body 를 스크롤 컨테이너로 만들면 sticky 상단바가 깨진다
+    //       (CLAUDE.md 스크롤바 규칙에 적혀 있는 함정).
+    document.documentElement.style.overflow = 'hidden';
     // 🔴 열려 있는 동안 상단바 아이콘을 빨갛게(2026-08-04 사용자 확정) — 즐겨찾기·내 메뉴와 같은 규칙.
     //    ⚠️ 어디서 열든(홈 박스로 열어도) 붙인다. 아이콘만 입구가 아니기 때문이다.
     const cb = document.getElementById('topCodeBtn');
     if (cb) cb.classList.add('is-open');
   }
   function closeSyncSheet() {
+    document.documentElement.style.overflow = '';   // 열 때 막아 둔 뒷화면 스크롤을 푼다
     const cb = document.getElementById('topCodeBtn');
     if (cb) cb.classList.remove('is-open');
     if (!syncOverlay) return;
