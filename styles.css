@@ -2780,11 +2780,23 @@ img {
   align-items: center;
   justify-content: center;
   opacity: 0;
+  /* 🔴 visibility 는 장식이 아니라 **버그 수정**이다(2026-08-05, 실기기 3차 시험으로 확정).
+     닫혀 있는 동안 이 오버레이는 position:fixed 로 **화면 전체를 계속 덮고 있었다**(투명하기만 했다).
+     그러면 아이폰 사파리가 아래 주소창을 **불투명**으로 바꾸고, 창을 닫아도 그대로 남았다.
+     증상이 난 창 셋(내 메뉴·내 코드·스티커 기록하기)이 전부 이 클래스였고,
+     멀쩡했던 창들(레시피·스토리·가챠)은 닫히면 display:none 으로 화면에서 빠지는 방식이었다.
+     ⚠️ display:none 으로 바꾸지 않는 이유 = 그러면 여는 애니메이션(투명→선명)이 사라진다.
+        visibility 는 사라지는 동안에도 보이다가 끝에서 딱 꺼지므로 모습이 그대로다.
+     ⚠️ transition 에서 visibility 를 빼면 닫는 순간 창이 툭 사라진다 — 같이 둘 것.
+     덤: 닫힌 창 안의 버튼이 키보드 탭 순서에 잡히던 것도 같이 해결된다.
+     자세한 경위는 인계 문서의 「주소창」 절 참고. */
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.22s;
+  transition: opacity 0.22s, visibility 0.22s;
 }
 .stamp-sheet-overlay.open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 .stamp-sheet {
@@ -2829,10 +2841,11 @@ img {
   align-items: center;
   justify-content: center;
   opacity: 0;
+  visibility: hidden;              /* 🔴 위 .stamp-sheet-overlay 와 같은 이유 — 주소창 버그. 그 주석 참고 */
   pointer-events: none;
-  transition: opacity 0.22s;
+  transition: opacity 0.22s, visibility 0.22s;
 }
-.stamp-view-overlay.open { opacity: 1; pointer-events: auto; }
+.stamp-view-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
 .stamp-view {
   position: relative;
   box-sizing: border-box;
