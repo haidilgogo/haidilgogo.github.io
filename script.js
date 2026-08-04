@@ -4825,53 +4825,19 @@
 
   function toggle(n) { picked.has(n) ? picked.delete(n) : picked.set(n, 1); }
 
-  // ── 그림 확대 모달 ── 그림(줄의 29%)을 누르면 뜨고, 나머지 71%는 바로 담긴다
-  // kind = 'menu' | 'broth'. 전골(육수)도 사진을 누르면 뜬다(2026-08-04 사용자 확정) —
-  // 예전엔 여는 조건이 `.mn-card[data-menu]` 라 `data-broth` 인 전골만 확대가 안 떴다.
-  function openZoom(n, kind) {
-    const dim = document.createElement('div');
-    dim.className = 'mn-zoom-dim'; dim.id = 'mnZoomDim';
-    // 🔴 `data-menu` 를 쓰지 않는다(2026-08-04) — 아래 담기 처리가 `[data-menu]` 를 범위 없이 찾아서
-    //    모달 자신이 걸렸다. 모달 안 사진을 누르면 그 메뉴가 담겼다 빠졌다 하고 뒤 목록이 다시 그려졌다.
-    dim.innerHTML = `<div class="mn-zoom" data-zoom="${n}" data-kind="${kind === 'broth' ? 'broth' : 'menu'}">
-      <button class="stamp-sheet-close" id="mnZoomClose" type="button" aria-label="닫기">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
-      </button>
-      <div class="mn-zoom-body"></div>
-    </div>`;
-    document.body.appendChild(dim);
-    // 🔴 뒤가 스크롤되지 않게 잠근다(2026-08-04 사용자 요청). body 가 아니라 html 에 건다 —
-    //    body 를 스크롤 컨테이너로 만들면 상단바 sticky 가 깨진다(가챠·레시피 상세와 같은 방식).
-    document.documentElement.style.overflow = 'hidden';
-    renderZoom();
-  }
-  function closeZoom() {
-    const dim = $('#mnZoomDim');
-    if (dim) dim.remove();
-    document.documentElement.style.overflow = '';
-    refreshCards();   // 통째로 다시 그리지 않는다 — 닫을 때도 그림이 깜빡였다
-  }
-  function renderZoom() {
-    const box = $('.mn-zoom'); if (!box) return;
-    const n = box.dataset.zoom;
-    const 육수 = box.dataset.kind === 'broth';
-    // 🔴 전골은 담기 규칙이 다르다 — 중복해서 담기고, 칸 수만큼만 들어가고, 다시 눌러도 안 빠진다.
-    //    그래서 「담음 ✓」가 없다. 대신 칸이 다 차면 버튼이 「냄비가 가득 찼어요」로 잠긴다.
-    const { 이름, 부제 } = 육수
-      ? { 이름: n, 부제: (D.broths.find((b) => b.n === n) || {}).jeju ? '제주 한정' : '' }
-      : 이름나누기(n);
-    const on = picked.has(n);
-    const 버튼 = 육수
-      ? (broths.length < cells
-          ? '<button class="mn-zoom-add" type="button">담기</button>'
-          : `<button class="mn-zoom-add" type="button" disabled>${냄비참}</button>`)
-      : `<button class="mn-zoom-add ${on ? 'is-on' : ''}" type="button">${on ? '담음 ✓' : '담기'}</button>`;
-    box.querySelector('.mn-zoom-body').innerHTML =
-      `<img class="mn-zoom-img" src="${IMG(n)}" alt="">
-       <span class="mn-zoom-name">${이름}</span>
-       ${부제 ? `<span class="mn-zoom-sub">${부제}</span>` : ''}
-       ${버튼}`;
-  }
+  /* ── 그림 확대 모달은 없앴다 (2026-08-04 사용자 확정) ───────────────────────────
+     🔴 되살리지 말 것. 이유 셋이 전부 같은 방향이었다.
+     ① **담으려고 그림을 눌렀는데 창이 떴다.** 카드에서 가장 눈에 띄는 자리(그림, 카드 폭의
+        24% · 320px 에선 29%)만 다른 일을 했다. 레시피 카드는 「다른 일」이 구석의 작은
+        아이콘 둘(즐겨찾기 5.5% · 좋아요 6.3%)뿐이라 안 헷갈리는 것과 대비된다.
+        담기는 이 탭에서 수십 번 하는 동작이고 확대는 어쩌다 한 번이다.
+     ② 🔴 **저작권** — 메뉴 일러스트는 하이디라오 사전주문 페이지 사진을 보고 생성한 것이라
+        크게 보여주지 않는 편이 하딜고고에 유리하다(CLAUDE.md 「공식 사진·로고는 못 쓴다」).
+     ③ 모달 생김새가 마음에 안 든다는 이야기도 있었다 — 고치는 대신 없애는 쪽으로 갔다.
+     이제 카드는 **어디를 눌러도 담기** 하나다. 「냄비가 가득 찼어요」는 토스트가 맡는다.
+     ⚠️ 80px 썸네일이 130장을 보여주는 유일한 자리가 됐다 — 그래서 그릇 그림자를 넣었다
+        (styles.css `.mn-card-thumb img`).
+     ────────────────────────────────────────────────────────────────────────── */
 
   // 🔴 하위 분류를 화면에서 걷어냈다(2026-08-03 사용자 확정) — 상위 하나를 누르면 그 안의 것이 전부 나온다.
   //    하위 줄 하나 때문에 붙박이·구분선·방향 감지까지 세 겹을 쌓게 돼서 접었다.
@@ -5065,27 +5031,6 @@
   }
 
   document.addEventListener('click', (e) => {
-    // 🔴 그림 클릭은 담기보다 먼저 본다 — 순서가 바뀌면 확대가 안 뜨고 담겨버린다
-    const th = e.target.closest('.mn-card-thumb');
-    if (th && th.querySelector('img')) {
-      const card = th.closest('.mn-card[data-menu], .mn-card[data-broth]');
-      if (card && card.dataset.menu) return openZoom(card.dataset.menu, 'menu');
-      if (card && card.dataset.broth) return openZoom(card.dataset.broth, 'broth');
-    }
-    if (e.target.closest('.mn-zoom-add')) {
-      const box = $('.mn-zoom');
-      if (box.dataset.kind === 'broth') {
-        if (broths.length >= cells) return;   // 찼으면 아무것도 하지 않는다(버튼도 이미 잠겨 있다)
-        broths.push(box.dataset.zoom);
-        refreshPot();               // 뒤 냄비가 바로 채워지는 게 보인다
-        return renderZoom();        // 마지막 칸을 채웠으면 버튼이 「냄비가 가득 찼어요」로 잠긴다
-      }
-      toggle(box.dataset.zoom); return renderZoom();
-    }
-    if (e.target.closest('#mnZoomClose') || e.target.classList.contains('mn-zoom-dim')) {
-      if ($('#mnZoomDim')) return closeZoom();
-    }
-
     // 🔴 반드시 #mnTabs 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다
     const tab = e.target.closest('#mnTabs .tab-btn');
     if (tab) {
@@ -5125,7 +5070,7 @@
       // 🔴 냄비가 찼으면 냄비를 다시 그리지 않는다(2026-08-04 사용자 지적) — 예전엔 담기지 않는데도
       //    refreshPot() 을 불러서, 연타하면 바뀐 게 없는데 냄비가 깜빡였다.
       //    대신 토스트로 알린다(2026-08-04 사용자 확정) — 아무 반응이 없으면 고장으로 보인다.
-      //    문구는 확대 모달의 잠긴 버튼과 **같은 말**을 쓴다(아래 renderZoom) — 같은 상황이다.
+      //    확대 모달이 없어진 지금은 **이 토스트가 「더는 못 담는다」를 알리는 유일한 자리**다.
       if (broths.length >= cells) {
         if (window.showToast) window.showToast(냄비참);
         return;
@@ -5186,10 +5131,9 @@
     });
   }
 
-  // Esc — 앱의 다른 시트·모달과 같게 (확대가 떠 있으면 확대부터 닫는다)
+  // Esc — 앱의 다른 시트·모달과 같게. 이제 이 탭에 떠 있는 것은 담은 목록 하나뿐이다.
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if ($('#mnZoomDim')) return closeZoom();
     if (sheetOverlay.classList.contains('open')) closeSheet();
   });
 
