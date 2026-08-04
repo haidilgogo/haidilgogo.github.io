@@ -52,12 +52,13 @@
     { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
 
-  // 🔴 지점별 네이버 장소번호(2026-08-04). **지금은 아직 안 쓴다** — 지우지 말 것.
-  //    지도에 핀을 찍으려면 이 번호가 필요한데, 어느 주소 형태를 쓸지가 아직 안 정해졌다.
-  //    #map/<번호> 를 붙여 봤다가 실기기에서 「알 수 없는 오류」가 나서 되돌렸다(아래 지도 버튼 주석 참고).
-  //    확인 중인 후보: m.map.naver.com/entry/place/<번호> · m.place.naver.com/restaurant/<번호>/home
-  //    (map.naver.com/p/entry/place/<번호> 는 앱으로 튀므로 쓰면 안 된다.)
-  //    번호를 다시 뽑는 데 시간이 걸리므로 결정될 때까지 여기 둔다.
+  // 🔴 지점별 네이버 장소번호(2026-08-04). 지도 버튼이 **핀 찍힌 지도**를 여는 근거다 — 지우지 말 것.
+  //    뽑는 법: m.map.naver.com/search?query=하이디라오+<지점>&mapMode=0 을 받아 오면 HTML 안에
+  //            "items":[{"id":<번호>,"name":"하이디라오 …"} 로 들어 있다. 14곳을 한 번에 훑어 뽑았다.
+  //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
+  //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
+  //    ⚠️ 오픈 예정(안산점·부산점)은 네이버에 아직 없어 번호가 없다. 그 둘은 지도 버튼 자체가 비활성이라
+  //       필요 없다. (부산점은 이름으로 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
   //    뽑는 법: m.map.naver.com/search?query=하이디라오+<지점>&mapMode=0 을 받아 오면
   //            HTML 안에 "items":[{"id":<번호>,"name":"하이디라오 …"} 로 들어 있다.
   //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
@@ -3148,14 +3149,20 @@
             //    (app.map.naver.com, appSchemeName=nmap&appmarket=N)로 넘겨서, 네이버지도 앱이
             //    없으면 「앱 설치」 화면만 뜨고 지도를 못 본다(실기기 캡처로 확인).
             //    m.map.naver.com/search + mapMode=0 은 앱으로 안 튀고 웹 지도에 핀을 찍는다.
-            //    🔴 #map/<장소번호> 를 뒤에 붙이면 안 된다(2026-08-04 실기기에서 확인) —
-            //       그건 이미 열려 있는 화면 안에서만 통하는 주소라, 새 탭으로 곧바로 열면
-            //       「알 수 없는 오류가 발생했습니다」가 뜬다. 사용자가 검색 결과의 「지도」를
-            //       눌러서 그 주소에 닿았을 땐 화면 상태가 이미 있어서 됐던 것이다.
-            //       → 핀은 아직 못 찍는다. 검색 결과로 뜨지만 매장 하나만 잡히고 지도·전화·길찾기가 붙는다.
-            //       장소번호로 바로 여는 주소(m.map.naver.com/entry/place/<번호> 등)를 확인 중이다.
+            //    🔴 핀은 pinId + pinType=site + menu=location 세 개가 찍는다(2026-08-04 실기기 확인).
+            //       이 값들은 네이버가 스스로 앱에 넘길 때 쓰던 것을 웹 주소에 그대로 옮긴 것이다.
+            //    ⚠️ 여기까지 오는 데 세 번 틀렸다. 다음에 손댈 때 같은 길로 다시 가지 말 것:
+            //       · map.naver.com/p/search/…        폰에서 앱 설치 화면으로 튄다(appmarket=N 이라 아무 일도 안 남)
+            //       · …/search?query=…&mapMode=0#map/<번호>  이미 열린 화면 안에서만 통한다.
+            //                                        새 탭으로 열면 「알 수 없는 오류가 발생했습니다」
+            //       · m.map.naver.com/entry/place/<번호>     오류
+            //       · m.place.naver.com/restaurant/<번호>/home  열리긴 하나 지도가 아니라 매장정보 페이지
+            //       · map.naver.com/p/entry/place/<번호>     앱으로 튄다
+            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다 — 매장 하나만 잡히므로 쓸 만하다.
             { label: '네이버지도', img: 'assets/icons/navermap.png?v=1',
-              href: 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
+              href: STORE_NAVER_ID[s.name]
+                ? 'https://m.map.naver.com/map.naver?pinId=' + STORE_NAVER_ID[s.name] + '&pinType=site&menu=location'
+                : 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
             // ⚠️ 카카오도 폰에서 앱으로 튄다(applink.map.kakao.com) — 앱이 없으면 같은 문제다.
             //    아직 안 고쳤다. 고칠 때는 네이버처럼 실기기에서 확인하고 바꿀 것.
             { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1', href: 'https://map.kakao.com/?q=' + q },
