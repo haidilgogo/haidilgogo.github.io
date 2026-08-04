@@ -2366,12 +2366,19 @@ img {
 .page[data-section="store"] .topbar-brand,
 .page[data-section="store"] #topShareBtn,
 .page[data-section="store"] #topInstallBtn { display: none; }
-/* 🔴 스티커는 공유·설치만 숨기고 **로고는 남긴다**(2026-08-04 사용자 확정).
-   위 셋과 이유가 다르다 — 저쪽은 탭줄에 자리를 내주려고 로고까지 숨긴 것이고,
-   스티커엔 탭줄이 없다. 로고를 빼면 왼쪽이 통째로 비어 「기록하기」 하나만 떠 있게 된다.
-   결과: 공유는 홈에만 남는다. */
+/* 🔴 스티커도 로고·공유·설치를 전부 숨긴다(2026-08-04 사용자 확정).
+   이유가 위 셋과 다르다 — 저쪽은 탭줄에 자리를 내주려는 것이지만, 스티커엔 탭줄이 없어
+   왼쪽이 비게 된다. 그런데도 숨기는 건 **규칙이 어긋나 보이는 게 더 나쁘기 때문**이다:
+   「로고는 홈에만」인데 스티커에만 남아 있으면 빼먹은 것처럼 읽힌다(사용자 지적).
+   결과: 로고·공유 둘 다 홈에만 남는다. 스티커 상단바에는 「기록하기」 하나만 있다. */
+.page[data-section="stamp"] .topbar-brand,
 .page[data-section="stamp"] #topShareBtn,
 .page[data-section="stamp"] #topInstallBtn { display: none; }
+/* 🔴 로고를 숨기면 상단바가 얇아진다 — 스티커만 57px 이 되어 탭을 옮길 때 화면이 위아래로 튄다
+   (실측 후 발견). 로고가 잡아 주던 44px 을 여기서 대신 잡는다. 위 .topbar-cat .tabs 가
+   레시피·메뉴·매장에 대해 같은 일을 하는 것과 같은 이유·같은 값이다.
+   ⚠️ 버튼 자체를 키우지 않는다 — 줄 높이만 잡아서 「기록하기」 모양은 그대로 둔다. */
+.page[data-section="stamp"] .topbar-right { min-height: 44px; align-items: center; }
 /* 🔴 상단바 높이가 탭을 옮겨도 안 변해야 한다 — 로고와 같은 44px 을 여기서도 잡는다.
    (안 잡으면 레시피 탭만 상단바가 얇아져 화면이 위아래로 튄다) */
 .topbar-cat .tabs {
