@@ -4815,6 +4815,15 @@
   function 칸번호칸수(n) {
     return broths.filter((x) => x === n).length;
   }
+  /* 🔴 「제주 한정」 줄 — **메뉴 카드와 육수 카드가 이 한 곳을 같이 쓴다**(2026-08-04 사용자 확정).
+     예전엔 육수만 아이콘 없는 맨 글자였다. 같은 뜻인데 화면마다 달라 보였다.
+     자리·크기·색을 왜 이렇게 정했는지는 카드HTML() 위 주석에 있다. */
+  const 제주한정 = '제주 한정';
+  function 제주줄(부제) {
+    return `<span class="mn-card-sub mn-card-sub--jeju">` +
+           `<img src="assets/icons/hallabong.svg" alt="">${제주한정}${부제 ? ` · ${부제}` : ''}</span>`;
+  }
+
   // 육수를 담고 뺄 때 카드의 번호만 갈아 끼운다 — 카드를 다시 그리면 그림이 깜빡인다
   function refreshBrothNums() {
     document.querySelectorAll('#mnBody .mn-card--broth').forEach((el) => {
@@ -4840,7 +4849,7 @@
               b.img ? `<img src="${IMG(b.n)}" alt="">` : b.n}</div>
             <span class="mn-card-body">
               <span class="mn-card-name">${b.n}</span>
-              ${b.jeju ? '<span class="mn-card-sub">제주 한정</span>' : ''}
+              ${b.jeju ? 제주줄() : ''}
             </span>
             <span class="mn-card-nums" data-n="${칸번호칸수(b.n)}">${칸번호HTML(b.n)}</span>
           </button>`;
@@ -4914,8 +4923,7 @@
        아이콘은 코덱스가 하딜고고용으로 새로 그렸다 — 원본은 저장소 밖
        `data/brand/icon/svg/jeju/hallabong-16px-color.svg`, 앱에는 복사본을 쓴다. */
     const 제주 = !!(it.part && it.jeju);
-    const 아랫줄 = 제주
-      ? `<span class="mn-card-sub mn-card-sub--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정${부제 ? ` · ${부제}` : ''}</span>`
+    const 아랫줄 = 제주 ? 제주줄(부제)
       : (부제 ? `<span class="mn-card-sub">${부제}</span>` : '');
     return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
       <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
@@ -4948,8 +4956,11 @@
   /* ── 검색 ──────────────────────────────────────────────────────────────────
      🔴 대상은 **화면에 보이는 이름 + 부제**다(2026-08-03 확정). 즉 이름나누기()를 거친 값이라
         `하이디라오 특제소고기` 는 `특제소고기` 로도, `하이디라오` 로도 걸린다.
-        「제주 한정」 꼬리표는 **대상이 아니다** — 그건 메뉴 이름이 아니라 상태 표시다.
-        (「일부 매장」 꼬리표는 2026-08-04에 화면에서 뗐다 — 카드HTML 주석 참고)
+     🔴 **「제주 한정」도 대상에 넣는다**(2026-08-04 사용자 확정). 처음엔 뺐는데 그때는 꼬리표가
+        「일부 매장」 47개 + 「제주 한정」 0개라, 넣으면 `일부 매장` 한 번에 47개가 쏟아져 쓸모가
+        없었다. 그 47개를 뗀 지금은 남은 꼬리표가 「제주 한정」 6개뿐이라 넣는 편이 쓸모 있다
+        (「제주도 가는데 거기만 있는 게 뭐지」가 실제로 있을 법한 검색이다).
+        ⚠️ 붙여 써도 걸린다 — 검색꼴()이 공백을 떼므로 `제주한정`·`제주 한정` 둘 다 맞는다.
      🔴 범위는 **분류를 가로지른다**(2026-08-04 사용자 확정). 어느 탭에서 치든 130개 전부에서
         찾는다 — 레시피 탭처럼 분류와 겹치는 AND 가 **아니다**.
         ⚠️ 나중에 「전체메뉴」 탭이 생겼지만 이 규칙은 그대로 두기로 했다(같은 날 재확인) —
@@ -4977,7 +4988,8 @@
     const nq = 검색꼴(q);
     const 걸린다 = (it) => {
       const { 이름, 부제 } = 이름나누기(it.n);
-      const 대상 = 이름 + ' ' + 부제;   // 꼬리표는 넣지 않는다
+      // 화면에 보이는 글자를 그대로 이어 붙인다 — 이름 + 부제 + (제주 한정)
+      const 대상 = 이름 + ' ' + 부제 + (it.part && it.jeju ? ' ' + 제주한정 : '');
       return 대상.includes(q) || (nq && 검색꼴(대상).includes(nq));
     };
     const out = [];
