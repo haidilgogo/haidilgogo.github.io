@@ -2107,29 +2107,12 @@ img {
 }
 
 /* ===== 매장(지점) 목록 ===== */
-/* 🔴 탭줄 = 탭(왼쪽) + 개수(오른쪽 끝). 매장·메뉴가 함께 쓴다(2026-08-03 사용자 확정.
-   옛 .store-region-tabs 를 .tabline + .tabs-scroll 둘로 나눈 것이다).
-   개수는 스크롤 「밖」에 있어야 한다 — 안에 넣으면 탭을 밀 때 숫자도 같이 밀린다. */
-.tabline {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 12px;
-}
-.tabline .count-line { margin-left: auto; flex: none; white-space: nowrap; }
-.tabs-scroll {
-  min-width: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.tabs-scroll .tabs {
-  flex-wrap: nowrap;                /* 스크롤하므로 감기지 않는다 */
-  justify-content: flex-start;      /* 왼쪽 정렬 — 첫 탭이 콘텐츠 좌측 라인에 맞음(2026-07-23) */
-}
-
-/* 🔴 옛 .stores-head(개수+안내문 줄)는 없앴다(2026-08-03) — 개수는 .tabline 오른쪽 끝으로,
-   안내문은 맨 아래 푸터(.footer-note)로 갔다. 메뉴 탭과 같은 방식이다. */
-.stores-count { margin: 0; padding: 0; flex: none; } /* 개수는 왼쪽 고정폭(줄어들지 않음) */
+/* 🔴 옛 .tabline / .tabline .count-line / .tabs-scroll / .tabs-scroll .tabs / .stores-count 를
+   지웠다(2026-08-04). 지역 탭이 상단바로 올라가면서 이 다섯은 쓰는 곳이 하나도 없어졌다
+   — 매장 뷰 전용이었고, 메뉴 탭은 8/4에 이미 상단바로 옮겨 갔다.
+   지금 매장 뷰에 남은 개수 줄은 메뉴 탭과 같은 .list-count 를 쓴다.
+   ⚠️ 이름이 비슷한 살아 있는 것들과 헷갈리지 말 것 — `.tabs`(탭줄 본체, 레시피·메뉴·매장 공용) ·
+      `.count-line`(스티커의 「다녀온 매장 N곳」이 아직 쓴다) 은 지우면 안 된다. */
 .stores {
   display: grid;
   /* 최소폭 420px → 데스크탑(콘텐츠 ~1080px)에서 최대 2칸(길게) — 스티커 기록 카드와 결 통일.
@@ -2362,20 +2345,27 @@ img {
    (옆의 .topbar-right 에 붙은 「basis 0 = 줄바꿈 유발 안 함」과 같은 이유다. 320px 에서 실측 확인) */
 .topbar-cat { display: none; flex: 1 1 0; min-width: 0; }
 .page[data-section="recipe"] .topbar-cat--recipe,
-.page[data-section="menu"] .topbar-cat--menu { display: block; }
+.page[data-section="menu"] .topbar-cat--menu,
+.page[data-section="store"] .topbar-cat--store { display: block; }
 /* 카테고리가 올라간 탭에서는 남는 폭을 탭줄이 다 갖는다 —
    오른쪽 아이콘(flex: 1 1 0)과 빈칸(flex: 1)이 그대로면 셋이 남는 폭을 나눠 가져 탭줄이 좁아진다 */
 .page[data-section="recipe"] .topbar-right,
-.page[data-section="menu"] .topbar-right { flex: 0 0 auto; }
+.page[data-section="menu"] .topbar-right,
+.page[data-section="store"] .topbar-right { flex: 0 0 auto; }
 .page[data-section="recipe"] .topbar-spacer,
-.page[data-section="menu"] .topbar-spacer { display: none; }
-/* 카테고리가 올라간 탭에서는 로고·공유·설치가 자리를 비켜준다 */
+.page[data-section="menu"] .topbar-spacer,
+.page[data-section="store"] .topbar-spacer { display: none; }
+/* 카테고리가 올라간 탭에서는 로고·공유·설치가 자리를 비켜준다.
+   🔴 안 비켜주면 탭이 잘린다 — 매장을 올렸을 때 실제로 「경기」부터 잘렸다(2026-08-04 측정). */
 .page[data-section="recipe"] .topbar-brand,
 .page[data-section="recipe"] #topShareBtn,
 .page[data-section="recipe"] #topInstallBtn,
 .page[data-section="menu"] .topbar-brand,
 .page[data-section="menu"] #topShareBtn,
-.page[data-section="menu"] #topInstallBtn { display: none; }
+.page[data-section="menu"] #topInstallBtn,
+.page[data-section="store"] .topbar-brand,
+.page[data-section="store"] #topShareBtn,
+.page[data-section="store"] #topInstallBtn { display: none; }
 /* 🔴 상단바 높이가 탭을 옮겨도 안 변해야 한다 — 로고와 같은 44px 을 여기서도 잡는다.
    (안 잡으면 레시피 탭만 상단바가 얇아져 화면이 위아래로 튄다) */
 .topbar-cat .tabs {

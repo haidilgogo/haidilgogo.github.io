@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=697">
+<link rel="stylesheet" href="styles.css?v=699">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -234,6 +234,13 @@
              옛 위치를 잃어버려 미끄러지지 못하고 0 에서 다시 그려진다(2026-08-03 실기기 영상으로 발견). -->
         <div class="tabs" id="mnTabs"><span class="tabs-underline" id="mnTabsUnderline"></span></div>
       </div>
+      <!-- 매장 지역 탭 — 레시피·메뉴와 같은 자리, 같은 부품(2026-08-04).
+           2026-07-23에 상단바 아래로 내렸던 것을 도로 올린 것이다. 그때는 세 탭이 제각각이었지만
+           8/3에 레시피·메뉴 탭이 상단바로 올라가면서 매장만 아래에 남아 혼자 달랐다.
+           🔴 감싸개(.tabs-scroll)를 두지 않는다 — `.tabs` 자체가 이미 overflow-x: auto 다. -->
+      <div class="topbar-cat topbar-cat--store">
+        <div class="tabs" id="storeTabs"><span class="tabs-underline" id="storeTabsUnderline"></span></div>
+      </div>
       <!-- 카테고리 필터 탭 제거(2026-07-21 홈 7단 개편) — 카테고리는 홈 섹션으로 이동.
            즐겨찾기 버튼은 topbar-right로 이사, 이 그룹은 숨김(favShareBtn 등은 script 참조 때문에 DOM 유지) -->
       <div class="tabs-group tabs-group--recipe">
@@ -253,8 +260,8 @@
           </svg>
         </button>
       </div>
-      <!-- 매장 섹션: 지역 탭(레시피 카테고리 탭과 동일 형태, 매장에서만 표시) -->
-      <!-- 지역 탭(#storeTabs)은 상단바 아래(매장 뷰 안, 전국 N곳 위)로 이동함(2026-07-23). 공유·설치 버튼만 여기 유지(숨김) -->
+      <!-- 매장 섹션의 공유·설치 버튼 자리(숨김). 지역 탭 자체는 위 .topbar-cat--store 로 올라갔다(2026-08-04).
+           ⚠️ 옛 주석에 「지역 탭은 상단바 아래로 이동함(2026-07-23)」이라고 적혀 있었는데 지금은 사실이 아니다. -->
       <div class="tabs-group tabs-group--store" id="storeTabsGroup">
         <button class="tabs-share-btn" id="storeShareBtn" type="button" aria-label="친구에게 공유">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -483,18 +490,10 @@
 
     <!-- 매장 섹션 -->
     <div class="view" id="view-store" hidden>
-      <!-- 🔴 순서: 개수·안내문 줄이 위, 지역 탭이 아래다(2026-08-03 사용자 확정) —
-           메뉴 탭(#view-menu)·레시피 탭(.list-head)과 같은 순서로 세 탭을 맞췄다. 되돌리지 말 것. -->
-      <!-- 지역 탭 + 개수 한 줄(2026-08-03 사용자 확정) — 레시피·메뉴 탭과 같이 개수는 탭줄 오른쪽 끝이다.
-           탭만 가로로 스크롤되고 개수는 스크롤 밖에 고정된다(.tabs-scroll). -->
-      <div class="tabline">
-        <div class="tabs-scroll">
-          <div class="tabs" id="storeTabs">
-            <span class="tabs-underline" id="storeTabsUnderline"></span>
-          </div>
-        </div>
-        <p class="count-line stores-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
-      </div>
+      <!-- 🔴 지역 탭은 상단바로 올라갔다(2026-08-04) — 레시피·메뉴와 같은 자리다.
+           여기 남는 건 개수 한 줄뿐이고, 클래스도 메뉴 탭과 같은 .list-count 를 쓴다
+           (옛 .tabline / .tabs-scroll / .stores-count 는 이 뷰만 쓰던 것이라 함께 지웠다). -->
+      <p class="list-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
       <div class="stores" id="stores"></div>
       <!-- 매장 푸터(2026-08-03 사용자 확정): 구분선 → 안내문 → 제보·문의 / 이미지 출처.
            안내문은 옛날에 지역 탭 위에 있던 그 줄이다 — 메뉴 탭과 같은 방식으로 아래로 내렸다.
