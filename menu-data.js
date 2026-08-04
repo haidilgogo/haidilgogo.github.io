@@ -264,7 +264,7 @@ window.MENU_DATA = {
      "n": "말고기",
      "img": true,
      "part": true,
-     "jeju": false,
+     "jeju": true,
      "up": "고기",
      "sub": "소양돈고기"
     },
@@ -280,7 +280,7 @@ window.MENU_DATA = {
      "n": "제주 흑돼지목살",
      "img": true,
      "part": true,
-     "jeju": false,
+     "jeju": true,
      "up": "고기",
      "sub": "소양돈고기"
     }
@@ -389,7 +389,7 @@ window.MENU_DATA = {
      "n": "소라",
      "img": true,
      "part": true,
-     "jeju": false,
+     "jeju": true,
      "up": "해산물",
      "sub": "해산물"
     }
@@ -913,7 +913,7 @@ window.MENU_DATA = {
      "n": "흰 무",
      "img": true,
      "part": true,
-     "jeju": false,
+     "jeju": true,
      "up": "채소·버섯",
      "sub": "근경류"
     }
@@ -1046,7 +1046,7 @@ window.MENU_DATA = {
      "n": "매운 떡볶이",
      "img": true,
      "part": true,
-     "jeju": false,
+     "jeju": true,
      "up": "사이드·디저트",
      "sub": "사이드메뉴"
     },
@@ -1062,7 +1062,7 @@ window.MENU_DATA = {
      "n": "제주한라봉셔벗",
      "img": true,
      "part": true,
-     "jeju": false,
+     "jeju": true,
      "up": "사이드·디저트",
      "sub": "디저트"
     },
