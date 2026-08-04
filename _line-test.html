@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" data-v="0">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCF9F5">
+<title>하단 선 범인 찾기</title>
+<style>
+  * { box-sizing: border-box; scrollbar-width: none; }
+  *::-webkit-scrollbar { display: none; }
+  html { overflow-y: auto; }
+  body {
+    margin: 0;
+    background: #FCF9F5;
+    color: #2B120D;
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  }
+
+  /* ── 변형 고르는 줄 (위에 고정) ── */
+  .pick {
+    position: sticky; top: 0; z-index: 90;
+    display: flex; gap: 6px; flex-wrap: wrap;
+    padding: 10px; background: #2B120D;
+  }
+  .pick button {
+    flex: 1 1 auto; min-width: 44px; padding: 10px 6px;
+    border: 0; border-radius: 10px; background: #5A4038; color: #FCF9F5;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+  }
+  .pick button.on { background: #E0301E; }
+  .now {
+    padding: 10px 14px; background: #FFF3D6; border-bottom: 1px solid #E7D9C4;
+    font-size: 14px; font-weight: 700; line-height: 1.5;
+  }
+
+  /* ── 본문: 선이 어디 걸리든 보이도록 촘촘하게 ── */
+  .body { padding: 0 20px 320px; }
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 26px; font-size: 15px; font-weight: 800;
+  }
+  .row span { font-size: 13px; font-weight: 600; color: #8A7A70; }
+  .flat { height: 120px; }              /* 아무것도 없는 크림 바닥 */
+  .band { height: 26px; background: #F2E7DA; }  /* 톤이 다른 띠 */
+
+  /* ── 탭바: 앱의 실제 값 그대로 ── */
+  .tabbar {
+    position: fixed; left: 50%; bottom: 12px;
+    transform: translateX(-50%);
+    width: calc(100% - 28px); max-width: 412px;
+    z-index: 50;
+    display: flex; justify-content: space-around; gap: 2px;
+    padding: 5px 10px;
+    background: rgba(252, 249, 245, .55);
+    border: 1px solid rgba(255, 255, 255, .75);
+    border-radius: 24px;
+    box-shadow: 0 8px 28px rgba(43, 18, 13, .16);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    backdrop-filter: blur(18px) saturate(1.15);
+    overflow: visible;
+  }
+  .tabbar b {
+    padding: 8px 4px; font-size: 11px; font-weight: 700;
+    color: #4D4139; text-align: center; flex: 1;
+  }
+  .tabbar b i { display: block; font-size: 18px; font-style: normal; }
+
+  /* ── 3차: 크기는 선이 안 보이는 범위(≤10px)로 묶어두고 진하기로 뜬 느낌을 되찾는다 ──
+     0 = 2차의 4번 그대로(선 없음이 확인된 값) · 5 = 지금 앱 값(선은 보이지만 뜬 느낌 비교용) */
+  [data-v="0"] .tabbar { box-shadow: 0 2px 8px rgba(43, 18, 13, .16); }
+  [data-v="1"] .tabbar { box-shadow: 0 2px 8px rgba(43, 18, 13, .28); }
+  [data-v="2"] .tabbar { box-shadow: 0 3px 10px rgba(43, 18, 13, .26); }
+  [data-v="3"] .tabbar { box-shadow: 0 1px 3px rgba(43, 18, 13, .18), 0 3px 9px rgba(43, 18, 13, .22); }
+  [data-v="4"] .tabbar { box-shadow: 0 1px 2px rgba(43, 18, 13, .22), 0 4px 10px rgba(43, 18, 13, .28); }
+  [data-v="5"] .tabbar { box-shadow: 0 8px 28px rgba(43, 18, 13, .16); }
+</style>
+</head>
+<body>
+
+<div class="pick">
+  <button data-go="0" class="on">0</button>
+  <button data-go="1">1</button>
+  <button data-go="2">2</button>
+  <button data-go="3">3</button>
+  <button data-go="4">4</button>
+  <button data-go="5">5</button>
+</div>
+<div class="now" id="now"></div>
+
+<div class="body" id="body"></div>
+
+<nav class="tabbar">
+  <b><i>⌂</i>홈</b><b><i>▤</i>레시피</b><b><i>▦</i>메뉴</b><b><i>◉</i>매장</b><b><i>★</i>스티커</b>
+</nav>
+
+<script>
+  var 설명 = [
+    '0 · 아까 고르신 값 그대로 (0 2px 8px, 농도 .16) — 선 없음이 확인된 값',
+    '1 · 같은 크기, 더 진하게 (0 2px 8px, 농도 .28)',
+    '2 · 살짝 키우고 진하게 (0 3px 10px, 농도 .26)',
+    '3 · 두 겹 — 바짝 붙은 것 + 조금 퍼진 것 (1px/3px + 3px/9px)',
+    '4 · 두 겹, 더 진하게 (1px/2px + 4px/10px)',
+    '5 · 지금 앱 값 (0 8px 28px, 농도 .16) — 선은 보이지만 뜬 느낌 견줄 기준'
+  ];
+
+  // 선이 어디에 걸리든 보이게 촘촘한 줄 + 민무늬 바닥 + 띠를 섞어 깐다
+  var h = '';
+  for (var i = 0; i < 60; i++) {
+    if (i % 9 === 4) h += '<div class="flat"></div>';
+    else if (i % 9 === 7) h += '<div class="band"></div>';
+    else h += '<div class="row">탕<span>전체보기 ›</span></div>';
+  }
+  document.getElementById('body').innerHTML = h;
+
+  function 고르기(v) {
+    document.documentElement.dataset.v = v;
+    document.getElementById('now').textContent = 설명[v];
+    var bs = document.querySelectorAll('.pick button');
+    for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i].dataset.go === v);
+  }
+  document.querySelector('.pick').addEventListener('click', function (e) {
+    if (e.target.dataset.go) 고르기(e.target.dataset.go);
+  });
+  고르기('0');
+</script>
+</body>
+</html>
