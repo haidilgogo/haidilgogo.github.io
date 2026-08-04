@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>토스트 투명도 비교 — 하딜고고</title>
+<!-- 🔴 앱의 진짜 styles.css 를 불러다 쓴다(목업 규칙). 여기서 덮어쓰는 것은 알약의 배경 알파뿐이다. -->
+<link rel="stylesheet" href="styles.css?v=686">
+<style>
+  body { margin:0; background:var(--bg-page, #FCF9F5); }
+  .wrap { max-width:440px; margin:0 auto; padding:20px 20px 140px; }
+  h1 { font-size:19px; font-weight:800; color:var(--text-dark); margin:6px 0 4px; }
+  .lead { font-size:13.5px; color:var(--text-muted); line-height:1.65; margin:0 0 4px; }
+  .lead b { color:var(--brand-red); }
+  .note { font-size:12.5px; color:var(--text-muted); line-height:1.6; margin:14px 0 20px;
+          padding:10px 12px; background:#F3EDE4; border-radius:10px; }
+
+  /* 카드 위에 알약을 겹쳐 놓는 자리 — 실제로도 카드 위에 뜬다 */
+  .stack { position:relative; }
+  .row { position:relative; margin:0 0 10px; }
+  .pill {
+    display:inline-block; color:#fff; font-size:13px; font-weight:500;
+    font-family:'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+    padding:10px 18px; border-radius:999px; white-space:nowrap;
+  }
+  .a100 { background:rgba(43,18,13,1); }
+  .a95  { background:rgba(43,18,13,.95); }
+  .a90  { background:rgba(43,18,13,.9); }
+  .a85  { background:rgba(43,18,13,.85); }
+  .a80  { background:rgba(43,18,13,.8); }
+  .a75  { background:rgba(43,18,13,.75); }
+  .lab { display:inline-block; margin-left:8px; font-size:12px; font-weight:700; color:var(--text-muted); vertical-align:middle; }
+  .lab--now { color:var(--brand-red); }
+
+  .try { display:block; width:100%; margin:0 0 8px; padding:12px 14px; text-align:left;
+         background:#fff; border:1px solid var(--card-border); border-radius:12px;
+         font-family:inherit; font-size:14px; font-weight:700; color:var(--text-dark); cursor:pointer; }
+  .try:active { transform:scale(.985); border-color:var(--card-hover-border); }
+  h2 { font-size:15px; font-weight:800; color:var(--text-dark); margin:28px 0 8px; }
+
+  /* 실제 자리(화면 아래 90px)에 띄워 보는 알약 */
+  #live { display:none; position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:250; }
+  #live.show { display:block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>알약 투명도 견주기</h1>
+  <p class="lead">
+    바탕색은 그대로 <b>#2B120D</b>(앱의 진한 글자색)이고, <b>비치는 정도만</b> 다릅니다.
+    지금 앱은 <b>0.9</b>입니다.
+  </p>
+  <p class="note">
+    아래 카드 위에 겹쳐 뒀습니다 — 실제로도 목록 카드 위에 뜹니다.
+    숫자가 <b>작을수록 더 비칩니다</b>(뒤가 더 보임).
+  </p>
+
+  <h2>카드 위에서</h2>
+  <div class="stack">
+    <div class="mn-list">
+      <button class="mn-card"><div class="mn-card-thumb"><img src="assets/menu/토마토탕훠궈.webp" alt=""></div>
+        <span class="mn-card-body"><span class="mn-card-name">토마토탕훠궈</span></span></button>
+      <div class="row"><span class="pill a100">냄비가 가득 찼어요</span><span class="lab">1.0 · 안 비침</span></div>
+      <div class="row"><span class="pill a95">냄비가 가득 찼어요</span><span class="lab">0.95</span></div>
+      <button class="mn-card"><div class="mn-card-thumb"><img src="assets/menu/쏸차이훠궈.webp" alt=""></div>
+        <span class="mn-card-body"><span class="mn-card-name">쏸차이훠궈</span></span></button>
+      <div class="row"><span class="pill a90">냄비가 가득 찼어요</span><span class="lab lab--now">0.9 · 지금</span></div>
+      <div class="row"><span class="pill a85">냄비가 가득 찼어요</span><span class="lab">0.85</span></div>
+      <button class="mn-card"><div class="mn-card-thumb"><img src="assets/menu/우유마라훠궈.webp" alt=""></div>
+        <span class="mn-card-body"><span class="mn-card-name">우유마라훠궈</span></span></button>
+      <div class="row"><span class="pill a80">냄비가 가득 찼어요</span><span class="lab">0.8</span></div>
+      <div class="row"><span class="pill a75">냄비가 가득 찼어요</span><span class="lab">0.75 · 많이 비침</span></div>
+      <button class="mn-card"><div class="mn-card-thumb"><img src="assets/menu/청유마라훠궈.webp" alt=""></div>
+        <span class="mn-card-body"><span class="mn-card-name">청유마라훠궈</span></span></button>
+    </div>
+  </div>
+
+  <h2>실제 자리에서 (화면 아래)</h2>
+  <button class="try" type="button" onclick="live('a100')">1.0 — 안 비침</button>
+  <button class="try" type="button" onclick="live('a95')">0.95</button>
+  <button class="try" type="button" onclick="live('a90')">0.9 — 지금</button>
+  <button class="try" type="button" onclick="live('a85')">0.85</button>
+  <button class="try" type="button" onclick="live('a80')">0.8</button>
+  <button class="try" type="button" onclick="live('a75')">0.75 — 많이 비침</button>
+  <p class="note">
+    누르면 실제 자리(탭바 위 20px)에 2초 떴다 사라집니다.
+    누른 뒤 <b>화면을 내려 카드가 알약 뒤로 지나가게</b> 해 보시면 비치는 정도가 잘 보입니다.
+  </p>
+</div>
+
+<div id="live"><span class="pill a90" id="livePill">냄비가 가득 찼어요</span></div>
+
+<script>
+  var timer = null;
+  function live(cls) {
+    var box = document.getElementById('live');
+    var pill = document.getElementById('livePill');
+    pill.className = 'pill ' + cls;
+    box.classList.add('show');
+    clearTimeout(timer);
+    timer = setTimeout(function () { box.classList.remove('show'); }, 2000);
+  }
+</script>
+</body>
+</html>

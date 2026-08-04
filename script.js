@@ -5139,7 +5139,11 @@
     const mc = e.target.closest('.mn-card[data-menu]');
     if (mc) { toggle(mc.dataset.menu); return refreshCards(); }
 
-    if (e.target.closest('#potToggleBtn')) return openSheet();
+    // 🔴 냄비 아이콘은 여닫이다(2026-08-04 사용자 요청) — 열려 있을 때 다시 누르면 닫힌다.
+    //    창이 떠 있는 동안 이 아이콘은 빨갛게(is-open) 눌린 모습이라, 다시 누르면 풀리는 게 맞다.
+    if (e.target.closest('#potToggleBtn')) {
+      return sheetOverlay.classList.contains('open') ? closeSheet() : openSheet();
+    }
     // 어두운 배경이나 X 를 누르면 닫는다(시트 안쪽을 눌렀을 때는 안 닫힌다)
     if (e.target.closest('#mnSheetClose') || e.target === sheetOverlay) return closeSheet();
     if (e.target.closest('#mnSheetClear')) {
