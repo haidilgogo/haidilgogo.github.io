@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCF9F5">
+<title>하단바 비교 — 지금 · 안 A · 물방울</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #FCF9F5; }
+  iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+  .pick {
+    position: fixed; left: 0; right: 0; top: 0; z-index: 99;
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px; background: rgba(43, 18, 13, .92);
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  }
+  .pick button {
+    flex: 1; padding: 9px 2px; border: 0; border-radius: 9px;
+    background: #5A4038; color: #FCF9F5; white-space: nowrap;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+  }
+  .pick button.on { background: #E0301E; }
+  .tip {
+    position: fixed; left: 10px; right: 10px; top: 52px; z-index: 99;
+    padding: 7px 10px; border-radius: 9px;
+    background: rgba(43, 18, 13, .82); color: #FCF9F5;
+    font: 12px/1.45 -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div class="pick">
+  <button data-v="0" class="on">지금</button>
+  <button data-v="A">안 A</button>
+  <button data-v="D">물방울</button>
+  <button data-v="D2">물방울↑</button>
+</div>
+<div class="tip" id="tip"></div>
+
+<iframe id="app" src="index.html"></iframe>
+
+<script>
+/* 🔴 목업이 진짜인 이유: 탭바를 새로 그리지 않고 index.html을 그대로 띄운 뒤 CSS만 갈아 끼운다.
+   실제 아이콘·글자·유리구슬·드래그가 전부 살아 있다.
+   🔴 어느 안도 .tabbar의 box-shadow는 안 건드린다 — 아이폰 가로선을 되살리지 않기 위해서다.
+   🔴 안 B(캡슐·색 뺀 알약)는 뺐다. 사용자님이 안 A의 반투명 로즈를 고르셨다. */
+
+/* ── 안 A: 사용자님이 좋다고 하신 재질 ── */
+var A안 = [
+  '.tabbar {',
+  '  border-color: rgba(43, 18, 13, .06);',   /* 밝은 흰 테두리 → 아주 옅은 어두운 선 */
+  '  border-radius: 28px;',
+  '}',
+  '.tabbar-indicator {',
+  '  background: rgba(245, 217, 210, .55);',  /* 같은 로즈, 불투명 → 반투명 */
+  '  border-radius: 23px;',
+  '}'
+].join('\n');
+
+/* ── 도착할 때 오므라들었다 펴지는 것 (물방울에 얹어 둔다) ──
+   유리구슬(76px 원) → 알약(작음)으로 "줄어드는" 전환이라, 목표를 살짝 지나치는 곡선이면
+   자동으로 "작아졌다 커지는" 움직임이 된다. 미끄러짐(transform)은 손대지 않는다. */
+var 정착 = [
+  '.tabbar-indicator {',
+  '  transition:',
+  '    transform .28s cubic-bezier(.4, 0, .2, 1),',
+  '    width .22s cubic-bezier(.34, 1.5, .64, 1),',
+  '    height .22s cubic-bezier(.34, 1.5, .64, 1),',
+  '    border-radius .22s cubic-bezier(.34, 1.5, .64, 1),',
+  '    background .13s ease-out, box-shadow .13s ease-out, border-color .13s ease-out;',
+  '}'
+].join('\n');
+
+var 안 = { 0: '', A: A안, D: A안 + '\n' + 정착, D2: A안 + '\n' + 정착 };
+var 세기표 = { 0: 0, A: 0, D: .22, D2: .42 };
+
+var 설명 = {
+  0:  '지금 — 흰 테두리 + 불투명 로즈 알약',
+  A:  '안 A — 반투명 로즈 알약 + 옅은 테두리. 재질만 바꾼 것(움직임은 지금과 같음)',
+  D:  '물방울 — 안 A에 더해, 방울을 손으로 끌어 보세요. 빠를수록 늘어나고 멈추면 되돌아옵니다',
+  D2: '물방울↑ — 같은 것을 더 세게. 과하면 이쪽은 버리시면 됩니다'
+};
+
+/* ── 물방울: 기존 코드를 안 건드리는 방식 ──
+   방울의 위치를 매 프레임 지켜보다가 "얼마나 빨리 움직이는지"를 재서,
+   빠를수록 가로로 늘리고 세로로 누른다(scale). 느려지면 저절로 1로 돌아온다.
+   🔴 transform이 아니라 CSS의 독립 scale 속성을 쓴다 — 앱이 transform(위치)을
+      WAAPI로 굴리고 있어서, 같은 칸을 건드리면 미끄러짐을 망가뜨린다. */
+var 루프 = 0, 세기 = 0;
+function 물방울켜기(k) {
+  물방울끄기();
+  if (!k) return;
+  var d = 앱.contentDocument;
+  var 방울 = d && d.querySelector('.tabbar-indicator');
+  if (!방울) return;
+  var 이전x = null, 이전t = 0;
+  (function step(now) {
+    var cs = getComputedStyle(방울);
+    var m = cs.transform && cs.transform !== 'none' ? new DOMMatrixReadOnly(cs.transform) : null;
+    var x = m ? m.e : 0;
+    if (이전x !== null) {
+      var dt = Math.max(1, now - 이전t);
+      var v = Math.abs(x - 이전x) / dt;          /* px/ms */
+      var 목표 = v < .02 ? 0 : Math.min(1, v / 1.1);  /* 멈춰 있을 때의 미세 떨림은 무시 */
+      세기 += (목표 - 세기) * .3;                 /* 갑자기 튀지 않게 완만히 따라감 */
+      방울.style.scale = (1 + k * 세기).toFixed(3) + ' ' + (1 - k * .7 * 세기).toFixed(3);
+    }
+    이전x = x; 이전t = now;
+    루프 = requestAnimationFrame(step);
+  })(performance.now());
+}
+function 물방울끄기() {
+  cancelAnimationFrame(루프);
+  세기 = 0;
+  var d = 앱.contentDocument;
+  var 방울 = d && d.querySelector('.tabbar-indicator');
+  if (방울) 방울.style.scale = '';
+}
+
+var 앱 = document.getElementById('app');
+var 지금 = '0';
+
+function 넣기() {
+  var d = 앱.contentDocument;
+  if (!d || !d.head) return;
+  var s = d.getElementById('_variant');
+  if (!s) { s = d.createElement('style'); s.id = '_variant'; d.head.appendChild(s); }
+  s.textContent = 안[지금];
+  물방울켜기(세기표[지금]);
+}
+
+function 고르기(v) {
+  지금 = v;
+  document.getElementById('tip').textContent = 설명[v];
+  var bs = document.querySelectorAll('.pick button');
+  for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i].dataset.v === v);
+  넣기();
+}
+
+앱.addEventListener('load', 넣기);   /* 앱 안에서 새로고침돼도 다시 발라준다 */
+document.querySelector('.pick').addEventListener('click', function (e) {
+  if (e.target.dataset.v) 고르기(e.target.dataset.v);
+});
+고르기('0');
+</script>
+</body>
+</html>
