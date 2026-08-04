@@ -4312,8 +4312,20 @@
       //    흔들린다(3차 교차검증 R1). 항목 자체는 통째로 교체되므로 얕은 사본이면 충분하다.
       favMarks: Object.assign({}, favMarks),
       likedMarks: Object.assign({}, likedMarks),
+      // 🔴 담은 목록(메뉴 탭)도 함께 보낸다(2026-08-04 사용자 확정) —
+      //    「초기화하기 전까지 유지되니 다음 주문 때도 써먹는다」는 것이 이유다.
+      //    메뉴 탭은 다른 IIFE 라 값을 직접 못 읽는다 → 저장된 것을 그대로 읽어 싣는다.
+      menu: readMenuPicked(),
       updatedAt: Date.now(),
     };
+  }
+  // 담은 목록 저장값 그대로. { picked:[], broths:[], cells:n, at:ms } — at 은 마지막으로 손댄 시각이다.
+  const MENU_PICKED_KEY = 'haidilao_menu_picked';
+  function readMenuPicked() {
+    try {
+      const v = JSON.parse(localStorage.getItem(MENU_PICKED_KEY));
+      return (v && typeof v === 'object') ? v : null;
+    } catch (e) { return null; }
   }
 
   // 서버 것 + 이 기기 것을 합쳐서 로컬에 적용. 합친 결과를 돌려준다(개수 안내용).
@@ -4377,6 +4389,13 @@
       // 목록도 이력과 같이 채워 둔다 — 이력이 진실이지만, 사람이 서버 값을 열어볼 때 읽기 쉽다.
       favorites: setsFromMarks(favMarksM),
       liked: setsFromMarks(likedMarksM),
+      // 🔴 담은 목록은 **합치지 않고 최신 것이 통째로 이긴다**(2026-08-04).
+      //    스티커·즐겨찾기는 항목마다 켠/끈 이력이 있어 합칠 수 있지만, 담은 목록은
+      //    「지금 이 한 벌」이다 — 합치면 냄비 칸 수(1·2·4)와 육수가 서로 안 맞게 뒤엉킨다.
+      //    예: 한쪽이 2칸에 육수 둘, 다른 쪽이 4칸에 육수 넷이면 합친 결과가 성립하지 않는다.
+      //    at 이 없는 옛 자료는 0 으로 봐서 새 쪽이 이긴다.
+      menu: ((a.menu && a.menu.at) || 0) >= ((b.menu && b.menu.at) || 0) ? (a.menu || b.menu || null)
+                                                                        : (b.menu || null),
       updatedAt: Date.now(),
     };
   }
@@ -4412,6 +4431,15 @@
       localStorage.setItem(FAV_MARKS_KEY, JSON.stringify(favMarks));
       localStorage.setItem(LIKED_MARKS_KEY, JSON.stringify(likedMarks));
     } catch (e) { /* 무시 */ }
+    // 🔴 담은 목록은 **더 새로울 때만** 덮어쓴다(2026-08-04). 지금 이 기기 것이 더 최신인데
+    //    덮으면 방금 담은 게 사라진다. mergePayloads 가 이미 최신 쪽을 골라 주지만,
+    //    여기서 한 번 더 보는 이유는 이 함수가 합치기를 거치지 않고 불릴 수도 있기 때문이다.
+    const 지금 = readMenuPicked();
+    if (p.menu && ((p.menu.at || 0) > ((지금 && 지금.at) || 0))) {
+      try { localStorage.setItem(MENU_PICKED_KEY, JSON.stringify(p.menu)); } catch (e) { /* 무시 */ }
+      // 메뉴 탭이 이미 그려져 있으면 화면까지 새로 그린다(다른 IIFE 라 window 를 거친다)
+      if (window.mnReloadPicked) window.mnReloadPicked();
+    }
   }
   function mergeIntoLocal(remote) {
     if (!remote) return;
@@ -4420,6 +4448,9 @@
 
   // 서버에 올리기 — 저장이 연달아 일어나도 한 번만 보내게 묶는다
   let pushTimer = null;
+  // 🔴 메뉴 탭은 다른 IIFE 라 직접 못 부른다 — 담은 목록이 바뀔 때도 코드에 올려야 해서 window 에 얹는다.
+  //    (메뉴 탭의 saveMenu 가 window.schedulePush() 를 부른다)
+  window.schedulePush = () => schedulePush();
   function schedulePush() {
     if (!syncRoot) return;
     // 🔴 **저장할 게 생기는 순간** 코드를 만든다 — 스티커든 즐겨찾기든 좋아요든(2026-07-31).
@@ -4831,13 +4862,34 @@
      키 이름은 앱의 다른 것과 같은 꼴이다(haidilao_favorites · haidilao_stamps).
      ────────────────────────────────────────────────────────────────────────── */
   const MENU_KEY = 'haidilao_menu_picked';
+  // 🔴 되살리는 동안에는 저장하지 않는다(2026-08-04). refreshCards·refreshPot 이 끝에서 saveMenu 를
+  //    부르는데, 불러오기로 받은 값을 그리는 중에 그게 돌면 두 가지가 한꺼번에 잘못된다:
+  //      ① at 이 지금 시각으로 덮여 **방금 받아온 것이 「더 새것」으로 둔갑**한다
+  //      ② schedulePush 가 다시 돌아 올리기 → 받기 → 그리기로 되돌아 나간다
+  let 되살리는중 = false;
   function saveMenu() {
+    if (되살리는중) return;
     try {
-      localStorage.setItem(MENU_KEY, JSON.stringify({ picked: [...picked.keys()], broths, cells }));
+      // 🔴 at = 마지막으로 손댄 시각. 내 코드로 기기 간에 옮길 때 **어느 쪽이 최신인지** 가리는 데 쓴다.
+      //    스티커·즐겨찾기는 켠/끈 이력을 합치지만, 담은 목록은 「지금 이 한 벌」이라
+      //    합치면 냄비 칸 수와 육수가 뒤엉킨다 — 그래서 통째로 최신 것이 이긴다.
+      localStorage.setItem(MENU_KEY, JSON.stringify({ picked: [...picked.keys()], broths, cells, at: Date.now() }));
     } catch (err) {
       // 시크릿 모드 등 저장이 막힌 경우는 무시한다(즐겨찾기와 같은 방식)
     }
+    if (window.schedulePush) window.schedulePush(); // 담은 목록도 내 코드에 실린다
   }
+  // 다른 기기에서 온 담은 목록을 반영할 때 쓴다(내 코드 불러오기) — 저장값을 다시 읽어 화면까지 새로 그린다.
+  window.mnReloadPicked = function () {
+    되살리는중 = true;
+    try {
+      picked.clear(); broths = []; cells = 2;   // 2 = 이 파일 위쪽 `let cells = 2` 와 같은 기본값
+      loadMenu();
+      refreshCards(); refreshPot();
+    } finally {
+      되살리는중 = false;
+    }
+  };
   function loadMenu() {
     let saved;
     try { saved = JSON.parse(localStorage.getItem(MENU_KEY)); } catch (err) { return; }
