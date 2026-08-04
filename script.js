@@ -5046,8 +5046,12 @@
     const rows = [];
     if (broths.length) {
       rows.push(`<p class="mn-sheet-group">전골 ${potLabel(cells)}</p>`);
+      // 🔴 몇 번 칸에 담은 건지 번호를 붙인다(2026-08-04 사용자 확정). 같은 육수를 두 칸에 담으면
+      //    똑같은 줄이 두 개 나란히 보여서 「왜 두 번 있지」가 됐다 — 번호가 그 답이다.
+      //    규격은 냄비 아래 목록·육수 카드 배지와 **같은 한 곳**을 쓴다(styles.css 「칸 번호 규격」).
       broths.forEach((b, i) => rows.push(
-        `<div class="mn-sheet-item">${줄그림(b, (D.broths.find((x) => x.n === b) || {}).img)}${b}` +
+        `<div class="mn-sheet-item"><b class="mn-sheet-num">${i + 1}</b>` +
+        `${줄그림(b, (D.broths.find((x) => x.n === b) || {}).img)}${b}` +
         `<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
     }
     // 담은 목록도 화면 분류대로 묶는다 — 어느 탭에서 담았는지 그대로 보이게.

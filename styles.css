@@ -4912,8 +4912,13 @@ img {
 /* 1맛일 때는 줄이 하나뿐이라 2열 격자의 왼쪽에만 놓여 오른쪽이 비어 보인다 → 가운데로 */
 .mn-pot-list.is-one { grid-template-columns:auto; justify-content:center; }
 .mn-pot-row { display:flex; gap:7px; align-items:center; font-size:13px; line-height:1.35; }
-.mn-pot-row b {
-  /* 냄비 안 23px보다 작게 — 목록에서는 이름이 주인공이고 번호는 거들기만 하면 된다 */
+/* 🔴 칸 번호 규격은 **여기 한 곳**이다(2026-08-04 합침). 냄비 아래 목록 · 육수 카드 오른쪽 배지 ·
+   내 메뉴의 전골 줄, 셋이 같은 번호를 말하므로 값을 나눠 적지 않는다.
+   (예전엔 `.mn-pot-row b` 와 `.mn-card-num` 에 똑같은 선언이 두 벌 있었다.)
+   냄비 안 23px보다 작다 — 목록에서는 이름이 주인공이고 번호는 거들기만 하면 된다. */
+.mn-pot-row b,
+.mn-card-num,
+.mn-sheet-num {
   flex:none; width:20px; height:20px; border-radius:5px;
   background:rgba(28,12,8,.45); color:#fff; font-size:11px; font-weight:800;
   display:flex; align-items:center; justify-content:center;
@@ -5069,11 +5074,7 @@ img {
    접으면 43px 로 줄어 이름 자리가 61 → 107px 이 되고, 글자 85px 이 다 들어간다. */
 .mn-card-nums { flex:none; display:flex; flex-wrap:wrap; gap:3px; align-items:center; justify-content:flex-end; }
 .mn-card-nums[data-n="3"], .mn-card-nums[data-n="4"] { width:43px; }
-.mn-card-num {
-  flex:none; width:20px; height:20px; border-radius:5px;
-  background:rgba(28,12,8,.45); color:#fff; font-size:11px; font-weight:800;
-  display:flex; align-items:center; justify-content:center;
-}
+/* `.mn-card-num` 의 생김새는 위 「칸 번호 규격」 한 곳에 있다(.mn-pot-row b 와 함께). */
 /* ── 그림 확대 모달은 없앴다 (2026-08-04 사용자 확정) ──────────────
    🔴 되살리지 말 것. 이유는 script.js 메뉴 탭 IIFE 의 같은 이름 주석에 적어 뒀다
    (담기 자리를 뺏던 것 · 저작권 · 생김새). 이제 카드는 어디를 눌러도 담기 하나다.
