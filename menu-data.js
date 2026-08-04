@@ -903,7 +903,7 @@ window.MENU_DATA = {
     },
     {
      "n": "쑥갓",
-     "img": false,
+     "img": true,
      "part": true,
      "jeju": false,
      "up": "채소·버섯",
