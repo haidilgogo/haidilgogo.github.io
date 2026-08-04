@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#FCF9F5">
-<title>하단바 비교 — 지금 · 안 A · 물방울</title>
+<title>하단바 비교 — 이동 중 방울</title>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #FCF9F5; }
   iframe { display: block; width: 100%; height: 100%; border: 0; }
@@ -33,9 +33,9 @@
 
 <div class="pick">
   <button data-v="0" class="on">지금</button>
-  <button data-v="A">안 A</button>
-  <button data-v="D">물방울</button>
-  <button data-v="D2">물방울↑</button>
+  <button data-v="C">동그라미</button>
+  <button data-v="M">중간</button>
+  <button data-v="S">둥근네모</button>
 </div>
 <div class="tip" id="tip"></div>
 
@@ -45,79 +45,38 @@
 /* 🔴 목업이 진짜인 이유: 탭바를 새로 그리지 않고 index.html을 그대로 띄운 뒤 CSS만 갈아 끼운다.
    실제 아이콘·글자·유리구슬·드래그가 전부 살아 있다.
    🔴 어느 안도 .tabbar의 box-shadow는 안 건드린다 — 아이폰 가로선을 되살리지 않기 위해서다.
-   🔴 안 B(캡슐·색 뺀 알약)는 뺐다. 사용자님이 안 A의 반투명 로즈를 고르셨다. */
 
-/* ── 안 A: 사용자님이 좋다고 하신 재질 ── */
-var A안 = [
-  '.tabbar {',
-  '  border-color: rgba(43, 18, 13, .06);',   /* 밝은 흰 테두리 → 아주 옅은 어두운 선 */
-  '  border-radius: 28px;',
-  '}',
-  '.tabbar-indicator {',
-  '  background: rgba(245, 217, 210, .55);',  /* 같은 로즈, 불투명 → 반투명 */
-  '  border-radius: 23px;',
-  '}'
-].join('\n');
+   🔴 2026-08-04 목업 자체의 버그를 고쳤다. 앞 판에서는 아래 규칙을 그냥 `.tabbar-indicator`로
+      썼는데, styles.css의 `.tabbar-indicator--glass`(이동 중 방울)와 힘이 같으면서 뒤에 놓여
+      이기는 바람에 **이동 중 방울까지 로즈 둥근네모로 덮어썼다.** 그래서 목업의 방울과
+      앱의 방울이 달랐다. 지금은 :not()으로 정지 상태에만 걸리게 했다. */
 
-/* ── 도착할 때 오므라들었다 펴지는 것 (물방울에 얹어 둔다) ──
-   유리구슬(76px 원) → 알약(작음)으로 "줄어드는" 전환이라, 목표를 살짝 지나치는 곡선이면
-   자동으로 "작아졌다 커지는" 움직임이 된다. 미끄러짐(transform)은 손대지 않는다. */
-var 정착 = [
-  '.tabbar-indicator {',
-  '  transition:',
-  '    transform .28s cubic-bezier(.4, 0, .2, 1),',
-  '    width .22s cubic-bezier(.34, 1.5, .64, 1),',
-  '    height .22s cubic-bezier(.34, 1.5, .64, 1),',
-  '    border-radius .22s cubic-bezier(.34, 1.5, .64, 1),',
-  '    background .13s ease-out, box-shadow .13s ease-out, border-color .13s ease-out;',
-  '}'
-].join('\n');
+/* 정지 상태(알약)는 앱에 이미 안 A가 들어가 있으므로 건드리지 않는다.
+   여기서 바꾸는 건 오직 "이동 중 방울"뿐 — 로즈 반투명으로 두고 모서리만 다르게 한다.
+   방울은 76×76 이므로 38px = 완전한 동그라미다.
+   나머지(흰 테두리·안쪽 광택·빨강 엣지광·뒤 흐림·표면 반사광)는 유리구슬 그대로 둔다. */
+function 로즈방울(모서리) {
+  return [
+    '.tabbar-indicator--glass {',
+    '  background: rgba(245, 217, 210, .55);',   /* 무지개빛 렌즈 → 로즈 반투명 */
+    '  border-radius: ' + 모서리 + ';',
+    '}'
+  ].join('\n');
+}
 
-var 안 = { 0: '', A: A안, D: A안 + '\n' + 정착, D2: A안 + '\n' + 정착 };
-var 세기표 = { 0: 0, A: 0, D: .22, D2: .42 };
-
-var 설명 = {
-  0:  '지금 — 흰 테두리 + 불투명 로즈 알약',
-  A:  '안 A — 반투명 로즈 알약 + 옅은 테두리. 재질만 바꾼 것(움직임은 지금과 같음)',
-  D:  '물방울 — 안 A에 더해, 방울을 손으로 끌어 보세요. 빠를수록 늘어나고 멈추면 되돌아옵니다',
-  D2: '물방울↑ — 같은 것을 더 세게. 과하면 이쪽은 버리시면 됩니다'
+var 안 = {
+  0: '',                        /* 지금 앱 = 무지개빛 유리구슬 */
+  C: 로즈방울('50%'),            /* 완전한 동그라미 */
+  M: 로즈방울('30px'),           /* 그 사이 — 동그라미도 네모도 아닌 것 */
+  S: 로즈방울('23px')            /* 목업에서 우연히 나왔던 둥근네모 */
 };
 
-/* ── 물방울: 기존 코드를 안 건드리는 방식 ──
-   방울의 위치를 매 프레임 지켜보다가 "얼마나 빨리 움직이는지"를 재서,
-   빠를수록 가로로 늘리고 세로로 누른다(scale). 느려지면 저절로 1로 돌아온다.
-   🔴 transform이 아니라 CSS의 독립 scale 속성을 쓴다 — 앱이 transform(위치)을
-      WAAPI로 굴리고 있어서, 같은 칸을 건드리면 미끄러짐을 망가뜨린다. */
-var 루프 = 0, 세기 = 0;
-function 물방울켜기(k) {
-  물방울끄기();
-  if (!k) return;
-  var d = 앱.contentDocument;
-  var 방울 = d && d.querySelector('.tabbar-indicator');
-  if (!방울) return;
-  var 이전x = null, 이전t = 0;
-  (function step(now) {
-    var cs = getComputedStyle(방울);
-    var m = cs.transform && cs.transform !== 'none' ? new DOMMatrixReadOnly(cs.transform) : null;
-    var x = m ? m.e : 0;
-    if (이전x !== null) {
-      var dt = Math.max(1, now - 이전t);
-      var v = Math.abs(x - 이전x) / dt;          /* px/ms */
-      var 목표 = v < .02 ? 0 : Math.min(1, v / 1.1);  /* 멈춰 있을 때의 미세 떨림은 무시 */
-      세기 += (목표 - 세기) * .3;                 /* 갑자기 튀지 않게 완만히 따라감 */
-      방울.style.scale = (1 + k * 세기).toFixed(3) + ' ' + (1 - k * .7 * 세기).toFixed(3);
-    }
-    이전x = x; 이전t = now;
-    루프 = requestAnimationFrame(step);
-  })(performance.now());
-}
-function 물방울끄기() {
-  cancelAnimationFrame(루프);
-  세기 = 0;
-  var d = 앱.contentDocument;
-  var 방울 = d && d.querySelector('.tabbar-indicator');
-  if (방울) 방울.style.scale = '';
-}
+var 설명 = {
+  0: '지금 앱 — 이동 중 방울이 무지개빛 유리구슬. 견줄 기준입니다',
+  C: '동그라미 — 로즈 반투명 + 완전한 원',
+  M: '중간 — 로즈 반투명 + 동그라미와 네모 사이',
+  S: '둥근네모 — 로즈 반투명 + 목업에서 우연히 나왔던 그 모양'
+};
 
 var 앱 = document.getElementById('app');
 var 지금 = '0';
@@ -128,7 +87,6 @@ function 넣기() {
   var s = d.getElementById('_variant');
   if (!s) { s = d.createElement('style'); s.id = '_variant'; d.head.appendChild(s); }
   s.textContent = 안[지금];
-  물방울켜기(세기표[지금]);
 }
 
 function 고르기(v) {
@@ -139,7 +97,7 @@ function 고르기(v) {
   넣기();
 }
 
-앱.addEventListener('load', 넣기);   /* 앱 안에서 새로고침돼도 다시 발라준다 */
+앱.addEventListener('load', 넣기);
 document.querySelector('.pick').addEventListener('click', function (e) {
   if (e.target.dataset.v) 고르기(e.target.dataset.v);
 });
