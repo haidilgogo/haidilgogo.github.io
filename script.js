@@ -4578,6 +4578,10 @@
   //    2026-08-04: 옛 띠의 버튼 대신 홈 박스 전체가 입구다.
   const homeCodeBox = document.getElementById('homeCode');
   if (homeCodeBox) homeCodeBox.addEventListener('click', () => openSyncSheet());
+  // 상단바 아이콘(홈 전용, 공유 왼쪽) — 같은 시트를 연다. 홈 박스와 입구가 둘이지만 역할이 다르다:
+  // 아이콘은 「상시 손 닿는 곳」, 박스는 「무엇인지 설명이 있는 곳」.
+  const topCodeBtn = document.getElementById('topCodeBtn');
+  if (topCodeBtn) topCodeBtn.addEventListener('click', () => openSyncSheet());
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
   const syncCloseBtn = document.getElementById('syncSheetClose');
   if (syncCloseBtn) syncCloseBtn.addEventListener('click', closeSyncSheet);

@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=707">
+<link rel="stylesheet" href="styles.css?v=709">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -308,6 +308,23 @@
            상단바가 붙박이라 스티커를 한참 내려도 늘 손에 닿는다.
            🔴 개수(다녀온 매장 N곳)는 본문에 그대로 둔다 — 사용자 지시. 올라온 건 이 버튼 하나뿐이다. -->
       <button class="gacha-btn stamp-write-btn" id="stampWriteBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기</button>
+      <!-- 내 코드(홈 전용) — 공유 버튼 **왼쪽**(2026-08-04 사용자 지시). 누르면 내 코드 시트가 열린다.
+           아이콘 원본: data/brand/icon/svg/code/code.svg — 사용자가 Solar Icons 「Password」(CC Attribution)를
+           고쳐 만든 것 중 글자 없는 판. 홈 박스(.home-code)의 HG-*** 와 같은 집안이다.
+           🔴 viewBox 를 원본 800×800 → 42 42 716 716 으로 좁혔다. 원본은 둘레에 빈 여백이 있어
+              그대로 쓰면 18px 자리에서 다른 아이콘보다 작아 보인다.
+           🔴 stroke 는 currentColor 다 — 색은 .topbar-icon-btn 이 정한다(#ffffff 를 박아 두지 않는다).
+           🔴 크기가 18px 이 아니라 **20px** 이다(2026-08-04 실측). 이 글리프는 가로로 넓적해서
+              18px 로 두면 글리프 높이가 14.7px 밖에 안 돼 공유(16.3px)보다 작아 보인다.
+              20px 로 키우면 높이가 16.3px 로 같아진다 — 매장(1.045배)·스티커(0.90배)를 정한 방식과 같다. -->
+      <button class="topbar-icon-btn code-btn" id="topCodeBtn" type="button" aria-label="내 코드">
+        <svg width="20" height="20" viewBox="42 42 716 716" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill="none" stroke="currentColor" stroke-width="50" d="M 66.666664 400 C 66.666664 274.291992 66.666664 211.438354 105.719002 172.385681 C 144.771667 133.333313 207.62532 133.333313 333.333344 133.333313 L 466.666656 133.333313 C 592.373352 133.333313 655.230042 133.333313 694.279968 172.385681 C 733.333313 211.438354 733.333313 274.291992 733.333313 400 C 733.333313 525.706665 733.333313 588.563354 694.279968 627.613342 C 655.230042 666.666687 592.373352 666.666687 466.666656 666.666687 L 333.333344 666.666687 C 207.62532 666.666687 144.771667 666.666687 105.719002 627.613342 C 66.666664 588.563354 66.666664 525.706665 66.666664 400 Z"/>
+          <path fill="none" stroke="currentColor" stroke-width="50" stroke-linecap="round" d="M 400.006683 333.333344 L 400.006683 466.666656 M 342.26001 366.666656 L 457.730011 433.333344 M 457.723328 366.666656 L 342.253326 433.333344"/>
+          <path fill="none" stroke="currentColor" stroke-width="50" stroke-linecap="round" d="M 224.421997 333.333344 L 224.421997 466.666656 M 166.674332 366.666656 L 282.144684 433.333344 M 282.136658 366.666656 L 166.666672 433.333344"/>
+          <path fill="none" stroke="currentColor" stroke-width="50" stroke-linecap="round" d="M 575.603333 333.333344 L 575.603333 466.666656 M 517.853333 366.666656 L 633.323364 433.333344 M 633.31665 366.666656 L 517.84668 433.333344"/>
+        </svg>
+      </button>
       <button class="topbar-icon-btn" id="topShareBtn" type="button" aria-label="친구에게 공유">
         <!-- 이 아이콘의 글리프 비율이 18px 아이콘군의 기준(스케일 없음) — stroke만 1.7로 통일(2026-07-25) -->
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -906,7 +923,12 @@
 
 <div class="a2hs-overlay" id="a2hsOverlay">
   <div class="a2hs-card">
-    <span class="a2hs-close" id="a2hsClose">&times;</span>
+    <!-- 🔴 2026-08-04: <span>&times;</span> 였던 것을 다른 닫기 X 와 같은 <button> + SVG 로 바꿨다.
+         2026-07-25 에 「&times; 글리프 → SVG 로 통일」을 했는데 이 모달만 빠져 있었다.
+         버튼이 아니라 span 이라 키보드로 못 눌렀고, 터치 타겟도 글자 크기(20px)뿐이었다. -->
+    <button class="a2hs-close" id="a2hsClose" type="button" aria-label="닫기">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
+    </button>
     <img class="a2hs-icon" src="assets/icons/apple-touch-icon-v6.png" alt="">
     <h3 class="a2hs-title">홈 화면에 추가하고<br>앱처럼 편하게 열어보세요</h3>
     <ol class="a2hs-steps">
@@ -1067,7 +1089,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=599"></script>
+<script src="script.js?v=601"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
