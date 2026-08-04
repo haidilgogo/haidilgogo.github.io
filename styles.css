@@ -2366,6 +2366,12 @@ img {
 .page[data-section="store"] .topbar-brand,
 .page[data-section="store"] #topShareBtn,
 .page[data-section="store"] #topInstallBtn { display: none; }
+/* 🔴 스티커는 공유·설치만 숨기고 **로고는 남긴다**(2026-08-04 사용자 확정).
+   위 셋과 이유가 다르다 — 저쪽은 탭줄에 자리를 내주려고 로고까지 숨긴 것이고,
+   스티커엔 탭줄이 없다. 로고를 빼면 왼쪽이 통째로 비어 「기록하기」 하나만 떠 있게 된다.
+   결과: 공유는 홈에만 남는다. */
+.page[data-section="stamp"] #topShareBtn,
+.page[data-section="stamp"] #topInstallBtn { display: none; }
 /* 🔴 상단바 높이가 탭을 옮겨도 안 변해야 한다 — 로고와 같은 44px 을 여기서도 잡는다.
    (안 잡으면 레시피 탭만 상단바가 얇아져 화면이 위아래로 튄다) */
 .topbar-cat .tabs {
