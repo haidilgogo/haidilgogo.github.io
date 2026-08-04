@@ -4664,6 +4664,35 @@
   const $ = (s) => document.querySelector(s);
   const sheetOverlay = $('#mnSheetOverlay');
 
+  /* ── 내 메뉴 저장 ──────────────────────────────────────────────────────────
+     🔴 이 기기에만 저장한다(2026-08-04 사용자 확정). 켰다 꺼도 남아야 화면의
+        「여기에 담아두고 매장에서 편하게 주문해보세요」가 참이 된다 — 그 전엔 새로고침하면 사라졌다.
+     🔴 기기 간 동기화(내 코드에 담기)는 **아직 아니다** — 계획서 5단계에 남아 있다.
+     🔴 되살릴 때 **지금 있는 메뉴만** 되살린다. 메뉴가 바뀌어 이름이 없어졌는데 그대로 넣으면
+        담긴 표시는 있는데 목록엔 없는 유령이 된다(칸 수도 1·2·4 가 아니면 버린다).
+     키 이름은 앱의 다른 것과 같은 꼴이다(haidilao_favorites · haidilao_stamps).
+     ────────────────────────────────────────────────────────────────────────── */
+  const MENU_KEY = 'haidilao_menu_picked';
+  function saveMenu() {
+    try {
+      localStorage.setItem(MENU_KEY, JSON.stringify({ picked: [...picked.keys()], broths, cells }));
+    } catch (err) {
+      // 시크릿 모드 등 저장이 막힌 경우는 무시한다(즐겨찾기와 같은 방식)
+    }
+  }
+  function loadMenu() {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(MENU_KEY)); } catch (err) { return; }
+    if (!saved || typeof saved !== 'object') return;
+    const 있는메뉴 = new Set(ALL.map((it) => it.n));
+    const 있는육수 = new Set(D.broths.map((b) => b.n));
+    if (POTS.includes(saved.cells)) cells = saved.cells;
+    if (Array.isArray(saved.broths)) broths = saved.broths.filter((n) => 있는육수.has(n)).slice(0, cells);
+    if (Array.isArray(saved.picked)) saved.picked.forEach((n) => { if (있는메뉴.has(n)) picked.set(n, 1); });
+    // 되살린 육수가 있으면 냄비 칸 그림도 곧 필요하다 — 미리 받아 둔다(위 타일미리받기 참고)
+    if (broths.length) 타일미리받기();
+  }
+
   function count() { return picked.size + (broths.length ? 1 : 0); }
 
   // 상위 탭 하나의 항목 수. 🔴 화면에 실제로 뜨는 것만 센다 — 하위 분류(subs)에 안 걸린 항목은
@@ -4964,6 +4993,9 @@
       el.classList.toggle('is-on', picked.has(el.dataset.menu));
     });
     $('#potIcon').classList.toggle('has-item', !!count());
+    // 🔴 저장은 여기와 refreshPot 두 곳에서만 부른다 — 담고 빼는 자리 일곱 곳이 전부 둘 중 하나를
+    //    거치기 때문이다(담기·빼기·칸 수·칸 빼기·목록 ✕·전체 지우기). 자리마다 넣으면 하나를 빠뜨린다.
+    saveMenu();
   }
   // 전골 화면 — 냄비만 다시 그린다. 아래 육수 카드 12장은 손대지 않는다.
   // 🔴 냄비 **안쪽까지** 통째로 다시 쓰면 안 된다(2026-08-04 사용자 지적) — `innerHTML` 을 새로 쓰면
@@ -4983,6 +5015,7 @@
     }
     refreshBrothNums();          // 아래 육수 카드의 번호도 같이 맞춘다(카드는 다시 안 그린다)
     $('#potIcon').classList.toggle('has-item', !!count());
+    saveMenu();                  // 저장하는 두 자리 중 하나(refreshCards 주석 참고)
   }
   // 칸 하나하나를 견줘 바뀐 것만 손댄다. 🔴 그림이 그대로면 <img> 를 건드리지 않는다 —
   //    src 를 같은 값으로 다시 넣기만 해도 브라우저가 다시 받아 깜빡인다.
@@ -5030,11 +5063,12 @@
         `<div class="mn-sheet-item">${줄그림(it.n, it.img)}${it.n}` +
         `<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
     });
-    // 🔴 고지(2026-08-04 사용자 확정) — 실제 주문으로 오해되면 곤란하다. 푸터에도 같은 뜻이 있다.
-    //    ⚠️ 「저장만 된다」고 쓰지 않는다 — 지금은 새로고침하면 사라진다(확인함). 저장은 미구현이다
-    //    (인계 문서 「내 코드를 홈으로」 5단계). 저장이 붙으면 이 문구부터 고칠 것.
-    //    담은 게 없을 때는 안 보여준다 — 빈 화면에 주의문만 남으면 이상하다.
-    if (rows.length) rows.push(`<p class="mn-sheet-note">여기서 담은 건 이 화면에서만 쓰는 거라, 실제 주문은 매장에서 해주세요.</p>`);
+    // 🔴 안내(2026-08-04 사용자 확정) — 경고가 아니라 **쓰는 법**을 말한다.
+    //    「매장에서 주문」이라는 말 자체가 「여기서 주문되는 게 아니다」를 전한다.
+    //    분명한 고지(「하이디라오 주문과는 연동되지 않아요」)는 메뉴 탭 푸터가 맡는다 — 역할을 나눴다.
+    //    ⚠️ 「담아두고」가 성립하려면 저장이 있어야 한다 — 그래서 같은 날 이 기기 저장을 붙였다(위 saveMenu).
+    //    담은 게 없을 때는 안 보여준다 — 빈 화면에 안내만 남으면 이상하다.
+    if (rows.length) rows.push(`<p class="mn-sheet-note">여기에 담아두고 매장에서 편하게 주문해보세요.</p>`);
     $('#mnSheetBody').innerHTML = rows.length ? rows.join('')
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
   }
@@ -5166,5 +5200,6 @@
     if (sheetOverlay.classList.contains('open')) closeSheet();
   });
 
+  loadMenu();   // 🔴 render() 보다 먼저 — 되살린 담은 것·육수·칸 수가 첫 화면에 그대로 나와야 한다
   render();
 })();
