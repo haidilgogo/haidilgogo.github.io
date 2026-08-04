@@ -4743,14 +4743,16 @@
             </div>` : ''}
           </div>
         </div>
-        <div class="mn-pot-list ${cells === 1 ? 'is-one' : ''}">
-          ${Array.from({ length: cells }, (_, i) => {
-            const b = broths[i];
-            return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
-                   (b ? `<button class="mn-pot-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
-          }).join('')}
-        </div>
+        <div class="mn-pot-list ${cells === 1 ? 'is-one' : ''}">${renderPotRows()}</div>
       </div>`;
+  }
+  // 고른 육수 목록의 줄들 — 그림이 없어서 통째로 다시 써도 깜빡이지 않는다(아래 refreshPot 참고)
+  function renderPotRows() {
+    return Array.from({ length: cells }, (_, i) => {
+      const b = broths[i];
+      return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
+             (b ? `<button class="mn-pot-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
+    }).join('');
   }
   // 🔴 육수 카드에 「몇 번 칸에 담겼는지」를 붙인다(2026-08-04 사용자 제안).
   //    체크(✓)를 안 쓰는 이유가 「이미 골라서 또 못 담는다」로 읽혀서였는데(2026-08-02),
@@ -4979,11 +4981,42 @@
     $('#potIcon').classList.toggle('has-item', !!count());
   }
   // 전골 화면 — 냄비만 다시 그린다. 아래 육수 카드 12장은 손대지 않는다.
+  // 🔴 냄비 **안쪽까지** 통째로 다시 쓰면 안 된다(2026-08-04 사용자 지적) — `innerHTML` 을 새로 쓰면
+  //    이미 떠 있던 칸 그림의 <img> 가 버려지고 새로 만들어져서, 육수를 담을 때마다 **먼저 담긴 칸이
+  //    다시 받아지며 깜빡였다.** 아래 육수 카드 12장에서 고쳤던 것과 같은 문제인데 냄비 안쪽엔
+  //    안 고쳐져 있었다. 그래서 여기서는 **칸 수가 바뀔 때만** 통째로 그리고, 그 밖에는 갈아 끼운다.
   function refreshPot() {
-    const top = $('#mnPotTop');
-    if (top) top.innerHTML = renderPotTop();
+    const inner = $('.mn-pot-inner');
+    if (!inner || +inner.dataset.cells !== cells) {
+      // 칸 수(한 칸·두 칸·네 칸)가 바뀌면 칸 자체가 늘고 줄어 구조가 달라진다 — 이때만 다시 그린다
+      const top = $('#mnPotTop');
+      if (top) top.innerHTML = renderPotTop();
+    } else {
+      updateCells(inner);
+      const list = $('.mn-pot-list');
+      if (list) list.innerHTML = renderPotRows();   // 그림이 없는 줄이라 다시 써도 안 깜빡인다
+    }
     refreshBrothNums();          // 아래 육수 카드의 번호도 같이 맞춘다(카드는 다시 안 그린다)
     $('#potIcon').classList.toggle('has-item', !!count());
+  }
+  // 칸 하나하나를 견줘 바뀐 것만 손댄다. 🔴 그림이 그대로면 <img> 를 건드리지 않는다 —
+  //    src 를 같은 값으로 다시 넣기만 해도 브라우저가 다시 받아 깜빡인다.
+  function updateCells(inner) {
+    inner.querySelectorAll('.mn-cell').forEach((cell, i) => {
+      const b = broths[i];
+      const img = cell.querySelector('img');
+      if (b) {
+        const src = CELL_IMG(b);
+        if (!img) cell.innerHTML = `<img src="${src}" alt="">`;
+        else if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+        cell.classList.add('is-filled');
+        cell.dataset.cell = i;
+      } else {
+        if (img) cell.innerHTML = '';
+        cell.classList.remove('is-filled');
+        delete cell.dataset.cell;   // 빈 칸은 눌러도 뺄 게 없다
+      }
+    });
   }
 
   function renderSheet() {
@@ -5034,7 +5067,8 @@
     if (e.target.closest('.mn-zoom-add')) {
       const box = $('.mn-zoom');
       if (box.dataset.kind === 'broth') {
-        if (broths.length < cells) broths.push(box.dataset.zoom);
+        if (broths.length >= cells) return;   // 찼으면 아무것도 하지 않는다(버튼도 이미 잠겨 있다)
+        broths.push(box.dataset.zoom);
         refreshPot();               // 뒤 냄비가 바로 채워지는 게 보인다
         return renderZoom();        // 마지막 칸을 채웠으면 버튼이 「냄비가 찼어요」로 잠긴다
       }
@@ -5080,7 +5114,10 @@
     //    빼는 것은 냄비 칸을 눌러서 한다(위). 안 그러면 「2칸에 같은 육수」를 만들 방법이 없다.
     const bc = e.target.closest('[data-broth]');
     if (bc) {
-      if (broths.length < cells) broths.push(bc.dataset.broth);
+      // 🔴 냄비가 찼으면 **아무것도 하지 않는다**(2026-08-04 사용자 지적) — 예전엔 담기지 않는데도
+      //    refreshPot() 을 불러서, 연타하면 바뀐 게 없는데 냄비가 깜빡였다.
+      if (broths.length >= cells) return;
+      broths.push(bc.dataset.broth);
       return refreshPot();
     }
 
