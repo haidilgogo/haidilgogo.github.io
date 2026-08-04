@@ -5104,6 +5104,14 @@ img {
 .mn-sheet-head { display:flex; padding-right:34px; align-items:center; gap:8px; margin-bottom:10px; }
 .mn-sheet-title { font-size:16px; font-weight:800; color:var(--text-dark); }
 .mn-sheet-clear { margin-left:auto; background:none; border:0; font-family:inherit; font-size:13px; color:var(--text-muted); text-decoration:underline; cursor:pointer; }
+/* 🔴 닫기 X 를 제목 줄에 맞춘다(2026-08-04 사용자 요청) — 「담은 목록」·「전체 지우기」와 한 줄로 읽히게.
+   X 는 제목 줄 밖에 절대 위치라 기본값(top:9px)이면 세로 중심이 3px 위였다(재서 확인).
+   계산: 시트 위 여백 24px + 제목 줄 높이 19px 의 절반 = 중심 33.5px → 44px 버튼의 top = 33.5 − 22 = 11.5px.
+   ⚠️ 11.5 가 아니라 12 를 쓴다 — 남는 0.5px 은 눈에 안 보이고(재서 확인: 3px → 0.5px),
+   반픽셀 위치는 1배율 화면에서 X 획을 흐리게 만든다. 정수로 두는 편이 낫다.
+   ⚠️ 이 시트에서만 바꾼다 — `.stamp-sheet-close` 는 스티커 시트도 쓰는 공용 클래스다.
+   ⚠️ transform 으로 가운데 맞추면 안 된다 — `:active` 의 `scale(.9)` 가 그걸 덮어써서 누를 때 튄다. */
+#mnSheetOverlay .stamp-sheet-close { top:12px; }
 /* 묶음 소제목 — 담은 목록의 「육류 › 내장류」와 검색 결과의 「육류 › 내장류」는 같은 것이다.
    🔴 값을 두 벌로 두지 않는다. 한쪽만 고치면 같은 줄이 화면마다 달라진다.
    .mn-group 은 목록 안에 들어가므로 첫 줄의 윗여백만 없앤다(아래 규칙). */
