@@ -4547,60 +4547,43 @@
   // 🔴 팝업으로 한 번 띄우는 방식은 버렸다(2026-07-31) — 스티커 붙는 연출 뒤에 겹쳐 뜨는 데다
   //    한 번 지나가면 다시 못 보고, "코드를 저장해두라"는 말은 놓치면 의미가 없다.
   //    띠는 사용자가 **직접 닫을 때까지 남는다**. 타이밍에 기대지 않아 훨씬 튼튼하다.
-  // 🔴 띠는 **없어지지 않는다**(2026-07-31 사용자 확정) — "이 기기에만 저장된다"를 계속 보이게 하는 게
-  //    목적이라 닫기가 아니라 **접기**다. 접힌 상태에서도 제목 한 줄은 남는다.
-  //    저장하는 건 '닫았다'가 아니라 '접어뒀다'뿐이고, 기록이 하나라도 있으면 띠 자체는 늘 뜬다.
-  const CODE_FOLD_KEY = 'haidilao_code_notice_folded';
+  // 🔴 접기는 없앴다(2026-08-04) — 스티커 탭의 띠(.code-notice)를 홈의 박스(.home-code)로 옮기면서,
+  //    통째로 누르는 박스에는 접을 자리가 없어졌다. CODE_FOLD_KEY·toggleCodeNotice 도 함께 지웠다.
+  //    옛 띠를 되살릴 일이 있으면 커밋 74a6893 을 볼 것.
   // (여기 있던 maybeIntroCode는 지웠다 — 코드 만들기와 띠 갱신을 schedulePush가 맡는다.
   //  스티커에만 걸려 있던 게 즐겨찾기·좋아요를 빠뜨린 원인이었다.)
   function renderCodeNotice() {
-    const el = document.getElementById('codeNotice');
+    const el = document.getElementById('homeCode');
     if (!el) return;
     // 🔴 기록이 없어도 **항상** 보인다(2026-07-31 사용자 확정: "기록이 없을 때도 띄우자").
     //    기록이 없을 때가 오히려 중요하다 — 새 기기·홈 화면에서 처음 열었을 때가 그 상태이고,
-    //    그 사람에게 필요한 건 '내 코드'가 아니라 **불러오기**다. 그래서 문구·버튼이 상황에 따라 바뀐다.
-    el.hidden = false;
+    //    그 사람에게 필요한 건 '내 코드'가 아니라 **불러오기**다. 그래서 문구가 상황에 따라 바뀐다.
     const hasCode = !!getSyncCode();
     // 🔴 제목은 **한 가지로 고정**한다(2026-07-31 사용자 확정).
     //    잠깐 상태에 따라 바꿔봤는데("이 기기에만" ↔ "내 코드에"), 제목이 뒤집히는 게 더 이상했다.
     //    코드가 없는 상태 = 아직 아무것도 저장 안 한 새 방문자뿐인데, 그 사람이 뭐라도 저장하는
     //    순간 코드가 생기면서 "이 기기에만"이 곧바로 거짓이 된다.
     //    「데이터는 내 코드에 저장돼요」는 지금도 앞으로도 맞는 말이라 뒤집힐 일이 없다.
-    const text = document.getElementById('codeNoticeText');
-    const btn = document.getElementById('codeNoticeBtn');
-    if (text) {
+    const sub = document.getElementById('homeCodeSub');
+    if (sub) {
       // 🔴 '기록'이 아니라 '데이터'다(2026-07-31 사용자 확정) — '기록'이라고 하면 스티커 얘기로만
       //    읽히는데 실제로는 즐겨찾기·좋아요까지 따라온다. 그래서 괄호로 셋을 그대로 적는다.
       // 괄호 순서는 **스티커가 먼저**다 — 셋 중 유일하게 다시 만들 수 없는 데이터라
       // 이 기능을 만든 이유이기도 하고, 화면에서 먼저 읽히는 게 맞다.
-      text.innerHTML = hasCode
+      // ⚠️ 문구는 옛 띠에서 **한 글자도 안 바꿨다**(2026-08-04) — 모양만 옮긴 것이라
+      //    문안은 따로 확정받아야 한다. 박스에 넣으니 두 줄로 감긴다.
+      sub.innerHTML = hasCode
         ? '내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 데이터(스티커, 즐겨찾기, 좋아요)를 그대로 불러올 수 있어요'
         : '다른 기기에서 남긴 데이터(스티커, 즐겨찾기, 좋아요)가 있다면 코드로 불러올 수 있어요';
     }
-    if (btn) btn.textContent = hasCode ? '내 코드 보기 · 불러오기' : '코드로 불러오기';
-    let folded = '';
-    try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
-    el.classList.toggle('is-folded', !!folded);
-    const toggle = document.getElementById('codeNoticeToggle');
-    if (toggle) toggle.setAttribute('aria-expanded', folded ? 'false' : 'true');
-  }
-  function toggleCodeNotice() {
-    let folded = '';
-    try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
-    try {
-      if (folded) localStorage.removeItem(CODE_FOLD_KEY);
-      else localStorage.setItem(CODE_FOLD_KEY, '1');
-    } catch (e) { /* 무시 */ }
-    renderCodeNotice();
   }
 
-  // 🔴 입구는 띠의 버튼 **하나뿐**이다(2026-07-31). 목록 아래 있던 별도 링크는 지웠다 —
+  // 🔴 입구는 이 박스 **하나뿐**이다(2026-07-31). 목록 아래 있던 별도 링크는 지웠다 —
   //    시트 안에 '내 코드'와 '불러오기'가 둘 다 있어서 입구가 둘일 이유가 없었다.
   //    안내 문단은 **코드가 있을 때만** 띄운다("기록이 저장됐어요"가 빈 기기에선 거짓말이 된다).
-  const codeNoticeBtn = document.getElementById('codeNoticeBtn');
-  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet());
-  const codeNoticeToggle = document.getElementById('codeNoticeToggle');
-  if (codeNoticeToggle) codeNoticeToggle.addEventListener('click', toggleCodeNotice);
+  //    2026-08-04: 옛 띠의 버튼 대신 홈 박스 전체가 입구다.
+  const homeCodeBox = document.getElementById('homeCode');
+  if (homeCodeBox) homeCodeBox.addEventListener('click', () => openSyncSheet());
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
   const syncCloseBtn = document.getElementById('syncSheetClose');
   if (syncCloseBtn) syncCloseBtn.addEventListener('click', closeSyncSheet);

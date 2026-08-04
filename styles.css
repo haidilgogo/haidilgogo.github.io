@@ -2973,54 +2973,9 @@ img {
   padding: 0 10px;
   text-align: center;
 }
-/* 안내 띠 — 🔴 없어지지 않고 **접히기만** 한다(사용자 확정). 접어도 제목 한 줄은 늘 보인다.
-   로즈 톤(레시피 팁 박스와 같은 문법). */
-.code-notice {
-  margin: 0 0 16px;
-  padding: 12px 15px;
-  border: 1px solid #F1D5CD;
-  border-radius: 14px;
-  background: #FDF1EE;
-}
-.code-notice[hidden] { display: none; }
-.code-notice-head {   /* 제목 줄 전체가 접기 버튼 — 터치 목표를 넓게 */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  padding: 0;
-  border: none;
-  background: none;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  color: #4D4139;
-}
-.code-notice-title { font-size: 13px; line-height: 1.5; font-weight: 500; }
-.code-notice-title b { font-weight: 700; }
-.code-notice-chev { flex: none; color: #B7A699; transition: transform .18s ease; }
-.code-notice.is-folded .code-notice-chev { transform: rotate(-90deg); } /* 접히면 화살표가 옆을 본다 */
-.code-notice-body { margin-top: 9px; }
-.code-notice.is-folded .code-notice-body { display: none; }
-.code-notice-text { margin: 0 0 11px; font-size: 12.5px; line-height: 1.65; color: #7A6459; }
-.code-notice-text b { font-weight: 700; }
-.code-notice-btn {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 10px;         /* 🔴 기록하기 버튼(.gacha-btn)과 같은 값(2026-07-31 사용자 지시) */
-  background: #F6E4DE;         /* 가챠 '레시피 보기'와 같은 로즈 소프트필 */
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  color: #C0392B;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform .08s ease, background .15s;
-}
-.code-notice-btn:active { transform: scale(.97); background: #EAC7BD; }
-/* (여기 있던 `.code-notice-close`('나중에' 버튼)는 지웠다 — 띠가 닫기에서 접기로 바뀌었다) */
+/* 🔴 옛 안내 띠(.code-notice*)는 전부 지웠다(2026-08-04) — 스티커 탭 안에 접히는 띠로 있던 것을
+   홈의 박스(.home-code, 아래 홈 절)로 옮겼다. 접기가 없어져 chev·is-folded·body·btn 도 함께 사라졌다.
+   되살릴 일이 있으면 커밋 74a6893 을 볼 것. 로즈 톤(#FDF1EE / #F1D5CD)은 새 박스가 그대로 잇는다. */
 
 /* ── 내 데이터 코드 시트 (2026-07-31) — 기기 간 복구. 입력 시트 문법을 그대로 쓴다 ── */
 /* (여기 있던 `.sync-open-btn`(목록 아래 밑줄 링크)은 지웠다 — 입구를 띠의 버튼 하나로 합쳤다) */
@@ -4117,6 +4072,37 @@ img {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* ── 내 코드 박스(2026-08-04) — 스티커 탭의 접히는 띠를 홈으로 옮긴 것 ──
+   얼개는 위 .home-guide 와 같다: 통째로 누르면 열리는 박스 + 오른쪽 화살표 + 누름 scale(.98).
+   🔴 색은 안 따라간다. 가이드는 빨강 그라데이션이라 홈 아래쪽에 빨간 덩어리가 둘이 되고,
+      매일 쓰는 기능도 아닌데 너무 커진다. 옛 띠의 로즈 톤(#FDF1EE/#F1D5CD)을 그대로 잇는다.
+   🔴 글씨는 가운데가 아니라 **왼쪽 정렬**이다 — 부제가 두 줄로 감기는 설명문이라
+      가운데 정렬하면 줄 끝이 들쭉날쭉해 읽기 나쁘다(가이드는 한 줄짜리라 가운데가 됐다). */
+.home-code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #F1D5CD;
+  border-radius: 14px;
+  background: #FDF1EE;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, background .15s;
+}
+.home-code:active { transform: scale(.98); background: #F8E6E1; }
+@media (hover: hover) {
+  .home-code:hover { background: #FBEBE7; }
+}
+.home-code-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.home-code-title { font-size: 13px; line-height: 1.5; font-weight: 500; color: #4D4139; }
+.home-code-title b { font-weight: 700; }
+.home-code-sub { font-size: 12.5px; line-height: 1.65; color: #7A6459; }
+.home-code-arrow { flex: none; width: 18px; height: 18px; color: #C2A79C; }
+
 .home-guide-arrow {
   margin-left: 8px;   /* 내용 가운데 정렬이라 맨 오른쪽으로 밀지 않고 글씨 옆에 붙임 */
   flex: none;
