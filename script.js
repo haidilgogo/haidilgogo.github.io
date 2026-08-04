@@ -3462,7 +3462,9 @@
       empty.className = 'stamp-empty';
       empty.innerHTML = (activeStampRegion !== '전체' && 전체.length)
         ? '<p class="stamp-empty-text">' + activeStampRegion + '에는 아직 기록이 없어요</p>'
-        : '<p class="stamp-empty-text">아직 스티커가 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요</p>';
+        // 🔴 「기록하기로…」 앞의 연필 아이콘은 뺐다(2026-08-04 사용자 지시).
+        //    위 버튼에 이미 같은 뜻의 아이콘이 있어서 한 화면에 두 번 나오던 것이다.
+        : '<p class="stamp-empty-text">아직 스티커가 없어요<br>기록하기로 첫 방문을 남겨보세요</p>';
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)

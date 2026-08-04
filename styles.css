@@ -2372,9 +2372,13 @@ img {
 .page[data-section="stamp"] .topbar-cat--stamp { display: block; }
 /* 카테고리가 올라간 탭에서는 남는 폭을 탭줄이 다 갖는다 —
    오른쪽 아이콘(flex: 1 1 0)과 빈칸(flex: 1)이 그대로면 셋이 남는 폭을 나눠 가져 탭줄이 좁아진다 */
+/* 🔴 오른쪽 묶음은 **내용만큼만** 차지한다 — 기본값(flex:1 1 0)이면 상단바의 절반을 가져가서
+   왼쪽 탭줄이 그만큼 좁아진다. 스티커에서 실제로 그랬다(2026-08-04 실측):
+   오른쪽이 164px 을 잡았는데 안에 든 「기록하기」는 89px 뿐이라 75px 이 빈 채로 탭을 밀고 있었다. */
 .page[data-section="recipe"] .topbar-right,
 .page[data-section="menu"] .topbar-right,
-.page[data-section="store"] .topbar-right { flex: 0 0 auto; }
+.page[data-section="store"] .topbar-right,
+.page[data-section="stamp"] .topbar-right { flex: 0 0 auto; }
 .page[data-section="recipe"] .topbar-spacer,
 .page[data-section="menu"] .topbar-spacer,
 .page[data-section="store"] .topbar-spacer { display: none; }
@@ -2742,7 +2746,8 @@ img {
    `.stamp-slot-paw`(기록 시트의 '스티커 붙이는 곳')는 스티커 탭바 아이콘과 같은 그림
    `.stamp-slot-ico`로 교체됐다. 그림 없는 지점의 🐾 자리표시 카드는 07-30에 삭제했다
    (아래 .stamp-ph 자리 주석 참고). */
-.stamp-empty .stamp-empty-pen { vertical-align: -2px; margin-right: 3px; } /* 문구 속 연필 SVG 정렬 */
+/* (여기 있던 .stamp-empty-pen 은 지웠다 — 2026-08-04 사용자 지시로 빈 화면 문구에서 연필 아이콘을 뺐다.
+   위 「기록하기」 버튼에 이미 같은 뜻의 아이콘이 있어 한 화면에 두 번 나오던 것이다.) */
 /* 스티커 = 투명 배경 라운드 다이컷 PNG. 앱은 그림자만 얹음(다이컷·테두리는 에셋에 구움).
    그래서 사용자가 픽셀메이터로 만든 사각 카드도, 처리 스크립트가 흰 외곽선+라운드+투명을
    입혀 '스티커'로 만들어줌 → 앱은 drop-shadow로 떠 있는 느낌만. */

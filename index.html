@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=712">
+<link rel="stylesheet" href="styles.css?v=713">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -315,7 +315,10 @@
       <!-- 기록하기(스티커 섹션 전용) — 본문 머리줄에서 상단바로 올라왔다(2026-08-04).
            상단바가 붙박이라 스티커를 한참 내려도 늘 손에 닿는다.
            🔴 개수(다녀온 매장 N곳)는 본문에 그대로 둔다 — 사용자 지시. 올라온 건 이 버튼 하나뿐이다. -->
-      <button class="gacha-btn stamp-write-btn" id="stampWriteBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기</button>
+      <!-- 아이콘 교체(2026-08-04 사용자 지시). 원본 data/brand/icon/svg/sticker/notebook-pen.svg (Lucide).
+           옛 아이콘은 연필 하나뿐이라 「쓰기」였는데, 이건 공책+펜이라 「기록」에 더 가깝다.
+           🔴 stroke-width 는 원본대로 2 다(옛 아이콘은 2.2였다) — 획이 6개로 늘어서 2.2 면 15px 에서 뭉갠다. -->
+      <button class="gacha-btn stamp-write-btn" id="stampWriteBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/></svg>기록하기</button>
       <!-- 내 코드(홈 전용) — 공유 버튼 **왼쪽**(2026-08-04 사용자 지시). 누르면 내 코드 시트가 열린다.
            아이콘 원본: data/brand/icon/svg/code/code.svg — 사용자가 Solar Icons 「Password」(CC Attribution)를
            고쳐 만든 것 중 글자 없는 판. 홈 박스(.home-code)의 HG-*** 와 같은 집안이다.
@@ -1097,7 +1100,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=604"></script>
+<script src="script.js?v=605"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
