@@ -3359,9 +3359,9 @@
   // ── 스티커 지역 탭(2026-08-04 사용자 지시로 되살림) ──
   // 🔴 2026-07-24 에 「스티커에 지역 탭 안 씀」으로 지웠던 기능이다. 그때 주석에 「되살릴 일이 생기면
   //    매장 탭 지역탭을 참고할 것」이라 적어 뒀고, 실제로 그것을 본떠 다시 만들었다(같은 .tab-btn + 밑줄).
-  // 🔴 매장과 다른 점 하나: **다녀온 지역만** 탭으로 만든다. 매장은 항상 6곳이 있어 고정 6탭이지만,
-  //    스티커는 내 기록이라 안 가본 지역 탭을 눌러 빈 화면을 보는 게 의미가 없다.
-  //    기록이 없으면 탭 줄 자체가 비고, 한 지역만 다녀왔으면 「전체」와 그 지역 둘만 뜬다.
+  // 🔴 탭은 **매장과 똑같이 전부** 나온다(2026-08-04 사용자 확정).
+  //    한때 「다녀온 지역만」으로 만들었다가 되돌렸다 — 기록이 하나도 없으면 탭이 다 사라져서
+  //    상단바 왼쪽이 통째로 비었다. 빈 지역을 눌렀을 때는 아래 renderStamps 가 그 지역용 문구를 띄운다.
   let activeStampRegion = '전체';
   const STAMP_REGION_OF = (name) => (STORES.find((s) => s.name === name) || {}).region || '';
   const stampTabsEl = document.getElementById('stampTabs');
@@ -3379,16 +3379,8 @@
   function renderStampTabs() {
     if (!stampTabsEl) return;
     stampTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
-    // 다녀온 지역만 — STORES 의 지역 순서를 그대로 따라 순서가 매번 흔들리지 않게 한다
-    const 다녀온 = [];
-    STORES.forEach((s) => {
-      if (다녀온.includes(s.region)) return;
-      if (stampData.records.some((r) => r.name === s.name)) 다녀온.push(s.region);
-    });
-    // 지역이 하나뿐이면 탭이 「전체 · 서울」 둘뿐이라 고를 게 없다 → 아예 안 그린다
-    if (다녀온.length < 2) { activeStampRegion = '전체'; stampUnderline.style.width = '0px'; return; }
-    if (activeStampRegion !== '전체' && !다녀온.includes(activeStampRegion)) activeStampRegion = '전체';
-    ['전체'].concat(다녀온).forEach((reg) => {
+    // 매장 탭과 같은 목록·같은 순서(storeRegions) — 기록이 없어도 탭은 그대로 서 있다
+    ['전체'].concat(storeRegions()).forEach((reg) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'tab-btn' + (reg === activeStampRegion ? ' active' : '');
@@ -3460,11 +3452,17 @@
       if ((a.date || '') !== (b.date || '')) return (a.date || '') < (b.date || '') ? 1 : -1;
       return (b.addedAt || 0) - (a.addedAt || 0);
     });
-    // 빈 상태 — 지역 필터가 없어졌으므로 "기록이 하나도 없음" 한 가지뿐이다(첫 기록 유도).
+    // 빈 상태 — 지역 탭이 돌아오면서 두 가지가 됐다(2026-08-04).
+    //   ① 기록이 하나도 없음      → 첫 기록을 부른다
+    //   ② 이 지역에만 없음        → 「아직 없다」만 말한다. 여기서 '첫 방문'을 부르면
+    //                              다른 지역엔 기록이 있는 사람에게 거짓말이 된다.
+    // ⚠️ ②의 문구는 아직 사용자 확정 전이다.
     if (!list.length) {
       const empty = document.createElement('div');
       empty.className = 'stamp-empty';
-      empty.innerHTML = '<p class="stamp-empty-text">아직 스티커가 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요</p>';
+      empty.innerHTML = (activeStampRegion !== '전체' && 전체.length)
+        ? '<p class="stamp-empty-text">' + activeStampRegion + '에는 아직 기록이 없어요</p>'
+        : '<p class="stamp-empty-text">아직 스티커가 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요</p>';
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
@@ -4586,8 +4584,14 @@
     if (syncInput) syncInput.value = '';
     syncOverlay.classList.add('open');
     syncOverlay.setAttribute('aria-hidden', 'false');
+    // 🔴 열려 있는 동안 상단바 아이콘을 빨갛게(2026-08-04 사용자 확정) — 즐겨찾기·내 메뉴와 같은 규칙.
+    //    ⚠️ 어디서 열든(홈 박스로 열어도) 붙인다. 아이콘만 입구가 아니기 때문이다.
+    const cb = document.getElementById('topCodeBtn');
+    if (cb) cb.classList.add('is-open');
   }
   function closeSyncSheet() {
+    const cb = document.getElementById('topCodeBtn');
+    if (cb) cb.classList.remove('is-open');
     if (!syncOverlay) return;
     syncOverlay.classList.remove('open');
     syncOverlay.setAttribute('aria-hidden', 'true');
