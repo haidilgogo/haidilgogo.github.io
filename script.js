@@ -4643,6 +4643,17 @@
   // 냄비 칸은 타일(-타일)을 쓴다. 아직 안 들어온 육수는 카드용 그림을 임시로 쓴다(냄비 속 냄비로 보인다)
   const TILE = new Set(D.broths.filter((b) => b.tile).map((b) => b.n));
   const CELL_IMG = (n) => IMG(TILE.has(n) ? n + '-타일' : n);
+  // 🔴 냄비 칸 그림(`-타일`)은 **카드 그림과 다른 파일**이라, 담는 순간에야 처음 받는다.
+  //    그래서 첫 담기가 살짝 늦어 보였다(2026-08-04 사용자 지적 — 실제로 확인:
+  //    전골 화면에 들어가면 카드용 12장만 받고 타일은 0장이었다).
+  //    🔴 **하나를 담고 나서** 나머지를 뒤에서 받아 둔다(B안, 사용자 확정). 전골 탭에 들어가자마자
+  //    12장(584KB)을 다 받으면 냄비를 안 쓰는 사람까지 치르게 된다 — 첫 한 번만 겪게 하는 쪽으로 정했다.
+  let 타일미리받음 = false;
+  function 타일미리받기() {
+    if (타일미리받음) return;
+    타일미리받음 = true;
+    D.broths.forEach((b) => { const im = new Image(); im.src = CELL_IMG(b.n); });
+  }
 
   let cur = 0;                    // 지금 탭
   let cells = 2;                  // 냄비 칸 수(1·2·4)
@@ -5019,6 +5030,11 @@
         `<div class="mn-sheet-item">${줄그림(it.n, it.img)}${it.n}` +
         `<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
     });
+    // 🔴 고지(2026-08-04 사용자 확정) — 실제 주문으로 오해되면 곤란하다. 푸터에도 같은 뜻이 있다.
+    //    ⚠️ 「저장만 된다」고 쓰지 않는다 — 지금은 새로고침하면 사라진다(확인함). 저장은 미구현이다
+    //    (인계 문서 「내 코드를 홈으로」 5단계). 저장이 붙으면 이 문구부터 고칠 것.
+    //    담은 게 없을 때는 안 보여준다 — 빈 화면에 주의문만 남으면 이상하다.
+    if (rows.length) rows.push(`<p class="mn-sheet-note">여기서 담은 건 이 화면에서만 쓰는 거라, 실제 주문은 매장에서 해주세요.</p>`);
     $('#mnSheetBody').innerHTML = rows.length ? rows.join('')
       : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`;
   }
@@ -5088,6 +5104,7 @@
         return;
       }
       broths.push(bc.dataset.broth);
+      타일미리받기();      // 첫 담기 뒤 나머지 타일을 뒤에서 받아 둔다(위 주석 참고)
       return refreshPot();
     }
 
