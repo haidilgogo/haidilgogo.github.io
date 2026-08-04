@@ -495,9 +495,13 @@
            (옛 .tabline / .tabs-scroll / .stores-count 는 이 뷰만 쓰던 것이라 함께 지웠다). -->
       <p class="list-count"><span id="storeCountLabel">전국</span> <span class="count-num" id="storeCountNum">0</span>곳</p>
       <div class="stores" id="stores"></div>
+      <!-- 맨 위로 — 레시피·메뉴와 같은 부품·같은 자리(푸터 구분선 「위」).
+           🔴 2026-08-03에는 「매장엔 두지 않는다」였는데 2026-08-04에 재서 뒤집었다:
+              매장 전국 목록이 2,824px = 화면 3.5개 분량으로, 맨 위로가 있는 메뉴 탭(2.5개)보다 길다.
+              「매장은 짧다」는 전제가 사실이 아니었다. -->
+      <button class="to-top-btn" type="button">맨 위로</button>
       <!-- 매장 푸터(2026-08-03 사용자 확정): 구분선 → 안내문 → 제보·문의 / 이미지 출처.
-           안내문은 옛날에 지역 탭 위에 있던 그 줄이다 — 메뉴 탭과 같은 방식으로 아래로 내렸다.
-           「맨 위로」는 두지 않는다(레시피·메뉴 탭에만). -->
+           안내문은 옛날에 지역 탭 위에 있던 그 줄이다 — 메뉴 탭과 같은 방식으로 아래로 내렸다. -->
       <footer class="footer">
         <span class="footer-note">영업시간은 매장 사정에 따라 다를 수 있어요</span>
         <div class="footer-links">
@@ -1043,7 +1047,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=587"></script>
+<script src="script.js?v=588"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

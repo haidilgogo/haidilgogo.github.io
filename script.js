@@ -3094,7 +3094,15 @@
           book.rel = 'noopener';
           acts.appendChild(book);
         }
-        if (s.addr) {
+        if (s.addr && catchUrl === 'soon') {
+          // 오픈 예정 지점의 지도 — 전화와 같은 이유로 막는다(2026-08-04 사용자 지시).
+          // 아직 문을 안 연 자리라 지도에서 찾아도 나오지 않거나 엉뚱한 곳이 잡힌다.
+          // 전화(tel--soon)와 같은 크림 바랜 모양이고, 자리는 지켜서 카드 폭이 안 흔들린다.
+          const map = document.createElement('span');
+          map.className = 'store-btn tel--soon';
+          map.textContent = '지도';
+          acts.appendChild(map);
+        } else if (s.addr) {
           // '지도' 버튼 → 아래(위)로 펼쳐지는 드롭다운(네이버 지도/카카오맵)
           const dd = document.createElement('div');
           dd.className = 'map-dd';
