@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=706">
+<link rel="stylesheet" href="styles.css?v=707">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -408,9 +408,15 @@
                  그 뒤에 안내 박스가 붙으면 마무리를 끊는다.
            부제는 코드 유무에 따라 바뀐다(script.js renderCodeNotice). -->
       <button class="home-code home-sec" id="homeCode" type="button">
+        <!-- 아이콘 HG-*** — 사용자가 Solar Icons 「Password」(CC Attribution)를 고쳐 만든 것.
+             코드 형식이 실제로 'HG-' + 네 글자라(script.js getSyncCode) 코드 모양을 그대로 보여 준다.
+             🔴 <img> 가 아니라 CSS 마스크다 — 색을 CSS 가 정해야 어두운 면 위에서 흰색으로 나온다. -->
+        <i class="home-code-ic" aria-hidden="true"></i>
         <span class="home-code-txt">
-          <span class="home-code-title">데이터는 <b>내 코드</b>에 저장돼요</span>
-          <span class="home-code-sub" id="homeCodeSub"></span>
+          <!-- 제목은 코드 유무에 따라 바뀐다(script.js renderCodeNotice) — 코드가 없는 사람에게는
+               「보기」가 거짓말이 되기 때문이다. 부제는 둘 다 공통. -->
+          <span class="home-code-title" id="homeCodeTitle">내 코드 보기 · 불러오기</span>
+          <span class="home-code-sub">데이터는 <b>내 코드</b>에 저장돼요</span>
         </span>
         <svg class="home-code-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -1061,7 +1067,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=598"></script>
+<script src="script.js?v=599"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

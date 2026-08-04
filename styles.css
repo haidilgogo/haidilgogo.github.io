@@ -4073,35 +4073,55 @@ img {
   text-overflow: ellipsis;
 }
 /* ── 내 코드 박스(2026-08-04) — 스티커 탭의 접히는 띠를 홈으로 옮긴 것 ──
-   얼개는 위 .home-guide 와 같다: 통째로 누르면 열리는 박스 + 오른쪽 화살표 + 누름 scale(.98).
-   🔴 색은 안 따라간다. 가이드는 빨강 그라데이션이라 홈 아래쪽에 빨간 덩어리가 둘이 되고,
-      매일 쓰는 기능도 아닌데 너무 커진다. 옛 띠의 로즈 톤(#FDF1EE/#F1D5CD)을 그대로 잇는다.
-   🔴 글씨는 가운데가 아니라 **왼쪽 정렬**이다 — 부제가 두 줄로 감기는 설명문이라
-      가운데 정렬하면 줄 끝이 들쭉날쭉해 읽기 나쁘다(가이드는 한 줄짜리라 가운데가 됐다). */
+   얼개·정렬은 위 .home-guide 와 같다: 둥근 아이콘 자리 + 가운데 글 + 오른쪽 화살표 + 누름 scale(.98).
+   🔴 색만 다르다 — 가이드는 빨강, 이쪽은 **짙은 회색 그라데이션**(2026-08-04 사용자 확정).
+      빨강을 또 쓰면 홈 아래쪽에 빨간 덩어리가 둘이 되고, 매일 쓰는 기능도 아닌데 너무 커진다.
+   🔴 아이콘은 원 안에 넣지 않는다(사용자 확정) — HG-*** 가 가로로 긴 그림이라
+      46px 원에 넣으면 글자가 안 읽힌다. 가로로 크게 놓아야 「코드 모양」이 보인다. */
 .home-code {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;   /* 가이드 박스와 같은 방식 — 내용을 가로 가운데로 */
+  gap: 14px;
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #F1D5CD;
+  padding: 16px 18px;
+  border: none;
   border-radius: 14px;
-  background: #FDF1EE;
+  background: linear-gradient(#33333A, #16161A);
   font-family: inherit;
-  text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .08s ease, background .15s;
+  transition: transform .08s ease, filter .15s;
 }
-.home-code:active { transform: scale(.98); background: #F8E6E1; }
+.home-code:active { transform: scale(.98); filter: brightness(1.15); }
 @media (hover: hover) {
-  .home-code:hover { background: #FBEBE7; }
+  .home-code:hover { filter: brightness(1.12); }
 }
-.home-code-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-.home-code-title { font-size: 13px; line-height: 1.5; font-weight: 500; color: #4D4139; }
-.home-code-title b { font-weight: 700; }
-.home-code-sub { font-size: 12.5px; line-height: 1.65; color: #7A6459; }
-.home-code-arrow { flex: none; width: 18px; height: 18px; color: #C2A79C; }
+/* 아이콘 — SVG 를 CSS 마스크로 깔고 색은 currentColor 가 정한다.
+   🔴 <img> 로 넣으면 색을 못 바꾼다(파일에 박힌 색만 나온다). 마스크라 파일 하나로 어디서든 쓴다. */
+.home-code-ic {
+  flex: none;
+  width: 68px;
+  aspect-ratio: 1300 / 800;
+  display: block;
+  background: currentColor;
+  color: #fff;
+  -webkit-mask: url(assets/icons/hg-code.svg) center/contain no-repeat;
+          mask: url(assets/icons/hg-code.svg) center/contain no-repeat;
+}
+/* 🔴 좁은 기기에서만 아이콘을 줄인다 — 320px 에서 68px 이면 제목이 두 줄로 감긴다(실측).
+   56px 부터 한 줄이 된다. 기준(365px)은 하단바 버튼 규칙과 같은 값이다. */
+@media (max-width: 365px) {
+  .home-code-ic { width: 56px; }
+}
+.home-code-txt {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0;
+  flex: 0 1 auto;      /* 폭을 다 차지하지 않고 내용만큼만 → 가운데로 모임(가이드와 같은 값) */
+  text-align: center;
+}
+.home-code-title { font-size: 15px; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+.home-code-sub { font-size: 11.5px; line-height: 1.45; color: rgba(255, 255, 255, .62); }
+.home-code-arrow { flex: none; width: 18px; height: 18px; margin-left: 8px; color: rgba(255, 255, 255, .7); }
 
 .home-guide-arrow {
   margin-left: 8px;   /* 내용 가운데 정렬이라 맨 오른쪽으로 밀지 않고 글씨 옆에 붙임 */
