@@ -1,0 +1,11 @@
+<!-- Original artwork drawn for Haidilgogo. User-provided art guided the mood only; no paths were traced and no third-party vector assets are included. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path fill="#FF9638" stroke="#D95A16" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" d="M7.35 8.75C6.85 7.7 7.35 6.35 8.55 5.8c1.1-.5 2.15-.15 2.75.65.7-.8 1.8-1.1 2.85-.55 1.35.7 1.8 2.25 1.05 3.45 3.45 1.25 5.35 4 5.35 7.25 0 4.35-3.65 6.7-8.55 6.7s-8.55-2.35-8.55-6.7c0-3.55 1.55-6.25 4.55-7.55"/>
+  <path fill="#397A38" stroke="#2E5E2D" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round" d="M10.6 6.3 11.75.8l1.85.4-1.35 5.35Z"/>
+  <path fill="#397A38" stroke="#2E5E2D" stroke-width="1.05" stroke-linejoin="round" d="M12.5 3.45c2.15-2.05 5.35-2.15 8.1-.35-2.1 1.85-5.2 2.5-7.85 1.2Z"/>
+  <path fill="none" stroke="#245E2A" stroke-width=".65" stroke-linecap="round" d="m14 3.65 3.75-.35"/>
+  <circle cx="7.1" cy="12.15" r=".7" fill="#FFD58A"/>
+  <circle cx="6.15" cy="13.9" r=".42" fill="#FFE0A7"/>
+  <circle cx="16.65" cy="17.45" r=".85" fill="#FFD58A"/>
+  <circle cx="18.35" cy="15.1" r=".4" fill="#FFE0A7"/>
+</svg>

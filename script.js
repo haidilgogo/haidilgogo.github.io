@@ -4895,17 +4895,21 @@
          (그전에도 차돌박이가 하루 만에 1곳 → 13곳, 부천점 응답이 146 → 140 → 143)
        대신 내 메뉴 안내와 메뉴 탭 푸터가 「매장 사정에 따라 판매하지 않는 메뉴가 있을 수
        있어요」로 **한 번만, 맞는 말로** 알린다. 47개에 개별 딱지를 붙이는 것보다 정직하다.
-       ⚠️ 「제주 한정」은 남긴다 — 그건 조회값이 아니라 진짜 지역 한정이다.
-          (지금 메뉴에는 0개, 육수 `고수 듬뿍 훠궈` 하나에만 붙는다)
+       ⚠️ 「제주 한정」은 남긴다 — 그건 조회값이 아니라 진짜 지역 한정이고, 공식 분류에
+          「제주한정」이 실제로 있다(제주도점에만). 메뉴 6개 + 육수 `고수 듬뿍 훠궈` 1개.
        ⚠️ 데이터의 `part`·판매 지점 기록은 그대로 둔다 — 조사 자료로는 쓸모가 있고
           `메뉴.md` 가 원본이다. 화면에만 안 쓴다. */
-    const 꼬리 = (it.part && it.jeju) ? '제주 한정' : '';
-    const 아랫줄 = [부제, 꼬리].filter(Boolean).join(' · ');
+    // 🔴 「제주 한정」은 이름 **위 배지**다(2026-08-04 사용자 확정). 부제 자리(이름 아래)가 아니다.
+    //    한라봉 아이콘은 코덱스가 하딜고고용으로 새로 그린 것이다 — 원본은 저장소 밖
+    //    `data/brand/icon/svg/jeju/hallabong-16px-color.svg` 이고 앱에는 복사본을 쓴다.
+    //    ⚠️ 16px 로만 쓸 것. 12px 로 줄이면 꼭지 혹이 뭉개져 그냥 귤로 보인다(재서 확인).
+    const 제주 = !!(it.part && it.jeju);
     return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
       <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
       <span class="mn-card-body">
+        ${제주 ? `<span class="mn-jeju"><img src="assets/icons/hallabong.svg" alt="" width="16" height="16">제주 한정</span>` : ''}
         <span class="mn-card-name">${이름}</span>
-        ${아랫줄 ? `<span class="mn-card-sub">${아랫줄}</span>` : ''}
+        ${부제 ? `<span class="mn-card-sub">${부제}</span>` : ''}
       </span>
       <span class="mn-card-check">${체크아이콘}</span>
     </button>`;

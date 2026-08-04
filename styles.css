@@ -5047,6 +5047,18 @@ img {
   display:block; font-size:15px; font-weight:700; color:var(--text-dark);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
+/* 🔴 「제주 한정」 배지 — 이름 **위**에 온다(2026-08-04 사용자 확정).
+   생김새 값은 매장 태그(.store-badge)에서 가져왔다 — 옅은 빨강 바탕 + 브랜드 빨강 글자.
+   아이콘은 16px 고정이다. ⚠️ 줄이지 말 것 — 12px 로 가면 한라봉의 꼭지 혹이 뭉개져
+   그냥 귤로 보인다(재서 확인). 그 혹이 한라봉을 한라봉이게 하는 유일한 특징이다.
+   ⚠️ 배지가 들어가면 배지 높이는 19 → 22px 이 되지만 **카드 높이는 안 바뀐다**(102px 유지) —
+   카드 높이는 그림 80px 이 정하기 때문이다(재서 확인). */
+.mn-jeju {
+  display:inline-flex; align-items:center; gap:4px; margin-bottom:3px;
+  font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px;
+  color:var(--brand-red); background:rgba(224,48,30,.1);
+}
+.mn-jeju img { flex:none; width:16px; height:16px; }
 .mn-card-sub {
   display:block; margin-top:2px; font-size:12px; color:var(--text-muted);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
