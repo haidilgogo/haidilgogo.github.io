@@ -649,7 +649,7 @@
           //    메기살덮밥(3개)이 홈 히든메뉴 상위 3칸에서 밀려 안 보였다 — 라이브에서 확인.
           //    refreshLikeCounts()는 숫자만 갱신하고 순서는 건드리지 않으므로 이걸로는 안 된다.
           if (typeof renderHomeCatList === 'function') renderHomeCatList('히든메뉴', hiddenGridEl);
-          if (typeof renderHomeCatGrid === 'function') renderHomeCatGrid('탕', tangGridEl);
+          // 🔴 전골은 여기서 다시 안 그린다 — 메뉴 육수라 좋아요와 무관하고 순서도 고정이다(2026-08-05)
           refreshLikeCounts();
         } else {
           refreshLikeCounts();
@@ -1610,7 +1610,7 @@
   //    — img onerror가 스스로 제거되는 방식이라, 나중에 사진만 넣으면 자동으로 얼굴로 바뀜.
   const celebRailEl = document.getElementById('celebRail');
   const popularRailEl = document.getElementById('popularRail');
-  const tangGridEl = document.getElementById('tangGrid');
+  const jeongolGridEl = document.getElementById('jeongolGrid');   // 홈 「전골」 — 레시피가 아니라 메뉴 육수다(2026-08-05)
   const hiddenGridEl = document.getElementById('hiddenGrid');
 
   // 가로 레일 마우스 드래그 스크롤(데스크탑용). 트랙패드·휠로만 되던 걸 손으로 끌 수 있게.
@@ -2075,11 +2075,43 @@
       bindRoleButtonKeyboard(el);
     });
   }
+  /* 🔴 홈 「전골」 — 메뉴 탭의 육수 중 **넷만** 보여준다(2026-08-05 사용자 확정).
+     순서는 사용자가 정한 것이다(2열 그리드라 좌·우·좌·우로 놓인다). 인기순 같은 계산이 아니다.
+     ⚠️ 이름은 `MENU_DATA.broths` 의 것과 **글자까지 같아야** 한다 — 그림 파일 이름도 이것을 쓴다.
+        (`청유마라훠궈` 와 `우유마라훠궈` 는 다른 항목이다. 헷갈리기 쉬우니 고칠 때 확인할 것.)
+     🔴 카드 생김새는 옛 「탕」 그리드 그대로다(`.hc-card` + 그림 + 이름). 사용자 지시 —
+        「이미지만 따오고 아래에 전골 이름 표시」. 그래서 레시피 카드의 하트·출처는 안 붙인다. */
+  const HOME_BROTHS = ['토마토탕훠궈', '청유마라훠궈', '후추탕훠궈', '고수 듬뿍 훠궈'];
+  function renderHomeJeongol() {
+    if (!jeongolGridEl) return;
+    const D = window.MENU_DATA;
+    if (!D || !D.broths) { jeongolGridEl.innerHTML = ''; return; }  // 메뉴 데이터가 없으면 조용히 빈칸
+    jeongolGridEl.innerHTML = HOME_BROTHS.map((n) => {
+      const b = D.broths.find((x) => x.n === n);
+      if (!b) return '';   // 이름이 바뀌었으면 그 칸만 빠진다(화면이 깨지지 않게)
+      return '<button class="hc-card" type="button" data-broth="' + n + '">'
+        + '<span class="hc-thumb">'
+        + (b.img ? '<img src="assets/menu/' + n + '.webp" alt="' + n + '" loading="lazy" draggable="false">' : '')
+        + '</span>'
+        + '<span class="hp-name">' + n + '</span>'
+        + '</button>';
+    }).join('');
+    jeongolGridEl.querySelectorAll('[data-broth]').forEach((btn) => {
+      btn.addEventListener('click', 전골로가기);
+    });
+  }
+  /* 메뉴 탭의 전골로 보낸다. 섹션을 먼저 바꾼 뒤 분류를 고른다 —
+     반대로 하면 메뉴 화면이 아직 안 보여서 폭이 0 이라 밑줄이 자리를 못 잡는다(mnSyncUnderline 주석 참고). */
+  function 전골로가기() {
+    switchSection('menu');
+    if (window.mnGoTab) window.mnGoTab('전골');
+  }
+
   function renderHomeSections() {
     renderCelebRail();
     renderHomePopular();
-    renderHomeCatList('히든메뉴', hiddenGridEl); // 히든메뉴 = 리스트(위), 탕 = 그리드(아래)로 스왑(2026-07-24)
-    renderHomeCatGrid('탕', tangGridEl);
+    renderHomeCatList('히든메뉴', hiddenGridEl); // 히든메뉴 = 리스트(위), 전골 = 그리드(아래)
+    renderHomeJeongol();
   }
 
   function renderIngList(el, items) {
@@ -3958,7 +3990,10 @@
   // 「맨 위로」 — 레시피·메뉴 탭 목록 끝의 버튼(2026-08-03). 하단바 재탭과 같은 일을 한다.
   document.querySelectorAll('.to-top-btn').forEach((btn) => btn.addEventListener('click', scrollToTop));
   // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderList에서 자동 적용됨)
-  document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
+  // 🔴 홈 「전골」의 「메뉴 보기」는 **레시피가 아니라 메뉴 탭**으로 간다(2026-08-05 사용자 확정).
+  //    카드도 같은 곳으로 간다 — 육수는 상세 화면이 없어서 갈 데가 여기뿐이고, 홈 카드가 눌러도
+  //    반응이 없으면 고장으로 보인다. ⚠️ 눌렀다고 냄비에 담지는 않는다(구경하다 담기면 놀란다).
+  document.getElementById('jeongolMore').addEventListener('click', 전골로가기);
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
   document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
 
@@ -5013,6 +5048,19 @@
     }
   }
   window.mnSyncUnderline = updateMenuUnderline;   // 섹션 전환 때 switchSection 이 부른다
+  /* 🔴 밖에서 특정 분류로 열어 주는 통로(2026-08-05) — 홈의 「전골」 섹션이 쓴다.
+     탭 누름 처리와 **같은 일**을 한다(cur 바꾸고 검색 끄고 다시 그리기). 한 곳에 몰아넣지 않고
+     따로 둔 이유는, 탭 누름 쪽에는 「같은 탭이면 아무 일도 안 한다」가 있어서다 — 밖에서 부를 땐
+     이미 그 탭이어도 목록을 맨 위로 올려 줘야 「눌렀더니 왔다」가 된다.
+     ⚠️ 분류 순서(TABS)가 바뀌면 부르는 쪽 번호도 같이 봐야 한다. 그래서 번호가 아니라 **이름**으로 받는다. */
+  window.mnGoTab = function (이름) {
+    const i = TABS.findIndex((t) => t.name === 이름);
+    if (i < 0) return false;
+    cur = i;
+    clearSearch();
+    render(true);
+    return true;
+  };
   if (window.enableDragScroll) window.enableDragScroll($('#mnTabs'));   // 데스크탑에서 손으로 끌기(2026-08-04)
 
   function renderTabs() {

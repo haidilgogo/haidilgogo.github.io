@@ -398,7 +398,7 @@
       <section class="home-sec" id="homePopular">
         <div class="home-sec-head">
           <h2 class="home-sec-title">인기 <span class="t-red">소스</span></h2>
-          <button class="home-sec-more" id="popularMore" type="button">전체보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="home-sec-more" id="popularMore" type="button">레시피 보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div class="hp-rail" id="popularRail"></div>
       </section>
@@ -417,16 +417,22 @@
       <section class="home-sec" id="homeHidden">
         <div class="home-sec-head">
           <h2 class="home-sec-title">히든메뉴</h2>
-          <button class="home-sec-more" id="hiddenMore" type="button">전체보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="home-sec-more" id="hiddenMore" type="button">레시피 보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div class="home-list" id="hiddenGrid"></div>
       </section>
-      <section class="home-sec" id="homeTang">
+      <!-- 🔴 「탕」이던 자리를 「전골」로 바꿨다(2026-08-05 사용자 확정). 성격이 달라졌다 —
+           예전엔 **레시피**(cat==='탕')를 보여주고 누르면 레시피 상세가 열렸는데,
+           지금은 **메뉴 탭의 육수**를 보여주고 누르면 메뉴 탭 전골로 간다.
+           ⚠️ 레시피의 「탕」 카테고리는 그대로 살아 있다 — 레시피 탭 전체보기·검색에서 계속 나온다.
+              홈에서만 빠진 것이다.
+           ⚠️ id 를 tang→jeongol 로 바꿨다. 옛 이름이 남아 있으면 다음 사람이 레시피인 줄 안다. -->
+      <section class="home-sec" id="homeJeongol">
         <div class="home-sec-head">
-          <h2 class="home-sec-title">탕</h2>
-          <button class="home-sec-more" id="tangMore" type="button">전체보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <h2 class="home-sec-title">전골</h2>
+          <button class="home-sec-more" id="jeongolMore" type="button">메뉴 보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
-        <div class="home-grid" id="tangGrid"></div>
+        <div class="home-grid" id="jeongolGrid"></div>
       </section>
       <!-- 내 코드 — 스티커 탭 안에 있던 띠를 홈으로 옮겼다(2026-08-04 사용자 확정).
            🔴 홈이 맞는 자리다: 이 안내가 가장 필요한 사람은 **아무것도 없는 새 기기에서 처음 연 사람**인데,
@@ -1157,7 +1163,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=621"></script>
+<script src="script.js?v=622"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
