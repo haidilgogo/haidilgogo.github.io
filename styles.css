@@ -5084,6 +5084,11 @@ img {
    🔴 「맨 위로」는 푸터 구분선 「위」다 — 그래서 목록↔버튼 여백(36px)을 버튼이 직접 갖고,
    버튼이 있는 화면에서는 푸터의 위 여백(36px)을 0으로 만든다. 안 그러면 버튼과 선이 36px 벌어진다. */
 .to-top-btn { display: block; margin: 36px 0 24px; }
+/* 🔴 위의 `display:block` 이 브라우저 기본 `[hidden]{display:none}` 을 이긴다 —
+   그래서 script.js 가 `hidden` 으로 숨겨도 **빈 화면에서 「맨 위로」가 그대로 보였다**(2026-08-05).
+   ⚠️ `display` 를 박아 둔 요소를 `hidden` 으로 숨기려면 이 짝이 반드시 있어야 한다.
+      같은 함정에 `.stamp-empty` 도 걸려 있었다(카드 위에 감자가 같이 떠 있었다). */
+.to-top-btn[hidden] { display: none; }
 .to-top-btn + .footer { margin-top: 0; }
 
 /* ══════════════════════════════════════════════════════════════
