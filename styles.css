@@ -3938,14 +3938,21 @@ img {
   flex: none;
 }
 /* 좋아요 — 검정 푸터 안, 알약 없이 흰 하트+숫자. 푸터는 상단정렬이지만 좋아요만 세로 가운데 */
+/* 🔴 숫자는 하트 **아래**에 놓는다(2026-08-05 사용자 확정, 미리보기로 고름).
+   320px 에서 카드가 좁아지면 하트는 안 줄고 이름만 줄어서, 이름칸이 43px 까지 밀려
+   「건희…」 「오리…」로 잘렸다. 세로로 세우면 이름칸이 43 → 61px 이 된다(재서 확인).
+   🔴 카드 높이는 안 변한다 — 아래칸 높이를 정하는 것은 글자 칼럼(38px)이고 하트는 35px 이라 그 안에 든다.
+   🔴 `min-width: 44px`(손가락 최소치)를 지운 것이 폭을 버는 핵심이다. 이것을 되살리면 2px 밖에 안 벌어진다.
+      대신 세로로 59px 이 되어 닿는 영역은 28×59 다. 가로 44px 을 되찾으려면 좌우 padding +12/margin -12 를
+      주면 되는데, 그러면 영역이 이름 쪽으로 12px 넘어와 이름 끝을 눌렀을 때 좋아요가 눌린다 — 그래서 안 했다. */
 .hp-like {
   flex-shrink: 0;
-  min-width: 44px;
   align-self: center;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   color: rgba(255, 255, 255, .9);
   font-size: 14px;
   font-weight: 700;
@@ -4274,13 +4281,15 @@ img {
   text-overflow: ellipsis;
 }
 /* 하트 오른쪽에 숫자(가로 배치) — 2026-07-25 확정, 세로 쌓기에서 변경 */
+/* 🔴 숫자는 하트 아래 — 위 `.hp-like` 와 같은 이유·같은 결정(2026-08-05). 그 주석 참고.
+   이름칸이 59 → 79px 이 된다(재서 확인). 잘리는 이름이 14개 → 6개로 준다. */
 .hc-row-like {
   flex: none;
   align-self: center;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 1px;
   color: var(--text-muted);
   cursor: pointer;
   padding: 12px 5px;
@@ -4296,7 +4305,27 @@ img {
 .hc-row-like.active { color: var(--brand-red); }
 .hc-row-like.active svg path { fill: currentColor; stroke: currentColor; }
 .hc-row-like.pop svg { animation: hpLikePop .32s ease; } /* 누를 때 통통 팝(인기소스와 공유) */
-.hc-row-like-n { font-size: 14px; font-weight: 700; line-height: 1; } /* 인기소스 좋아요 숫자(.like-count)와 동일 크기(2026-07-24) */
+.hc-row-like-n { line-height: 1; }
+/* 🔴 좋아요 숫자 — 하트 **아래**에 놓는 카드 둘(홈 인기소스·레시피)이 한 곳에서 같은 값을 쓴다.
+      값은 전부 2026-08-05 미리보기(`_like-preview.html`)로 사용자가 눈으로 고른 것이다.
+   ⚠️ **모달 하트(.modal-like-btn)의 숫자는 여기 안 든다** — 거기는 하트 옆에 나란히 놓는 자리라
+      `.like-count` 의 기본값(14px)을 그대로 쓴다. 그래서 `.hp-like` 안으로 좁혀 적었다.
+      좁히지 않고 `.like-count` 에 그냥 적으면 **모달 숫자까지 10px 로 줄어든다**(미리보기에서 실제로 그랬다).
+
+   - 10px  : 세로로 서면 14px 은 하트보다 커 보인다. 폭에는 영향이 없다(폭은 아이콘 20px 이 정한다).
+   - +1px  : 「1」이 든 숫자(21·11)의 잉크가 제 칸에서 0.42px 왼쪽에 놓여 생기는 치우침을 눈으로 맞춘 값.
+             🔴 `position:relative` 로 민다 — **자리를 안 차지해서** 하트칸도 이름칸도 안 바뀐다.
+             margin·padding 으로 밀면 칸이 넓어져 애써 넓힌 이름칸을 도로 깎는다.
+   - 나란히: tabular-nums = 모든 숫자에 같은 폭을 줘서 「1」도 제 칸 가운데에 놓인다(Pretendard 지원 확인).
+             폭이 12.6 → 17.6px 이 되지만 아이콘 20px 보다 작아 이름칸은 그대로다. */
+.hp-like .like-count,
+.hc-row-like-n {
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  left: 1px;
+}
 
 /* ── 홈 인터랙션(2026-07-24) ──
    호버 = '안쪽 이미지(썸네일)만' 확대(프레임·글씨 고정). 컨테이너 overflow:hidden이 넘치는 부분을 잘라 줌인 효과.
