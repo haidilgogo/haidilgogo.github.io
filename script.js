@@ -2653,22 +2653,28 @@
   /* 칼럼에 붙는 **메뉴** 한 줄. 위 `buildColumnSauce` 와 같은 부품을 쓰되 셋이 다르다:
      ① 그림이 `assets/menu/*.webp` 다 — 배경 없는 냄비 그림이라 `col-sauce-thumb--menu`(안에 맞춤 + 크림 배경)를 쓴다.
         소스처럼 `cover` 로 두면 잘린다.
-     ② **누를 데가 없다.** 메뉴에는 레시피 상세 같은 열 화면이 없다 — 그래서 `col-sauce--static` 이다.
+     ② **누르면 메뉴 탭에서 그 항목이 보이는 자리로 간다**(2026-08-05 사용자 확정). 소스 줄처럼 화살표를 붙인다.
+        🔴 가는 방법이 둘이다 — 누르는 사람에겐 하나로 보이지만 속은 다르다:
+           · **육수(전골)** → `mnGoTab('전골')`. 검색으로는 **안 걸린다**(검색이 상위 7개 분류만 훑는다).
+             육수 목록이 12개뿐이라 탭만 열어도 바로 보인다.
+           · **그 밖의 메뉴** → `mnSearch(이름)`. 분류 탭으로만 보내면 60여 개에 파묻혀 못 찾는다.
      ③ 부제는 **있는 것만**. 지금은 「제주 한정」뿐이고, 한라봉 아이콘을 반드시 같이 넣는다
         (2026-08-05 사용자 지시 — 같은 말이 화면마다 다르게 보이면 안 된다). 색·크기는 메뉴 탭과 같은 값.
-     ⚠️ 이 모양은 `cilantro.html` 의 것과 **글자까지 같아야 한다**(원본↔복사본 규칙). */
+     ⚠️ 복사본(`cilantro.html`)에서는 **소스도 메뉴도 안 눌린다** — 그 페이지엔 앱이 없어 갈 데가 없다.
+        글자와 모양은 같게 두되 **동작만 다른 것**이고, 원본↔복사본 규칙에 어긋나지 않는다. */
   function buildColumnMenu(n) {
     const D = window.MENU_DATA;
-    const it = D ? ((D.broths || []).find((b) => b.n === n)
-                 || (D.tabs || []).flatMap((t) => t.items).find((i) => i.n === n)) : null;
+    const 육수 = D && (D.broths || []).find((b) => b.n === n);
+    const it = 육수 || (D ? (D.tabs || []).flatMap((t) => t.items).find((i) => i.n === n) : null);
     if (!it) return '';   // 이름이 바뀌었으면 그 줄만 빠진다(아티클이 깨지지 않게)
     const 부제 = it.jeju
       ? '<span class="col-sauce-ver col-sauce-ver--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정</span>'
       : '';
-    return '<div class="col-sauce col-sauce--static">'
+    return '<button class="col-sauce" type="button" data-menu-n="' + n + '"' + (육수 ? ' data-menu-broth="1"' : '') + '>'
       + '<img class="col-sauce-thumb col-sauce-thumb--menu" src="assets/menu/' + n + '.webp" alt="" draggable="false">'
       + '<span class="col-sauce-meta"><span class="col-sauce-name">' + n + '</span>' + 부제 + '</span>'
-      + '</div>';
+      + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '</button>';
   }
   function getColumnSauces(col) {
     return RECIPES.filter((r) =>
@@ -2737,10 +2743,22 @@
       : '';
     // 자동 목록과 본문 중간 목록을 함께 잡는다(listEl만 보면 본문 것이 눌리지 않는다).
     // 열 때마다 버튼을 새로 만들므로 리스너가 겹치지 않는다.
-    [...columnOverlay.querySelectorAll('.col-sauce')].forEach((el) => {
+    [...columnOverlay.querySelectorAll('.col-sauce[data-rid]')].forEach((el) => {
       el.addEventListener('click', () => {
         const r = RECIPES.find((x) => x.id === el.dataset.rid);
         if (r) { closeColumn(); openModal(r); }
+      });
+    });
+    /* 메뉴 줄 — 아티클을 닫고 **메뉴 탭에서 그게 보이는 자리**로 간다(2026-08-05 사용자 확정).
+       소스 줄이 「칼럼을 닫고 레시피를 연다」와 같은 흐름이다.
+       ⚠️ 가는 방법이 둘인 이유는 buildColumnMenu 주석 참고(육수는 검색에 안 걸린다). */
+    [...columnOverlay.querySelectorAll('.col-sauce[data-menu-n]')].forEach((el) => {
+      el.addEventListener('click', () => {
+        const n = el.dataset.menuN;
+        closeColumn();
+        switchSection('menu');
+        if (el.dataset.menuBroth) { if (window.mnGoTab) window.mnGoTab('전골'); }
+        else if (window.mnSearch) window.mnSearch(n);
       });
     });
     // 본문 안 CTA 버튼. data-go 값으로 갈 곳을 정한다 — 소스 카드의 data-rid와 같은 방식이라
@@ -5089,6 +5107,20 @@
     if (i < 0) return false;
     cur = i;
     clearSearch();
+    render(true);
+    return true;
+  };
+  /* 🔴 밖에서 **검색된 상태로** 열어 주는 통로(2026-08-05) — 고수 아티클의 「고수가 들어간 메뉴」가 쓴다.
+     ⚠️ **육수(전골)는 검색으로 안 걸린다** — 검색은 상위 7개 분류만 훑는다(검색결과() 참고).
+        그래서 부르는 쪽이 육수면 이걸 쓰지 말고 `mnGoTab('전골')` 로 보내야 한다.
+     검색을 켜면 「전체메뉴」 탭으로 옮긴다 — 사람이 직접 칠 때와 같은 규칙이다(그쪽 주석 참고). */
+  window.mnSearch = function (말) {
+    const s = String(말 || '').trim();
+    if (!s) return false;
+    query = s;
+    if (searchInput) searchInput.value = s;
+    if (searchBox) searchBox.classList.add('has-value');
+    if (전체메뉴자리 >= 0) cur = 전체메뉴자리;
     render(true);
     return true;
   };
