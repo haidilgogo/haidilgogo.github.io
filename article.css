@@ -284,7 +284,9 @@
 /* 출처 안내 문단 안의 링크(제보 폼) — 본문과 같은 검정에 굵게. 링크임은 밑줄로만 알린다.
    푸터 링크(연한 갈색)와 달리 여기선 문장 속이라 색이 튀면 오히려 읽기 흐름이 끊긴다. */
 .credit-note a {
-  color: var(--text-dark);
+  /* 브랜드 빨강(2026-08-05 사용자 지시). 이 선택자에 걸리는 링크는 「알려주세요」(제보 폼) 하나뿐이라
+     — 목록의 「원본」 링크는 `.credit-src` 쪽이다 — 여기만 눈에 띄게 해도 다른 데는 안 번진다. */
+  color: var(--brand-red);
   font-weight: 700;
   text-decoration: underline;
   text-decoration-color: rgba(43, 18, 13, .32);
