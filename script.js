@@ -2997,6 +2997,8 @@
     //    들어가면 「전체」 밑에 밑줄이 없었고, 지역을 한 번 눌러야 그때 생겼다.
     //    상단바는 늘 보이지만 .topbar-cat--stamp 는 스티커일 때만 display 되므로, 그 전엔 폭이 0이다.
     if (name === 'stamp' && window.updateStampUnderline) { window.updateStampUnderline(); requestAnimationFrame(window.updateStampUnderline); }
+    // 빈 화면의 감자 그림 여섯 장을 미리 받아 둔다 — 지역을 처음 누를 때 깜빡이던 것을 막는다
+    if (name === 'stamp' && window.preloadGamja) window.preloadGamja();
     syncTopbarH();
   }
 
@@ -3483,6 +3485,30 @@
   //    상단바 왼쪽이 통째로 비었다. 빈 지역을 눌렀을 때는 아래 renderStamps 가 그 지역용 문구를 띄운다.
   let activeStampRegion = '전체';
   const STAMP_REGION_OF = (name) => (STORES.find((s) => s.name === name) || {}).region || '';
+  // ── 빈 화면의 감자 말풍선 ──────────────────────────────────────────────
+  // 지역 그림은 지역 수만큼 따로 있다 — 말풍선 문구가 「서울에는…」처럼 지역 이름을 부른다.
+  // 🔴 파일 이름은 로마자다. 한글 파일명은 자모 분리(NFD)로 저장된 것이 섞여 있어 탈이 난 적이 있다.
+  // ⚠️ 지역 목록은 STORES 에서 뽑으므로(storeRegions) 새 지역이 생기면 그림이 없을 수 있다.
+  //    그때는 예전처럼 글씨만 나온다 — renderStamps 에서 갈라 둔다. 화면이 비지 않는다.
+  const GAMJA_REGION = { 서울: 'seoul', 경기: 'gyeonggi', 부산: 'busan', 대구: 'daegu', 제주: 'jeju' };
+  const gamjaSlot = (src, alt) =>
+    '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
+    + '<img class="stamp-empty-gamja" src="' + src + '" width="660" height="800" alt="' + alt + '">'
+    + '</div></div>';
+  // 만들어 둔 빈 화면을 지역별로 들고 있는다 — 깜빡임을 막는 쪽(renderStamps 주석 참고)
+  const stampEmptyCache = new Map();
+  // 🔴 그림을 미리 받아 둔다. 위 캐시는 **한 번 본 지역**만 막아주고, 처음 누르는 지역은
+  //    여전히 그 자리에서 내려받느라 깜빡인다. 여섯 장 합쳐 240KB 라 미리 받아도 부담이 없다.
+  //    ⚠️ 스티커 탭을 처음 열 때 부른다 — 앱을 켜자마자 받으면 첫 화면(홈)과 대역폭을 다툰다.
+  let gamjaPreloaded = false;
+  function preloadGamja() {
+    if (gamjaPreloaded) return;
+    gamjaPreloaded = true;
+    ['gamja-bubble'].concat(Object.values(GAMJA_REGION).map((r) => 'gamja-bubble-' + r))
+      .forEach((n) => { const im = new Image(); im.src = 'assets/mascot/' + n + '.webp'; });
+  }
+  window.preloadGamja = preloadGamja;
+
   const stampTabsEl = document.getElementById('stampTabs');
   const stampUnderline = document.getElementById('stampTabsUnderline');
   function updateStampUnderline() {
@@ -3575,35 +3601,34 @@
       if ((a.date || '') !== (b.date || '')) return (a.date || '') < (b.date || '') ? 1 : -1;
       return (b.addedAt || 0) - (a.addedAt || 0);
     });
-    // 빈 상태 — 지역 탭이 돌아오면서 두 가지가 됐다(2026-08-04).
-    //   ① 기록이 하나도 없음      → 첫 기록을 부른다
-    //   ② 이 지역에만 없음        → 「아직 없다」만 말한다. 여기서 '첫 방문'을 부르면
-    //                              다른 지역엔 기록이 있는 사람에게 거짓말이 된다.
-    // ⚠️ ②의 문구는 아직 사용자 확정 전이다.
+    // 빈 상태 — 감자가 말풍선으로 말을 건다. **지금 보고 있는 탭 하나로만 갈린다**
+    // (2026-08-05 사용자 확정. 그전에는 「기록이 아예 없나」까지 따져 두 갈래였는데, 지역 그림이
+    //  다 생기면서 그 구분이 필요 없어졌다 — 「서울에는 아직 기록이 없어요」는 다른 지역에
+    //  기록이 있든 없든 참이라 거짓말이 되지 않는다).
+    //   전체 탭   → 「아직 스티커가 없어요 / 기록하기로 첫 방문을 남겨보세요」
+    //   지역 탭   → 「<지역>에는 아직 기록이 없어요」
     if (!list.length) {
-      const empty = document.createElement('div');
-      empty.className = 'stamp-empty';
-      // 지역 그림은 지역 수만큼 따로 있다 — 말풍선 문구가 「서울에는…」처럼 지역 이름을 부른다.
-      // 🔴 파일 이름은 로마자다. 한글 파일명은 자모 분리(NFD)로 저장된 것이 섞여 있어 탈이 난 적이 있다.
-      // ⚠️ 지역 목록은 STORES 에서 뽑으므로(storeRegions) 새 지역이 생기면 그림이 없을 수 있다.
-      //    그때는 예전처럼 글씨만 나온다 — 화면이 비지 않게 아래에서 갈라 둔다.
-      const GAMJA_REGION = { 서울: 'seoul', 경기: 'gyeonggi', 부산: 'busan', 대구: 'daegu', 제주: 'jeju' };
-      const gamjaSlot = (src, alt) =>
-        '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
-        + '<img class="stamp-empty-gamja" src="' + src + '" width="660" height="800" alt="' + alt + '">'
-        + '</div></div>';
-      empty.innerHTML = (activeStampRegion !== '전체' && 전체.length)
-        ? (GAMJA_REGION[activeStampRegion]
-            ? gamjaSlot('assets/mascot/gamja-bubble-' + GAMJA_REGION[activeStampRegion] + '.webp',
-                        activeStampRegion + '에는 아직 기록이 없어요')
-            : '<p class="stamp-empty-text">' + activeStampRegion + '에는 아직 기록이 없어요</p>')
-        // ①은 감자가 점선 자리 안에서 말풍선으로 말을 건다(2026-08-05 사용자 확정).
-        // 🔴 문구는 그림 안에 그려져 있다 — 그래서 아래 문단이 없다. 화면에 글씨로는 안 나오므로
+      // 🔴 빈 화면은 **만들어 두고 다시 쓴다.** 매번 새로 만들면 그때마다 `<img>` 가 새 요소라
+      //    지역을 옮길 때마다 감자가 깜빡였다(실기기에서만 보인다 — 로컬은 너무 빨라 안 보인다).
+      //    카드가 `stampCardCache` 로 같은 짓을 막고 있는 것과 같은 방식이다.
+      const key = activeStampRegion;
+      let empty = stampEmptyCache.get(key);
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.className = 'stamp-empty';
+        // 🔴 문구는 그림 안에 그려져 있다 — 그래서 글씨 문단이 없다. 화면에 글씨로는 안 나오므로
         //    같은 문장을 alt 에 그대로 적어 둔다(읽어주는 기기·그림이 안 뜰 때가 여기에 걸린다).
         // 🔴 「기록하기로…」 앞의 연필 아이콘은 뺐다(2026-08-04 사용자 지시).
         //    위 버튼에 이미 같은 뜻의 아이콘이 있어서 한 화면에 두 번 나오던 것이다.
-        : gamjaSlot('assets/mascot/gamja-bubble.webp',
-                    '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요');
+        empty.innerHTML = (key === '전체')
+          ? gamjaSlot('assets/mascot/gamja-bubble.webp',
+                      '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요')
+          : (GAMJA_REGION[key]
+              ? gamjaSlot('assets/mascot/gamja-bubble-' + GAMJA_REGION[key] + '.webp',
+                          key + '에는 아직 기록이 없어요')
+              : '<p class="stamp-empty-text">' + key + '에는 아직 기록이 없어요</p>');
+        stampEmptyCache.set(key, empty);
+      }
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
