@@ -1392,7 +1392,10 @@ img {
    ⚠️ 결과 카드도 스테이지 안에 있어서 이 배율을 같이 받는다. 그래서 뽑는 순간 1배로 되돌리고,
       되돌아가는 것이 보이지 않게 위 `transition` 으로 그릇이 사라지는 시간과 겹쳐 둔다. */
 .gacha-modal.is-start .gacha-stage { transform: scale(1.3); }
-.gacha-modal.is-start .gacha-pull { margin-bottom: 66px; }
+/* 🔴 여백은 **문구 아래**다 — 버튼에 주면 버튼과 문구 사이가 벌어져 한 덩어리로 안 읽힌다
+   (2026-08-05 실제로 72px 로 벌어졌다). 값은 안내 문구가 생기면서 66 → 42px 로 줄었다.
+   재는 법: 이 값을 0 으로 두면 뽑기 전이 395px 이고 뽑은 뒤가 437px 이니 그 차이가 곧 이 값이다. */
+.gacha-modal.is-start .gacha-pull-note { margin-bottom: 42px; }
 
 /* 소스그릇: 블러/그림자 필터 없이 SVG 그라데이션만 사용(iOS 렌더링 문제 회피).
    층 순서: 그림자(0) < 그릇 안쪽(1) < 소스(2) < 떨어지는 재료(3) < 그릇 앞면(4)
@@ -1578,7 +1581,8 @@ img {
 }
 
 /* 재뽑기 없음 안내(하루 한 번) — 버튼 아님, 닫기는 X·바깥클릭이 처리 */
-.gacha-again-note {
+.gacha-again-note,
+.gacha-pull-note {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1588,7 +1592,17 @@ img {
   letter-spacing: -.2px;
   transform: translateX(-11.5px); /* 👋(18px)+gap(5px)의 절반 — 이모지 때문에 오른쪽으로 밀린 '내일 또 만나요' 텍스트를 버튼 중앙과 정렬 */
 }
-.gacha-note-ic { width: 18px; height: 18px; flex: none; display: inline-block; } /* Noto 손흔들기 정지 PNG(👋) — 기기 통일(텍스트 이모지 대신), 주사위와 동일 원칙 */
+.gacha-note-ic { width: 18px; height: 18px; flex: none; display: inline-block; } /* Noto 정지 그림(👋·☝️) — 기기 통일(텍스트 이모지 대신) */
+
+/* 🔴 뽑기 전 안내(2026-08-05) — 뽑은 뒤의 「내일 또 만나요」와 **같은 부품·같은 자리**다.
+   그래서 값을 위 `.gacha-again-note` 에서 그대로 물려받고, 다른 것만 여기 적는다.
+   `margin-top: -9px` = 모달의 세로 간격 15px 을 6px 로 좁히는 값(15 − 9). 액션 영역의
+   버튼↔문구 간격(gap: 6px)과 같게 맞춘 것이다 — 버튼과 한 덩어리로 읽혀야 한다. */
+/* 🔴 뽑기 전에만 보인다 — 안 숨기면 뽑은 뒤에 「내일 또 만나요」와 둘 다 남아 창이 커진다
+   (2026-08-05 실제로 474px 가 됐다). JS 가 아니라 `.is-start` 로 켠다 — 버튼 숨김은 JS 가 하지만
+   이 문구는 상태 클래스 하나로 끝나는 일이라 여기서 처리하는 편이 흩어지지 않는다. */
+.gacha-pull-note { display: none; }
+.gacha-modal.is-start .gacha-pull-note { display: inline-flex; margin-top: -9px; }
 
 @media (hover: hover) {
   /* 🔴 두 버튼은 같은 반응을 쓴다(2026-08-05) — 값을 고칠 땐 둘 다 고칠 것 */
