@@ -3,29 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>토스트 자리 시험판 — 하딜고고</title>
+<title>토스트 자리 시험판 2 — 하딜고고</title>
 <link rel="stylesheet" href="styles.css?v=754">
 <style>
 /* ===== 시험판 전용 (앱 파일은 안 건드린다) =====
    🔴 앱의 .share-toast 는 display:none ↔ block 이라 서서히 사라지는 게 안 걸린다.
-      여기서는 opacity + visibility 로 바꿔 본다.
-      visibility 를 같이 거는 이유 = 투명도만 0 으로 두면 닫힌 요소가 화면을 차지한 채 남아
-      사파리 주소창이 불투명해지던 전례가 있다(2026-08-05 해결). */
+      opacity + visibility 로 바꾼다. visibility 를 같이 거는 이유 = 투명도만 0 으로 두면
+      닫힌 요소가 화면을 차지한 채 남아 사파리 주소창이 불투명해지던 전례가 있다. */
 .share-toast {
-  display: block;              /* 앱의 display:none 을 덮는다 */
+  display: block;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--out, 0s) linear, visibility 0s linear var(--out, 0s);
+  transition: opacity var(--out, .15s) linear, visibility 0s linear var(--out, .15s);
 }
 .share-toast.show {
   opacity: 1;
   visibility: visible;
-  transition: opacity var(--in, 0s) linear, visibility 0s;
+  transition: opacity 0s, visibility 0s;   /* 뜨는 건 언제나 「확」 */
 }
-/* 자리 — 위 */
-.share-toast.at-top { top: var(--toastTop, 85px); bottom: auto; }
+.share-toast.at-top { top: var(--toastTop, 250px); bottom: auto; }
 
-/* 인앱 배너 흉내 */
+/* 자리 눈금 — 어디가 1/3인지 눈으로 보이게 (토스트 띄울 때 같이 사라진다) */
+#guides { position: fixed; inset: 0; pointer-events: none; z-index: 240; display: none; }
+body.show-guides #guides { display: block; }
+#guides i {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: repeating-linear-gradient(to right, rgba(208,64,46,.55) 0 6px, transparent 6px 12px);
+}
+#guides i::after {
+  content: attr(data-l); position: absolute; right: 6px; top: -14px;
+  font: 600 10px Pretendard, sans-serif; color: #D0402E;
+}
+
 #fakeBanner {
   display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 300;
   background: #2B120D; color: #fff; font-size: 12.5px; text-align: center;
@@ -33,34 +42,38 @@
 }
 body.has-banner #fakeBanner { display: block; }
 
-/* 조작판 */
 #panel {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 400;
   background: #fff; border-top: 2px solid #2B120D;
   padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px));
   font-family: Pretendard, sans-serif; font-size: 13px;
-  max-height: 52vh; overflow-y: auto;
+  max-height: 56vh; overflow-y: auto;
+  transition: transform .18s ease;
 }
-#panel h4 { margin: 10px 0 6px; font-size: 12px; color: #8A6A5F; font-weight: 700; }
+/* 🔴 토스트 보는 동안 조작판이 비켜난다 — 안 그러면 화면 아래가 가려 비율을 못 잰다 */
+body.previewing #panel { transform: translateY(100%); }
+#panel h4 { margin: 11px 0 6px; font-size: 12px; color: #8A6A5F; font-weight: 700; }
 #panel h4:first-child { margin-top: 0; }
 .row { display: flex; flex-wrap: wrap; gap: 6px; }
 .row button {
-  flex: 1 1 auto; min-width: 64px; padding: 9px 6px; border-radius: 9px;
+  flex: 1 1 auto; min-width: 60px; padding: 9px 6px; border-radius: 9px;
   border: 1.5px solid #E4D9CE; background: #FCF9F5; font-size: 12.5px;
   font-weight: 600; color: #2B120D; font-family: inherit;
 }
 .row button.on { background: #D0402E; border-color: #D0402E; color: #fff; }
+.done { color: #1E8A5F; font-weight: 700; }
 #fire {
-  width: 100%; margin-top: 12px; padding: 14px; border: 0; border-radius: 11px;
+  width: 100%; margin-top: 12px; padding: 15px; border: 0; border-radius: 11px;
   background: #2B120D; color: #fff; font-size: 15px; font-weight: 700; font-family: inherit;
 }
-#now { margin-top: 9px; font-size: 12px; color: #8A6A5F; text-align: center; line-height: 1.5; }
-/* 조작판이 화면을 먹으니 탭바를 그 위로 */
-.tabbar { bottom: calc(52vh + 12px); }
-.filler { padding: 20px 16px; font-size: 14px; color: #8A6A5F; line-height: 1.9; }
+#now { margin-top: 9px; font-size: 12px; color: #8A6A5F; text-align: center; line-height: 1.6; }
+#now b { color: #2B120D; }
+/* 조작판이 열려 있는 동안만 탭바를 위로 (띄울 땐 제자리로 돌아간다) */
+body:not(.previewing) .tabbar { bottom: calc(56vh + 12px); }
+.filler { padding: 18px 16px; font-size: 14px; color: #8A6A5F; line-height: 1.9; }
 </style>
 </head>
-<body>
+<body class="show-guides">
 
 <div id="fakeBanner">홈 화면에 추가해서 앱처럼 사용하려면 Safari로 열어주세요</div>
 
@@ -220,14 +233,15 @@ body.has-banner #fakeBanner { display: block; }
 
 <main class="main">
   <div class="filler">
-    토스트 자리 시험판입니다.<br>
-    아래에서 번호를 고르고 <b>「토스트 띄우기」</b>를 누르세요.<br><br>
-    🔴 <b>맥에서는 차이가 거의 안 보입니다. 폰에서 보세요.</b><br><br>
-    ⚠️ 사라지는 속도는 <b>2초 뒤에</b> 시작합니다. 뜬 뒤 기다리세요.
+    <b>토스트 자리 시험판 2</b><br>
+    화면을 비율로 나눠 고릅니다.<br><br>
+    🔴 <b>띄우면 조작판이 잠깐 비켜납니다</b> — 그래야 진짜 화면에서 보입니다.<br><br>
+    ⚠️ 사라지는 건 <b>2초 뒤</b>에 시작합니다.
   </div>
 </main>
 
-<div class="share-toast" id="toast">링크가 복사되었어요!</div>
+<div id="guides"></div>
+<div class="share-toast at-top" id="toast">링크가 복사되었어요!</div>
 
 <nav class="tabbar" id="tabbar" aria-label="섹션 이동">
   <span class="tabbar-indicator" id="tabbarIndicator" aria-hidden="true"></span>
@@ -297,22 +311,21 @@ body.has-banner #fakeBanner { display: block; }
 </nav>
 
 <div id="panel">
-  <h4>① 자리</h4>
+  <h4>① 자리 — 화면을 나눈 비율 (토스트 가운데 기준)</h4>
   <div class="row" id="posRow">
     <button data-pos="bottom">0 · 지금(아래)</button>
-    <button data-pos="77">1 · 위 77</button>
-    <button data-pos="81">2 · 위 81</button>
-    <button data-pos="85">3 · 위 85</button>
-    <button data-pos="93">4 · 위 93</button>
+    <button data-pos="top85">1 · 상단바 밑</button>
+    <button data-pos="0.25">2 · 1/4</button>
+    <button data-pos="0.3333">3 · <b>1/3</b></button>
+    <button data-pos="0.4">4 · 2/5</button>
+    <button data-pos="0.5">5 · 한가운데</button>
   </div>
 
-  <h4>② 사라지는 방식 (뜨는 건 전부 「확」)</h4>
+  <h4>② 사라지는 방식 <span class="done">— B 0.15초로 정해졌습니다</span></h4>
   <div class="row" id="outRow">
-    <button data-out="0">A · 툭 (지금)</button>
-    <button data-out="0.15">B · 0.15초</button>
+    <button data-out="0.15">B · 0.15초 ✓</button>
     <button data-out="0.3">C · 0.3초</button>
     <button data-out="0.5">D · 0.5초</button>
-    <button data-out="0.8">E · 0.8초</button>
   </div>
 
   <h4>③ 인앱 배너 (카톡으로 열었을 때)</h4>
@@ -321,18 +334,24 @@ body.has-banner #fakeBanner { display: block; }
     <button data-ban="1">배너 있음</button>
   </div>
 
+  <h4>④ 눈금선</h4>
+  <div class="row" id="gRow">
+    <button data-g="1">보임</button>
+    <button data-g="0">숨김</button>
+  </div>
+
   <button id="fire">토스트 띄우기</button>
   <div id="now"></div>
 </div>
 
 <script>
 (function () {
-  var toast = document.getElementById('toast');
-  var body  = document.body;
-  var state = { pos: '85', out: '0.3', ban: '0' };
-  var timer = null;
+  var toast  = document.getElementById('toast');
+  var banner = document.getElementById('fakeBanner');
+  var body   = document.body;
+  var state  = { pos: '0.3333', out: '0.15', ban: '0', g: '1' };
+  var timer = null, backTimer = null;
 
-  // 탭바 표시등을 첫 탭 자리에 (앱은 JS가 놓는다 — 없으면 탭바가 실제와 달라 보인다)
   var ind = document.getElementById('tabbarIndicator');
   var first = document.querySelector('.tabbar-btn');
   if (ind && first) {
@@ -341,57 +360,88 @@ body.has-banner #fakeBanner { display: block; }
     ind.style.width = b.width + 'px';
   }
 
-  function paint() {
-    [['posRow','pos'],['outRow','out'],['banRow','ban']].forEach(function (pair) {
-      var row = document.getElementById(pair[0]);
-      [].forEach.call(row.children, function (btn) {
-        var v = btn.dataset.pos || btn.dataset.out || btn.dataset.ban;
-        btn.classList.toggle('on', v === state[pair[1]]);
-      });
+  function vh() { return window.innerHeight; }
+
+  function drawGuides() {
+    var g = document.getElementById('guides');
+    g.innerHTML = '';
+    [[0.25,'1/4'],[1/3,'1/3'],[0.4,'2/5'],[0.5,'한가운데']].forEach(function (f) {
+      var i = document.createElement('i');
+      i.style.top = Math.round(vh() * f[0]) + 'px';
+      i.dataset.l = f[1] + ' · ' + Math.round(vh() * f[0]) + 'px';
+      g.appendChild(i);
     });
+  }
+
+  function paint() {
+    [['posRow','pos','pos'],['outRow','out','out'],['banRow','ban','ban'],['gRow','g','g']]
+      .forEach(function (t) {
+        var row = document.getElementById(t[0]);
+        [].forEach.call(row.children, function (btn) {
+          btn.classList.toggle('on', btn.dataset[t[2]] === state[t[1]]);
+        });
+      });
+
+    var bh = state.ban === '1' ? banner.offsetHeight : 0;
+    var label, topPx = null;
 
     if (state.pos === 'bottom') {
       toast.classList.remove('at-top');
+      label = '지금 자리 (아래에서 90px)';
     } else {
       toast.classList.add('at-top');
-      var top = parseInt(state.pos, 10);
-      if (state.ban === '1') top += document.getElementById('fakeBanner').offsetHeight;
-      toast.style.setProperty('--toastTop', top + 'px');
+      if (state.pos === 'top85') {
+        topPx = 85 + bh;
+        label = '상단바 밑 (틈 20px)';
+      } else {
+        var frac = parseFloat(state.pos);
+        var th = toast.offsetHeight || 36;
+        topPx = Math.round(vh() * frac - th / 2) + bh;   // 가운데가 그 비율에 오도록
+        label = '화면 ' + (state.pos === '0.3333' ? '1/3' :
+                 state.pos === '0.25' ? '1/4' :
+                 state.pos === '0.4' ? '2/5' : '한가운데') + ' 지점';
+      }
+      toast.style.setProperty('--toastTop', topPx + 'px');
     }
-    toast.style.setProperty('--out', state.out + 's');
-    toast.style.setProperty('--in', '0s');   // 뜨는 건 언제나 즉시
-    body.classList.toggle('has-banner', state.ban === '1');
-    body.style.paddingTop = state.ban === '1'
-      ? document.getElementById('fakeBanner').offsetHeight + 'px' : '';
 
-    document.getElementById('now').textContent =
-      '자리 ' + (state.pos === 'bottom' ? '지금(아래 90)' : '위 ' + state.pos) +
-      ' · 사라지기 ' + (state.out === '0' ? '툭' : state.out + '초') +
+    toast.style.setProperty('--out', state.out + 's');
+    body.classList.toggle('has-banner', state.ban === '1');
+    body.classList.toggle('show-guides', state.g === '1');
+    body.style.paddingTop = bh ? bh + 'px' : '';
+
+    document.getElementById('now').innerHTML =
+      '<b>' + label + '</b>' + (topPx !== null ? ' · 위에서 <b>' + topPx + 'px</b>' : '') +
+      '<br>화면 높이 <b>' + vh() + 'px</b> · 사라지기 ' + state.out + '초' +
       (state.ban === '1' ? ' · 배너 있음' : '');
+    drawGuides();
   }
 
   document.getElementById('panel').addEventListener('click', function (e) {
     var b = e.target.closest('button');
-    if (!b) return;
+    if (!b || b.id === 'fire') return;
     if (b.dataset.pos) state.pos = b.dataset.pos;
     else if (b.dataset.out) state.out = b.dataset.out;
     else if (b.dataset.ban) state.ban = b.dataset.ban;
+    else if (b.dataset.g) state.g = b.dataset.g;
     else return;
     paint();
   });
 
   document.getElementById('fire').addEventListener('click', function () {
-    clearTimeout(timer);
+    clearTimeout(timer); clearTimeout(backTimer);
     toast.classList.remove('show');
-    // 한 프레임 쉬어야 다시 「확」 뜬다
+    body.classList.add('previewing');          // 조작판 비켜남
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
+        paint();                                // 조작판 치운 뒤 자리 다시 계산
         toast.classList.add('show');
         timer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
+        backTimer = setTimeout(function () { body.classList.remove('previewing'); }, 3600);
       });
     });
   });
 
+  window.addEventListener('resize', paint);
   paint();
 })();
 </script>
