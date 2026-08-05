@@ -236,8 +236,11 @@ body:not(.previewing) .tabbar { bottom: calc(56vh + 12px); }
     <b>토스트 자리 시험판 2</b><br>
     화면을 비율로 나눠 고릅니다.<br><br>
     🔴 <b>띄우면 조작판이 잠깐 비켜납니다</b> — 그래야 진짜 화면에서 보입니다.<br><br>
-    ⚠️ 사라지는 건 <b>2초 뒤</b>에 시작합니다.
+    ⚠️ 사라지는 건 <b>2초 뒤</b>에 시작합니다.<br><br>
+    ⚠️ <b>아래로 쓸어 주소창을 접었다 펴 보세요.</b> 화면 높이가 바뀌는 것이
+    「본 범위」에 기록됩니다 — 그 값이 있어야 비율로 넣을지 px으로 굳힐지 정할 수 있습니다.
   </div>
+  <div style="height: 160vh"></div><!-- 주소창을 접으려면 스크롤할 거리가 있어야 한다 -->
 </main>
 
 <div id="guides"></div>
@@ -351,6 +354,7 @@ body:not(.previewing) .tabbar { bottom: calc(56vh + 12px); }
   var body   = document.body;
   var state  = { pos: '0.3333', out: '0.15', ban: '0', g: '1' };
   var timer = null, backTimer = null;
+  var seen = { min: Infinity, max: 0 };   // 본 적 있는 화면 높이 범위
 
   var ind = document.getElementById('tabbarIndicator');
   var first = document.querySelector('.tabbar-btn');
@@ -382,6 +386,9 @@ body:not(.previewing) .tabbar { bottom: calc(56vh + 12px); }
         });
       });
 
+    /* 🔴 배너를 **먼저** 켜 놓고 높이를 잰다. 순서를 바꾸면 display:none 인 채로 재서
+       0 이 나오고, 처음 켤 때만 자리가 한 박자 늦게 반영된다 (1·2차 시험판이 그랬다). */
+    body.classList.toggle('has-banner', state.ban === '1');
     var bh = state.ban === '1' ? banner.offsetHeight : 0;
     var label, topPx = null;
 
@@ -405,14 +412,21 @@ body:not(.previewing) .tabbar { bottom: calc(56vh + 12px); }
     }
 
     toast.style.setProperty('--out', state.out + 's');
-    body.classList.toggle('has-banner', state.ban === '1');
     body.classList.toggle('show-guides', state.g === '1');
     body.style.paddingTop = bh ? bh + 'px' : '';
 
+    /* 주소창이 접혔다 펴지면 화면 높이가 바뀐다 — 본 적 있는 범위를 기록해 둔다.
+       비율로 넣을지 px 으로 굳힐지는 이 범위를 봐야 정할 수 있다. */
+    if (vh() < seen.min) seen.min = vh();
+    if (vh() > seen.max) seen.max = vh();
+    var range = seen.min === seen.max ? '' :
+      ' <b>(본 범위 ' + seen.min + '~' + seen.max + ')</b>';
+
     document.getElementById('now').innerHTML =
       '<b>' + label + '</b>' + (topPx !== null ? ' · 위에서 <b>' + topPx + 'px</b>' : '') +
-      '<br>화면 높이 <b>' + vh() + 'px</b> · 사라지기 ' + state.out + '초' +
-      (state.ban === '1' ? ' · 배너 있음' : '');
+      (bh ? ' <span style="color:#D0402E">(배너 ' + bh + 'px 포함)</span>' : '') +
+      '<br>화면 높이 <b>' + vh() + 'px</b>' + range +
+      '<br>사라지기 ' + state.out + '초';
     drawGuides();
   }
 
@@ -442,6 +456,7 @@ body:not(.previewing) .tabbar { bottom: calc(56vh + 12px); }
   });
 
   window.addEventListener('resize', paint);
+  window.addEventListener('scroll', paint, { passive: true });   // 주소창 접힘도 잡는다
   paint();
 })();
 </script>
