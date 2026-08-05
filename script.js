@@ -3583,18 +3583,27 @@
     if (!list.length) {
       const empty = document.createElement('div');
       empty.className = 'stamp-empty';
+      // 지역 그림은 지역 수만큼 따로 있다 — 말풍선 문구가 「서울에는…」처럼 지역 이름을 부른다.
+      // 🔴 파일 이름은 로마자다. 한글 파일명은 자모 분리(NFD)로 저장된 것이 섞여 있어 탈이 난 적이 있다.
+      // ⚠️ 지역 목록은 STORES 에서 뽑으므로(storeRegions) 새 지역이 생기면 그림이 없을 수 있다.
+      //    그때는 예전처럼 글씨만 나온다 — 화면이 비지 않게 아래에서 갈라 둔다.
+      const GAMJA_REGION = { 서울: 'seoul', 경기: 'gyeonggi', 부산: 'busan', 대구: 'daegu', 제주: 'jeju' };
+      const gamjaSlot = (src, alt) =>
+        '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
+        + '<img class="stamp-empty-gamja" src="' + src + '" width="660" height="800" alt="' + alt + '">'
+        + '</div></div>';
       empty.innerHTML = (activeStampRegion !== '전체' && 전체.length)
-        ? '<p class="stamp-empty-text">' + activeStampRegion + '에는 아직 기록이 없어요</p>'
+        ? (GAMJA_REGION[activeStampRegion]
+            ? gamjaSlot('assets/mascot/gamja-bubble-' + GAMJA_REGION[activeStampRegion] + '.webp',
+                        activeStampRegion + '에는 아직 기록이 없어요')
+            : '<p class="stamp-empty-text">' + activeStampRegion + '에는 아직 기록이 없어요</p>')
         // ①은 감자가 점선 자리 안에서 말풍선으로 말을 건다(2026-08-05 사용자 확정).
         // 🔴 문구는 그림 안에 그려져 있다 — 그래서 아래 문단이 없다. 화면에 글씨로는 안 나오므로
         //    같은 문장을 alt 에 그대로 적어 둔다(읽어주는 기기·그림이 안 뜰 때가 여기에 걸린다).
         // 🔴 「기록하기로…」 앞의 연필 아이콘은 뺐다(2026-08-04 사용자 지시).
         //    위 버튼에 이미 같은 뜻의 아이콘이 있어서 한 화면에 두 번 나오던 것이다.
-        : '<div class="stamp-slot stamp-empty-slot">'
-          + '<div class="stamp-slot-empty">'
-          + '<img class="stamp-empty-gamja" src="assets/mascot/gamja-bubble.webp" width="660" height="800"'
-          + ' alt="아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요">'
-          + '</div></div>';
+        : gamjaSlot('assets/mascot/gamja-bubble.webp',
+                    '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요');
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
