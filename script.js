@@ -3585,9 +3585,16 @@
       empty.className = 'stamp-empty';
       empty.innerHTML = (activeStampRegion !== '전체' && 전체.length)
         ? '<p class="stamp-empty-text">' + activeStampRegion + '에는 아직 기록이 없어요</p>'
+        // ①은 감자가 점선 자리 안에서 말풍선으로 말을 건다(2026-08-05 사용자 확정).
+        // 🔴 문구는 그림 안에 그려져 있다 — 그래서 아래 문단이 없다. 화면에 글씨로는 안 나오므로
+        //    같은 문장을 alt 에 그대로 적어 둔다(읽어주는 기기·그림이 안 뜰 때가 여기에 걸린다).
         // 🔴 「기록하기로…」 앞의 연필 아이콘은 뺐다(2026-08-04 사용자 지시).
         //    위 버튼에 이미 같은 뜻의 아이콘이 있어서 한 화면에 두 번 나오던 것이다.
-        : '<p class="stamp-empty-text">아직 스티커가 없어요<br>기록하기로 첫 방문을 남겨보세요</p>';
+        : '<div class="stamp-slot stamp-empty-slot">'
+          + '<div class="stamp-slot-empty">'
+          + '<img class="stamp-empty-gamja" src="assets/mascot/gamja-bubble.webp" width="660" height="800"'
+          + ' alt="아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요">'
+          + '</div></div>';
       grid.replaceChildren(empty);
     } else {
       // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
