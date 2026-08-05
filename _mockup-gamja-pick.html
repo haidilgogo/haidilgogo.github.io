@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>감자 자리잡기 — 번호로 갈아 끼우는 판</title>
+  <link rel="stylesheet" href="styles.css?v=741">
+  <style>
+    /* ─────────────────────────────────────────────────────────────
+       스티커 탭 「기록이 하나도 없을 때」 화면을 그대로 흉내 낸 판이다.
+       값은 styles.css 의 .stamp-empty / .stamp-slot / .stamp-slot-empty 에서 그대로 옮겼다.
+       🔴 앱 파일은 하나도 안 건드린다. 여기서 번호를 골라 확정한 뒤에 옮긴다.
+       ───────────────────────────────────────────────────────────── */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #E9E4DC; }
+    body { color: var(--text-dark); font-family: var(--font-body, inherit); }
+
+    .app {
+      width: min(100%, 440px);
+      min-height: 100svh;
+      margin: 0 auto;
+      background: var(--bg-card);
+      position: relative;
+      padding-bottom: 205px;      /* 아래 조절판이 문구를 가리지 않을 만큼 */
+      overflow-x: hidden;
+    }
+
+    /* ── 상단바(지역 탭) ── */
+    .topbar {
+      height: 58px; display: flex; align-items: stretch;
+      border-bottom: 1px solid var(--card-border);
+      background: var(--bg-card);
+    }
+    .regions {
+      width: 100%; display: flex; align-items: center; gap: 26px;
+      padding: 0 18px; overflow: hidden; white-space: nowrap;
+      color: var(--text-muted); font-size: 14px; font-weight: 600;
+    }
+    .region { height: 58px; display: grid; place-items: center; position: relative; }
+    .region.on { color: var(--brand-red); }
+    .region.on::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+      height: 2px; border-radius: 999px; background: var(--brand-red);
+    }
+
+    /* ── 개수 줄 ── */
+    .main { padding: 18px 18px 38px; }
+    .head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .count { margin: 0; font-size: 14px; }
+    .count b { color: var(--brand-red); font-size: 16px; }
+    .write {
+      border: 0; border-radius: 999px; padding: 9px 13px;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--brand-red); color: #fff;
+      font: inherit; font-size: 13px; font-weight: 700;
+    }
+
+    /* ── 빈 화면 (.stamp-empty 와 같은 값) ── */
+    .empty {
+      min-height: 52svh;
+      padding: 40px 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      color: var(--text-muted); font-size: 14px; line-height: 1.7;
+    }
+
+    /* 감자와 점선 상자를 함께 담는 무대 — 가로 정렬(A/B)이 여기서 갈린다 */
+    .stage { position: relative; }
+    /* A안: 점선 상자가 화면 한가운데. 감자는 오른쪽으로 나간다 */
+    .stage[data-align="A"] { margin: 0 auto; }
+    /* B안: 상자+감자를 묶어서 가운데. 상자가 왼쪽으로 밀린다 */
+    .stage[data-align="B"] { margin: 0 auto; transform: translateX(calc(var(--gamja-w) / -2)); }
+
+    /* ── 점선 상자 (.stamp-slot / .stamp-slot-empty 와 같은 값) ── */
+    /* 🔴 앱의 값은 width:158px 고정이다. 여기서만 번호로 갈아 끼우려고 변수로 뺐다 */
+    .slot { width: var(--slot-w, 158px); aspect-ratio: 0.58; margin: 26px auto 36px; position: relative; }
+    .slot-dash {
+      position: absolute; inset: -12px;
+      border: 2.5px dashed #D6C6BA; border-radius: 18px;
+      background: rgba(255, 255, 255, 0.5);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; padding: 0 10px; text-align: center;
+    }
+    .slot-ico { width: 42px; height: 42px; color: #B7A699; display: block; }
+    .slot-hint { font-size: 12px; font-weight: 600; color: #B7A699; line-height: 1.4; }
+
+    /* ── 감자 ──
+       왼쪽 끝이 오른쪽 세로 점선 위에 얹힌다. 점선은 상자 밖 -12px 에 있으므로
+       감자의 왼쪽 = 상자의 오른쪽 + 12px 이고, 거기서 점선 두께만큼 살짝 겹친다. */
+    .gamja {
+      position: absolute;
+      left: calc(100% + 12px - 2px);
+      height: var(--gamja-h);
+      width: auto;
+      pointer-events: none; user-select: none;
+      display: block;
+    }
+    .gamja[hidden] { display: none; }
+    /* 세로 자리 — 아래 맞춤 = 아래 점선에 발을 붙인다 */
+    .stage[data-vpos="bottom"] .gamja { bottom: -12px; }
+    .stage[data-vpos="mid"]    .gamja { top: 50%; transform: translateY(-50%); }
+
+    .copy { margin: 30px 0 0; }
+    .copy[hidden] { display: none; }
+
+    /* ── 안쪽 말풍선 판 ──
+       점선 상자 안쪽 왼쪽 벽에 붙인다. 감자의 왼쪽이 잘려 있어 벽에서 나오는 것처럼 보인다.
+       .slot-dash 안에 두므로 상자 안쪽(테두리 안)이 기준이 된다. */
+    .bubble {
+      position: absolute;
+      left: 0;
+      width: var(--bubble-w, 100%);
+      height: auto;
+      pointer-events: none; user-select: none;
+      display: block;
+    }
+    .bubble[hidden] { display: none; }
+    .slot-dash[data-bpos="bottom"] .bubble { bottom: 0; }
+    .slot-dash[data-bpos="mid"]    .bubble { top: 50%; transform: translateY(-50%); }
+    .slot-dash[data-bpos="top"]    .bubble { top: 0; }
+    /* 말풍선 판이 보이는 동안에는 안쪽 안내(발바닥+글씨)를 숨긴다 — 겹친다 */
+    .slot-dash.has-bubble .slot-ico,
+    .slot-dash.has-bubble .slot-hint { display: none; }
+
+    /* ── 조절판 ── */
+    .panel {
+      position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
+      width: min(100%, 440px);
+      background: #2B2521; color: #F4EFE8;
+      padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+      font-size: 13px; z-index: 50;
+      box-shadow: 0 -6px 20px rgba(0,0,0,.18);
+    }
+    .panel .row { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+    .panel .row:last-child { margin-bottom: 0; }
+    .panel .lab { width: 62px; flex: none; color: #B9AFA4; font-size: 12px; }
+    .panel button {
+      flex: 1 1 0; min-width: 0;
+      border: 1px solid #4A4139; background: #3A322C; color: #F4EFE8;
+      border-radius: 8px; padding: 8px 0; font: inherit; font-weight: 700;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .panel button.on { background: var(--brand-red); border-color: var(--brand-red); }
+    .readout { color: #B9AFA4; font-size: 11.5px; text-align: center; padding-top: 6px; letter-spacing: .01em; }
+
+    /* ── 조절판 접기 ──
+       화면을 다 덮어서 정작 볼 것이 안 보인다는 문제. 접으면 얇은 띠만 남는다. */
+    .fold {
+      position: absolute; right: 10px; top: -34px;
+      border: 1px solid #4A4139; background: #2B2521; color: #F4EFE8;
+      border-radius: 999px; padding: 6px 14px;
+      font: inherit; font-size: 12px; font-weight: 700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.22);
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.folded .panel .row { display: none !important; }
+    body.folded .app { padding-bottom: 62px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="regions">
+        <span class="region on">전체</span><span class="region">서울</span><span class="region">경기</span>
+        <span class="region">부산</span><span class="region">대구</span><span class="region">제주</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="head">
+        <p class="count">다녀온 하이디라오 매장 <b>0</b>곳</p>
+        <button class="write" type="button">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.9-2.9a2 2 0 0 1 .5-.9z"/></svg>
+          기록하기
+        </button>
+      </div>
+
+      <section class="empty">
+        <div class="stage" id="stage" data-align="A" data-vpos="bottom">
+          <div class="slot">
+            <div class="slot-dash">
+              <svg class="slot-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12C2 17.5 6.5 22 12 22c.6 0 1.3-.3 1.7-.8l7.5-7.5c.5-.5.8-1.1.8-1.7 0-5.5-4.5-10-10-10S2 6.5 2 12Z"/>
+                <path d="M8.9 15.9c1 .3 2.2.3 3.4.1"/>
+                <ellipse cx="14.5" cy="9.8" rx="1" ry="1.5" transform="rotate(-15 14.5 9.8)" fill="currentColor" stroke="none"/>
+                <ellipse cx="8.7" cy="11.3" rx="1" ry="1.5" transform="rotate(-15 8.7 11.3)" fill="currentColor" stroke="none"/>
+                <path d="M12 22c0-2.8 0-4.2.4-5.3a6.5 6.5 0 0 1 4.3-4.3c1.1-.4 2.5-.4 5.3-.4"/>
+              </svg>
+              <span class="slot-hint">스티커 붙이는 곳</span>
+              <img class="bubble" id="bubble" src="_gamja-bubble.webp" alt="말풍선으로 말을 거는 감자" hidden>
+            </div>
+            <img class="gamja" id="gamja" src="_gamja.webp" alt="점선 뒤에서 빼꼼 내다보는 감자">
+          </div>
+        </div>
+        <p class="copy">아직 스티커가 없어요<br>기록하기로 첫 방문을 남겨보세요</p>
+      </section>
+    </main>
+  </div>
+
+  <div class="panel">
+    <button class="fold" id="fold" type="button">접기 ▾</button>
+    <div class="row"><span class="lab">판</span>
+      <button data-mode="out" class="on">바깥 빼꼼</button>
+      <button data-mode="in">안쪽 말풍선</button>
+    </div>
+    <div class="row" data-only="out"><span class="lab">크기</span><span id="sizes"></span></div>
+    <div class="row" data-only="out"><span class="lab">세로</span>
+      <button data-vpos="bottom" class="on">아래 맞춤</button>
+      <button data-vpos="mid">가운데</button>
+    </div>
+    <div class="row" data-only="out"><span class="lab">가로</span>
+      <button data-align="A" class="on">A 상자가 가운데</button>
+      <button data-align="B">B 둘이 가운데</button>
+    </div>
+
+    <div class="row" data-only="in"><span class="lab">그림</span>
+      <button data-bimg="_gamja-bubble.webp" class="on">A 처음 것</button>
+      <button data-bimg="_gamja-bubble-s.webp">B 말풍선 작게</button>
+    </div>
+    <div class="row" data-only="in"><span class="lab">상자</span><span id="slots"></span></div>
+    <div class="row" data-only="in"><span class="lab">폭</span><span id="bsizes"></span></div>
+    <div class="row" data-only="in"><span class="lab">세로</span>
+      <button data-bpos="bottom" class="on">아래</button>
+      <button data-bpos="mid">가운데</button>
+      <button data-bpos="top">위</button>
+    </div>
+    <div class="row" data-only="in"><span class="lab">아래 문구</span>
+      <button data-copy="0" class="on">숨김</button>
+      <button data-copy="1">보임</button>
+    </div>
+
+    <div class="row"><span class="lab">감자</span>
+      <button data-show="1" class="on">보임</button>
+      <button data-show="0">숨김 (지금 화면)</button>
+    </div>
+    <p class="readout" id="readout"></p>
+  </div>
+
+<script>
+(function () {
+  var HEIGHTS = [100, 130, 160, 190, 220];   // 바깥 판 번호 1~5 = 감자 높이(px)
+  var BWIDTHS = [80, 90, 100, 115, 130];     // 안쪽 판 번호 1~5 = 상자 안쪽 폭 대비 %
+  var SLOTS   = [158, 190, 220, 250];        // 상자 번호 1~4 = .stamp-slot 폭(px). 1번이 지금 앱 값
+  // 말풍선 글씨의 잉크 높이 ÷ 그림 가로 — 두 그림에서 재 둔 값(작은 줄 기준)
+  var INK = { '_gamja-bubble.webp': 0.0419, '_gamja-bubble-s.webp': 0.0388 };
+  var stage   = document.getElementById('stage');
+  var dash    = stage.querySelector('.slot-dash');
+  var gamja   = document.getElementById('gamja');
+  var bubble  = document.getElementById('bubble');
+  var copyEl  = document.querySelector('.copy');
+  var readout = document.getElementById('readout');
+  var slot    = stage.querySelector('.slot');
+  var state = { mode: 'out', h: 130, vpos: 'bottom', align: 'A', show: true,
+                bw: 100, bpos: 'bottom', copy: false,
+                slotw: 158, bimg: '_gamja-bubble.webp' };
+
+  function numbers(hostId, values, key) {
+    var host = document.getElementById(hostId);
+    host.style.cssText = 'display:flex;gap:6px;flex:1 1 0;min-width:0';
+    values.forEach(function (v, i) {
+      var b = document.createElement('button');
+      b.textContent = String(i + 1);
+      b.dataset[key] = v;
+      host.appendChild(b);
+    });
+  }
+  numbers('sizes', HEIGHTS, 'h');
+  numbers('bsizes', BWIDTHS, 'bw');
+  numbers('slots', SLOTS, 'slotw');
+
+  function apply() {
+    var isIn = state.mode === 'in';
+
+    // 판에 따라 조절 줄을 갈아 끼운다
+    document.querySelectorAll('.panel .row[data-only]').forEach(function (r) {
+      r.style.display = (r.dataset.only === state.mode) ? '' : 'none';
+    });
+
+    // ── 바깥 빼꼼 ──
+    stage.dataset.align = state.align;
+    stage.dataset.vpos  = state.vpos;
+    gamja.hidden = isIn || !state.show;
+    gamja.style.setProperty('--gamja-h', state.h + 'px');
+    var gw = gamja.naturalWidth ? state.h * gamja.naturalWidth / gamja.naturalHeight : 0;
+    stage.style.setProperty('--gamja-w', (gamja.hidden ? 0 : gw).toFixed(1) + 'px');
+
+    // ── 안쪽 말풍선 ──
+    // 상자 폭은 안쪽 판에서만 키운다 — 바깥 판은 앱의 지금 값(158px)으로 잰다
+    slot.style.setProperty('--slot-w', (isIn ? state.slotw : 158) + 'px');
+    if (bubble.getAttribute('src') !== state.bimg) bubble.setAttribute('src', state.bimg);
+    bubble.hidden = !isIn || !state.show;
+    dash.dataset.bpos = state.bpos;
+    dash.classList.toggle('has-bubble', !bubble.hidden);
+    bubble.style.setProperty('--bubble-w', state.bw + '%');
+    copyEl.hidden = isIn && !state.copy;
+
+    document.querySelectorAll('.panel button').forEach(function (b) {
+      var d = b.dataset, on =
+        (d.mode  && d.mode  === state.mode)  ||
+        (d.h     && +d.h    === state.h)     ||
+        (d.vpos  && d.vpos  === state.vpos)  ||
+        (d.align && d.align === state.align) ||
+        (d.bw    && +d.bw   === state.bw)    ||
+        (d.slotw && +d.slotw === state.slotw) ||
+        (d.bimg  && d.bimg  === state.bimg)  ||
+        (d.bpos  && d.bpos  === state.bpos)  ||
+        (d.copy  && (d.copy  === '1') === state.copy) ||
+        (d.show  && (d.show  === '1') === state.show);
+      b.classList.toggle('on', !!on);
+    });
+
+    if (!state.show) { readout.textContent = '감자 숨김 — 지금 앱 화면 그대로'; return; }
+    if (isIn) {
+      var br = bubble.getBoundingClientRect();
+      var ink = br.width * (INK[state.bimg] || 0.042);
+      readout.textContent =
+        '그림 ' + (state.bimg.indexOf('-s.') > 0 ? 'B' : 'A')
+        + ' · 상자 ' + (SLOTS.indexOf(state.slotw) + 1) + '번(' + state.slotw + 'px)'
+        + ' · 폭 ' + (BWIDTHS.indexOf(state.bw) + 1) + '번(' + state.bw + '%)'
+        + ' · ' + ({ bottom: '아래', mid: '가운데', top: '위' })[state.bpos]
+        + '  →  말풍선 글씨 약 ' + ink.toFixed(1) + 'px (앱 문구 14px)';
+    } else {
+      readout.textContent = '바깥 빼꼼 · 크기 ' + (HEIGHTS.indexOf(state.h) + 1) + '번 (높이 '
+        + state.h + 'px · 폭 ' + gw.toFixed(0) + 'px) · '
+        + (state.vpos === 'bottom' ? '아래 맞춤' : '가운데') + ' · ' + state.align + '안';
+    }
+  }
+
+  document.querySelector('.panel').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var d = b.dataset;
+    if (d.mode)  state.mode  = d.mode;
+    if (d.h)     state.h     = +d.h;
+    if (d.vpos)  state.vpos  = d.vpos;
+    if (d.align) state.align = d.align;
+    if (d.bw)    state.bw    = +d.bw;
+    if (d.slotw) state.slotw = +d.slotw;
+    if (d.bimg)  state.bimg  = d.bimg;
+    if (d.bpos)  state.bpos  = d.bpos;
+    if (d.copy)  state.copy  = d.copy === '1';
+    if (d.show)  state.show  = d.show === '1';
+    apply();
+  });
+
+  // 조절판이 화면을 덮어 정작 볼 것이 안 보이던 문제 — 접으면 지금 값 한 줄만 남는다
+  var foldBtn = document.getElementById('fold');
+  foldBtn.addEventListener('click', function () {
+    var folded = document.body.classList.toggle('folded');
+    foldBtn.textContent = folded ? '조절판 ▴' : '접기 ▾';
+  });
+
+  // 그림을 갈아 끼우면 세로비가 바뀌므로 다 읽힌 뒤 값을 다시 잰다
+  [gamja, bubble].forEach(function (im) { im.addEventListener('load', apply); });
+  apply();
+})();
+</script>
+</body>
+</html>
