@@ -2111,12 +2111,17 @@
         + '</button>';
     }).join('');
     jeongolGridEl.querySelectorAll('[data-home-broth]').forEach((btn) => {
-      btn.addEventListener('click', 전골로가기);
+      btn.addEventListener('click', () => 전골로가기(btn.dataset.homeBroth));
     });
   }
   /* 메뉴 탭의 전골로 보낸다. 섹션을 먼저 바꾼 뒤 분류를 고른다 —
      반대로 하면 메뉴 화면이 아직 안 보여서 폭이 0 이라 밑줄이 자리를 못 잡는다(mnSyncUnderline 주석 참고). */
-  function 전골로가기() {
+  /* 🔴 **담고** 메뉴 탭 전골로 간다(2026-08-05 사용자 확정). 처음엔 이동만 했는데 되짚어 바꿨다 —
+     홈 전골 카드는 메뉴 탭 육수 카드와 **같은 그림**이라, 한 곳에선 담기고 한 곳에선 안 담기면 더 헷갈린다.
+     「구경하다 담기면 놀란다」는 걱정은 **이동이 붙으면서 사라졌다** — 담긴 게 바로 눈앞에 보이고
+     그 자리에서 뺄 수 있다. ⚠️ 냄비가 차 있으면 안 담기고 토스트만 뜬다(메뉴 탭 안과 같은 규칙). */
+  function 전골로가기(이름) {
+    if (이름 && window.mnAddBroth) window.mnAddBroth(이름);
     switchSection('menu');
     if (window.mnGoTab) window.mnGoTab('전골');
   }
@@ -2757,15 +2762,19 @@
         if (r) { closeColumn(); openModal(r); }
       });
     });
-    /* 메뉴 줄 — 아티클을 닫고 **메뉴 탭에서 그게 보이는 자리**로 간다(2026-08-05 사용자 확정).
-       소스 줄이 「칼럼을 닫고 레시피를 연다」와 같은 흐름이다.
-       ⚠️ 가는 방법이 둘인 이유는 buildColumnMenu 주석 참고(육수는 검색에 안 걸린다). */
+    /* 메뉴 줄 — **담고** 아티클을 닫고 메뉴 탭에서 그게 보이는 자리로 간다(2026-08-05 사용자 확정).
+       홈 전골 카드와 **같은 규칙**이다. 소스 줄이 「칼럼을 닫고 레시피를 연다」와 같은 흐름이기도 하다.
+       ⚠️ 가는 방법이 둘인 이유는 buildColumnMenu 주석 참고(육수는 검색에 안 걸린다).
+       ⚠️ 담기도 둘로 갈린다 — 육수는 냄비에(mnAddBroth), 그 밖의 메뉴는 담은 목록에(mnPick). */
     [...columnOverlay.querySelectorAll('.col-sauce[data-menu-n]')].forEach((el) => {
       el.addEventListener('click', () => {
         const n = el.dataset.menuN;
+        const 육수 = !!el.dataset.menuBroth;
+        if (육수) { if (window.mnAddBroth) window.mnAddBroth(n); }
+        else if (window.mnPick) window.mnPick(n);
         closeColumn();
         switchSection('menu');
-        if (el.dataset.menuBroth) { if (window.mnGoTab) window.mnGoTab('전골'); }
+        if (육수) { if (window.mnGoTab) window.mnGoTab('전골'); }
         else if (window.mnSearch) window.mnSearch(n);
       });
     });
@@ -4050,7 +4059,8 @@
   // 🔴 홈 「전골」의 「메뉴 보기」는 **레시피가 아니라 메뉴 탭**으로 간다(2026-08-05 사용자 확정).
   //    카드도 같은 곳으로 간다 — 육수는 상세 화면이 없어서 갈 데가 여기뿐이고, 홈 카드가 눌러도
   //    반응이 없으면 고장으로 보인다. ⚠️ 눌렀다고 냄비에 담지는 않는다(구경하다 담기면 놀란다).
-  document.getElementById('jeongolMore').addEventListener('click', 전골로가기);
+  //    ⚠️ 「메뉴 보기」 버튼은 **담지 않는다** — 이름 없이 부른다. 「보러 간다」는 뜻이라 담을 대상이 없다.
+  document.getElementById('jeongolMore').addEventListener('click', () => 전골로가기());
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
   document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
 
@@ -5122,6 +5132,29 @@
      ⚠️ **육수(전골)는 검색으로 안 걸린다** — 검색은 상위 7개 분류만 훑는다(검색결과() 참고).
         그래서 부르는 쪽이 육수면 이걸 쓰지 말고 `mnGoTab('전골')` 로 보내야 한다.
      검색을 켜면 「전체메뉴」 탭으로 옮긴다 — 사람이 직접 칠 때와 같은 규칙이다(그쪽 주석 참고). */
+  /* 🔴 밖에서 **담아 주는** 통로(2026-08-05 사용자 확정) — 홈 전골 카드와 고수 아티클의 메뉴 줄이 쓴다.
+     같은 그림의 카드가 메뉴 탭 안에서는 담기는데 밖에서는 안 담기면 그게 더 헷갈린다는 판단이다.
+     🔴 **담고 나서 부르는 쪽이 그 화면으로 데려간다** — 담긴 게 눈앞에 보여야 하고, 잘못 눌렀으면
+        그 자리에서 뺄 수 있어야 한다. 이동 없이 담기만 하면 「모르는 새 담긴다」가 되어 안 된다.
+     ⚠️ 담기 규칙은 메뉴 탭 안에서 누를 때와 **똑같이** 간다 — 냄비가 차면 토스트만 뜨고 안 담긴다. */
+  window.mnAddBroth = function (이름) {
+    if (!(D.broths || []).some((b) => b.n === 이름)) return false;
+    if (broths.length >= cells) {          // 메뉴 탭 안 누름과 같은 규칙
+      if (window.showToast) window.showToast(냄비참);
+      return false;
+    }
+    broths.push(이름);
+    refreshPot();
+    return true;
+  };
+  /* 🔴 육수가 아닌 메뉴를 담는다. **담기만 하고 빼지는 않는다** — 메뉴 탭 안에서는 다시 누르면 빠지지만,
+     밖에서 부를 땐 「담아 달라」는 뜻이라 이미 담긴 것을 빼 버리면 놀란다. 이미 있으면 그냥 둔다. */
+  window.mnPick = function (이름) {
+    if (picked.has(이름)) return true;
+    picked.set(이름, 1);
+    refreshCards();
+    return true;
+  };
   window.mnSearch = function (말) {
     const s = String(말 || '').trim();
     if (!s) return false;
