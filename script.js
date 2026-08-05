@@ -4250,7 +4250,18 @@
 
   const SYNC_CODE_KEY = 'haidilao_sync_code';
   // 헷갈리는 글자(I·O·0·1) 제외 — 사용자가 눈으로 읽고 손으로 입력하는 코드다.
-  const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  /* 🔴 코드를 **만들 때** 쓰는 글자다(2026-08-05 개편). 모음 A·E·U 와 반모음 Y 를 뺐다 —
+     안 빼면 읽히는 영어 단어가 만들어진다. 실제로 욕설이 그대로 들어간 코드가 나왔다(사용자 발견).
+     I·O·0·1 은 원래부터 헷갈려서 빼 두었다.
+     🔴 **입력 검사(아래 CODE_CHAR)는 절대 같이 좁히지 말 것.** 이미 나가 있는 옛 코드에는 모음이
+        들어 있어서, 좁히면 그 사람들이 자기 코드를 못 넣게 된다. **만들 때만** 좁힌다.
+     가짓수는 28^6 ≈ 4억 8천만이다(전 32^6 ≈ 10억 7천만). 줄지만 이 규모엔 넘친다 —
+     더 늘려야 하면 알파벳을 넓히지 말고 **자릿수를 7로** 올릴 것(28^7 ≈ 135억). */
+  const CODE_ALPHABET = 'BCDFGHJKLMNPQRSTVWXZ23456789';
+  /* 🔴 모음을 빼도 자음만으로 읽히는 말이 남는다(FCK 처럼). 그런 조각이 들어간 코드는 다시 뽑는다.
+     ⚠️ 이 목록이 전부일 수 없다 — 거슬리는 코드가 나오면 여기 한 줄 추가하면 된다.
+     ⚠️ 소문자로 적고 대문자 코드와 맞출 땐 대소문자를 무시한다. */
+  const CODE_BANNED = ['fck', 'fuk', 'sht', 'nggr', 'ngr', 'cnt', 'kkk', 'dck', 'phk', 'wtf', 'jjk'];
 
   // 🔴 저장소가 가득 차거나 막혀도 **이 세션에선 코드가 살아 있어야 한다**(2026-07-31 교차검증).
   //    예전엔 setSyncCode의 실패를 삼켰는데, pushSync가 저장소에서 코드를 다시 읽는 구조라
@@ -4269,7 +4280,7 @@
     syncCodeMem = code;
     try { localStorage.setItem(SYNC_CODE_KEY, code); } catch (e) { /* 저장 실패해도 위 사본으로 버틴다 */ }
   }
-  function makeSyncCode() {
+  function 여섯자리() {
     let s = '';
     const buf = new Uint32Array(6);
     if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
@@ -4277,15 +4288,30 @@
       const n = buf[i] || Math.floor(Math.random() * 0xffffffff);
       s += CODE_ALPHABET[n % CODE_ALPHABET.length];
     }
+    return s;
+  }
+  function makeSyncCode() {
+    // 🔴 걸리는 조각이 들어 있으면 다시 뽑는다. 20번은 넉넉한 상한이다 —
+    //    걸릴 확률이 아주 낮아 실제로는 첫 판에 끝난다. 상한을 두는 이유는 목록이 잘못 커져
+    //    (예: 한 글자를 넣어 버림) 영원히 도는 일을 막기 위해서다. 그땐 마지막 것을 그냥 쓴다.
+    let s = '';
+    for (let i = 0; i < 20; i++) {
+      s = 여섯자리();
+      const 소문자 = s.toLowerCase();
+      if (!CODE_BANNED.some((w) => 소문자.includes(w))) break;
+    }
     return 'HG-' + s;
   }
   // 사용자가 어떻게 적어와도 받아준다 — 소문자, 공백, 하이픈 유무, 'HG' 생략까지.
   // 🔴 'HG'를 무조건 떼면 안 된다. 코드 알파벳에 H와 G가 있어서 뒤 6자리가 'HGXY12'처럼
   //    HG로 시작할 수 있는데, 그때 접두어로 착각해 떼면 4글자만 남아 멀쩡한 코드가 거부된다.
   //    → **길이가 8일 때만** 앞의 HG를 접두어로 본다(6자리면 그대로가 본체다).
-  // 🔴 실제 코드에 쓰는 글자만 통과시킨다(CODE_ALPHABET과 같은 집합 = I·O·0·1 제외).
-  //    예전엔 [A-Z0-9]를 다 받아서, 0이나 1이 섞인 코드가 화면에선 멀쩡히 통과한 뒤
-  //    서버 규칙에 막혀 "저장된 데이터가 없어요"로 나왔다 — 형식 문제인데 없는 코드처럼 보였다.
+  // 🔴 헷갈리는 글자(I·O·0·1)만 막는다. 예전엔 [A-Z0-9]를 다 받아서, 0이나 1이 섞인 코드가
+  //    화면에선 멀쩡히 통과한 뒤 서버 규칙에 막혀 "저장된 데이터가 없어요"로 나왔다 —
+  //    형식 문제인데 없는 코드처럼 보였다.
+  // 🔴 **이 집합은 CODE_ALPHABET(만들 때)보다 넓다. 좁히지 말 것**(2026-08-05).
+  //    만들 때는 모음을 빼지만, **이미 나가 있는 옛 코드에는 모음이 들어 있다.** 여기를 같이 좁히면
+  //    그 사람들이 자기 코드를 못 넣게 된다 — 되살릴 방법이 없는 데이터라 치명적이다.
   const CODE_CHAR = /^[A-HJ-NP-Z2-9]{6}$/;
   function normalizeCode(raw) {
     let s = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
