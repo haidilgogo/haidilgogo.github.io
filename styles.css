@@ -1512,9 +1512,11 @@ img {
 }
 
 .gacha-pull {
-  display: inline-flex;      /* 평면 주사위 아이콘 + '뽑기' 정렬(2026-07-24) */
+  /* 🔴 왼쪽에 있던 평면 주사위 아이콘을 뺐다(2026-08-05 사용자 지시) — 글자만 남는다.
+     아이콘이 있던 때는 `gap: 8px` 로 아이콘·글자를 띄웠고 `.gacha-pull-ic`(24px) 규칙이 따로 있었다.
+     둘 다 지웠다. inline-flex 는 글자 세로 가운데를 위해 남긴다. */
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
   border: none;
   background: var(--brand-red);
   color: #fff;
@@ -1527,8 +1529,6 @@ img {
   transition: transform .15s ease, background-color .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.gacha-pull-ic { width: 24px; height: 24px; flex: none; }
-
 .gacha-actions {
   display: none;
   flex-direction: column;
@@ -3403,6 +3403,17 @@ img {
 }
 .stamp-submit:hover { background: var(--brand-red-hover); }
 .stamp-submit:active { background: var(--brand-red-active); transform: scale(0.98); }
+
+/* 🔴 「불러오기」만 짙은 회색이다(2026-08-05 사용자 지시) — 홈의 내 코드 박스(.home-code)와 같은 색이라
+   「이 박스에서 온 화면」이 색으로 이어진다. 값은 베끼지 말고 .home-code 와 같은 그라데이션을 쓴다.
+   🔴 `#syncLoadBtn` 으로 좁힌다 — `.stamp-submit` 은 **스티커 기록하기의 「등록」 버튼과 공용**이라,
+      클래스에 걸면 스티커 등록 버튼까지 검게 변한다.
+   누름·hover 반응도 .home-code 와 같은 방식(밝기)으로 맞춘다 — 빨강용 변수는 여기서 안 맞는다. */
+#syncLoadBtn { background: linear-gradient(#33333A, #16161A); }
+#syncLoadBtn:active { background: linear-gradient(#33333A, #16161A); filter: brightness(1.15); }
+@media (hover: hover) {
+  #syncLoadBtn:hover { background: linear-gradient(#33333A, #16161A); filter: brightness(1.12); }
+}
 .stamp-submit:disabled {
   background: #D8CCC2;
   cursor: default;
