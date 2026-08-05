@@ -85,7 +85,7 @@ input[type=range] { width: 100%; accent-color: var(--brand-red); height: 32px; }
   <div class="preview">
     <div class="empty">
       <div class="slotwrap" id="slotwrap">
-        <img class="gamja sil" id="gamja" src="_gamja-a.png" alt="">
+        <img class="gamja" id="gamja" src="_gamja-a.png" alt="">
         <div class="slot" id="slot">
           <div class="dash" id="dash">
             <!-- 기록 시트의 자리표시 아이콘과 같은 그림 -->
@@ -159,8 +159,8 @@ input[type=range] { width: 100%; accent-color: var(--brand-red); height: 32px; }
     <div class="row">
       <label>8. 보기 방식</label>
       <div class="seg" data-group="look">
-        <button data-v="sil" aria-pressed="true">실루엣</button>
-        <button data-v="photo" aria-pressed="false">사진</button>
+        <button data-v="photo" aria-pressed="true">사진</button>
+        <button data-v="sil" aria-pressed="false">실루엣</button>
       </div>
     </div>
 
@@ -194,7 +194,9 @@ input[type=range] { width: 100%; accent-color: var(--brand-red); height: 32px; }
     readout: document.getElementById('readout'),
     nudgeAxis: document.getElementById('nudgeAxis'),
   };
-  const state = { pose: 'a', side: 'top', copy: 'in', look: 'sil', fill: 'solid' };
+  /* 기본은 사진 — '얼마나 빼꼼'은 얼굴이 어디까지 보이는지로 판단한다.
+     실루엣은 얼굴이 안 보이므로 덩어리 크기만 볼 때 쓴다. */
+  const state = { pose: 'a', side: 'top', copy: 'in', look: 'photo', fill: 'solid' };
   const num = { box: 130, size: 180, peek: 54, nudge: 0 };
 
   function draw() {
