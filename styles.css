@@ -4146,13 +4146,13 @@ img {
 .home-code {
   display: flex;
   align-items: center;
-  /* 🔴 왼쪽 정렬 — 가이드 박스와 같은 방식이다(2026-08-05 사용자 확정). 얼개를 공유하는 두 박스라
-     한쪽만 바꾸면 어긋난다. ⚠️ 좌우 여백·사이 간격은 가이드와 달리 **안 줄였다** — 여기는
-     잘리는 글자가 없어서 줄일 이유가 없다(줄일지는 화면 보고 판단하기로 함). */
+  /* 🔴 왼쪽 정렬 + 좌우 여백·사이 간격을 가이드 박스와 **같은 값으로** 맞췄다(2026-08-05 사용자 확정).
+     얼개를 공유하는 두 박스라 한쪽만 바꾸면 어긋난다.
+     ⚠️ 위아래 여백은 각자 값을 지킨다(가이드 18 · 여기 16) — 박스 높이가 원래 다르다. */
   justify-content: flex-start;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  padding: 16px 18px;
+  padding: 16px 14px;
   border: none;
   border-radius: 14px;
   background: linear-gradient(#33333A, #16161A);
