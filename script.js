@@ -2095,14 +2095,22 @@
     jeongolGridEl.innerHTML = HOME_BROTHS.map((n) => {
       const b = D.broths.find((x) => x.n === n);
       if (!b) return '';   // 이름이 바뀌었으면 그 칸만 빠진다(화면이 깨지지 않게)
-      return '<button class="hc-card" type="button" data-broth="' + n + '">'
+      /* 🔴 부제 줄은 **넷 다 만든다**(2026-08-05 사용자 지시) — 하나만 있으면 2열 그리드에서
+         카드 높이가 어긋난다. 없는 카드는 빈 줄로 자리만 잡는다(`&nbsp;` 라야 높이가 생긴다). */
+      const 부제 = b.jeju
+        ? '<span class="jeongol-sub jeongol-sub--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정</span>'
+        : '<span class="jeongol-sub" aria-hidden="true">&nbsp;</span>';
+      /* 🔴 `data-broth` 를 쓰면 **안 된다** — 메뉴 탭이 문서 전체에서 `[data-broth]` 를 듣고 있어서
+         홈 카드를 눌러도 그 육수가 냄비에 담긴다(2026-08-05 사용자가 발견). 이름을 달리해 떼어 놓는다. */
+      return '<button class="hc-card" type="button" data-home-broth="' + n + '">'
         + '<span class="hc-thumb">'
         + (b.img ? '<img src="assets/menu/' + n + '.webp" alt="' + n + '" loading="lazy" draggable="false">' : '')
         + '</span>'
         + '<span class="hp-name">' + n + '</span>'
+        + 부제
         + '</button>';
     }).join('');
-    jeongolGridEl.querySelectorAll('[data-broth]').forEach((btn) => {
+    jeongolGridEl.querySelectorAll('[data-home-broth]').forEach((btn) => {
       btn.addEventListener('click', 전골로가기);
     });
   }
