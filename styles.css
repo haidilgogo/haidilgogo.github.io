@@ -3131,15 +3131,17 @@ img {
 .sync-btn:active { transform: scale(.98); background: var(--bg-cream); }
 /* 🔴 두 버튼을 다른 색으로(2026-07-31 사용자 지시). '나에게 보내기'가 실제로 권하는 행동이라
    강조색을 준다. '복사하기'는 담백하게.
-   🔴 2026-08-05 사용자 지시로 **짙은 회색**이 됐다(옛 로즈 소프트필 #F6E4DE + 글자 #C0392B).
-      홈의 내 코드 박스(.home-code)·시트의 「불러오기」와 같은 색이라, 이 화면의 「눌러야 할 것」이
-      한 색으로 모인다. 값은 베끼지 말고 셋이 같은 그라데이션을 쓰는지 확인할 것. */
+   🔴 2026-08-05 사용자 지시로 **회색 계열**이 됐다(옛 로즈 소프트필 #F6E4DE + 글자 #C0392B).
+      홈의 내 코드 박스·시트의 「불러오기」와 한 집안이라, 이 화면의 「눌러야 할 것」이 한 색으로 모인다.
+   🔴 다만 **그 둘보다 한 단계 연하다**(2026-08-05 사용자 지시). 같은 화면에 짙은 검정 덩어리가
+      둘(불러오기·나에게 보내기) 나란히 오면 무거워서다. 흰 「복사하기」와 검정 「불러오기」 사이에 앉는다.
+      흰 글자 대비는 6.3:1 로 작은 글자 기준(4.5)을 넘는다 — 더 연하게 갈 땐 이 값을 다시 잴 것. */
 .sync-btn--accent {
   border-color: transparent;
-  background: linear-gradient(#33333A, #16161A);
+  background: linear-gradient(#5C5C66, #3C3C44);
   color: #fff;
 }
-.sync-btn--accent:active { background: linear-gradient(#33333A, #16161A); filter: brightness(1.15); }
+.sync-btn--accent:active { background: linear-gradient(#5C5C66, #3C3C44); filter: brightness(1.15); }
 @media (hover: hover) {
   .sync-btn--accent:hover { filter: brightness(1.12); }
 }
