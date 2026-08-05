@@ -2997,8 +2997,6 @@
     //    들어가면 「전체」 밑에 밑줄이 없었고, 지역을 한 번 눌러야 그때 생겼다.
     //    상단바는 늘 보이지만 .topbar-cat--stamp 는 스티커일 때만 display 되므로, 그 전엔 폭이 0이다.
     if (name === 'stamp' && window.updateStampUnderline) { window.updateStampUnderline(); requestAnimationFrame(window.updateStampUnderline); }
-    // 빈 화면의 감자 그림 여섯 장을 미리 받아 둔다 — 지역을 처음 누를 때 깜빡이던 것을 막는다
-    if (name === 'stamp' && window.preloadGamja) window.preloadGamja();
     syncTopbarH();
   }
 
@@ -3495,23 +3493,47 @@
   //    옛 그림이 캐시로 남는다(css·js 의 index.html `?v=` 와 같은 이유·같은 방식이다).
   const GAMJA_V = 3;
   const gamjaSrc = (name) => 'assets/mascot/' + name + '.webp?v=' + GAMJA_V;
-  const gamjaSlot = (src, alt) =>
-    '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
-    + '<img class="stamp-empty-gamja" src="' + src + '" width="660" height="800" alt="' + alt + '">'
-    + '</div></div>';
-  // 만들어 둔 빈 화면을 지역별로 들고 있는다 — 깜빡임을 막는 쪽(renderStamps 주석 참고)
-  const stampEmptyCache = new Map();
-  // 🔴 그림을 미리 받아 둔다. 위 캐시는 **한 번 본 지역**만 막아주고, 처음 누르는 지역은
-  //    여전히 그 자리에서 내려받느라 깜빡인다. 여섯 장 합쳐 240KB 라 미리 받아도 부담이 없다.
-  //    ⚠️ 스티커 탭을 처음 열 때 부른다 — 앱을 켜자마자 받으면 첫 화면(홈)과 대역폭을 다툰다.
-  let gamjaPreloaded = false;
-  function preloadGamja() {
-    if (gamjaPreloaded) return;
-    gamjaPreloaded = true;
-    ['gamja-bubble'].concat(Object.values(GAMJA_REGION).map((r) => 'gamja-bubble-' + r))
-      .forEach((n) => { const im = new Image(); im.src = gamjaSrc(n); });
+
+  /* 🔴 **여섯 장을 처음부터 다 겹쳐 놓고 보이는 것만 바꾼다.** 지역을 옮겨도 그림이 화면에서
+     떨어지지 않으므로 **깜빡일 수가 없다** — 네트워크도, 다시 그리기도, 붙였다 떼기도 없다.
+
+     ⚠️ 여기까지 온 이력을 적어 둔다. 같은 자리를 두 번 헛짚었다(둘 다 실기기에서만 보인다).
+       1차: 지역마다 빈 화면을 **새로 만들고** 있었다 → 지역별로 만들어 두고 다시 쓰게 했다. 그래도 깜빡였다.
+       2차: 처음 누르는 지역은 그때 **내려받는다** → 여섯 장을 미리 받아 뒀다. 그래도 깜빡였다.
+       3차(지금): 남은 원인은 **바꿔 끼우는 것 자체**였다. 만들어 둔 요소라도 `replaceChildren` 으로
+                  갈아 끼우면 그림이 화면에서 떨어졌다 붙으면서 다시 그려진다.
+     🔴 그러니 **다시 「갈아 끼우는」 구조로 되돌리지 말 것.** 미리 받기만으로는 안 잡힌다. */
+  const GAMJA_ALL = 'all';
+  let stampEmptyEl = null;      // 한 번 만들고 grid 에서 **절대 떼지 않는다**
+  function buildStampEmpty() {
+    const el = document.createElement('div');
+    el.className = 'stamp-empty';
+    const 장들 = [[GAMJA_ALL, 'gamja-bubble', '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요']]
+      .concat(Object.keys(GAMJA_REGION).map((ko) =>
+        [GAMJA_REGION[ko], 'gamja-bubble-' + GAMJA_REGION[ko], ko + '에는 아직 스티커가 없어요']));
+    // 🔴 alt 는 **그림에 그려진 문구를 그대로** 적는다. 문구가 그림 안에 있어 화면에 글씨로
+    //    안 나오기 때문이다. 그림을 다시 그려 문구가 달라지면 여기도 같이 고칠 것 — 자동이 아니다.
+    el.innerHTML = '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
+      + 장들.map((g) => '<img class="stamp-empty-gamja" data-g="' + g[0] + '" src="' + gamjaSrc(g[1])
+                        + '" width="660" height="800" alt="' + g[2] + '" aria-hidden="true">').join('')
+      + '</div></div>'
+      // 그림이 없는 지역(나중에 새 지점이 새 지역에 생기면)만 쓰는 자리 — 평소엔 숨어 있다
+      + '<p class="stamp-empty-text" hidden></p>';
+    return el;
   }
-  window.preloadGamja = preloadGamja;
+  // 보이는 한 장만 갈아 준다. 그림을 건드리지 않으므로 화면이 안 끊긴다.
+  function showGamja(region) {
+    if (!stampEmptyEl) return;
+    const key = (region === '전체') ? GAMJA_ALL : GAMJA_REGION[region];
+    stampEmptyEl.querySelectorAll('.stamp-empty-gamja').forEach((im) => {
+      const on = !!key && im.dataset.g === key;
+      im.classList.toggle('is-on', on);
+      im.setAttribute('aria-hidden', on ? 'false' : 'true');
+    });
+    const 글씨 = stampEmptyEl.querySelector('.stamp-empty-text');
+    글씨.hidden = !!key;                       // 그림이 있으면 글씨는 안 쓴다
+    if (!key) 글씨.textContent = region + '에는 아직 스티커가 없어요';
+  }
 
   const stampTabsEl = document.getElementById('stampTabs');
   const stampUnderline = document.getElementById('stampTabsUnderline');
@@ -3611,40 +3633,22 @@
     //  기록이 있든 없든 참이라 거짓말이 되지 않는다).
     //   전체 탭   → 「아직 스티커가 없어요 / 기록하기로 첫 방문을 남겨보세요」
     //   지역 탭   → 「<지역>에는 아직 기록이 없어요」
+    // 🔴 감자 판은 **한 번 만들어 grid 에 넣고 다시는 떼지 않는다.** 떼었다 붙이면 그림이
+    //    다시 그려지면서 깜빡인다(위 buildStampEmpty 주석의 「1·2·3차」 참고).
+    //    그래서 아래는 `replaceChildren` 로 통째로 갈지 않고 **카드만** 넣고 뺀다.
+    if (!stampEmptyEl) { stampEmptyEl = buildStampEmpty(); grid.prepend(stampEmptyEl); }
+    Array.from(grid.children).forEach((c) => { if (c !== stampEmptyEl) c.remove(); });
     if (!list.length) {
-      // 🔴 빈 화면은 **만들어 두고 다시 쓴다.** 매번 새로 만들면 그때마다 `<img>` 가 새 요소라
-      //    지역을 옮길 때마다 감자가 깜빡였다(실기기에서만 보인다 — 로컬은 너무 빨라 안 보인다).
-      //    카드가 `stampCardCache` 로 같은 짓을 막고 있는 것과 같은 방식이다.
-      const key = activeStampRegion;
-      let empty = stampEmptyCache.get(key);
-      if (!empty) {
-        empty = document.createElement('div');
-        empty.className = 'stamp-empty';
-        // 🔴 문구는 그림 안에 그려져 있다 — 그래서 글씨 문단이 없다. 화면에 글씨로는 안 나오므로
-        //    같은 문장을 alt 에 그대로 적어 둔다(읽어주는 기기·그림이 안 뜰 때가 여기에 걸린다).
-        // 🔴 「기록하기로…」 앞의 연필 아이콘은 뺐다(2026-08-04 사용자 지시).
-        //    위 버튼에 이미 같은 뜻의 아이콘이 있어서 한 화면에 두 번 나오던 것이다.
-        empty.innerHTML = (key === '전체')
-          ? gamjaSlot(gamjaSrc('gamja-bubble'),
-                      '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요')
-          // 🔴 alt 는 **그림에 그려진 문구를 그대로** 적는다. 2026-08-05 에 그림 문구가
-          //    「…에는 아직 기록이 없어요」→「…에는 아직 스티커가 없어요」로 바뀌어 같이 고쳤다.
-          //    그림을 다시 그려 문구가 달라지면 여기도 반드시 같이 고칠 것 — 자동이 아니다.
-          : (GAMJA_REGION[key]
-              ? gamjaSlot(gamjaSrc('gamja-bubble-' + GAMJA_REGION[key]),
-                          key + '에는 아직 스티커가 없어요')
-              : '<p class="stamp-empty-text">' + key + '에는 아직 스티커가 없어요</p>');
-        stampEmptyCache.set(key, empty);
-      }
-      grid.replaceChildren(empty);
+      stampEmptyEl.hidden = false;
+      showGamja(activeStampRegion);      // 보이는 한 장만 바뀐다
     } else {
-      // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
-      const cards = list.map((rec) => {
+      stampEmptyEl.hidden = true;
+      // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → 순서만 재배치(재생성 X)
+      grid.append(...list.map((rec) => {
         let card = stampCardCache.get(rec.id);
         if (!card) { card = buildStampRecCard(rec); stampCardCache.set(rec.id, card); }
         return card;
-      });
-      grid.replaceChildren(...cards);
+      }));
     }
     // 🔴 「맨 위로」는 보여줄 목록이 있을 때만 — 빈 화면에 있으면 내릴 게 없는데 올라가라는 말이 된다.
     //    기준은 `list`(지금 보이는 목록)다. 전체 기록이 있어도 이 지역이 비었으면 화면은 비어 있다.

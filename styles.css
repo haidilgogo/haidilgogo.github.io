@@ -2789,7 +2789,12 @@ img {
   font-size: 14px;
   line-height: 1.7;
 }
+/* 🔴 `.stamp-empty` 는 `display:flex` 라 **`hidden` 속성만으로는 안 숨는다** — 브라우저 기본
+   `[hidden]{display:none}` 보다 위 규칙이 세다. 기록이 있을 때 감자 판을 숨기려면 이 줄이 있어야 한다.
+   (실제로 없어서 카드 위에 감자가 같이 떠 있었다. 「맨 위로」 버튼도 같은 함정에 걸려 있다.) */
+.stamp-empty[hidden] { display: none; }
 .stamp-empty-text { margin: 0; }
+.stamp-empty-text[hidden] { display: none; }
 /* ── 빈 화면의 점선 자리 + 감자 (2026-08-05 사용자 확정) ──
    기록이 하나도 없을 때만 나온다. 지역별 빈 화면(②)에는 안 붙는다 —
    말풍선이 「첫 방문을 남겨보세요」라고 말하는데, 다른 지역엔 기록이 있는 사람에게는 거짓말이 된다.
@@ -2800,6 +2805,12 @@ img {
 /* ⚠️ `.stamp-slot`(158px)이 이 파일에서 **아래쪽**에 있어 같은 무게면 그쪽이 이긴다.
    그래서 부모(.stamp-empty)를 함께 적어 무게를 올린다 — !important 를 쓸 자리가 아니다. */
 .stamp-empty .stamp-empty-slot { width: 220px; }
+/* 🔴 여섯 장이 **다 겹쳐 있고** 보이는 한 장만 `.is-on` 이다. 지역을 옮겨도 그림이 화면에서
+   떨어지지 않으므로 깜빡일 수가 없다(script.js 의 buildStampEmpty 주석 참고).
+   ⚠️ `display:none` 으로 숨기지 말 것 — 그러면 사파리가 그림을 놓아 버려서 다시 보일 때 또 깜빡인다.
+      `opacity` 는 그림을 살려 둔 채 가리기만 한다. */
+.stamp-empty-gamja { opacity: 0; }
+.stamp-empty-gamja.is-on { opacity: 1; }
 .stamp-empty-gamja {
   position: absolute;
   /* 🔴 0 이어야 한다. 벽 뒤로 조금이라도 넣으면(−1px 만 해도) **아이폰에서 왼쪽 점선이 흐려진다**
