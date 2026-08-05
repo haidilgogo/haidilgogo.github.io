@@ -2455,8 +2455,11 @@
   function gachaToStart() {
     gachaResetBowl();
     gachaActions.style.display = 'none';
-    gachaPull.style.display = 'inline-flex'; // CSS의 아이콘 정렬(inline-flex) 유지 — 'inline-block'이면 주사위·글자 baseline으로 어긋남(2026-07-24)
+    gachaPull.style.display = 'inline-flex'; // 글자 세로 가운데(2026-08-05 주사위 아이콘 제거 후에도 유지)
     gachaPull.style.pointerEvents = 'auto';
+    // 🔴 뽑기 전 상태 — 그릇을 1.3배로 키우고 버튼 아래를 띄워 **뽑은 뒤와 창 높이를 같게** 한다.
+    //    값과 이유는 styles.css 의 `.gacha-modal.is-start` 주석에 있다.
+    gachaModal.classList.add('is-start');
   }
 
   function gachaPullOnce() {
@@ -2514,6 +2517,10 @@
         gachaConfetti();
         gachaPull.style.display = 'none';
         gachaActions.style.display = 'flex';
+        // 🔴 그릇 확대를 여기서 푼다 — 그릇이 사라지는 0.25초와 겹치게 부드럽게 줄어든다.
+        //    창 높이는 안 바뀐다(확대가 transform 이라 자리를 안 차지하고, 버튼 아래 66px 이
+        //    액션 영역으로 그대로 대체되기 때문).
+        gachaModal.classList.remove('is-start');
       };
       const cardImg = gachaResult.querySelector('.hc-thumb > img');
       if (cardImg && cardImg.complete && cardImg.naturalWidth > 0) {
@@ -2544,6 +2551,7 @@
   // 오늘 이미 뽑았으면 뽑기 연출 없이 그 소스를 바로 결과 카드로(그릇/뽑기 버튼 숨김)
   function gachaShowSaved(r) {
     gachaResetBowl();
+    gachaModal.classList.remove('is-start');   // 이미 뽑은 상태로 바로 여는 길 — 확대·여백 없이 시작
     gachaPull.style.display = 'none';
     gachaResult.innerHTML = '';
     gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, hideFav: true, eager: true, interactive: false }));
@@ -3483,6 +3491,10 @@
       });
       grid.replaceChildren(...cards);
     }
+    // 🔴 「맨 위로」는 보여줄 목록이 있을 때만 — 빈 화면에 있으면 내릴 게 없는데 올라가라는 말이 된다.
+    //    기준은 `list`(지금 보이는 목록)다. 전체 기록이 있어도 이 지역이 비었으면 화면은 비어 있다.
+    const 맨위로 = document.getElementById('stampToTop');
+    if (맨위로) 맨위로.hidden = !list.length;
     // 삭제된 기록의 캐시 정리(메모리 누수·오래된 카드 재사용 방지)
     const liveIds = new Set(stampData.records.map((r) => r.id));
     stampCardCache.forEach((_, id) => { if (!liveIds.has(id)) stampCardCache.delete(id); });
