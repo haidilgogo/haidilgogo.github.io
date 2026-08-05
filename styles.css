@@ -4236,20 +4236,26 @@ img {
 }
 /* 아이콘 — SVG 를 CSS 마스크로 깔고 색은 currentColor 가 정한다.
    🔴 <img> 로 넣으면 색을 못 바꾼다(파일에 박힌 색만 나온다). 마스크라 파일 하나로 어디서든 쓴다. */
+/* 🔴 테두리 없는 판을 쓴다(2026-08-05 사용자 요청) — 둥근 사각 테두리를 걷어내고 「HG-***」만 남겼다.
+   테두리 있는 옛 판은 같은 폴더의 `hg-code.svg` 에 그대로 있다(되돌리려면 파일명과 아래 두 값만 바꾸면 된다).
+   🔴 **폭·비율이 같이 바뀐 이유**: 테두리를 빼면 그림이 글자만 남아 비율이 1.63 → 6.03 이 된다.
+      비율만 바꾸고 폭을 그대로 두면 글자가 지금보다 커져 버린다. 그래서 **글자 크기가 지금과 같아지도록**
+      폭을 다시 계산했다 — 옛 판에서 글자가 차지하던 폭이 전체의 1105/1300 이므로 68 × 1105/1300 ≈ 58,
+      좁은 기기는 56 × 1105/1300 ≈ 48 이다. 즉 **테두리만 사라지고 글자 크기는 그대로**다. */
 .home-code-ic {
   flex: none;
-  width: 68px;
-  aspect-ratio: 1300 / 800;
+  width: 58px;
+  aspect-ratio: 1105 / 183;
   display: block;
   background: currentColor;
   color: #fff;
-  -webkit-mask: url(assets/icons/hg-code.svg) center/contain no-repeat;
-          mask: url(assets/icons/hg-code.svg) center/contain no-repeat;
+  -webkit-mask: url(assets/icons/hg-code-plain.svg) center/contain no-repeat;
+          mask: url(assets/icons/hg-code-plain.svg) center/contain no-repeat;
 }
-/* 🔴 좁은 기기에서만 아이콘을 줄인다 — 320px 에서 68px 이면 제목이 두 줄로 감긴다(실측).
-   56px 부터 한 줄이 된다. 기준(365px)은 하단바 버튼 규칙과 같은 값이다. */
+/* 🔴 좁은 기기에서만 아이콘을 줄인다 — 320px 에서 크면 제목이 두 줄로 감긴다(실측).
+   기준(365px)은 하단바 버튼 규칙과 같은 값이다. */
 @media (max-width: 365px) {
-  .home-code-ic { width: 56px; }
+  .home-code-ic { width: 48px; }
 }
 .home-code-txt {
   display: flex; flex-direction: column; gap: 3px; min-width: 0;
