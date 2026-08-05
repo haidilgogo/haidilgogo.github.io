@@ -3493,7 +3493,7 @@
   const GAMJA_REGION = { 서울: 'seoul', 경기: 'gyeonggi', 부산: 'busan', 대구: 'daegu', 제주: 'jeju' };
   // 🔴 그림을 새로 그려 넣으면 **이 숫자를 올린다.** 파일 이름이 그대로라 안 올리면 폰에
   //    옛 그림이 캐시로 남는다(css·js 의 index.html `?v=` 와 같은 이유·같은 방식이다).
-  const GAMJA_V = 2;
+  const GAMJA_V = 3;
   const gamjaSrc = (name) => 'assets/mascot/' + name + '.webp?v=' + GAMJA_V;
   const gamjaSlot = (src, alt) =>
     '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
@@ -3627,10 +3627,13 @@
         empty.innerHTML = (key === '전체')
           ? gamjaSlot(gamjaSrc('gamja-bubble'),
                       '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요')
+          // 🔴 alt 는 **그림에 그려진 문구를 그대로** 적는다. 2026-08-05 에 그림 문구가
+          //    「…에는 아직 기록이 없어요」→「…에는 아직 스티커가 없어요」로 바뀌어 같이 고쳤다.
+          //    그림을 다시 그려 문구가 달라지면 여기도 반드시 같이 고칠 것 — 자동이 아니다.
           : (GAMJA_REGION[key]
               ? gamjaSlot(gamjaSrc('gamja-bubble-' + GAMJA_REGION[key]),
-                          key + '에는 아직 기록이 없어요')
-              : '<p class="stamp-empty-text">' + key + '에는 아직 기록이 없어요</p>');
+                          key + '에는 아직 스티커가 없어요')
+              : '<p class="stamp-empty-text">' + key + '에는 아직 스티커가 없어요</p>');
         stampEmptyCache.set(key, empty);
       }
       grid.replaceChildren(empty);
