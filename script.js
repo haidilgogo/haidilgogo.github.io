@@ -4752,9 +4752,22 @@
   if (syncShareBtn) syncShareBtn.addEventListener('click', async () => {
     const code = getSyncCode();
     if (!code) return;
-    const text = '하딜고고 내 데이터 코드: ' + code;
+    /* 🔴 이 글은 **카톡이나 메모에 남아 몇 달 뒤에 읽힌다** — 그때는 앱 화면이 옆에 없다.
+       그래서 네 가지가 다 들어간다(2026-08-05 사용자 확정):
+         ① 무슨 앱인지(「하딜고고」 = 나중에 검색해 찾는 말) ② 코드 ③ 무엇에 쓰는지 ④ 남에게 주지 말 것
+       ③④ 는 앱의 「내 코드」 절 문구를 **그대로** 가져왔다 — 앱과 메시지가 다른 말을 하면 안 된다.
+       🔴 순서도 그 절과 같다: 불러올 수 있다 → 공유하지 마라 → 무엇이 들어 있나(2026-08-05 사용자 확정).
+          경고를 목록 뒤로 미루면 목록을 읽다 끝나서 경고를 안 읽고 넘어간다.
+       ⚠️ 「내 코드」 절 문구를 고치면 여기도 같이 고칠 것(index.html 의 .sync-note--strong).
+       🔴 ④를 빼지 말 것 — 「나에게 보내기」를 누르면 공유창에 **친구 목록이 먼저 뜬다.** 잘못 눌러
+          남에게 갈 수 있는 자리이고, 메모에 남은 글은 나중에 그대로 전달되기도 한다.
+       ⚠️ 문구를 길게 써도 된다 — 붙여넣기는 extractCode 가 `HG-` 뒤 6자만 뽑아낸다(확인함). */
+    const text = '하딜고고 내 코드 ' + code + '\n'
+      + '이 코드가 있으면 어디서든 데이터를 불러올 수 있어요.\n'
+      + '코드를 아는 사람은 내 데이터를 볼 수 있으니 절대 공유하지 마세요.\n'
+      + '데이터에는 내 메뉴, 스티커, 즐겨찾기, 좋아요가 포함되어 있어요.';
     if (navigator.share) {
-      try { await navigator.share({ title: '하딜고고 내 데이터 코드', text: text }); return; } catch (e) { return; }
+      try { await navigator.share({ title: '하딜고고 내 코드', text: text }); return; } catch (e) { return; }
     }
     try {
       await navigator.clipboard.writeText(text);
