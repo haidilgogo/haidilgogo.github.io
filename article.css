@@ -281,19 +281,22 @@
 }
 .credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
 
-/* 출처 안내 문단 안의 링크(제보 폼) — 본문과 같은 검정에 굵게. 링크임은 밑줄로만 알린다.
-   푸터 링크(연한 갈색)와 달리 여기선 문장 속이라 색이 튀면 오히려 읽기 흐름이 끊긴다. */
+/* 출처 안내 문단 안의 링크(제보 폼) — **브랜드 빨강**(2026-08-05 사용자 지시).
+   그전에는 본문과 같은 검정에 밑줄로만 링크임을 알렸는데, 눈에 안 띄어서 색을 줬다.
+   ⚠️ 이 선택자에 걸리는 링크는 「알려주세요」 하나뿐이라 다른 데는 안 번진다 —
+      목록의 「원본」·「CC BY」는 `.credit-links a` 쪽이고 흐린 색을 지킨다. */
 .credit-note a {
-  /* 브랜드 빨강(2026-08-05 사용자 지시). 이 선택자에 걸리는 링크는 「알려주세요」(제보 폼) 하나뿐이라
-     — 목록의 「원본」 링크는 `.credit-src` 쪽이다 — 여기만 눈에 띄게 해도 다른 데는 안 번진다. */
   color: var(--brand-red);
   font-weight: 700;
   text-decoration: underline;
-  text-decoration-color: rgba(43, 18, 13, .32);
+  /* 🔴 밑줄 색을 따로 안 적으면 검정 반투명이 그대로 남는다 — 글자만 빨개지고 밑줄은 안 바뀐다.
+     `text-decoration-color` 는 `color` 를 자동으로 따라가지 않는다(이 파일에 값이 박혀 있어서다). */
+  text-decoration-color: var(--brand-red);
   text-underline-offset: 3px;
 }
-.credit-note a:hover { text-decoration-color: var(--brand-red); color: var(--brand-red); }
-.credit-note a:active { color: var(--brand-red); }
+/* 기본이 이미 빨강이므로 누를 때는 **더 진한 빨강**으로 내려간다(`.credit-links a:hover` 와 같은 방식) */
+.credit-note a:hover,
+.credit-note a:active { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
 
 /* 출처 페이지 하단 '닫기' — 앱 배너 시트의 닫기(.column-bottom-close)와 같은 모양·반응.
    두 곳의 '나가기'가 달라 보이면 안 된다. 아티클 3개의 빨간 CTA(.art-more-btn)와는
