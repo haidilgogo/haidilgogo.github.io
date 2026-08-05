@@ -1553,8 +1553,11 @@ img {
   font-weight: 800;
   padding: 13px 34px;
   border-radius: 14px;       /* 알약 → 둥근 사각(홈 버튼과 통일, 2026-07-24) */
+  /* 🔴 그림자는 「레시피 보기」와 **같은 값**이다(2026-08-05) — 두 버튼이 같은 자리에 번갈아 나오는데
+     한쪽만 바닥에 앉아 있으면 뜬금없어 보인다. 색·글자는 각자 것을 지키고 그림자만 공유한다. */
+  box-shadow: 0 8px 18px rgba(110, 40, 30, .45);
   cursor: pointer;
-  transition: transform .15s ease, background-color .15s ease;
+  transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .gacha-actions {
@@ -1616,7 +1619,7 @@ img {
   .gacha-view:hover { background: #F0D6CD; box-shadow: 0 11px 24px rgba(110, 40, 30, .48); } /* 살짝 진해지고 그림자 뜸 */
 }
 
-.gacha-pull:active { transform: scale(.95); background: var(--brand-red-active); }
+.gacha-pull:active { transform: scale(.95); background: var(--brand-red-active); box-shadow: 0 3px 9px rgba(110, 40, 30, .40); } /* 눌리면 그림자가 낮아져 바닥에 눌림 — .gacha-view 와 같은 값 */
 .gacha-view:active { transform: scale(.96); background: #EAC7BD; box-shadow: 0 3px 9px rgba(110, 40, 30, .40); } /* 눌리면 진해지고 그림자 낮아져 바닥에 눌림 */
 
 /* 데스크톱에서 가챠 팝업 크게 */
