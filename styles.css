@@ -1883,12 +1883,35 @@ img {
 }
 
 .share-toast {
-  display: none;
+  /* 🔴 자리 = 화면 1/3 지점(토스트 **가운데** 기준, 2026-08-06 사용자 확정).
+     원래는 `bottom: 90px` 이었고 두 가지가 걸렸다.
+       ① 탭바 바로 위 = **조작하는 손가락 근처**다(사용자 지적).
+       ② 홈 화면 웹앱에서 **토스트가 탭바를 28px 덮었다** — 탭바만 safe-area 를 따라 올라가고
+          (`@media (display-mode: standalone)`) 토스트는 90px 에 박혀 있었다. 재서 확인한 값이다.
+     위로 옮기면서 둘 다 사라졌다. 이제 토스트는 탭바와 아무 상관이 없다.
+     🔴 `vh` 가 아니라 `svh` 다 — 위 `.page` 주석과 같은 이유. vh 는 주소창이 숨겨진 상태의 큰 높이라
+        (사용자 폰 실측: svh 695 / vh 735) 정작 주소창이 보일 때 1/3 보다 아래로 내려간다.
+        svh 는 기기마다 한 번 정해지는 값이라 **주소창이 접혀도 안 움직인다.**
+        ⚠️ `dvh` 로 바꾸지 말 것 — 그건 주소창을 따라 움직여서 토스트가 뜬 채로 미끄러진다.
+        위 `vh` 줄은 svh 를 모르는 구형 브라우저용 폴백이므로 남겨둔다.
+     ⚠️ `--inapp-h` = 인앱 브라우저(카톡 등) 안내 배너의 높이. 배너가 뜨면 화면 전체가 그만큼
+        내려가는데 토스트는 화면에 고정이라 안 따라간다 → `script.js` 가 이 값을 넣어 준다.
+        안 넣으면 배너(z-index 300)가 토스트(250)를 덮는다. */
   position: fixed;
   left: 50%;
-  bottom: 90px;
-  transform: translateX(-50%);
+  top: calc(33.33vh + var(--inapp-h, 0px));
+  top: calc(33.33svh + var(--inapp-h, 0px));
+  transform: translate(-50%, -50%); /* 세로도 가운데 — 글이 길어져 높이가 변해도 1/3 이 유지된다 */
   z-index: 250;
+  /* 🔴 뜰 때는 「확」(0초), 사라질 때는 0.15초에 서서히(2026-08-06 사용자 확정).
+     원래 `display: none` ↔ `block` 이었는데 **display 에는 서서히가 안 걸린다.**
+     그래서 투명도로 숨긴다. 🔴 `visibility` 를 같이 걸어야 한다 — 투명도만 0 으로 두면
+     닫힌 요소가 화면을 차지한 채 남는다(닫힌 오버레이가 사파리 주소창을 불투명하게 만들던
+     2026-08-05 건과 같은 이유). visibility 에 0.15s 지연을 주지 않으면 사라지는 동안
+     토스트가 첫 프레임에 툭 없어져 서서히가 안 보인다. */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .15s linear, visibility 0s linear .15s;
   /* 🔴 배경 = 앱의 진한 글자색(--text-dark #2B120D)을 0.8 로 깐 것(2026-08-04 사용자 확정, .9 에서 내림).
      변수를 못 쓰는 것은 투명도를 붙이려면 rgba() 로 풀어 써야 해서다.
      ⚠️ 흐림(backdrop-filter)은 일부러 안 넣는다 — 이 정도로는 뒤가 거의 안 비쳐 뭉갤 게 없고,
@@ -1905,7 +1928,9 @@ img {
 }
 
 .share-toast.show {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0s, visibility 0s; /* 뜰 때는 기다리지 않는다 */
 }
 
 /* IN-APP BROWSER GUIDE */

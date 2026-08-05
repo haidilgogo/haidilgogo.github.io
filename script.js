@@ -4336,9 +4336,14 @@
     inappBanner.style.display = 'flex';
     const bannerHeight = inappBanner.offsetHeight;
     document.body.style.paddingTop = bannerHeight + 'px';
+    // 🔴 화면에 고정된 것들은 body 여백을 안 따라간다 — 배너 높이를 CSS 에 건네준다.
+    //    지금 쓰는 곳은 토스트(.share-toast) 하나다. 안 넣으면 배너(z-index 300)가 토스트(250)를 덮는다.
+    //    ⚠️ 앞으로 position:fixed 로 화면 위쪽에 두는 것을 새로 만들면 여기에 같이 엮을 것.
+    document.documentElement.style.setProperty('--inapp-h', bannerHeight + 'px');
     inappBannerClose.addEventListener('click', () => {
       inappBanner.style.display = 'none';
       document.body.style.paddingTop = '';
+      document.documentElement.style.removeProperty('--inapp-h');
       sessionStorage.setItem(INAPP_DISMISS_KEY, '1');
     });
   }
