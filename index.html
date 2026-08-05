@@ -900,6 +900,15 @@
       <h3 class="column-sauces-title">고수가 들어간 소스</h3>
       <div class="column-sauce-list" id="columnSauceList"></div>
     </div>
+    <!-- 🔴 「고수가 들어간 메뉴」(2026-08-05 사용자 요청). 위 소스 절과 같은 부품을 쓴다.
+         🔴 **이쪽이 원본이다** — 별도 주소 페이지(cilantro.html)는 이것의 복사본이고,
+            여기가 바뀌면 거기도 **반드시** 같이 바꾼다(사용자가 정한 규칙, 2026-08-05).
+         ⚠️ 소스 목록은 재료(`ingFilter`)로 자동 수집되지만 메뉴는 **손으로 적은 목록**이다
+            (`GOSU_COLUMN.menus`) — 메뉴에는 재료 정보가 없어서 모을 근거가 없다. -->
+    <div class="column-sauces" id="columnMenus" hidden>
+      <h3 class="column-sauces-title">고수가 들어간 메뉴</h3>
+      <div class="column-sauce-list" id="columnMenuList"></div>
+    </div>
     <div class="column-notes" id="columnNotes" hidden></div>
     <div class="column-footer">
       <button class="column-bottom-close" id="columnBottomClose" type="button">닫기</button>
@@ -1163,7 +1172,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=622"></script>
+<script src="script.js?v=623"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

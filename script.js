@@ -848,6 +848,12 @@
     emoji: '🌿',
     ingFilter: '고수',             // 이 재료가 든 항목을 칼럼 하단에 자동 나열
     catFilter: '소스',             // 그중 이 카테고리만(요리·히든메뉴 제외, '소스'만)
+    /* 🔴 「고수가 들어간 메뉴」(2026-08-05 사용자 요청) — 소스 목록 바로 아래 절.
+       ⚠️ 소스는 재료(ingFilter)로 **자동 수집**되지만 메뉴는 **손으로 적는다.**
+          메뉴 데이터에는 재료가 없어서 모을 근거가 없다. 이름은 `MENU_DATA` 의 것과 글자까지 같아야 한다.
+       🔴 **여기가 원본이다.** 별도 주소 페이지(cilantro.html)는 복사본이고, 여기가 바뀌면
+          거기도 반드시 같이 바꾼다(사용자가 정한 규칙). */
+    menus: ['고수 듬뿍 훠궈', '고수'],
     body:
       // 도입부는 '훅 한 문장 + 설명 한 문단'으로 끊는다(2026-07-29). 안물안궁 도입부와 같은 꼴.
       '<p class="col-lead">고수를 한입 먹자마자 “어? 비누 맛인데?” 싶었다면 기분 탓만은 아니에요.</p>' +
@@ -2644,6 +2650,26 @@
       + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       + '</button>';
   }
+  /* 칼럼에 붙는 **메뉴** 한 줄. 위 `buildColumnSauce` 와 같은 부품을 쓰되 셋이 다르다:
+     ① 그림이 `assets/menu/*.webp` 다 — 배경 없는 냄비 그림이라 `col-sauce-thumb--menu`(안에 맞춤 + 크림 배경)를 쓴다.
+        소스처럼 `cover` 로 두면 잘린다.
+     ② **누를 데가 없다.** 메뉴에는 레시피 상세 같은 열 화면이 없다 — 그래서 `col-sauce--static` 이다.
+     ③ 부제는 **있는 것만**. 지금은 「제주 한정」뿐이고, 한라봉 아이콘을 반드시 같이 넣는다
+        (2026-08-05 사용자 지시 — 같은 말이 화면마다 다르게 보이면 안 된다). 색·크기는 메뉴 탭과 같은 값.
+     ⚠️ 이 모양은 `cilantro.html` 의 것과 **글자까지 같아야 한다**(원본↔복사본 규칙). */
+  function buildColumnMenu(n) {
+    const D = window.MENU_DATA;
+    const it = D ? ((D.broths || []).find((b) => b.n === n)
+                 || (D.tabs || []).flatMap((t) => t.items).find((i) => i.n === n)) : null;
+    if (!it) return '';   // 이름이 바뀌었으면 그 줄만 빠진다(아티클이 깨지지 않게)
+    const 부제 = it.jeju
+      ? '<span class="col-sauce-ver col-sauce-ver--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정</span>'
+      : '';
+    return '<div class="col-sauce col-sauce--static">'
+      + '<img class="col-sauce-thumb col-sauce-thumb--menu" src="assets/menu/' + n + '.webp" alt="" draggable="false">'
+      + '<span class="col-sauce-meta"><span class="col-sauce-name">' + n + '</span>' + 부제 + '</span>'
+      + '</div>';
+  }
   function getColumnSauces(col) {
     return RECIPES.filter((r) =>
       (!col.catFilter || r.cat === col.catFilter) &&
@@ -2679,6 +2705,11 @@
     saucesSection.hidden = !sauces.length;
     const listEl = document.getElementById('columnSauceList');
     listEl.innerHTML = sauces.map(buildColumnSauce).join('');
+    // 하단: 관련 메뉴(손으로 적은 목록). 적어 둔 칼럼에만 뜬다 — 없으면 절째로 숨는다.
+    const menusSection = document.getElementById('columnMenus');
+    const menus = (col.menus || []).map(buildColumnMenu).filter(Boolean);
+    menusSection.hidden = !menus.length;
+    document.getElementById('columnMenuList').innerHTML = menus.join('');
     // 본문 중간에 직접 고른 소스를 놓는 자리. 본문 HTML에
     // <div class="column-sauce-list" data-sauce-ids="s1,s2"></div> 를 넣으면 그 자리에 채워진다.
     // 아래 자동 목록(.column-sauces)은 재료로 모으고 위치가 맨 끝 고정이라, 가이드처럼
