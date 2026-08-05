@@ -36,6 +36,7 @@
 <div class="bar">
   <div class="줄"><span class="딱지">배치</span><span class="칸" id="배치"></span></div>
   <div class="줄"><span class="딱지">숫자 크기</span><span class="칸" id="크기"></span></div>
+  <div class="줄"><span class="딱지">숫자 굵기</span><span class="칸" id="굵기"></span></div>
   <div class="줄"><span class="딱지">돋보기</span><span class="칸" id="돋보기"></span></div>
   <p class="tip" id="tip"></p>
 </div>
@@ -67,12 +68,23 @@ var 크기안 = [
   { 이름: '10px', 밑: '', px: 10 }
 ];
 
+/* 🔴 숫자가 하트보다 굵다 — 재서 확인(14px 기준 획 두께):
+   하트 선 1.67px(stroke-width 2 를 20px 로 그림) · 숫자 700 = 2.00px · 600 = 2.00px · 500 = 1.75px · 400 = 1.50px.
+   옆으로 나란할 땐 티가 덜 나는데 **위아래로 겹치면** 굵기 차이가 바로 보인다.
+   500 이 하트와 거의 같다(1.75 vs 1.67). */
+var 굵기안 = [
+  { 이름: '700', 밑: '지금', w: null },
+  { 이름: '600', 밑: '', w: 600 },
+  { 이름: '500', 밑: '하트와 같음', w: 500 },
+  { 이름: '400', 밑: '', w: 400 }
+];
+
 var 돋보기안 = [
   { 이름: '끄기', 밑: '', 켬: false },
   { 이름: '4배로 떼어 보기', 밑: '가운데선 표시', 켬: true }
 ];
 
-var 고른 = { 배치: 0, 크기: 0, 돋보기: 0 };
+var 고른 = { 배치: 0, 크기: 0, 굵기: 0, 돋보기: 0 };
 var iframe = document.getElementById('app');
 
 function 버튼그리기(칸id, 목록, 키) {
@@ -83,6 +95,7 @@ function 버튼그리기(칸id, 목록, 키) {
 }
 버튼그리기('배치', 배치안, '배치');
 버튼그리기('크기', 크기안, '크기');
+버튼그리기('굵기', 굵기안, '굵기');
 버튼그리기('돋보기', 돋보기안, '돋보기');
 
 function 입히기() {
@@ -92,7 +105,10 @@ function 입히기() {
   if (!el) { el = d.createElement('style'); el.id = '__미리보기'; d.head.appendChild(el); }
   var css = 배치안[고른.배치].css;
   var px = 크기안[고른.크기].px;
+  var w = 굵기안[고른.굵기].w;
+  // 🔴 인기소스는 숫자가 `.like-count` 인데 굵기가 부모(.hp-like)에 걸려 있다 — 둘 다 적어야 먹는다
   if (px) css += '.like-count,.hc-row-like-n{font-size:' + px + 'px}';
+  if (w) css += '.hp-like,.like-count,.hc-row-like-n{font-weight:' + w + '}';
   el.textContent = css;
 
   돋보기그리기(d);
