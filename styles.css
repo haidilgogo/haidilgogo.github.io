@@ -1528,22 +1528,27 @@ img {
   cursor: default;
 }
 
+/* 🔴 왼쪽에 있던 평면 주사위 아이콘을 뺐다(2026-08-05 사용자 지시) — 글자만 남는다.
+   아이콘이 있던 때는 `gap: 8px` 과 `.gacha-pull-ic`(24px) 규칙이 있었고, 둘 다 지웠다.
+   🔴 생김새는 「레시피 보기」(.gacha-view)와 **똑같이 맞춘다**(2026-08-05 사용자 지시).
+      옛 모습은 브랜드 빨강 꽉 찬 배경 + 흰 글자였다. 두 버튼이 같은 자리에 번갈아 나오는데
+      생김새가 달라서 창이 바뀐 것처럼 보였다.
+      ⚠️ 값을 바꿀 땐 `.gacha-view` 와 **둘 다** 고칠 것 — 같아 보이는 게 목적이다.
+         (좌우 여백만 34px 로 다르다: 「뽑기」가 「레시피 보기」보다 짧아 같은 32px 이면 알약처럼 작아진다.) */
 .gacha-pull {
-  /* 🔴 왼쪽에 있던 평면 주사위 아이콘을 뺐다(2026-08-05 사용자 지시) — 글자만 남는다.
-     아이콘이 있던 때는 `gap: 8px` 로 아이콘·글자를 띄웠고 `.gacha-pull-ic`(24px) 규칙이 따로 있었다.
-     둘 다 지웠다. inline-flex 는 글자 세로 가운데를 위해 남긴다. */
   display: inline-flex;
   align-items: center;
   border: none;
-  background: var(--brand-red);
-  color: #fff;
+  background: #F6E4DE;       /* 로즈 소프트필 — .gacha-view 와 같은 값 */
+  color: #C0392B;            /* 짙은 브랜드 빨강 글자 — .gacha-view 와 같은 값 */
+  box-shadow: 0 8px 18px rgba(110, 40, 30, .45);   /* .gacha-view 와 같은 값 */
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 800;
   padding: 13px 34px;
   border-radius: 14px;       /* 알약 → 둥근 사각(홈 버튼과 통일, 2026-07-24) */
   cursor: pointer;
-  transition: transform .15s ease, background-color .15s ease;
+  transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .gacha-actions {
@@ -1586,11 +1591,12 @@ img {
 .gacha-note-ic { width: 18px; height: 18px; flex: none; display: inline-block; } /* Noto 손흔들기 정지 PNG(👋) — 기기 통일(텍스트 이모지 대신), 주사위와 동일 원칙 */
 
 @media (hover: hover) {
-  .gacha-pull:hover { background: var(--brand-red-hover); }
+  /* 🔴 두 버튼은 같은 반응을 쓴다(2026-08-05) — 값을 고칠 땐 둘 다 고칠 것 */
+  .gacha-pull:hover,
   .gacha-view:hover { background: #F0D6CD; box-shadow: 0 11px 24px rgba(110, 40, 30, .48); } /* 살짝 진해지고 그림자 뜸 */
 }
 
-.gacha-pull:active { transform: scale(.95); background: var(--brand-red-active); }
+.gacha-pull:active { transform: scale(.96); background: #EAC7BD; box-shadow: 0 3px 9px rgba(110, 40, 30, .40); }
 .gacha-view:active { transform: scale(.96); background: #EAC7BD; box-shadow: 0 3px 9px rgba(110, 40, 30, .40); } /* 눌리면 진해지고 그림자 낮아져 바닥에 눌림 */
 
 /* 데스크톱에서 가챠 팝업 크게 */
