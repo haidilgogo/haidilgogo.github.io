@@ -14,19 +14,25 @@
   body { display: flex; flex-direction: column;
          font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', sans-serif; }
 
-  .bar { flex: none; padding: 7px 8px 8px; background: #2B120D; color: #fff; }
-  .줄 { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-  .줄:last-of-type { margin-bottom: 0; }
-  .딱지 { flex: none; width: 46px; font-size: 10.5px; font-weight: 700; color: #E8A99C; letter-spacing: -.3px; }
-  .칸 { flex: 1; display: flex; gap: 5px; }
-  .칸 button { flex: 1; padding: 7px 3px; border: 1px solid rgba(255,255,255,.2); border-radius: 8px;
+  /* 🔴 조작판이 화면을 많이 먹으면 정작 앱을 못 본다 — 촘촘하게 두고 접을 수 있게 한다 */
+  .bar { flex: none; padding: 5px 6px 6px; background: #2B120D; color: #fff; }
+  .줄 { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .딱지 { flex: none; width: 40px; font-size: 9.5px; font-weight: 700; color: #E8A99C; letter-spacing: -.4px; }
+  .칸 { flex: 1; display: flex; gap: 4px; }
+  .칸 button { flex: 1; padding: 4px 2px; border: 1px solid rgba(255,255,255,.2); border-radius: 7px;
                background: rgba(255,255,255,.06); color: #fff; font-family: inherit;
-               font-size: 11.5px; font-weight: 700; line-height: 1.3; }
-  .칸 button small { display: block; font-weight: 500; font-size: 10px; color: #D7B7AE; }
+               font-size: 10.5px; font-weight: 700; line-height: 1.25; }
+  .칸 button small { display: block; font-weight: 500; font-size: 8.5px; color: #D7B7AE; }
   .칸 button.on { background: #E0301E; border-color: #E0301E; }
   .칸 button.on small { color: #FFD9D2; }
 
-  .tip { margin: 7px 0 0; font-size: 10.5px; line-height: 1.5; color: #D8BCB4; }
+  .tip { margin: 5px 0 0; font-size: 9.5px; line-height: 1.45; color: #D8BCB4; }
+
+  /* 접기 — 고른 것은 그대로 두고 조작판만 감춘다 */
+  .접기 { display: block; width: 100%; margin-top: 5px; padding: 5px; border: 0; border-radius: 7px;
+          background: rgba(255,255,255,.12); color: #fff; font-family: inherit; font-size: 10.5px; font-weight: 700; }
+  body.접힘 .줄, body.접힘 .tip { display: none; }
+  body.접힘 .접기 { margin-top: 0; }
 
   iframe { flex: 1; width: 100%; border: 0; display: block; background: #FCF9F5; }
 </style>
@@ -37,8 +43,11 @@
   <div class="줄"><span class="딱지">배치</span><span class="칸" id="배치"></span></div>
   <div class="줄"><span class="딱지">숫자 크기</span><span class="칸" id="크기"></span></div>
   <div class="줄"><span class="딱지">숫자 굵기</span><span class="칸" id="굵기"></span></div>
+  <div class="줄"><span class="딱지">숫자 밀기</span><span class="칸" id="밀기"></span></div>
+  <div class="줄"><span class="딱지">숫자 나란히</span><span class="칸" id="나란히"></span></div>
   <div class="줄"><span class="딱지">돋보기</span><span class="칸" id="돋보기"></span></div>
   <p class="tip" id="tip"></p>
+  <button type="button" class="접기" id="접기">조작판 접기 ▲</button>
 </div>
 
 <iframe id="app" src="index.html" title="하딜고고"></iframe>
@@ -79,12 +88,32 @@ var 굵기안 = [
   { 이름: '400', 밑: '', w: 400 }
 ];
 
+/* 🔴 강제로 미는 것은 `position:relative; left` 로 한다 — **자리를 안 차지해서** 하트칸 폭도
+   이름칸도 안 바뀐다. margin 이나 padding 으로 밀면 칸이 같이 넓어져 이름칸을 도로 깎아먹는다.
+   0.5px 은 레티나(2배·3배 화면)에서 실제 화소 1개라 눈에 보인다. */
+var 밀기안 = [
+  { 이름: '0', 밑: '지금', px: null },
+  { 이름: '+0.5', 밑: '', px: 0.5 },
+  { 이름: '+1', 밑: '', px: 1 },
+  { 이름: '−0.5', 밑: '', px: -0.5 }
+];
+
+/* 🔴 치우침은 「1」이 든 숫자에서만 생긴다(21·11 이 0.42px 왼쪽, 나머지는 0.00px) — 「1」 글자의
+   잉크가 제 칸에서 왼쪽에 놓이기 때문이다. tabular-nums 는 모든 숫자에 같은 폭을 줘서
+   「1」도 제 칸 가운데에 놓이게 한다. **원인을 없애는 쪽**이고, 미는 것은 평균으로 때우는 쪽이다.
+   Pretendard 가 지원하는 것을 확인했다("11"과 "88"의 폭이 같아진다).
+   폭은 12.6 → 17.6px 로 커지지만 아이콘(20px)보다 작아서 **이름칸은 안 줄어든다.** */
+var 나란히안 = [
+  { 이름: '끄기', 밑: '지금', 켬: false },
+  { 이름: '켜기', 밑: 'tabular-nums', 켬: true }
+];
+
 var 돋보기안 = [
   { 이름: '끄기', 밑: '', 켬: false },
   { 이름: '4배로 떼어 보기', 밑: '가운데선 표시', 켬: true }
 ];
 
-var 고른 = { 배치: 0, 크기: 0, 굵기: 0, 돋보기: 0 };
+var 고른 = { 배치: 0, 크기: 0, 굵기: 0, 밀기: 0, 나란히: 0, 돋보기: 0 };
 var iframe = document.getElementById('app');
 
 function 버튼그리기(칸id, 목록, 키) {
@@ -96,6 +125,8 @@ function 버튼그리기(칸id, 목록, 키) {
 버튼그리기('배치', 배치안, '배치');
 버튼그리기('크기', 크기안, '크기');
 버튼그리기('굵기', 굵기안, '굵기');
+버튼그리기('밀기', 밀기안, '밀기');
+버튼그리기('나란히', 나란히안, '나란히');
 버튼그리기('돋보기', 돋보기안, '돋보기');
 
 function 입히기() {
@@ -109,6 +140,9 @@ function 입히기() {
   // 🔴 인기소스는 숫자가 `.like-count` 인데 굵기가 부모(.hp-like)에 걸려 있다 — 둘 다 적어야 먹는다
   if (px) css += '.like-count,.hc-row-like-n{font-size:' + px + 'px}';
   if (w) css += '.hp-like,.like-count,.hc-row-like-n{font-weight:' + w + '}';
+  var 밀 = 밀기안[고른.밀기].px;
+  if (밀) css += '.like-count,.hc-row-like-n{position:relative;left:' + 밀 + 'px}';
+  if (나란히안[고른.나란히].켬) css += '.like-count,.hc-row-like-n{font-variant-numeric:tabular-nums}';
   el.textContent = css;
 
   돋보기그리기(d);
@@ -154,6 +188,11 @@ document.addEventListener('click', function (e) {
   var b = e.target.closest('.칸 button'); if (!b) return;
   고른[b.dataset['키']] = +b.dataset.i;
   입히기();
+});
+
+document.getElementById('접기').addEventListener('click', function () {
+  var 접힘 = document.body.classList.toggle('접힘');
+  this.textContent = 접힘 ? '조작판 펴기 ▼' : '조작판 접기 ▲';
 });
 
 iframe.addEventListener('load', 입히기);   // 앱 안에서 새로고침해도 고른 것이 유지된다
