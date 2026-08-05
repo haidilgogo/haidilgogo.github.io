@@ -5052,6 +5052,16 @@
   //    「소양돈고기 다음 닭고기」 같은 줄 세우기는 그대로 살아 있다(2026-08-03 확정 참고).
   const 상위메뉴 = (t) => t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
   const IMG = (n) => 'assets/menu/' + n + '.webp';
+  /* 🔴 목록 그림이 **칸을 꽉 채우는** 메뉴(2026-08-06 사용자 확정). 여기 적힌 것만 예외다.
+     나머지 129장은 「접시에 담긴 음식 · 배경 투명」이 규칙이고, 크림 칸 가운데에 그림자와 함께 놓인다.
+
+     쿵푸면은 참고 사진부터가 **접시 사진이 아니라 면을 뽑는 공연 장면**이라(SIGNATURE 메뉴),
+     접시로 그리면 다른 넓적면과 구분이 안 됐다. 공연 그림을 그대로 쓰되 80px 목록에서
+     **「이건 다른 메뉴다」가 눈에 띄게** 하려고 칸을 꽉 채운다.
+     🔴 그래서 이 그림만 **배경이 검고 불투명**하다. 규격 위반이 아니라 의도다 —
+        `make_menu_images.py` 가 「여백 0px」로 경고하는 것도 이 한 장뿐이고 무시해도 된다.
+     ⚠️ 예외를 늘릴 때는 **왜 접시로는 안 되는지**부터 적을 것. 하나씩 늘면 규칙이 사라진다. */
+  const MENU_FILL = new Set(['쿵푸면']);
   // 🔴 담긴 표시 ✓ 는 SVG 다(2026-08-04 사용자 확정). 옛 글자 `✓`(U+2713)는 폰트가 그려주는 것이라
   //    굵기·모양이 앱의 다른 아이콘(전부 SVG, 「18px 통일」 규격)과 따로 놀았다.
   //    18px + stroke 2.2 = 화면에서 획 약 1.65px — 상단바 아이콘들과 같은 굵기다.
@@ -5420,7 +5430,7 @@
     const 아랫줄 = 제주 ? 제주줄(부제)
       : (부제 ? `<span class="mn-card-sub">${부제}</span>` : '');
     return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
-      <div class="mn-card-thumb ${it.img ? '' : 'is-text'}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
+      <div class="mn-card-thumb ${it.img ? '' : 'is-text'} ${MENU_FILL.has(it.n) ? 'is-fill' : ''}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
       <span class="mn-card-body">
         <span class="mn-card-name">${이름}</span>
         ${아랫줄}
