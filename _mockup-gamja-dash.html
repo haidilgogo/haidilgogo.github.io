@@ -4,44 +4,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <title>감자 옆 점선이 흐린 이유 가리기</title>
-  <link rel="stylesheet" href="styles.css?v=746">
+  <title>감자 옆 점선 — 번호로 고르기</title>
+  <link rel="stylesheet" href="styles.css?v=749">
   <style>
-    /* 폰에서만 「감자 몸쪽 점선이 흐리다」가 보인다. 원인 후보를 하나씩만 바꿔 가며 잰다.
-       🔴 앱과 같은 클래스(.stamp-empty / .stamp-slot / .stamp-slot-empty)를 그대로 쓴다 —
-          목업에서만 다르게 그리면 잰 것이 앱과 안 맞는다. */
+    /* 2차 판(2026-08-05 밤). 1차에서 「감자를 벽 뒤로 넣으면 선이 뭉개진다」까지는 가렸다.
+       지금 남은 것은 **선의 굵기와 감자와의 틈**이다.
+       🔴 앱과 같은 클래스를 그대로 쓴다 — 목업에서만 다르게 그리면 잰 것이 앱과 안 맞는다.
+       🔴 점선 두께 2.5px 은 기록 시트와 함께 쓰는 값이다. 여기서 바꾸는 것은 **빈 화면 상자만**이다. */
     * { box-sizing: border-box; }
     html, body { margin: 0; background: var(--bg-card); }
-    .wrap { width: min(100%, 440px); margin: 0 auto; padding: 14px 18px 200px; }
-    .lead { font-size: 13px; line-height: 1.7; color: var(--text-muted); margin: 0 0 4px; }
+    .wrap { width: min(100%, 440px); margin: 0 auto; padding: 12px 18px 190px; }
+    .lead { font-size: 13px; line-height: 1.65; color: var(--text-muted); margin: 0 0 2px; }
     .lead b { color: var(--brand-red); }
 
-    /* 여기가 시험 대상 — 번호마다 이 두 값만 달라진다 */
-    .stamp-empty { min-height: 0; padding: 8px 0 0; }
+    .stamp-empty { min-height: 0; padding: 6px 0 0; }
     .stamp-empty .stamp-empty-slot { width: 220px; }
     .stamp-empty-gamja {
       position: absolute; bottom: 14px; width: 90%; height: auto; display: block;
       pointer-events: none; user-select: none;
     }
 
-    /* 1번 = 지금 앱 그대로 */
-    body[data-v="1"] .stamp-slot-empty { overflow: hidden; }
-    body[data-v="1"] .stamp-empty-gamja { left: -1px; }
-    /* 2번 = 자름만 뺀다 */
-    body[data-v="2"] .stamp-slot-empty { overflow: visible; }
-    body[data-v="2"] .stamp-empty-gamja { left: -1px; }
-    /* 3번 = 자름은 두고 감자를 벽 안쪽으로 */
-    body[data-v="3"] .stamp-slot-empty { overflow: hidden; }
-    body[data-v="3"] .stamp-empty-gamja { left: 0; }
-    /* 4번 = 둘 다 뺀다 */
-    body[data-v="4"] .stamp-slot-empty { overflow: visible; }
-    body[data-v="4"] .stamp-empty-gamja { left: 0; }
-    /* 5번 = 감자를 아예 안 그린다 (기준선) */
-    body[data-v="5"] .stamp-slot-empty { overflow: visible; }
-    body[data-v="5"] .stamp-empty-gamja { display: none; }
-    /* 6번 = 자름만 켜고 감자는 없다 — 「자름 자체가 점선을 흐리게 하나」를 가린다 */
-    body[data-v="6"] .stamp-slot-empty { overflow: hidden; }
-    body[data-v="6"] .stamp-empty-gamja { display: none; }
+    /* 번호마다 ① 점선 두께 ② 감자와 점선 사이 틈, 둘만 달라진다 */
+    body[data-v="1"] .stamp-slot-empty { border-width: 2.5px; }
+    body[data-v="1"] .stamp-empty-gamja { left: 2px; }     /* 지금 앱 */
+    body[data-v="2"] .stamp-slot-empty { border-width: 2.5px; }
+    body[data-v="2"] .stamp-empty-gamja { left: 0; }       /* 틈 없음 (얇아 보이던 것) */
+    body[data-v="3"] .stamp-slot-empty { border-width: 3px; }
+    body[data-v="3"] .stamp-empty-gamja { left: 0; }       /* 틈 없음 + 선을 3px 로 */
+    body[data-v="4"] .stamp-slot-empty { border-width: 2.5px; }
+    body[data-v="4"] .stamp-empty-gamja { left: 1px; }     /* 틈 1px */
+    body[data-v="5"] .stamp-slot-empty { border-width: 2.5px; }
+    body[data-v="5"] .stamp-empty-gamja { left: 4px; }     /* 틈 4px */
+    body[data-v="6"] .stamp-slot-empty { border-width: 2.5px; }
+    body[data-v="6"] .stamp-empty-gamja { display: none; } /* 감자 없음 — 맨 점선 */
 
     .panel {
       position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
@@ -60,13 +55,14 @@
 </head>
 <body data-v="1">
   <div class="wrap">
-    <p class="lead"><b>감자 몸쪽 왼쪽 점선</b>만 보세요. 번호를 바꿔 가며 <b>또렷한 번호</b>를 알려주시면 됩니다.<br>
-      5·6번에는 감자가 없습니다 — 그때도 흐리면 감자 탓이 아닙니다.</p>
+    <p class="lead"><b>감자 왼쪽의 세로 점선</b>만 보세요. 다른 세 변과 <b>같아 보이는 번호</b>를 알려주시면 됩니다.<br>
+      6번엔 감자가 없습니다 — 그게 「원래 선」입니다. 마음에 드는 게 없으면 그렇게 말씀해 주세요.</p>
 
     <div class="stamp-empty">
       <div class="stamp-slot stamp-empty-slot">
         <div class="stamp-slot-empty">
-          <img class="stamp-empty-gamja" src="assets/mascot/gamja-bubble.webp" width="660" height="800" alt="">
+          <img class="stamp-empty-gamja" src="assets/mascot/gamja-bubble-busan.webp?v=3"
+               width="660" height="800" alt="">
         </div>
       </div>
     </div>
@@ -80,12 +76,12 @@
 <script>
 (function () {
   var V = [
-    { n: 1, t: '지금 앱 그대로 — 자름 있음 · 감자 벽 뒤 1px' },
-    { n: 2, t: '자름만 뺐다 — 감자는 그대로 벽 뒤 1px' },
-    { n: 3, t: '자름 있음 · 감자를 벽 안쪽으로(0px)' },
-    { n: 4, t: '자름 없음 · 감자를 벽 안쪽으로(0px)' },
-    { n: 5, t: '감자 없음 · 자름 없음 — 맨 점선(기준선)' },
-    { n: 6, t: '감자 없음 · 자름 있음 — 자름만의 영향' }
+    { n: 1, t: '지금 앱 — 선 2.5px · 틈 2px' },
+    { n: 2, t: '선 2.5px · 틈 없음 (얇아 보이던 것)' },
+    { n: 3, t: '선 3px · 틈 없음 — 감자가 벽에 딱 붙는다' },
+    { n: 4, t: '선 2.5px · 틈 1px' },
+    { n: 5, t: '선 2.5px · 틈 4px' },
+    { n: 6, t: '감자 없음 — 이게 원래 선이다' }
   ];
   var btns = document.getElementById('btns');
   var readout = document.getElementById('readout');
