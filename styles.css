@@ -4939,6 +4939,15 @@ img {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .col-sauce-arrow { width: 18px; height: 18px; flex: 0 0 18px; color: #c3bbb3; }
+/* 🔴 아티클의 「고수가 들어간 메뉴」용(2026-08-05). 소스 카드와 **그림 처리만** 다르다 —
+   소스는 정사각 카드(assets/cards/*.jpg)라 `cover` 로 꽉 채우지만, 메뉴 그림(assets/menu/*.webp)은
+   배경이 없는 냄비 그림이라 `cover` 로 하면 잘린다. `contain` + 크림 배경으로 담아 둔다.
+   ⚠️ 크림색은 메뉴 탭 썸네일(.mn-card-thumb)과 **같은 값**이다 — 두 곳이 갈리지 않게. */
+.col-sauce-thumb--menu { object-fit: contain; background: #FBF4E6; }
+/* 🔴 「제주 한정」은 메뉴 탭(.mn-card-sub--jeju)과 **같은 값**을 쓴다 — 색·굵기·아이콘 13px.
+   같은 말이 화면마다 다르게 보이면 안 된다. 아이콘을 빼지 말 것(2026-08-05 사용자 지시). */
+.col-sauce-ver--jeju { display: flex; align-items: center; gap: 3px; color: #D95A16; font-weight: 700; }
+.col-sauce-ver--jeju img { flex: none; width: 13px; height: 13px; }
 /* 관련 소스 다음에 오는 주석·출처 */
 .column-notes {
   margin: 0 22px; padding: 22px 0;
