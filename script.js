@@ -3491,6 +3491,10 @@
   // ⚠️ 지역 목록은 STORES 에서 뽑으므로(storeRegions) 새 지역이 생기면 그림이 없을 수 있다.
   //    그때는 예전처럼 글씨만 나온다 — renderStamps 에서 갈라 둔다. 화면이 비지 않는다.
   const GAMJA_REGION = { 서울: 'seoul', 경기: 'gyeonggi', 부산: 'busan', 대구: 'daegu', 제주: 'jeju' };
+  // 🔴 그림을 새로 그려 넣으면 **이 숫자를 올린다.** 파일 이름이 그대로라 안 올리면 폰에
+  //    옛 그림이 캐시로 남는다(css·js 의 index.html `?v=` 와 같은 이유·같은 방식이다).
+  const GAMJA_V = 2;
+  const gamjaSrc = (name) => 'assets/mascot/' + name + '.webp?v=' + GAMJA_V;
   const gamjaSlot = (src, alt) =>
     '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
     + '<img class="stamp-empty-gamja" src="' + src + '" width="660" height="800" alt="' + alt + '">'
@@ -3505,7 +3509,7 @@
     if (gamjaPreloaded) return;
     gamjaPreloaded = true;
     ['gamja-bubble'].concat(Object.values(GAMJA_REGION).map((r) => 'gamja-bubble-' + r))
-      .forEach((n) => { const im = new Image(); im.src = 'assets/mascot/' + n + '.webp'; });
+      .forEach((n) => { const im = new Image(); im.src = gamjaSrc(n); });
   }
   window.preloadGamja = preloadGamja;
 
@@ -3621,10 +3625,10 @@
         // 🔴 「기록하기로…」 앞의 연필 아이콘은 뺐다(2026-08-04 사용자 지시).
         //    위 버튼에 이미 같은 뜻의 아이콘이 있어서 한 화면에 두 번 나오던 것이다.
         empty.innerHTML = (key === '전체')
-          ? gamjaSlot('assets/mascot/gamja-bubble.webp',
+          ? gamjaSlot(gamjaSrc('gamja-bubble'),
                       '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요')
           : (GAMJA_REGION[key]
-              ? gamjaSlot('assets/mascot/gamja-bubble-' + GAMJA_REGION[key] + '.webp',
+              ? gamjaSlot(gamjaSrc('gamja-bubble-' + GAMJA_REGION[key]),
                           key + '에는 아직 기록이 없어요')
               : '<p class="stamp-empty-text">' + key + '에는 아직 기록이 없어요</p>');
         stampEmptyCache.set(key, empty);
