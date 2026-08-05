@@ -1276,7 +1276,11 @@
       '<p class="col-outro col-outro--plain">소스바 앞에서 헤매지 않도록, <span class="col-brand">하딜고고</span>가 함께할게요.</p>' +
       // '레시피를 구경하며 기다려도 좋아요'를 실제로 이어주는 출구. 누르면 칼럼을 닫고 전체보기를 연다.
       // data-go 값으로 동작을 정한다(openColumn에서 배선) — 소스 카드의 data-rid와 같은 방식이다.
-      '<button class="col-cta" type="button" data-go="browse">레시피 보러 가기</button>',
+      '<button class="col-cta" type="button" data-go="browse">레시피 보러 가기</button>' +
+      // 🔴 메뉴로 가는 출구도 나란히(2026-08-05 사용자 요청). **전골로 보낸다** — 메뉴 탭의 기본 자리다.
+      //    ⚠️ 복사본(guide.html)에는 이 버튼이 없다. 거기 CTA 는 「하딜고고에서 더 보기」 링크 하나뿐이고
+      //       앱이 없어 탭 이동을 못 한다 — 소스 줄이 거기서 안 눌리는 것과 같은 경우다.
+      '<button class="col-cta" type="button" data-go="menu">메뉴 보러 가기</button>',
   };
 
   function pickMonthlyFeatures() {
@@ -2783,6 +2787,11 @@
     [...columnOverlay.querySelectorAll('.col-cta[data-go]')].forEach((el) => {
       el.addEventListener('click', () => {
         if (el.dataset.go === 'browse') { closeColumn(); enterBrowse('전체'); }
+        else if (el.dataset.go === 'menu') {
+          closeColumn();
+          switchSection('menu');
+          if (window.mnGoTab) window.mnGoTab('전골');   // 메뉴 탭의 기본 자리
+        }
       });
     });
     columnOverlay.hidden = false;
