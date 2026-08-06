@@ -25,6 +25,9 @@
 .rp-block { display: flex; flex-direction: column; gap: 8px; }
 .rp-label { font-size: 13px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
 .rp-opt { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+/* ⑦ 「선택」 꼬리표 끄기 — 별표가 필수를 표시하면 별표 없는 것은 저절로 선택이라
+   같은 말을 두 방향에서 두 번 하게 된다. 레시피 갈래에서는 「선택」이 여섯 번 반복된다. */
+body.opt-off .rp-opt { display: none; }
 /* 필수 표시 — 구글폼과 같은 방식(빨강 별표). 「선택」 꼬리표와 짝을 이룬다. */
 .rp-req { color: var(--brand-red); font-weight: 800; }
 /* 별표 안내 한 줄 — 색은 ⑥번으로 갈아 끼운다.
@@ -394,6 +397,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-nt="off">없음</button>
   </div>
 
+  <h4>⑦ 「선택」 꼬리표</h4>
+  <div class="prow" id="opRow">
+    <button data-op="off">뺀다 (권함)</button>
+    <button data-op="on">둔다</button>
+  </div>
+
   <button id="hide">조작판 내리기</button>
 </div>
 <button id="showPanel" type="button">조작판 ▲</button>
@@ -403,7 +412,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 (function () {
   var body = document.body;
   // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
-  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', sw: '0', nt: 'gray', kind: null, ct: 'email' };
+  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', sw: '0', nt: 'gray', op: 'on', kind: null, ct: 'email' };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -527,7 +536,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp'],['swRow','sw','sw'],['ntRow','nt','nt']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp'],['swRow','sw','sw'],['ntRow','nt','nt'],['opRow','op','op']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -588,6 +597,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     body.classList.toggle('swap', state.sw === '1');
     body.classList.toggle('note-red', state.nt === 'red');
     body.classList.toggle('note-off', state.nt === 'off');
+    body.classList.toggle('opt-off', state.op === 'off');
     renderAuto();
     checkReady();
   }
@@ -606,6 +616,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     else if (b.dataset.gp) state.gp = b.dataset.gp;
     else if (b.dataset.sw) state.sw = b.dataset.sw;
     else if (b.dataset.nt) state.nt = b.dataset.nt;
+    else if (b.dataset.op) state.op = b.dataset.op;
     else return;
     paint();
   });
