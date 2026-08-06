@@ -407,6 +407,11 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   var ta = document.getElementById('rBody'), cnt = document.getElementById('rpCount');
   ta.addEventListener('input', function () { cnt.textContent = ta.value.length + ' / 1000자'; });
 
+  /* 🔴 iOS 사파리는 **터치 리스너가 하나도 없으면 `:active` 를 아예 안 켠다**
+     (2026-08-04 `_press-compare.html` 에서 실제로 겪었다 — 눌러도 아무 반응이 없었다).
+     아무 일도 안 하는 리스너 하나로 켜진다. 지우면 폰에서만 누름 반응이 사라진다. */
+  document.addEventListener('touchstart', function () {}, { passive: true });
+
   // 종류 고르기
   document.getElementById('rpKinds').addEventListener('click', function (e) {
     var b = e.target.closest('.rp-kind'); if (!b) return;
