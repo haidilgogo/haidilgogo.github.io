@@ -90,6 +90,19 @@ body.show-bar #bar { display: block; }
 
 [data-off] { display: none !important; }
 
+/* 간격 — 번호로 갈아 끼운다(2026-08-06). 지금 값은 「넉넉」이다. */
+body.gap-mid .credit-head { padding-top: 18px; padding-bottom: 4px; }
+body.gap-mid .rp-form { gap: 14px; }
+body.gap-mid .rp-kinds { gap: 5px; }
+body.gap-mid .rp-block { gap: 6px; }
+body.gap-mid .rp-kind { min-height: 46px; }
+
+body.gap-tight .credit-head { padding-top: 12px; padding-bottom: 0; }
+body.gap-tight .rp-form { gap: 11px; }
+body.gap-tight .rp-kinds { gap: 3px; }
+body.gap-tight .rp-block { gap: 5px; }
+body.gap-tight .rp-kind { min-height: 44px; }
+
 #panel {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 400;
   background: #fff; border-top: 2px solid #2B120D;
@@ -254,6 +267,13 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     <button data-pb="1">있음</button>
   </div>
 
+  <h4>④ 간격</h4>
+  <div class="prow" id="gpRow">
+    <button data-gp="loose">1 · 넉넉 (지금)</button>
+    <button data-gp="mid">2 · 보통</button>
+    <button data-gp="tight">3 · 촘촘</button>
+  </div>
+
   <button id="hide">조작판 숨기고 보기 (6초)</button>
 </div>
 
@@ -262,7 +282,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
 (function () {
   var body = document.body;
   // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
-  var state = { br: 'full', fh: 'b', pb: '0', kind: null, ct: 'email' };
+  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', kind: null, ct: 'email' };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -345,7 +365,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -379,6 +399,8 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     else { ct.type = 'text'; ct.placeholder = '인스타그램 아이디 (@ 없이)'; }
 
     body.classList.toggle('show-bar', state.pb === '1');
+    body.classList.toggle('gap-mid', state.gp === 'mid');
+    body.classList.toggle('gap-tight', state.gp === 'tight');
     renderAuto();
   }
 
@@ -393,6 +415,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     if (b.dataset.br) state.br = b.dataset.br;
     else if (b.dataset.fh) state.fh = b.dataset.fh;
     else if (b.dataset.pb) state.pb = b.dataset.pb;
+    else if (b.dataset.gp) state.gp = b.dataset.gp;
     else return;
     paint();
   });
