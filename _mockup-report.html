@@ -49,7 +49,7 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
    ⚠️ 칸 안 예시(placeholder)와 역할이 다르다: 라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. */
 .rp-sublabel { font-size: 12.5px; font-weight: 700; color: var(--text-dark); }
 .rp-lead {
-  margin: 0 22px 4px; padding: 12px 14px; background: #F6F1EA; border-radius: 11px;
+  margin: 0; padding: 12px 14px; background: #F6F1EA; border-radius: 11px;
   font-size: 12.5px; line-height: 1.7; color: var(--text-muted);
 }
 .rp-lead b { color: var(--text-dark); }
@@ -348,10 +348,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <p class="credit-sub">하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요.<br>소중한 제보 감사합니다! ☺️</p>
   </div>
 
-  <div class="rp-lead" id="lead" data-off>
-    아는 만큼만 적어 주셔도 좋아요. <b>레시피 이름만 필수</b>이고, 나머지는 비워 두셔도 됩니다.
-  </div>
-
   <p class="rp-note"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요</p>
 
   <form class="rp-form" id="rpForm" onsubmit="return false">
@@ -365,6 +361,14 @@ body.previewing .column-sheet { padding-bottom: 28px; }
         <button type="button" class="rp-kind" data-k="bug">잘못된 정보나 오류가 있어요!</button>
         <button type="button" class="rp-kind" data-k="etc">기타 문의사항이 있습니다.</button>
       </div>
+    </div>
+
+    <!-- 🔴 이 안내는 **세 갈래를 고른 아래**에 온다(2026-08-07 사용자 지시).
+         레시피 갈래에만 해당하는 말이라, 고르기 전 맨 위에 있으면 아직 상관없는 사람에게도 보였다.
+         ⚠️ 폼 안(`.rp-form`)으로 들어왔으므로 좌우 여백은 폼의 `padding: 0 22px` 가 준다 —
+            `.rp-lead` 에 가로 margin 을 다시 주면 22px 이 두 번 들어간다. -->
+    <div class="rp-lead" id="lead" data-off>
+      아는 만큼만 적어 주셔도 좋아요. <b>레시피 이름만 필수</b>이고, 나머지는 비워 두셔도 됩니다.
     </div>
 
     <!-- ── 레시피 갈래 ── -->
