@@ -127,7 +127,6 @@ body.previewing .column-sheet { padding-bottom: 60px; }
 <main class="column-sheet">
   <div class="credit-head">
     <h1 class="credit-title">제보 · 문의</h1>
-    <p class="credit-sub">잘못된 정보나 궁금한 점을 알려 주세요.</p>
   </div>
 
   <div class="rp-lead" id="lead" data-off>
@@ -137,12 +136,13 @@ body.previewing .column-sheet { padding-bottom: 60px; }
   <form class="rp-form" id="rpForm" onsubmit="return false">
 
     <div class="rp-block">
-      <span class="rp-label">어떤 이야기인가요?</span>
-      <!-- 🔴 기본값 없음 — 고르기 전에는 아래를 아예 안 보여준다(2026-08-06 사용자 지시) -->
+      <span class="rp-label">어떤 내용으로 문의하고 싶으신가요?</span>
+      <!-- 🔴 기본값 없음 — 고르기 전에는 아래를 아예 안 보여준다(2026-08-06 사용자 지시)
+           🔴 선택지 문구는 **지금 구글폼 그대로**다(사용자 지시). 줄여 쓰지 말 것. -->
       <div class="rp-kinds" id="rpKinds">
-        <button type="button" class="rp-kind" data-k="recipe">레시피 추가</button>
-        <button type="button" class="rp-kind" data-k="bug">잘못된 정보 · 오류</button>
-        <button type="button" class="rp-kind" data-k="etc">기타 문의</button>
+        <button type="button" class="rp-kind" data-k="recipe">레시피 추가해주세요!</button>
+        <button type="button" class="rp-kind" data-k="bug">잘못된 정보나 오류가 있어요!</button>
+        <button type="button" class="rp-kind" data-k="etc">기타 문의사항이 있습니다.</button>
       </div>
     </div>
 
