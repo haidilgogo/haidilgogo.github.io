@@ -307,7 +307,12 @@ body.previewing #showPanel { display: block; }
 }
 /* ⚠️ 위 여백이 세 군데(폼 사이 18 + 여기 + 이유 위)에서 겹쳐 52px 이 됐다(2026-08-06 사용자 지적).
    여기를 6 으로 줄이고 이유 쪽 위 여백을 0 으로 두어 **24px** 로 맞춘다. */
-#submitWrap { margin-top: auto; padding-top: 6px; }
+#submitWrap { padding-top: 6px; }
+/* 🔴 「화면 아래로 내리기」는 **갈래를 고르기 전에만** 한다(2026-08-06 사용자 지시로 갈랐다).
+   ① 고르기 전 — 상자 셋뿐이라 닫기가 위에 붙으면 휑하다 → 아래로 내린다.
+   ② 고른 뒤 — 칸이 늘어나므로 **내용 바로 뒤**에 붙는다.
+   ⚠️ 갈라 놓지 않으면 「고른 뒤」에도 auto 가 남는 공간을 밀어내 **299px 이 벌어졌다**(실측). */
+body:not(.has-pick) #submitWrap { margin-top: auto; }
 /* 🔴 내용 칸이 남는 높이를 다 먹는다(2026-08-06 사용자 지시).
    `min-height: 0` 이 있어야 flex 자식이 제대로 줄어든다 — 없으면 내용이 넘칠 때 안 줄어들어
    버튼이 화면 밖으로 밀려난다.
@@ -711,6 +716,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     off('bodyBlock', !picked || (isRecipe && state.br === 'full'));
     off('lead', !(picked && isRecipe && state.br === 'full'));
     off('ctBlock', !picked);
+    body.classList.toggle('has-pick', picked);   // 버튼을 아래로 내릴지 정한다(위 CSS 참고)
     // 🔴 아무것도 안 골랐을 때도 **닫기는 보인다**(2026-08-06 사용자 지시).
     //    나가는 길은 언제나 있어야 한다. 보내기만 감춘다 — 보낼 것이 없으니까.
     off('submitWrap', false);
@@ -732,10 +738,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     var PH = {
       bug: '예) 코엑스점 영업시간이 실제와 달라요\n' + SP + '건희소스 레시피가 틀렸어요',
       /* ⚠️ 「강아지가 귀여워요」는 여기로 옮겼다 — 오류 갈래 라벨(「잘못된 점」)과 어긋났다.
-         🔴 셋째 줄에 **실제 소스 이름을 쓰지 않는다** — 「그 레시피가 남의 것이다」라고
-            실제 저작자를 지목하는 꼴이 된다. 가릴 때는 `○○`(동그라미)가 한글 정식 표기다
-            (알파벳 `OO` 가 아니다). */
-      etc: '예) 스티커 탭에 있는 강아지가 너무 귀여워요\n' + SP + '이런 기능이 있으면 좋겠어요\n' + SP + '○○소스는 제 레시피라 출처를 바꿔 주세요',
+         🔴 셋째 줄에 **소스 이름을 안 쓴다**(2026-08-06 사용자 확정) — 실제 이름을 쓰면
+            「그 레시피가 남의 것이다」라고 저작자를 지목하는 꼴이 되고, `○○` 로 가려도
+            읽는 사람이 한 번 더 생각해야 한다. 이름 없이 말이 되면 그게 낫다. */
+      etc: '예) 스티커 탭에 있는 강아지가 너무 귀여워요\n' + SP + '이런 기능이 있으면 좋겠어요\n' + SP + '제 레시피인데 출처를 바꿔주세요',
       recipe: '아는 만큼만 적어 주세요.'
     };
     document.getElementById('bodyLabel').innerHTML =
