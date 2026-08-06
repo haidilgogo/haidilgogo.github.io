@@ -148,10 +148,19 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
 /* ⑤ 좌우 바꾸기 */
 body.swap .rp-actions { flex-direction: row-reverse; }
 
-/* 진행바 (① 번호로 켜고 끈다) */
+/* 진행바 — 가로(위) / 세로(오른쪽) 둘 다 번호로 볼 수 있게.
+   ⚠️ 세로바는 사실상 스크롤바다. 이 사이트는 스크롤바를 전역으로 없앤 곳이라(절대 규칙)
+      되살리는 셈이 된다. 넣기 전에 그 점을 알고 고를 것. */
 #bar { position: sticky; top: 65px; z-index: 25; height: 3px; background: rgba(43,18,13,.08); display: none; }
-body.show-bar #bar { display: block; }
+body.bar-h #bar { display: block; }
 #barFill { height: 100%; width: 0; background: var(--brand-red); transition: width .2s ease; }
+
+#vbar {
+  position: fixed; right: 4px; top: 73px; bottom: 12px; width: 3px; z-index: 25;
+  background: rgba(43,18,13,.08); border-radius: 999px; display: none;
+}
+body.bar-v #vbar { display: block; }
+#vbarFill { width: 100%; height: 0; background: var(--brand-red); border-radius: 999px; transition: height .2s ease; }
 
 [data-off] { display: none !important; }
 
@@ -234,6 +243,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   </div>
 </header>
 <div id="bar"><div id="barFill"></div></div>
+<div id="vbar"><div id="vbarFill"></div></div>
 
 <main class="column-sheet">
   <div class="credit-head">
@@ -371,37 +381,23 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-fh="c">다 · 안 맞을 때만</button>
   </div>
 
-  <h4>③ 진행바</h4>
+  <h4>③ 진행바 <span style="color:#9A8A83;font-weight:600">— 안 넣는 쪽을 권합니다</span></h4>
   <div class="prow" id="pbRow">
-    <button data-pb="0">없음</button>
-    <button data-pb="1">있음</button>
+    <button data-pb="0">없음 (권함)</button>
+    <button data-pb="h">가로 (위)</button>
+    <button data-pb="v">세로 (오른쪽)</button>
   </div>
 
-  <h4>④ 간격</h4>
-  <div class="prow" id="gpRow">
-    <button data-gp="loose">1 · 넉넉 (지금)</button>
-    <button data-gp="mid">2 · 보통</button>
-    <button data-gp="tight">3 · 촘촘</button>
-  </div>
-
-  <h4>⑤ 버튼 자리</h4>
-  <div class="prow" id="swRow">
-    <button data-sw="0">닫기 왼 · 보내기 오</button>
-    <button data-sw="1">반대로</button>
-  </div>
-
-  <h4>⑥ 「* 표시는 필수」 안내</h4>
-  <div class="prow" id="ntRow">
-    <button data-nt="gray">회색 (권함)</button>
-    <button data-nt="red">빨강</button>
-    <button data-nt="off">없음</button>
-  </div>
-
-  <h4>⑦ 「선택」 꼬리표</h4>
+  <h4>④ 「선택」 꼬리표</h4>
   <div class="prow" id="opRow">
     <button data-op="off">뺀다 (권함)</button>
     <button data-op="on">둔다</button>
   </div>
+
+  <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
+    ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색<br>
+    (개별 미세조정은 말씀해 주시면 그때그때 반영합니다)
+  </p>
 
   <button id="hide">조작판 내리기</button>
 </div>
@@ -412,7 +408,9 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 (function () {
   var body = document.body;
   // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
-  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', sw: '0', nt: 'gray', op: 'on', kind: null, ct: 'email' };
+  /* 🔴 정해진 것은 조작판에서 뺐다(2026-08-06 사용자 지시) — 미결만 남긴다.
+     간격 = 넉넉 · 버튼 자리 = 닫기 왼/보내기 오 · 「* 표시는 필수」 = 회색. */
+  var state = { br: 'full', fh: 'b', pb: '0', op: 'on', kind: null, ct: 'email' };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -536,7 +534,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp'],['swRow','sw','sw'],['ntRow','nt','nt'],['opRow','op','op']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['opRow','op','op']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -592,12 +590,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     if (state.ct === 'email') { ct.type = 'email'; ct.placeholder = '답변을 받으실 이메일'; }
     else { ct.type = 'text'; ct.placeholder = '인스타그램 아이디 (@ 없이)'; }
 
-    body.classList.toggle('show-bar', state.pb === '1');
-    body.classList.toggle('gap-mid', state.gp === 'mid');
-    body.classList.toggle('gap-tight', state.gp === 'tight');
-    body.classList.toggle('swap', state.sw === '1');
-    body.classList.toggle('note-red', state.nt === 'red');
-    body.classList.toggle('note-off', state.nt === 'off');
+    body.classList.toggle('bar-h', state.pb === 'h');
+    body.classList.toggle('bar-v', state.pb === 'v');
     body.classList.toggle('opt-off', state.op === 'off');
     renderAuto();
     checkReady();
@@ -606,7 +600,9 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   // 진행바 — 스크롤 진행도
   window.addEventListener('scroll', function () {
     var h = document.documentElement.scrollHeight - innerHeight;
-    document.getElementById('barFill').style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+    var pct = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+    document.getElementById('barFill').style.width = pct;
+    document.getElementById('vbarFill').style.height = pct;
   }, { passive: true });
 
   document.getElementById('panel').addEventListener('click', function (e) {
@@ -614,9 +610,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     if (b.dataset.br) state.br = b.dataset.br;
     else if (b.dataset.fh) state.fh = b.dataset.fh;
     else if (b.dataset.pb) state.pb = b.dataset.pb;
-    else if (b.dataset.gp) state.gp = b.dataset.gp;
-    else if (b.dataset.sw) state.sw = b.dataset.sw;
-    else if (b.dataset.nt) state.nt = b.dataset.nt;
     else if (b.dataset.op) state.op = b.dataset.op;
     else return;
     paint();
