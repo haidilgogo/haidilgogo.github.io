@@ -344,13 +344,17 @@ body.previewing .column-sheet { padding-bottom: 28px; }
          누른 링크와 도착한 화면이 같은 그림이라 「제대로 왔구나」가 읽힌다.
          ⚠️ 푸터 아이콘을 바꾸면 여기도 같이 바꿀 것. 자동이 아니다. -->
     <h1 class="credit-title"><svg class="credit-title-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</h1>
-    <!-- 지금 구글폼의 설명문 그대로(사용자 확인). 줄바꿈도 폼과 같은 자리다. -->
+    <!-- 지금 구글폼의 설명문 그대로(사용자 확인).
+         🔴 **강제 줄바꿈은 뺐다**(2026-08-07 사용자 지시) — 구글폼은 여기서 줄을 나눴지만
+            폼 폭이 좁아 어차피 감기고, `<br>` 이 있으면 「감긴 줄 + 나눈 줄」이 섞여 층이 진다. -->
     <!-- ⚠️ 구글폼 원문은 「알려주세요」였는데 **「알려 주세요」로 고쳤다**(사용자 확정) —
          `credits.html` 이 이미 「알려 주세요」라 사이트 안에서 표기를 맞춘 것이다. -->
-    <p class="credit-sub">하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요.<br>소중한 제보 감사합니다! ☺️</p>
+    <p class="credit-sub">하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요. 소중한 제보 감사합니다! ☺️</p>
   </div>
 
-  <p class="rp-note"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요</p>
+  <!-- ⚠️ 마침표를 붙였다(2026-08-07 사용자 확정) — 문장이면 마침표, 이름표면 없음이 이 폼의 기준인데
+       여기만 문장인데 빠져 있었다. -->
+  <p class="rp-note"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요.</p>
 
   <form class="rp-form" id="rpForm" onsubmit="return false">
 
@@ -416,17 +420,19 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
       <div class="rp-block" id="stepBlock" style="margin-top:18px">
         <span class="rp-label">만드는 법 <span class="rp-opt">선택</span></span>
-        <textarea class="rp-textarea" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다."></textarea>
+        <!-- ⚠️ 칸 안 예시에는 마침표를 안 붙인다(2026-08-07 사용자 확정) — 예시는 완결된 문장이 아니라
+             「이렇게 생긴 걸 적으세요」라고 보여주는 조각이고, 마침표가 있으면 진짜 입력값처럼 보인다. -->
+        <textarea class="rp-textarea" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
       </div>
 
       <div class="rp-block" id="tipBlock" style="margin-top:18px">
         <span class="rp-label">더 맛있게 먹는 팁 <span class="rp-opt">선택</span></span>
-        <textarea class="rp-textarea" placeholder="예) 고수를 더 올려 먹으면 맛있다."></textarea>
+        <textarea class="rp-textarea" placeholder="예) 고수를 더 올려 먹으면 맛있다"></textarea>
       </div>
 
       <div class="rp-block" id="srcBlock" style="margin-top:18px">
         <span class="rp-label">어디서 보셨나요? <span class="rp-opt">선택</span></span>
-        <textarea class="rp-textarea" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요."></textarea>
+        <textarea class="rp-textarea" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요"></textarea>
       </div>
     </div>
 
@@ -816,9 +822,14 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     off('ctSub', !(isMail || isInsta));
     // ⚠️ 인스타는 「아이디」가 아니라 **「계정」**이다(2026-08-06 사용자 지시).
     //    아래 검사 문구도 같은 말로 맞춰 뒀다.
-    sub.textContent = isInsta
+    /* 🔴 별표를 붙인다(2026-08-07 사용자 확정). 이 칸은 **비우면 보내기가 잠긴다**(checkReady 참고)
+       — 즉 실제로 필수인데 표시만 없었다. 「* 표시는 필수」 안내와 어긋나 있었다.
+       ⚠️ 그래서 textContent 가 아니라 innerHTML 이다 — 별표가 빨간 `<span>` 이라 태그가 필요하다.
+       ⚠️ 위 라벨(연락처 질문)에도 별표가 있어 이 묶음엔 별표가 둘이다. 뜻이 다르다 —
+          위 = 셋 중 하나를 고르는 것이 필수, 여기 = 고른 칸을 채우는 것이 필수. */
+    sub.innerHTML = (isInsta
       ? '답변을 받으실 인스타그램 계정을 입력해 주세요.'
-      : '답변을 받으실 이메일 주소를 입력해 주세요.';
+      : '답변을 받으실 이메일 주소를 입력해 주세요.') + ' <span class="rp-req">*</span>';
 
     // 도메인 「직접 입력」
     var dom = document.getElementById('rMailDom');
