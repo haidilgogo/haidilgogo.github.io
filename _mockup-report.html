@@ -520,8 +520,28 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
 <div id="panel">
   <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#1E8A5F">
-    ✅ 오류 · 기타 갈래는 정할 것이 남지 않았습니다.
+    ✅ 오류 · 기타 갈래는 끝났습니다. 아래는 <b>레시피 갈래</b>용입니다.
   </p>
+
+  <h4>① 레시피를 고르면 칸이 몇 개</h4>
+  <div class="prow" id="brRow">
+    <button data-br="full">그대로 (6칸)</button>
+    <button data-br="mid">중간 (2칸)</button>
+    <button data-br="min">줄인 안 (1칸)</button>
+  </div>
+
+  <h4>② 자동완성 — 목록에 없을 때 안내 (주문 항목 칸)</h4>
+  <div class="prow" id="fhRow">
+    <button data-fh="a">가 · 늘 보임</button>
+    <button data-fh="b">나 · 목록 맨 아래</button>
+    <button data-fh="c">다 · 안 맞을 때만</button>
+  </div>
+
+  <h4>③ 「선택」 꼬리표 <span style="color:#9A8A83;font-weight:600">(레시피 갈래에만 5개)</span></h4>
+  <div class="prow" id="opRow">
+    <button data-op="off">뺀다 (권함)</button>
+    <button data-op="on">둔다</button>
+  </div>
 
   <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
     ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 ·
@@ -695,8 +715,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    /* 조작판에 남은 항목이 없다 — 정해진 것은 전부 state 기본값으로 박혀 있다.
-       레시피 갈래를 시작할 때 여기에 다시 붙인다. */
+    // 레시피 갈래용 조작 셋을 되살렸다(2026-08-07)
+    [['brRow','br','br'],['fhRow','fh','fh'],['opRow','op','op']].forEach(function (p) {
+      var row = document.getElementById(p[0]);
+      if (!row) return;
+      [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
+    });
     [].forEach.call(document.getElementById('rpKinds').children, function (b) {
       b.classList.toggle('on', b.dataset.k === state.kind);
     });
@@ -803,7 +827,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     if (b.dataset.br) state.br = b.dataset.br;
     else if (b.dataset.fh) state.fh = b.dataset.fh;
     else if (b.dataset.op) state.op = b.dataset.op;
-    else if (b.dataset.ml) state.ml = b.dataset.ml;
     else if (b.dataset.bg) state.bg = b.dataset.bg;
     else if (b.dataset.mk) state.mk = b.dataset.mk;
     else return;
