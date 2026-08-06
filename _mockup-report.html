@@ -95,6 +95,38 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
   .rp-kind:hover { border-color: var(--card-hover-border); }
 }
 .rp-kind:active { transform: scale(.985); border-color: var(--card-hover-border); }
+
+/* 🔴 「누르는 상자」와 「적는 칸」이 똑같이 생겼던 것(2026-08-06 사용자 지적).
+   앱 입력칸(.stamp-field)의 값을 그대로 빌려 쓴 탓이다 — 흰 배경·1.5px 테두리·모서리 12.
+   「앱과 통일」을 노렸는데 너무 통일해서 **무엇이 눌리는지 안 읽혔다.**
+   아래 셋을 번호로 비교한다. */
+
+/* 🔴 바탕과 표시는 **따로 고른다**(2026-08-06 사용자 지시) — 면 + 동그라미처럼 겹쳐 쓸 수 있다. */
+
+/* 표시 ① 동그라미 — 「고르는 것」임을 가장 분명히 말한다(구글폼과 같은 관용구) */
+body.pick-radio .rp-kind::before {
+  content: ''; flex: none; width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--card-border); margin-right: 11px;
+  transition: border-color .12s, background .12s;
+}
+body.pick-radio .rp-kind.on::before {
+  border-color: #fff;
+  background: radial-gradient(circle, #fff 0 46%, transparent 47%);
+}
+
+/* 바탕 ② 면으로 — 누르는 것은 채운 면, 적는 칸은 흰 바탕에 선.
+   ⚠️ 동그라미는 면 위에서 테두리가 묻히므로 조금 진하게 한다. */
+body.pick-fill .rp-kind { background: #F1E9DF; border-color: transparent; }
+body.pick-fill .rp-kind.on { background: var(--brand-red); }
+body.pick-fill.pick-radio .rp-kind::before { border-color: #C9B8A6; }
+
+/* 표시 ② 화살표 — 앱의 매장 고르기(.stamp-dd-btn)가 쓰는 방식과 같은 뜻 */
+body.pick-chev .rp-kind::after {
+  content: ''; flex: none; margin-left: auto; width: 8px; height: 8px;
+  border-right: 2px solid #B9ABA3; border-bottom: 2px solid #B9ABA3;
+  transform: rotate(-45deg);
+}
+body.pick-chev .rp-kind.on::after { border-color: #fff; }
 /* 🔴 연락처 종류는 **가로 두 칸**이다. 첫 질문과 같은 세로 상자로 두면 「이메일」 한 칸이
    화면 폭을 통째로 먹어 첫 질문보다 무거워 보인다(2026-08-06 렌더해 보고 갈랐다).
    상자 생김새(테두리·모서리 12·고른 것 빨강)는 같게 두어 말이 통일된다. */
@@ -425,27 +457,33 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-fh="c">다 · 안 맞을 때만</button>
   </div>
 
-  <h4>③ 진행바 <span style="color:#9A8A83;font-weight:600">— 안 넣는 쪽을 권합니다</span></h4>
-  <div class="prow" id="pbRow">
-    <button data-pb="0">없음 (권함)</button>
-    <button data-pb="h">가로 (위)</button>
-    <button data-pb="v">세로 (오른쪽)</button>
-  </div>
-
-  <h4>④ 「선택」 꼬리표</h4>
+  <h4>③ 「선택」 꼬리표</h4>
   <div class="prow" id="opRow">
     <button data-op="off">뺀다 (권함)</button>
     <button data-op="on">둔다</button>
   </div>
 
-  <h4>⑤ 이메일 칸</h4>
+  <h4>④ 이메일 칸</h4>
   <div class="prow" id="mlRow">
     <button data-ml="one">한 칸 (권함)</button>
     <button data-ml="split">아이디 @ 도메인▾</button>
   </div>
 
+  <h4>⑤ 고르는 상자 — 바탕</h4>
+  <div class="prow" id="bgRow">
+    <button data-bg="white">흰색 (지금)</button>
+    <button data-bg="fill">면으로 (크림)</button>
+  </div>
+
+  <h4>⑥ 고르는 상자 — 표시 <span style="color:#9A8A83;font-weight:600">(⑤와 겹쳐 씁니다)</span></h4>
+  <div class="prow" id="mkRow">
+    <button data-mk="radio">동그라미</button>
+    <button data-mk="chev">화살표</button>
+    <button data-mk="none">없음</button>
+  </div>
+
   <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
-    ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색<br>
+    ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 · <b>진행바 가로</b><br>
     (개별 미세조정은 말씀해 주시면 그때그때 반영합니다)
   </p>
 
@@ -461,7 +499,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   /* 🔴 정해진 것은 조작판에서 뺐다(2026-08-06 사용자 지시) — 미결만 남긴다.
      간격 = 넉넉 · 버튼 자리 = 닫기 왼/보내기 오 · 「* 표시는 필수」 = 회색. */
   // 🔴 ct 도 처음엔 **아무것도 안 골라진 상태**(null)로 시작한다(2026-08-06 사용자 지시)
-  var state = { br: 'full', fh: 'b', pb: '0', op: 'on', ml: 'one', kind: null, ct: null };
+  /* 진행바 = 가로로 확정(2026-08-06 사용자 확정) — 조작판에서 뺐다. */
+  var state = { br: 'full', fh: 'b', op: 'on', ml: 'one', bg: 'white', mk: 'radio', kind: null, ct: null };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -599,7 +638,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['opRow','op','op'],['mlRow','ml','ml']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['opRow','op','op'],['mlRow','ml','ml'],
+     ['bgRow','bg','bg'],['mkRow','mk','mk']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -666,9 +706,11 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     var dom = document.getElementById('rMailDom');
     off('rMailDomSelf', dom.value !== '__self');
 
-    body.classList.toggle('bar-h', state.pb === 'h');
-    body.classList.toggle('bar-v', state.pb === 'v');
+    body.classList.add('bar-h');          // 진행바 가로 — 확정
     body.classList.toggle('opt-off', state.op === 'off');
+    body.classList.toggle('pick-fill', state.bg === 'fill');
+    body.classList.toggle('pick-radio', state.mk === 'radio');
+    body.classList.toggle('pick-chev', state.mk === 'chev');
     renderAuto();
     checkReady();
   }
@@ -685,9 +727,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     var b = e.target.closest('button'); if (!b || b.id === 'hide') return;
     if (b.dataset.br) state.br = b.dataset.br;
     else if (b.dataset.fh) state.fh = b.dataset.fh;
-    else if (b.dataset.pb) state.pb = b.dataset.pb;
     else if (b.dataset.op) state.op = b.dataset.op;
     else if (b.dataset.ml) state.ml = b.dataset.ml;
+    else if (b.dataset.bg) state.bg = b.dataset.bg;
+    else if (b.dataset.mk) state.mk = b.dataset.mk;
     else return;
     paint();
   });
