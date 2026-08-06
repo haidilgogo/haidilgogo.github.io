@@ -73,6 +73,8 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
 }
 /* 입력칸(한 줄)도 같은 이유로 16px */
 .stamp-field input { font-size: 16px; }
+/* 칸 안 고정 라벨(`@`)도 입력 글자와 같은 16px 로 — 앱 기본값 14px 이면 아래위로 어긋나 보인다 */
+#ctPrefix { font-size: 16px; font-weight: 400; }
 .rp-textarea::placeholder { color: var(--text-muted); opacity: 1; }
 .rp-count { font-size: 11px; color: var(--text-muted); text-align: right; }
 
@@ -413,9 +415,13 @@ body.previewing .column-sheet { padding-bottom: 28px; }
            라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. -->
       <span class="rp-sublabel" id="ctSub" data-off></span>
 
-      <!-- 한 칸 안 -->
+      <!-- 한 칸 안.
+           🔴 인스타일 때는 칸 안에 `@` 를 박아 둔다(2026-08-06 사용자 지적 — `id` 두 글자만
+              떠 있으니 빈 칸처럼 보였다). 앱의 **칸 안 고정 라벨**(.stamp-field-label)을 그대로 쓴다.
+           🟢 덤: `@` 가 눈에 보이니 라벨에서 **「(@ 없이)」를 뺄 수 있다.** -->
       <div class="stamp-field stamp-field--light-ph" id="ctOne">
-        <input type="email" id="rCt" placeholder="qwerty@abc.com" autocomplete="email">
+        <span class="stamp-field-label" id="ctPrefix" data-off>@</span>
+        <input type="email" id="rCt" placeholder="id@example.com" autocomplete="email">
       </div>
 
       <!-- 쪼갠 안 (@ 뒤 드롭다운) -->
@@ -707,12 +713,13 @@ body.previewing .column-sheet { padding-bottom: 28px; }
        절대 실제 사이트가 아니다. ⚠️ `abc.com` 같은 흔한 예시는 **실제로 있는 도메인**이다. */
     if (isInsta) { ct.type = 'text'; ct.placeholder = 'id'; ct.autocomplete = 'off'; }
     else { ct.type = 'email'; ct.placeholder = 'id@example.com'; ct.autocomplete = 'email'; }
+    off('ctPrefix', !isInsta);   // 칸 안 `@` 는 인스타일 때만
 
     // 칸 위 라벨 — 「입력해 주세요」는 띄어 쓴다(사이트 표기와 맞춤)
     var sub = document.getElementById('ctSub');
     off('ctSub', !(isMail || isInsta));
     sub.textContent = isInsta
-      ? '답변을 받으실 인스타그램 아이디를 입력해 주세요 (@ 없이)'
+      ? '답변을 받으실 인스타그램 아이디를 입력해 주세요'
       : '답변을 받으실 이메일을 입력해 주세요';
 
     // 도메인 「직접 입력」
