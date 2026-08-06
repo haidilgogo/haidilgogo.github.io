@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제보 · 문의 (목업) · 하딜고고</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="styles.css?v=756">
+<link rel="stylesheet" href="article.css?v=23">
+<meta name="theme-color" content="#FCF9F5">
+<style>
+/* ===== 목업 전용. 앱 파일은 안 건드린다 =====
+   🔴 입력칸(.stamp-field)·보내기(.stamp-submit)·토스트(.share-toast)는 **앱 것을 그대로 쓴다.**
+      새로 그리면 앱과 따로 놀고, 나중에 앱 스타일이 바뀌어도 안 따라온다. */
+
+/* 🔴 .column-sheet 은 좌우 여백이 없다 — 자식이 각자 갖는 구조다(.credit-head 가 22px).
+   그래서 폼도 22px 을 직접 가져야 제목과 왼쪽 줄이 맞는다. 안 주면 화면 끝에 붙는다. */
+.rp-form { display: flex; flex-direction: column; gap: 18px; margin-top: 4px; padding: 0 22px; }
+.rp-block { display: flex; flex-direction: column; gap: 8px; }
+.rp-label {
+  font-size: 13px; font-weight: 700; color: var(--text-dark);
+  display: flex; align-items: center; gap: 6px;
+}
+.rp-opt { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.rp-help { font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+
+/* 여러 줄 입력 — .stamp-field 와 같은 상자(흰 배경·1.5px 테두리·radius 12) */
+.rp-textarea {
+  background: #fff; border: 1.5px solid var(--card-border); border-radius: 12px;
+  padding: 12px 13px; box-sizing: border-box; width: 100%;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+  font-size: 14px; font-weight: 400; line-height: 1.65; color: var(--text-dark);
+  min-height: 140px; resize: none; outline: none;
+}
+.rp-textarea::placeholder { color: var(--text-muted); opacity: 1; }
+.rp-count { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+/* 종류 고르기 */
+.rp-kinds { display: flex; flex-wrap: wrap; gap: 7px; }
+.rp-kind {
+  border: 1.5px solid var(--card-border); background: #fff; border-radius: 999px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--text-muted);
+  font-family: inherit; -webkit-tap-highlight-color: transparent;
+}
+.rp-kind.on { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
+
+/* 개인정보 동의 */
+.rp-agree { display: flex; align-items: flex-start; gap: 9px; }
+.rp-agree input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--brand-red); flex: none; }
+.rp-agree label { font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.5; }
+.rp-privacy {
+  background: #F6F1EA; border-radius: 11px; padding: 12px 13px;
+  font-size: 11.5px; line-height: 1.7; color: var(--text-muted);
+}
+.rp-privacy b { color: var(--text-dark); font-weight: 700; }
+.rp-privacy ul { margin: 6px 0 0; padding-left: 15px; }
+.rp-privacy li { margin: 2px 0; }
+/* 접힘 안 */
+details.rp-privacy-fold { font-size: 12px; color: var(--text-muted); }
+details.rp-privacy-fold > summary {
+  cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted);
+  text-decoration: underline; text-underline-offset: 3px; list-style: none;
+}
+details.rp-privacy-fold > summary::-webkit-details-marker { display: none; }
+details.rp-privacy-fold .rp-privacy { margin-top: 8px; }
+
+.rp-submit-wrap { margin-top: 6px; }
+/* 보내기는 폭을 꽉 채운다 — 스티커 등록(182px)은 「점선에 맞춘 것」이라 여기선 근거가 없다 */
+#rpSubmit { width: 100%; }
+
+/* 숨김 */
+[data-off] { display: none !important; }
+
+/* 조작판 */
+#panel {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 400;
+  background: #fff; border-top: 2px solid #2B120D;
+  padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  font-family: Pretendard, sans-serif; font-size: 13px;
+  transition: transform .18s ease;
+}
+body.previewing #panel { transform: translateY(100%); }
+#panel h4 { margin: 11px 0 6px; font-size: 12px; color: #8A6A5F; font-weight: 700; }
+#panel h4:first-child { margin-top: 0; }
+.prow { display: flex; gap: 6px; }
+.prow button {
+  flex: 1; padding: 9px 6px; border-radius: 9px; border: 1.5px solid #E4D9CE;
+  background: #FCF9F5; font-size: 12.5px; font-weight: 600; color: #2B120D; font-family: inherit;
+}
+.prow button.on { background: #D0402E; border-color: #D0402E; color: #fff; }
+#hide { width: 100%; margin-top: 11px; padding: 12px; border: 0; border-radius: 10px;
+  background: #2B120D; color: #fff; font-size: 14px; font-weight: 700; font-family: inherit; }
+.column-sheet { padding-bottom: 240px; }
+body.previewing .column-sheet { padding-bottom: 60px; }
+</style>
+</head>
+<body class="art-page">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="./">
+      <img class="topbar-logo-mark" src="assets/icons/logo-mark-color-v2.png?v=1" width="25" height="22" draggable="false" alt="">
+      <span class="topbar-title">하딜고고</span>
+    </a>
+  </div>
+</header>
+
+<main class="column-sheet">
+  <div class="credit-head">
+    <h1 class="credit-title">제보 · 문의</h1>
+    <p class="credit-sub">잘못된 정보나 궁금한 점을 알려 주세요.</p>
+  </div>
+
+  <form class="rp-form" id="rpForm" onsubmit="return false">
+
+    <!-- ① 종류 — 있는 안 / 없는 안을 번호로 갈아 낀다 -->
+    <div class="rp-block" id="kindBlock">
+      <span class="rp-label">어떤 이야기인가요?</span>
+      <div class="rp-kinds" id="rpKinds">
+        <button type="button" class="rp-kind on">매장 정보</button>
+        <button type="button" class="rp-kind">레시피</button>
+        <button type="button" class="rp-kind">잘못된 내용</button>
+        <button type="button" class="rp-kind">그 밖</button>
+      </div>
+    </div>
+
+    <!-- ② 내용 -->
+    <div class="rp-block">
+      <span class="rp-label">내용</span>
+      <textarea class="rp-textarea" id="rpBody" maxlength="1000"
+        placeholder="예) 분당점이 없어진 것 같아요. 지난주에 갔더니 문이 닫혀 있었습니다."></textarea>
+      <span class="rp-count" id="rpCount">0 / 1000자</span>
+    </div>
+
+    <!-- ③ 연락처 (선택) -->
+    <div class="rp-block">
+      <span class="rp-label">연락처 <span class="rp-opt">선택</span></span>
+      <div class="stamp-field stamp-field--light-ph">
+        <input type="email" id="rpMail" placeholder="답변을 받으실 이메일" autocomplete="email">
+      </div>
+      <p class="rp-help">답변이 필요하시면 적어 주세요. 적지 않으셔도 제보 · 문의는 정상적으로 접수됩니다.</p>
+
+      <div class="rp-agree">
+        <input type="checkbox" id="rpAgree">
+        <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
+      </div>
+
+      <!-- 펼친 안 -->
+      <div class="rp-privacy" id="privOpen">
+        <ul>
+          <li><b>수집 항목</b> 이메일 주소</li>
+          <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
+          <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
+        </ul>
+        동의하지 않으셔도 제보 · 문의는 접수되며, <b>답변만 받으실 수 없습니다.</b>
+      </div>
+
+      <!-- 접은 안 -->
+      <details class="rp-privacy-fold" id="privFold" data-off>
+        <summary>수집 항목 · 이용 목적 · 보유 기간 보기</summary>
+        <div class="rp-privacy">
+          <ul>
+            <li><b>수집 항목</b> 이메일 주소</li>
+            <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
+            <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
+          </ul>
+          동의하지 않으셔도 제보 · 문의는 접수되며, <b>답변만 받으실 수 없습니다.</b>
+        </div>
+      </details>
+    </div>
+
+    <div class="rp-submit-wrap">
+      <button type="button" class="stamp-submit" id="rpSubmit">보내기</button>
+    </div>
+  </form>
+</main>
+
+<!-- 앱과 같은 토스트 (자리도 앱과 같은 화면 1/3) -->
+<div class="share-toast" id="toast">보내주셔서 고맙습니다!</div>
+
+<div id="panel">
+  <h4>① 「어떤 이야기인가요?」 칸</h4>
+  <div class="prow" id="kindRow">
+    <button data-kind="1">있음</button>
+    <button data-kind="0">없음</button>
+  </div>
+
+  <h4>② 개인정보 안내</h4>
+  <div class="prow" id="privRow">
+    <button data-priv="open">펼쳐 둠</button>
+    <button data-priv="fold">접어 둠</button>
+  </div>
+
+  <button id="hide">조작판 숨기고 보기 (5초)</button>
+</div>
+
+<script>
+(function () {
+  var body = document.body;
+  var state = { kind: '1', priv: 'open' };
+
+  // 글자 수
+  var ta = document.getElementById('rpBody'), cnt = document.getElementById('rpCount');
+  ta.addEventListener('input', function () { cnt.textContent = ta.value.length + ' / 1000자'; });
+
+  // 종류 고르기
+  document.getElementById('rpKinds').addEventListener('click', function (e) {
+    var b = e.target.closest('.rp-kind');
+    if (!b) return;
+    [].forEach.call(this.children, function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+  });
+
+  // 보내기 — 목업이라 실제로 안 보낸다
+  var toast = document.getElementById('toast'), t = null;
+  document.getElementById('rpSubmit').addEventListener('click', function () {
+    if (!ta.value.trim()) { show('내용을 적어 주세요'); return; }
+    show('보내주셔서 고맙습니다! (목업이라 실제로는 안 갑니다)');
+  });
+  function show(msg) {
+    toast.textContent = msg;
+    toast.classList.remove('show');
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      toast.classList.add('show');
+      clearTimeout(t); t = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+    }); });
+  }
+
+  function paint() {
+    [['kindRow', 'kind'], ['privRow', 'priv']].forEach(function (p) {
+      var row = document.getElementById(p[0]);
+      [].forEach.call(row.children, function (b) {
+        b.classList.toggle('on', (b.dataset.kind || b.dataset.priv) === state[p[1]]);
+      });
+    });
+    toggle(document.getElementById('kindBlock'), state.kind === '1');
+    toggle(document.getElementById('privOpen'), state.priv === 'open');
+    toggle(document.getElementById('privFold'), state.priv === 'fold');
+  }
+  function toggle(el, on) { if (on) el.removeAttribute('data-off'); else el.setAttribute('data-off', ''); }
+
+  document.getElementById('panel').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b || b.id === 'hide') return;
+    if (b.dataset.kind) state.kind = b.dataset.kind;
+    else if (b.dataset.priv) state.priv = b.dataset.priv;
+    else return;
+    paint();
+  });
+
+  document.getElementById('hide').addEventListener('click', function () {
+    body.classList.add('previewing');
+    setTimeout(function () { body.classList.remove('previewing'); }, 5000);
+  });
+
+  paint();
+})();
+</script>
+</body>
+</html>
