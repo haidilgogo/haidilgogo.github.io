@@ -122,6 +122,20 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
 /* 안 「다」 — 안 맞을 때만 뜨는 한 줄 */
 .rp-nomatch { font-size: 12px; color: var(--text-muted); }
 
+/* 이메일을 아이디 @ 도메인으로 쪼갠 안 */
+.rp-mail { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rp-mail > .stamp-field { flex: 1 1 90px; min-width: 0; }
+.rp-at { flex: none; font-size: 15px; font-weight: 700; color: var(--text-muted); }
+#rMailDomWrap { padding-right: 8px; }
+#rMailDom {
+  flex: 1; min-width: 0; border: none; outline: none; background: none;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+  /* 🔴 16px — 여기도 아이폰 자동 확대 기준을 지킨다(select 도 걸린다) */
+  font-size: 16px; font-weight: 400; color: var(--text-dark);
+  -webkit-appearance: none; appearance: none;
+}
+#rMailDomSelf { flex: 1 1 100%; }
+
 .rp-agree { display: flex; align-items: flex-start; gap: 9px; }
 .rp-agree input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--brand-red); flex: none; }
 .rp-agree label { font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.5; }
@@ -330,16 +344,45 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
     <!-- ── 연락처 ── -->
     <div class="rp-block" id="ctBlock">
-      <span class="rp-label">연락처 <span class="rp-opt">선택</span></span>
-      <div class="rp-kinds rp-kinds--inline" id="ctKinds">
-        <button type="button" class="rp-kind on" data-c="email">이메일</button>
+      <span class="rp-label">답변이 필요한 경우, 연락 가능한 연락처를 알려 주세요. <span class="rp-req">*</span></span>
+      <!-- 🔴 「선택 안 함」을 넣었기 때문에 별표를 붙여도 된다 —
+           **연락처를 주는 것**이 필수가 아니라 **셋 중 하나를 고르는 것**이 필수다.
+           동의를 강요하지 않으므로 개인정보보호법과도 어긋나지 않는다. -->
+      <div class="rp-kinds" id="ctKinds">
+        <button type="button" class="rp-kind" data-c="none">답변이 필요 없어요</button>
+        <button type="button" class="rp-kind" data-c="email">이메일</button>
         <button type="button" class="rp-kind" data-c="insta">인스타그램</button>
       </div>
-      <div class="stamp-field stamp-field--light-ph">
+
+      <!-- 한 칸 안 -->
+      <div class="stamp-field stamp-field--light-ph" id="ctOne">
         <input type="email" id="rCt" placeholder="답변을 받으실 이메일" autocomplete="email">
       </div>
-      <p class="rp-help">답변이 필요하시면 적어 주세요. 적지 않으셔도 제보 · 문의는 정상적으로 접수됩니다.</p>
 
+      <!-- 쪼갠 안 (@ 뒤 드롭다운) -->
+      <div class="rp-mail" id="ctSplit" data-off>
+        <div class="stamp-field stamp-field--light-ph">
+          <input type="text" id="rMailId" placeholder="아이디" autocomplete="off">
+        </div>
+        <span class="rp-at">@</span>
+        <div class="stamp-field" id="rMailDomWrap">
+          <select id="rMailDom">
+            <option value="">고르기</option>
+            <option>naver.com</option><option>gmail.com</option><option>daum.net</option>
+            <option>hanmail.net</option><option>kakao.com</option><option>nate.com</option>
+            <option>icloud.com</option><option>outlook.com</option>
+            <option value="__self">직접 입력</option>
+          </select>
+        </div>
+        <div class="stamp-field stamp-field--light-ph" id="rMailDomSelf" data-off>
+          <input type="text" id="rMailDomInput" placeholder="직접 입력" autocomplete="off">
+        </div>
+      </div>
+
+      <p class="rp-help" id="ctHelp">답변이 필요하시면 적어 주세요.</p>
+
+      <!-- 🔴 「답변이 필요 없어요」를 고르면 이 묶음이 통째로 사라진다 — 받는 게 없으니 동의도 없다 -->
+      <div id="agreeWrap" style="display:flex;flex-direction:column;gap:8px" data-off>
       <div class="rp-agree">
         <input type="checkbox" id="rpAgree">
         <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
@@ -351,6 +394,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
           <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
         </ul>
         동의하지 않으셔도 제보 · 문의는 접수되며, <b>답변만 받으실 수 없습니다.</b>
+      </div>
       </div>
     </div>
 
@@ -394,6 +438,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-op="on">둔다</button>
   </div>
 
+  <h4>⑤ 이메일 칸</h4>
+  <div class="prow" id="mlRow">
+    <button data-ml="one">한 칸 (권함)</button>
+    <button data-ml="split">아이디 @ 도메인▾</button>
+  </div>
+
   <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
     ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색<br>
     (개별 미세조정은 말씀해 주시면 그때그때 반영합니다)
@@ -410,7 +460,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
   /* 🔴 정해진 것은 조작판에서 뺐다(2026-08-06 사용자 지시) — 미결만 남긴다.
      간격 = 넉넉 · 버튼 자리 = 닫기 왼/보내기 오 · 「* 표시는 필수」 = 회색. */
-  var state = { br: 'full', fh: 'b', pb: '0', op: 'on', kind: null, ct: 'email' };
+  // 🔴 ct 도 처음엔 **아무것도 안 골라진 상태**(null)로 시작한다(2026-08-06 사용자 지시)
+  var state = { br: 'full', fh: 'b', pb: '0', op: 'on', ml: 'one', kind: null, ct: null };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -488,24 +539,38 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     var btn = document.getElementById('rpSubmit'), why = document.getElementById('rpWhy');
     var name = document.getElementById('rName').value.trim();
     var bodyV = document.getElementById('rBody').value.trim();
-    var ctV = document.getElementById('rCt').value.trim();
     var agreed = document.getElementById('rpAgree').checked;
     var isRecipe = state.kind === 'recipe';
     var needName = isRecipe && (state.br === 'full' || state.br === 'mid');
     var reason = '';
 
+    // 이메일은 한 칸 안 / 쪼갠 안 두 가지라 값을 모아서 본다
+    var dom = document.getElementById('rMailDom');
+    var ctV;
+    if (state.ct === 'email' && state.ml === 'split') {
+      var id = document.getElementById('rMailId').value.trim();
+      var d = dom.value === '__self' ? document.getElementById('rMailDomInput').value.trim() : dom.value;
+      ctV = (id && d) ? id + '@' + d : '';
+    } else {
+      ctV = document.getElementById('rCt').value.trim();
+    }
+
     if (state.kind === null) reason = '';
     else if (needName && !name) reason = '레시피 이름을 적어 주세요.';
     else if (!needName && !bodyV) reason = '내용을 적어 주세요.';
-    else if (ctV && !agreed) reason = '연락처를 적으셨으면 개인정보 수집 · 이용에 동의해 주세요.';
+    // 🔴 연락처는 **셋 중 하나를 고르는 것**이 필수다(값을 주는 것이 아니라)
+    else if (state.ct === null) reason = '연락처를 어떻게 하실지 골라 주세요.';
+    else if (state.ct !== 'none' && !ctV) reason = '연락처를 적어 주세요.';
+    else if (state.ct !== 'none' && !agreed) reason = '개인정보 수집 · 이용에 동의해 주세요.';
 
     btn.disabled = reason !== '' || state.kind === null;
     why.textContent = btn.disabled ? reason : '';
   }
-  ['rName','rBody','rCt'].forEach(function (id) {
+  ['rName','rBody','rCt','rMailId','rMailDomInput'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', checkReady);
   });
   document.getElementById('rpAgree').addEventListener('change', checkReady);
+  document.getElementById('rMailDom').addEventListener('change', paint);
 
   // 닫기 — 🔴 credits.html 과 같은 방식: 같은 사이트에서 왔으면 왔던 자리로, 아니면 홈으로.
   //        ⚠️ 다만 여기는 폼이라 **적던 글이 있으면 한 번 묻는다**.
@@ -534,7 +599,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['opRow','op','op']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['opRow','op','op'],['mlRow','ml','ml']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -585,10 +650,21 @@ body.previewing .column-sheet { padding-bottom: 28px; }
       (LABEL[state.kind] || '내용') + ' <span class="rp-req">*</span>';
     if (PH[state.kind]) document.getElementById('rBody').placeholder = PH[state.kind];
 
-    // 연락처 종류에 맞춰 안내문·자판
+    /* 연락처 — 고른 종류에 따라 칸·동의·안내문이 달라진다.
+       🔴 「답변이 필요 없어요」를 고르면 **개인정보를 아예 안 받으므로** 동의 줄도 감춘다. */
     var ct = document.getElementById('rCt');
-    if (state.ct === 'email') { ct.type = 'email'; ct.placeholder = '답변을 받으실 이메일'; }
-    else { ct.type = 'text'; ct.placeholder = '인스타그램 아이디 (@ 없이)'; }
+    var isMail = state.ct === 'email', isInsta = state.ct === 'insta', isNone = state.ct === 'none';
+    var splitMail = isMail && state.ml === 'split';
+    off('ctOne', !((isMail && !splitMail) || isInsta));
+    off('ctSplit', !splitMail);
+    off('agreeWrap', !(isMail || isInsta));
+    off('ctHelp', state.ct !== null);
+    if (isInsta) { ct.type = 'text'; ct.placeholder = '인스타그램 아이디 (@ 없이)'; ct.autocomplete = 'off'; }
+    else { ct.type = 'email'; ct.placeholder = '답변을 받으실 이메일'; ct.autocomplete = 'email'; }
+
+    // 도메인 「직접 입력」
+    var dom = document.getElementById('rMailDom');
+    off('rMailDomSelf', dom.value !== '__self');
 
     body.classList.toggle('bar-h', state.pb === 'h');
     body.classList.toggle('bar-v', state.pb === 'v');
@@ -611,6 +687,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     else if (b.dataset.fh) state.fh = b.dataset.fh;
     else if (b.dataset.pb) state.pb = b.dataset.pb;
     else if (b.dataset.op) state.op = b.dataset.op;
+    else if (b.dataset.ml) state.ml = b.dataset.ml;
     else return;
     paint();
   });
