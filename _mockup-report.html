@@ -120,6 +120,18 @@ body.pick-fill .rp-kind { background: #F1E9DF; border-color: transparent; }
 body.pick-fill .rp-kind.on { background: var(--brand-red); }
 body.pick-fill.pick-radio .rp-kind::before { border-color: #C9B8A6; }
 
+/* 바탕 ③④ 그림자 — 🔴 「눌릴 것 같은 느낌」은 색이 아니라 **떠 있음**에서 온다(2026-08-06 사용자 지적).
+   🔴 크게 키우지 말 것 — 아이폰 사파리에서 **가로 구분선이 생긴다**(2026-08-04 탭바에서 실제로 겪었다.
+      바깥 끝이 10px 을 넘으면 그 끝에서 선이 보인다). 그래서 탭바와 같은 방식으로 **작게 두 겹**이다.
+   ⚠️ 고른 상자(빨강)는 그림자를 조금 진하게 — 밝은 면과 같은 값이면 안 떠 보인다. */
+body.pick-shadow .rp-kind {
+  box-shadow: 0 1px 2px rgba(43, 18, 13, .10), 0 2px 6px rgba(43, 18, 13, .09);
+}
+body.pick-shadow .rp-kind.on {
+  box-shadow: 0 1px 3px rgba(178, 40, 24, .28), 0 3px 8px rgba(178, 40, 24, .22);
+}
+body.pick-shadow .rp-kind:active { box-shadow: 0 1px 2px rgba(43, 18, 13, .12); } /* 누르면 내려앉는다 */
+
 /* 표시 ② 화살표 — 앱의 매장 고르기(.stamp-dd-btn)가 쓰는 방식과 같은 뜻 */
 body.pick-chev .rp-kind::after {
   content: ''; flex: none; margin-left: auto; width: 8px; height: 8px;
@@ -471,8 +483,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
   <h4>⑤ 고르는 상자 — 바탕</h4>
   <div class="prow" id="bgRow">
-    <button data-bg="white">흰색 (지금)</button>
-    <button data-bg="fill">면으로 (크림)</button>
+    <button data-bg="white">흰색</button>
+    <button data-bg="fill">크림 면</button>
+  </div>
+  <div class="prow" id="bgRow2" style="margin-top:6px">
+    <button data-bg="shadow">흰색 + 그림자</button>
+    <button data-bg="fillshadow">크림 + 그림자</button>
   </div>
 
   <h4>⑥ 고르는 상자 — 표시 <span style="color:#9A8A83;font-weight:600">(⑤와 겹쳐 씁니다)</span></h4>
@@ -639,7 +655,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
   function paint() {
     [['brRow','br','br'],['fhRow','fh','fh'],['opRow','op','op'],['mlRow','ml','ml'],
-     ['bgRow','bg','bg'],['mkRow','mk','mk']].forEach(function (p) {
+     ['bgRow','bg','bg'],['bgRow2','bg','bg'],['mkRow','mk','mk']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -708,7 +724,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
     body.classList.add('bar-h');          // 진행바 가로 — 확정
     body.classList.toggle('opt-off', state.op === 'off');
-    body.classList.toggle('pick-fill', state.bg === 'fill');
+    body.classList.toggle('pick-fill', state.bg === 'fill' || state.bg === 'fillshadow');
+    body.classList.toggle('pick-shadow', state.bg === 'shadow' || state.bg === 'fillshadow');
     body.classList.toggle('pick-radio', state.mk === 'radio');
     body.classList.toggle('pick-chev', state.mk === 'chev');
     renderAuto();
