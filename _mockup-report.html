@@ -25,6 +25,22 @@
 .rp-block { display: flex; flex-direction: column; gap: 8px; }
 .rp-label { font-size: 13px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
 .rp-opt { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+/* 필수 표시 — 구글폼과 같은 방식(빨강 별표). 「선택」 꼬리표와 짝을 이룬다. */
+.rp-req { color: var(--brand-red); font-weight: 800; }
+/* 별표 안내 한 줄 — 색은 ⑥번으로 갈아 끼운다.
+   ⚠️ 기본을 회색으로 둔 이유: 이 사이트에서 빨강은 「누르는 것·중요한 것」의 색이라
+      안내문에 쓰면 경고처럼 읽힌다. 필수는 한 번에 둘뿐이고 나머지엔 「선택」이 적혀 있다. */
+/* ⚠️ 간격은 `padding` 이 아니라 `margin` 으로 준다 — padding 으로 주면 상자 위끝은 그대로라
+   재는 값과 눈에 보이는 것이 어긋난다(실제로 2px 로 재져서 헷갈렸다). */
+.rp-note {
+  margin: 18px 22px 0;
+  font-size: 12px; font-weight: 600; color: var(--text-muted);
+}
+body.note-red .rp-note { color: var(--brand-red); }
+body.note-off .rp-note { display: none; }
+/* 안내를 끄면 그만큼 폼 위 여백을 되돌린다 */
+body.note-off .rp-form { margin-top: 18px; }
+body:not(.note-off) .rp-form { margin-top: 8px; }
 .rp-help { font-size: 12px; line-height: 1.55; color: var(--text-muted); }
 .rp-lead {
   margin: 0 22px 4px; padding: 12px 14px; background: #F6F1EA; border-radius: 11px;
@@ -233,10 +249,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     아는 만큼만 적어 주셔도 좋아요. <b>레시피 이름만 필수</b>이고, 나머지는 비워 두셔도 됩니다.
   </div>
 
+  <p class="rp-note"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요</p>
+
   <form class="rp-form" id="rpForm" onsubmit="return false">
 
     <div class="rp-block">
-      <span class="rp-label">어떤 내용으로 문의하고 싶으신가요?</span>
+      <span class="rp-label">어떤 내용으로 문의하고 싶으신가요? <span class="rp-req">*</span></span>
       <!-- 🔴 기본값 없음 — 고르기 전에는 아래를 아예 안 보여준다(2026-08-06 사용자 지시)
            🔴 선택지 문구는 **지금 구글폼 그대로**다(사용자 지시). 줄여 쓰지 말 것. -->
       <div class="rp-kinds" id="rpKinds">
@@ -249,7 +267,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <!-- ── 레시피 갈래 ── -->
     <div id="recipeFull">
       <div class="rp-block">
-        <span class="rp-label">레시피 이름</span>
+        <span class="rp-label">레시피 이름 <span class="rp-req">*</span></span>
         <div class="stamp-field stamp-field--light-ph">
           <input type="text" id="rName" placeholder="예) 건희소스, 쑨디2호소스, 희수국밥">
         </div>
@@ -369,6 +387,13 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-sw="1">반대로</button>
   </div>
 
+  <h4>⑥ 「* 표시는 필수」 안내</h4>
+  <div class="prow" id="ntRow">
+    <button data-nt="gray">회색 (권함)</button>
+    <button data-nt="red">빨강</button>
+    <button data-nt="off">없음</button>
+  </div>
+
   <button id="hide">조작판 내리기</button>
 </div>
 <button id="showPanel" type="button">조작판 ▲</button>
@@ -378,7 +403,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 (function () {
   var body = document.body;
   // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
-  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', sw: '0', kind: null, ct: 'email' };
+  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', sw: '0', nt: 'gray', kind: null, ct: 'email' };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -502,7 +527,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp'],['swRow','sw','sw']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp'],['swRow','sw','sw'],['ntRow','nt','nt']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -530,8 +555,27 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     off('submitWrap', false);
     off('rpSubmit', !picked);
 
-    document.getElementById('bodyLabel').textContent =
-      isRecipe ? '레시피를 아는 만큼 적어 주세요' : '내용';
+    /* 🔴 갈래마다 묻는 말이 다르다(2026-08-06 사용자 지시).
+       구글폼은 두 갈래를 한 섹션으로 합쳐 같은 문구를 보여줬는데, 우리는 한 화면이라 나눌 수 있다.
+       ⚠️ 「알려 주세요」는 띄어 쓴다 — 사이트 표기를 `credits.html` 에 맞춘 것이다. */
+    var LABEL = {
+      bug:    '어떤 점이 잘못되었는지, 어떤 오류가 있는지 알려 주세요.',
+      etc:    '문의하실 내용을 적어 주세요.',
+      recipe: '레시피를 아는 만큼 적어 주세요.'
+    };
+    /* 🔴 둘째 줄부터는 **공백 6칸**으로 「예) 」 아래에 줄을 맞춘다(2026-08-06 사용자 지시).
+       눈대중으로 고르지 않았다 — 같은 글꼴·크기로 재서 「예) 」=23.3px, 공백 6칸=24.1px 로
+       가장 가까웠다(5칸은 20.1px 로 3px 모자람).
+       ⚠️ **글자 크기(16px)나 글꼴을 바꾸면 이 칸 수를 다시 재야 한다.** 비례폭 글꼴이라 저절로 안 맞는다. */
+    var SP = '      '; // 공백 6칸
+    var PH = {
+      bug: '예) OO점 영업시간이 실제와 달라요\n' + SP + 'OO소스 레시피가 틀렸어요',
+      etc: '예) 레시피 사진을 써도 되나요?\n' + SP + '제 사진인데 출처가 잘못 적혔어요',
+      recipe: '아는 만큼만 적어 주세요.'
+    };
+    document.getElementById('bodyLabel').innerHTML =
+      (LABEL[state.kind] || '내용') + ' <span class="rp-req">*</span>';
+    if (PH[state.kind]) document.getElementById('rBody').placeholder = PH[state.kind];
 
     // 연락처 종류에 맞춰 안내문·자판
     var ct = document.getElementById('rCt');
@@ -542,6 +586,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     body.classList.toggle('gap-mid', state.gp === 'mid');
     body.classList.toggle('gap-tight', state.gp === 'tight');
     body.classList.toggle('swap', state.sw === '1');
+    body.classList.toggle('note-red', state.nt === 'red');
+    body.classList.toggle('note-off', state.nt === 'off');
     renderAuto();
     checkReady();
   }
@@ -559,6 +605,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     else if (b.dataset.pb) state.pb = b.dataset.pb;
     else if (b.dataset.gp) state.gp = b.dataset.gp;
     else if (b.dataset.sw) state.sw = b.dataset.sw;
+    else if (b.dataset.nt) state.nt = b.dataset.nt;
     else return;
     paint();
   });
