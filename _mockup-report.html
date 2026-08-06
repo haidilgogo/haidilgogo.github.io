@@ -19,7 +19,9 @@
 /* 🔴 설명문 → 첫 질문 사이는 **20px** 이다(2026-08-06 사용자 지시).
    기준은 `credits.html` 의 「설명문 → 인물 사진」 간격이고, 재 보니 20px 였다
    (`.credit-sec` 의 padding-top 18px 에서 나온다). 여기서 margin-top 18 + 2 = 20. */
-.rp-form { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; padding: 0 22px; }
+/* 🔴 `flex: 1` 이 있어야 폼이 남는 높이를 차지하고, 그래야 안에 있는 버튼 묶음의
+   `margin-top: auto` 가 먹는다. 이게 없으면 버튼이 내용 바로 밑에 붙어 버린다. */
+.rp-form { display: flex; flex-direction: column; flex: 1; gap: 18px; margin-top: 18px; padding: 0 22px; }
 .rp-block { display: flex; flex-direction: column; gap: 8px; }
 .rp-label { font-size: 13px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
 .rp-opt { font-size: 12px; font-weight: 600; color: var(--text-muted); }
@@ -145,8 +147,26 @@ body.previewing #panel { transform: translateY(100%); }
 .prow button.on { background: #D0402E; border-color: #D0402E; color: #fff; }
 #hide { width: 100%; margin-top: 11px; padding: 12px; border: 0; border-radius: 10px;
   background: #2B120D; color: #fff; font-size: 14px; font-weight: 700; font-family: inherit; }
-.column-sheet { padding-bottom: 300px; }
-body.previewing .column-sheet { padding-bottom: 60px; }
+/* 🔴 닫기·보내기를 **화면 아래쪽으로 내린다**(2026-08-06 사용자 지시).
+   `position: fixed` 는 쓰지 않는다 — 아이폰에서 키보드가 올라오면 화면 아래 고정 요소가
+   말썽이고, 글 쓰는 폼에서는 특히 위험하다.
+   대신 본문을 한 화면 높이로 깔고 버튼 묶음에 `margin-top: auto` 를 준다.
+   → **내용이 짧으면 버튼이 아래로 내려가고, 길면 그냥 내용을 따라온다.** 겹치지 않는다.
+   🔴 `vh` 가 아니라 `svh` 다(앱 `.page` 와 같은 이유 — 주소창이 보일 때 안 넘친다).
+      위 `vh` 줄은 구형 브라우저 폴백이라 남겨 둔다. 65px = 상단바 높이. */
+/* 🔴 선택자에 `.art-page` 를 같이 적어야 한다 — `article.css` 에
+   `.art-page .column-sheet { min-height: 0 }` 이 있어서 `.column-sheet` 하나로는 진다.
+   (실제로 그렇게 썼다가 버튼이 안 내려갔다.) */
+.art-page .column-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 65px);
+  min-height: calc(100svh - 65px);
+  box-sizing: border-box;
+  padding-bottom: 300px;   /* 목업 조작판 자리 — 아래 previewing 이 진짜 값이다 */
+}
+#submitWrap { margin-top: auto; padding-top: 20px; }
+body.previewing .column-sheet { padding-bottom: 28px; }
 </style>
 </head>
 <body class="art-page">
@@ -169,7 +189,9 @@ body.previewing .column-sheet { padding-bottom: 60px; }
          ⚠️ 푸터 아이콘을 바꾸면 여기도 같이 바꿀 것. 자동이 아니다. -->
     <h1 class="credit-title"><svg class="credit-title-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</h1>
     <!-- 지금 구글폼의 설명문 그대로(사용자 확인). 줄바꿈도 폼과 같은 자리다. -->
-    <p class="credit-sub">하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려주세요.<br>소중한 제보 감사합니다! ☺️</p>
+    <!-- ⚠️ 구글폼 원문은 「알려주세요」였는데 **「알려 주세요」로 고쳤다**(사용자 확정) —
+         `credits.html` 이 이미 「알려 주세요」라 사이트 안에서 표기를 맞춘 것이다. -->
+    <p class="credit-sub">하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요.<br>소중한 제보 감사합니다! ☺️</p>
   </div>
 
   <div class="rp-lead" id="lead" data-off>
