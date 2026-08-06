@@ -393,8 +393,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
              구글폼 제목의 「(소스, 육수, 밥, 면, 기타)」가 하던 「소스 말고도 된다」는 신호를 여기서 준다.
              ⚠️ 원문 그대로 못 옮긴다 — 「육수」·「밥/면/기타」는 **옛 분류**다. 2026-07-21에
                 `육수 → 탕`, `밥·면·기타 → 히든메뉴`로 바뀌었다(`script.js` 의 `CATS`).
-             ⏸ **아래 문구는 아직 임시다** — 사용자 확정 전이다. -->
-        <p class="rp-help">소스·탕·히든메뉴 무엇이든 좋아요.</p>
+             🔴 **순서는 소스 · 히든메뉴 · 탕이다**(2026-08-07 사용자 확정).
+                ⚠️ 사이트 탭 순서(`CATS` = 소스 · 탕 · 히든메뉴)와 **다르다** — 일부러 다른 것이니
+                   「탭이랑 안 맞는다」고 고치지 말 것. -->
+        <p class="rp-help">소스·히든메뉴·탕 무엇이든 좋아요.</p>
         <div class="stamp-field stamp-field--light-ph">
           <input type="text" id="rName" placeholder="예) 건희소스, 쑨디2호소스, 희수국밥">
         </div>
@@ -439,8 +441,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <!-- ── 오류 · 기타 갈래 (그리고 「줄인 안」의 레시피도 여기로) ── -->
     <div class="rp-block" id="bodyBlock">
       <span class="rp-label" id="bodyLabel">내용</span>
-      <textarea class="rp-textarea rp-textarea--tall" id="rBody" maxlength="1000"
-        placeholder="예) 분당점이 없어진 것 같아요. 지난주에 갔더니 문이 닫혀 있었습니다."></textarea>
+      <!-- ⚠️ 여기에 기본 예시를 적어 두지 않는다(2026-08-07 사용자 지시로 지웠다) — 화면에 절대 안 뜬다.
+           갈래를 고르는 순간 아래 JS(`PH`)가 갈래별 예시로 항상 덮어쓰고, 고르기 전에는
+           이 묶음 자체가 감춰져 있다. 적어 두면 「어디에도 없는 문구」가 코드에만 남는다. -->
+      <textarea class="rp-textarea rp-textarea--tall" id="rBody" maxlength="1000"></textarea>
       <span class="rp-count" id="rpCount">0 / 1000자</span>
     </div>
 
