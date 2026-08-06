@@ -45,6 +45,9 @@ body.note-off .rp-note { display: none; }
 body.note-off .rp-form { margin-top: 18px; }
 body:not(.note-off) .rp-form { margin-top: 8px; }
 .rp-help { font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+/* 칸 바로 위 작은 라벨 — 위 질문(.rp-label 13px)보다 한 단계 작게 두어 딸린 것으로 읽히게 한다.
+   ⚠️ 칸 안 예시(placeholder)와 역할이 다르다: 라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. */
+.rp-sublabel { font-size: 12.5px; font-weight: 700; color: var(--text-dark); }
 .rp-lead {
   margin: 0 22px 4px; padding: 12px 14px; background: #F6F1EA; border-radius: 11px;
   font-size: 12.5px; line-height: 1.7; color: var(--text-muted);
@@ -406,15 +409,19 @@ body.previewing .column-sheet { padding-bottom: 28px; }
         <button type="button" class="rp-kind" data-c="insta">인스타그램</button>
       </div>
 
+      <!-- 🔴 칸 바로 위 라벨(2026-08-06 사용자 지시). 칸 안 예시와 역할이 다르다 —
+           라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. -->
+      <span class="rp-sublabel" id="ctSub" data-off></span>
+
       <!-- 한 칸 안 -->
       <div class="stamp-field stamp-field--light-ph" id="ctOne">
-        <input type="email" id="rCt" placeholder="답변을 받으실 이메일" autocomplete="email">
+        <input type="email" id="rCt" placeholder="qwerty@abc.com" autocomplete="email">
       </div>
 
       <!-- 쪼갠 안 (@ 뒤 드롭다운) -->
       <div class="rp-mail" id="ctSplit" data-off>
         <div class="stamp-field stamp-field--light-ph">
-          <input type="text" id="rMailId" placeholder="아이디" autocomplete="off">
+          <input type="text" id="rMailId" placeholder="qwerty" autocomplete="off">
         </div>
         <span class="rp-at">@</span>
         <div class="stamp-field" id="rMailDomWrap">
@@ -696,8 +703,15 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     off('ctSplit', !splitMail);
     off('agreeWrap', !(isMail || isInsta));
     off('ctHelp', state.ct !== null);
-    if (isInsta) { ct.type = 'text'; ct.placeholder = '인스타그램 아이디 (@ 없이)'; ct.autocomplete = 'off'; }
-    else { ct.type = 'email'; ct.placeholder = '답변을 받으실 이메일'; ct.autocomplete = 'email'; }
+    if (isInsta) { ct.type = 'text'; ct.placeholder = 'qwerty'; ct.autocomplete = 'off'; }
+    else { ct.type = 'email'; ct.placeholder = 'qwerty@abc.com'; ct.autocomplete = 'email'; }
+
+    // 칸 위 라벨 — 「입력해 주세요」는 띄어 쓴다(사이트 표기와 맞춤)
+    var sub = document.getElementById('ctSub');
+    off('ctSub', !(isMail || isInsta));
+    sub.textContent = isInsta
+      ? '답변을 받으실 인스타그램 아이디를 입력해 주세요 (@ 없이)'
+      : '답변을 받으실 이메일을 입력해 주세요';
 
     // 도메인 「직접 입력」
     var dom = document.getElementById('rMailDom');
