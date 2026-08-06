@@ -44,7 +44,9 @@ body.note-off .rp-note { display: none; }
 /* 안내를 끄면 그만큼 폼 위 여백을 되돌린다 */
 body.note-off .rp-form { margin-top: 18px; }
 body:not(.note-off) .rp-form { margin-top: 8px; }
-.rp-help { font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+/* ⚠️ `<p>` 의 기본 margin(위아래 약 12px)을 지운다 — 안 지우면 `.rp-block` 의 gap(8px) 에
+   그 값이 더해져서 도움말만 혼자 떠 보인다(2026-08-07 실제로 그랬다). 간격은 gap 한 곳에서만 준다. */
+.rp-help { margin: 0; font-size: 12px; line-height: 1.55; color: var(--text-muted); }
 /* 칸 바로 위 작은 라벨 — 위 질문(.rp-label 13px)보다 한 단계 작게 두어 딸린 것으로 읽히게 한다.
    ⚠️ 칸 안 예시(placeholder)와 역할이 다르다: 라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. */
 .rp-sublabel { font-size: 12.5px; font-weight: 700; color: var(--text-dark); }
@@ -380,7 +382,15 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <!-- ── 레시피 갈래 ── -->
     <div id="recipeFull">
       <div class="rp-block">
-        <span class="rp-label">레시피 이름 <span class="rp-req">*</span></span>
+        <!-- ⚠️ 구글폼 원문은 「적어주세요」인데 **「적어 주세요」로 띄웠다** — 사이트 표기를 맞춘 것이다
+             (`credits.html`·이 폼 머리글의 「알려 주세요」와 같은 규칙, 2026-08-06 사용자 확정). -->
+        <span class="rp-label">레시피 이름을 적어 주세요! <span class="rp-req">*</span></span>
+        <!-- 🔴 자리는 **라벨 아래·칸 위**로 확정(2026-08-07 사용자 「나 안」 채택).
+             구글폼 제목의 「(소스, 육수, 밥, 면, 기타)」가 하던 「소스 말고도 된다」는 신호를 여기서 준다.
+             ⚠️ 원문 그대로 못 옮긴다 — 「육수」·「밥/면/기타」는 **옛 분류**다. 2026-07-21에
+                `육수 → 탕`, `밥·면·기타 → 히든메뉴`로 바뀌었다(`script.js` 의 `CATS`).
+             ⏸ **아래 문구는 아직 임시다** — 사용자 확정 전이다. -->
+        <p class="rp-help">소스·탕·히든메뉴 무엇이든 좋아요.</p>
         <div class="stamp-field stamp-field--light-ph">
           <input type="text" id="rName" placeholder="예) 건희소스, 쑨디2호소스, 희수국밥">
         </div>
