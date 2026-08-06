@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>제보 · 문의 (목업) · 하딜고고</title>
+<title>제보 · 문의 (목업 2) · 하딜고고</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -12,32 +12,32 @@
 <meta name="theme-color" content="#FCF9F5">
 <style>
 /* ===== 목업 전용. 앱 파일은 안 건드린다 =====
-   🔴 입력칸(.stamp-field)·보내기(.stamp-submit)·토스트(.share-toast)는 **앱 것을 그대로 쓴다.**
-      새로 그리면 앱과 따로 놀고, 나중에 앱 스타일이 바뀌어도 안 따라온다. */
+   🔴 입력칸(.stamp-field)·보내기(.stamp-submit)·토스트(.share-toast)·아래로 뜨는 목록
+      (.stamp-dd-menu)은 **앱 것을 그대로 빌린다.** 새로 그리면 앱과 따로 논다. */
 
-/* 🔴 .column-sheet 은 좌우 여백이 없다 — 자식이 각자 갖는 구조다(.credit-head 가 22px).
-   그래서 폼도 22px 을 직접 가져야 제목과 왼쪽 줄이 맞는다. 안 주면 화면 끝에 붙는다. */
+/* 🔴 .column-sheet 은 좌우 여백이 없다 — 자식이 각자 갖는다(.credit-head 22px). */
 .rp-form { display: flex; flex-direction: column; gap: 18px; margin-top: 4px; padding: 0 22px; }
 .rp-block { display: flex; flex-direction: column; gap: 8px; }
-.rp-label {
-  font-size: 13px; font-weight: 700; color: var(--text-dark);
-  display: flex; align-items: center; gap: 6px;
-}
+.rp-label { font-size: 13px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
 .rp-opt { font-size: 12px; font-weight: 600; color: var(--text-muted); }
 .rp-help { font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+.rp-lead {
+  margin: 0 22px 4px; padding: 12px 14px; background: #F6F1EA; border-radius: 11px;
+  font-size: 12.5px; line-height: 1.7; color: var(--text-muted);
+}
+.rp-lead b { color: var(--text-dark); }
 
-/* 여러 줄 입력 — .stamp-field 와 같은 상자(흰 배경·1.5px 테두리·radius 12) */
 .rp-textarea {
   background: #fff; border: 1.5px solid var(--card-border); border-radius: 12px;
   padding: 12px 13px; box-sizing: border-box; width: 100%;
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 14px; font-weight: 400; line-height: 1.65; color: var(--text-dark);
-  min-height: 140px; resize: none; outline: none;
+  min-height: 108px; resize: none; outline: none;
 }
+.rp-textarea--tall { min-height: 150px; }
 .rp-textarea::placeholder { color: var(--text-muted); opacity: 1; }
 .rp-count { font-size: 11px; color: var(--text-muted); text-align: right; }
 
-/* 종류 고르기 */
 .rp-kinds { display: flex; flex-wrap: wrap; gap: 7px; }
 .rp-kind {
   border: 1.5px solid var(--card-border); background: #fff; border-radius: 999px;
@@ -46,53 +46,63 @@
 }
 .rp-kind.on { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
 
-/* 개인정보 동의 */
+/* 자동완성 — 앱의 .stamp-dd-menu 를 그대로 빌린다 */
+.rp-auto { position: relative; }
+.rp-auto-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--bg-cream); border-radius: 12px; padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12); z-index: 30;
+  max-height: 232px; overflow-y: auto; display: none;
+}
+.rp-auto.open .rp-auto-menu { display: block; }
+.rp-auto-item {
+  display: block; width: 100%; text-align: left; border: none; background: transparent;
+  color: var(--text-muted); font-family: inherit; font-size: 13.5px; font-weight: 600;
+  padding: 10px 11px; border-radius: 9px; -webkit-tap-highlight-color: transparent;
+}
+.rp-auto-item:active { background: rgba(0,0,0,.06); }
+.rp-auto-item b { color: var(--brand-red); font-weight: 800; }
+/* 안 「나」 — 목록 맨 아래 「'○○'(으)로 적기」 확인 줄 */
+.rp-auto-free { border-top: 1px solid var(--card-border); margin-top: 4px; padding-top: 8px; color: var(--text-dark); }
+/* 안 「다」 — 안 맞을 때만 뜨는 한 줄 */
+.rp-nomatch { font-size: 12px; color: var(--text-muted); }
+
 .rp-agree { display: flex; align-items: flex-start; gap: 9px; }
 .rp-agree input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--brand-red); flex: none; }
 .rp-agree label { font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.5; }
-.rp-privacy {
-  background: #F6F1EA; border-radius: 11px; padding: 12px 13px;
-  font-size: 11.5px; line-height: 1.7; color: var(--text-muted);
-}
+.rp-privacy { background: #F6F1EA; border-radius: 11px; padding: 12px 13px; font-size: 11.5px; line-height: 1.7; color: var(--text-muted); }
 .rp-privacy b { color: var(--text-dark); font-weight: 700; }
 .rp-privacy ul { margin: 6px 0 0; padding-left: 15px; }
-.rp-privacy li { margin: 2px 0; }
-/* 접힘 안 */
-details.rp-privacy-fold { font-size: 12px; color: var(--text-muted); }
-details.rp-privacy-fold > summary {
-  cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted);
-  text-decoration: underline; text-underline-offset: 3px; list-style: none;
-}
-details.rp-privacy-fold > summary::-webkit-details-marker { display: none; }
-details.rp-privacy-fold .rp-privacy { margin-top: 8px; }
 
-.rp-submit-wrap { margin-top: 6px; }
-/* 보내기는 폭을 꽉 채운다 — 스티커 등록(182px)은 「점선에 맞춘 것」이라 여기선 근거가 없다 */
 #rpSubmit { width: 100%; }
+.rp-submit-wrap { margin-top: 6px; }
 
-/* 숨김 */
+/* 진행바 (① 번호로 켜고 끈다) */
+#bar { position: sticky; top: 65px; z-index: 25; height: 3px; background: rgba(43,18,13,.08); display: none; }
+body.show-bar #bar { display: block; }
+#barFill { height: 100%; width: 0; background: var(--brand-red); transition: width .2s ease; }
+
 [data-off] { display: none !important; }
 
-/* 조작판 */
 #panel {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 400;
   background: #fff; border-top: 2px solid #2B120D;
   padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px));
   font-family: Pretendard, sans-serif; font-size: 13px;
-  transition: transform .18s ease;
+  max-height: 56vh; overflow-y: auto; transition: transform .18s ease;
 }
 body.previewing #panel { transform: translateY(100%); }
 #panel h4 { margin: 11px 0 6px; font-size: 12px; color: #8A6A5F; font-weight: 700; }
 #panel h4:first-child { margin-top: 0; }
-.prow { display: flex; gap: 6px; }
+.prow { display: flex; gap: 6px; flex-wrap: wrap; }
 .prow button {
-  flex: 1; padding: 9px 6px; border-radius: 9px; border: 1.5px solid #E4D9CE;
+  flex: 1 1 auto; min-width: 62px; padding: 9px 6px; border-radius: 9px; border: 1.5px solid #E4D9CE;
   background: #FCF9F5; font-size: 12.5px; font-weight: 600; color: #2B120D; font-family: inherit;
 }
 .prow button.on { background: #D0402E; border-color: #D0402E; color: #fff; }
 #hide { width: 100%; margin-top: 11px; padding: 12px; border: 0; border-radius: 10px;
   background: #2B120D; color: #fff; font-size: 14px; font-weight: 700; font-family: inherit; }
-.column-sheet { padding-bottom: 240px; }
+.column-sheet { padding-bottom: 300px; }
 body.previewing .column-sheet { padding-bottom: 60px; }
 </style>
 </head>
@@ -106,6 +116,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     </a>
   </div>
 </header>
+<div id="bar"><div id="barFill"></div></div>
 
 <main class="column-sheet">
   <div class="credit-head">
@@ -113,32 +124,81 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     <p class="credit-sub">잘못된 정보나 궁금한 점을 알려 주세요.</p>
   </div>
 
+  <div class="rp-lead" id="lead" data-off>
+    아는 만큼만 적어 주셔도 좋아요. <b>레시피 이름만 필수</b>이고, 나머지는 비워 두셔도 됩니다.
+  </div>
+
   <form class="rp-form" id="rpForm" onsubmit="return false">
 
-    <!-- ① 종류 — 있는 안 / 없는 안을 번호로 갈아 낀다 -->
-    <div class="rp-block" id="kindBlock">
+    <div class="rp-block">
       <span class="rp-label">어떤 이야기인가요?</span>
       <div class="rp-kinds" id="rpKinds">
-        <button type="button" class="rp-kind on">매장 정보</button>
-        <button type="button" class="rp-kind">레시피</button>
-        <button type="button" class="rp-kind">잘못된 내용</button>
-        <button type="button" class="rp-kind">그 밖</button>
+        <button type="button" class="rp-kind on" data-k="recipe">레시피 추가</button>
+        <button type="button" class="rp-kind" data-k="bug">잘못된 정보 · 오류</button>
+        <button type="button" class="rp-kind" data-k="etc">기타 문의</button>
       </div>
     </div>
 
-    <!-- ② 내용 -->
-    <div class="rp-block">
-      <span class="rp-label">내용</span>
-      <textarea class="rp-textarea" id="rpBody" maxlength="1000"
+    <!-- ── 레시피 갈래 ── -->
+    <div id="recipeFull">
+      <div class="rp-block">
+        <span class="rp-label">레시피 이름</span>
+        <div class="stamp-field stamp-field--light-ph">
+          <input type="text" id="rName" placeholder="예) 건희소스, 쑨디2호소스, 희수국밥">
+        </div>
+      </div>
+
+      <div class="rp-block" id="orderBlock" style="margin-top:18px">
+        <span class="rp-label">매장에서 주문해야 하는 항목 <span class="rp-opt">선택</span></span>
+        <div class="rp-auto" id="orderAuto">
+          <div class="stamp-field stamp-field--light-ph">
+            <input type="text" id="rOrder" placeholder="예) 공깃밥, 청유마라훠궈" autocomplete="off">
+          </div>
+          <div class="rp-auto-menu" id="orderMenu"></div>
+        </div>
+        <p class="rp-help" id="freeHelpA" data-off>목록에 없으면 그냥 적으셔도 됩니다.</p>
+        <p class="rp-nomatch" id="freeHelpC" data-off></p>
+      </div>
+
+      <div class="rp-block" id="ingBlock" style="margin-top:18px">
+        <span class="rp-label">소스바에서 담는 재료와 양 <span class="rp-opt">선택</span></span>
+        <textarea class="rp-textarea" id="rIng" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"></textarea>
+        <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요. 정확하지 않아도 괜찮습니다.</p>
+      </div>
+
+      <div class="rp-block" id="stepBlock" style="margin-top:18px">
+        <span class="rp-label">만드는 법 <span class="rp-opt">선택</span></span>
+        <textarea class="rp-textarea" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다."></textarea>
+      </div>
+
+      <div class="rp-block" id="tipBlock" style="margin-top:18px">
+        <span class="rp-label">더 맛있게 먹는 팁 <span class="rp-opt">선택</span></span>
+        <textarea class="rp-textarea" placeholder="예) 고수를 더 올려 먹으면 맛있다."></textarea>
+      </div>
+
+      <div class="rp-block" id="srcBlock" style="margin-top:18px">
+        <span class="rp-label">어디서 보셨나요? <span class="rp-opt">선택</span></span>
+        <textarea class="rp-textarea" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요."></textarea>
+      </div>
+    </div>
+
+    <!-- ── 오류 · 기타 갈래 (그리고 「줄인 안」의 레시피도 여기로) ── -->
+    <div class="rp-block" id="bodyBlock">
+      <span class="rp-label" id="bodyLabel">내용</span>
+      <textarea class="rp-textarea rp-textarea--tall" id="rBody" maxlength="1000"
         placeholder="예) 분당점이 없어진 것 같아요. 지난주에 갔더니 문이 닫혀 있었습니다."></textarea>
       <span class="rp-count" id="rpCount">0 / 1000자</span>
     </div>
 
-    <!-- ③ 연락처 (선택) -->
+    <!-- ── 연락처 ── -->
     <div class="rp-block">
       <span class="rp-label">연락처 <span class="rp-opt">선택</span></span>
+      <div class="rp-kinds" id="ctKinds">
+        <button type="button" class="rp-kind on" data-c="email">이메일</button>
+        <button type="button" class="rp-kind" data-c="insta">인스타그램</button>
+      </div>
       <div class="stamp-field stamp-field--light-ph">
-        <input type="email" id="rpMail" placeholder="답변을 받으실 이메일" autocomplete="email">
+        <input type="email" id="rCt" placeholder="답변을 받으실 이메일" autocomplete="email">
       </div>
       <p class="rp-help">답변이 필요하시면 적어 주세요. 적지 않으셔도 제보 · 문의는 정상적으로 접수됩니다.</p>
 
@@ -146,29 +206,14 @@ body.previewing .column-sheet { padding-bottom: 60px; }
         <input type="checkbox" id="rpAgree">
         <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
       </div>
-
-      <!-- 펼친 안 -->
-      <div class="rp-privacy" id="privOpen">
+      <div class="rp-privacy">
         <ul>
-          <li><b>수집 항목</b> 이메일 주소</li>
+          <li><b>수집 항목</b> 회신 받으실 연락처 1가지 — 이메일 주소 · 인스타그램 계정 중 선택</li>
           <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
           <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
         </ul>
         동의하지 않으셔도 제보 · 문의는 접수되며, <b>답변만 받으실 수 없습니다.</b>
       </div>
-
-      <!-- 접은 안 -->
-      <details class="rp-privacy-fold" id="privFold" data-off>
-        <summary>수집 항목 · 이용 목적 · 보유 기간 보기</summary>
-        <div class="rp-privacy">
-          <ul>
-            <li><b>수집 항목</b> 이메일 주소</li>
-            <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
-            <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
-          </ul>
-          동의하지 않으셔도 제보 · 문의는 접수되며, <b>답변만 받으실 수 없습니다.</b>
-        </div>
-      </details>
     </div>
 
     <div class="rp-submit-wrap">
@@ -177,82 +222,170 @@ body.previewing .column-sheet { padding-bottom: 60px; }
   </form>
 </main>
 
-<!-- 앱과 같은 토스트 (자리도 앱과 같은 화면 1/3) -->
 <div class="share-toast" id="toast">보내주셔서 고맙습니다!</div>
 
 <div id="panel">
-  <h4>① 「어떤 이야기인가요?」 칸</h4>
-  <div class="prow" id="kindRow">
-    <button data-kind="1">있음</button>
-    <button data-kind="0">없음</button>
+  <h4>① 갈래 — 레시피를 고르면 얼마나 나오나</h4>
+  <div class="prow" id="brRow">
+    <button data-br="full">1 · 그대로 (6칸)</button>
+    <button data-br="min">2 · 줄인 안 (1칸)</button>
+    <button data-br="mid">3 · 중간 (2칸)</button>
   </div>
 
-  <h4>② 개인정보 안내</h4>
-  <div class="prow" id="privRow">
-    <button data-priv="open">펼쳐 둠</button>
-    <button data-priv="fold">접어 둠</button>
+  <h4>② 목록에 없을 때 안내 (주문 항목 칸)</h4>
+  <div class="prow" id="fhRow">
+    <button data-fh="a">가 · 늘 보임</button>
+    <button data-fh="b">나 · 목록 맨 아래</button>
+    <button data-fh="c">다 · 안 맞을 때만</button>
   </div>
 
-  <button id="hide">조작판 숨기고 보기 (5초)</button>
+  <h4>③ 진행바</h4>
+  <div class="prow" id="pbRow">
+    <button data-pb="0">없음</button>
+    <button data-pb="1">있음</button>
+  </div>
+
+  <button id="hide">조작판 숨기고 보기 (6초)</button>
 </div>
 
+<script src="menu-data.js?v=5"></script>
 <script>
 (function () {
   var body = document.body;
-  var state = { kind: '1', priv: 'open' };
+  var state = { br: 'full', fh: 'b', pb: '0', kind: 'recipe', ct: 'email' };
+
+  // 자동완성 목록 = 메뉴 130 + 육수 12
+  var NAMES = [];
+  try {
+    var D = window.MENU_DATA;
+    D.tabs.forEach(function (t) { t.items.forEach(function (i) { NAMES.push(i.n); }); });
+    D.broths.forEach(function (b) { if (NAMES.indexOf(b.n) < 0) NAMES.push(b.n); });
+  } catch (e) {}
+
+  var auto = document.getElementById('orderAuto');
+  var menu = document.getElementById('orderMenu');
+  var inp  = document.getElementById('rOrder');
+  var helpC = document.getElementById('freeHelpC');
+
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+
+  function renderAuto() {
+    var q = inp.value.trim();
+    if (!q) { auto.classList.remove('open'); helpC.setAttribute('data-off',''); return; }
+    var hits = NAMES.filter(function (n) { return n.indexOf(q) >= 0; }).slice(0, 8);
+    var html = hits.map(function (n) {
+      return '<button type="button" class="rp-auto-item" data-v="' + esc(n) + '">' +
+        esc(n).replace(esc(q), '<b>' + esc(q) + '</b>') + '</button>';
+    }).join('');
+
+    // 안 「나」 — 맨 아래 확인 줄
+    if (state.fh === 'b') {
+      html += '<button type="button" class="rp-auto-item rp-auto-free" data-v="' + esc(q) + '">' +
+        '「' + esc(q) + '」(으)로 적기</button>';
+    }
+    menu.innerHTML = html;
+    auto.classList.toggle('open', html !== '');
+
+    // 안 「다」 — 안 맞을 때만 한 줄
+    if (state.fh === 'c' && hits.length === 0) {
+      helpC.textContent = '목록에 없는 이름이에요. 그대로 보내집니다.';
+      helpC.removeAttribute('data-off');
+    } else helpC.setAttribute('data-off','');
+  }
+  inp.addEventListener('input', renderAuto);
+  inp.addEventListener('focus', renderAuto);
+  menu.addEventListener('click', function (e) {
+    var b = e.target.closest('.rp-auto-item');
+    if (!b) return;
+    inp.value = b.dataset.v;
+    auto.classList.remove('open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!auto.contains(e.target)) auto.classList.remove('open');
+  });
 
   // 글자 수
-  var ta = document.getElementById('rpBody'), cnt = document.getElementById('rpCount');
+  var ta = document.getElementById('rBody'), cnt = document.getElementById('rpCount');
   ta.addEventListener('input', function () { cnt.textContent = ta.value.length + ' / 1000자'; });
 
   // 종류 고르기
   document.getElementById('rpKinds').addEventListener('click', function (e) {
-    var b = e.target.closest('.rp-kind');
-    if (!b) return;
-    [].forEach.call(this.children, function (x) { x.classList.remove('on'); });
-    b.classList.add('on');
+    var b = e.target.closest('.rp-kind'); if (!b) return;
+    state.kind = b.dataset.k; paint();
+  });
+  document.getElementById('ctKinds').addEventListener('click', function (e) {
+    var b = e.target.closest('.rp-kind'); if (!b) return;
+    state.ct = b.dataset.c; paint();
   });
 
-  // 보내기 — 목업이라 실제로 안 보낸다
   var toast = document.getElementById('toast'), t = null;
   document.getElementById('rpSubmit').addEventListener('click', function () {
-    if (!ta.value.trim()) { show('내용을 적어 주세요'); return; }
-    show('보내주셔서 고맙습니다! (목업이라 실제로는 안 갑니다)');
+    show('목업이라 실제로는 안 갑니다');
   });
   function show(msg) {
-    toast.textContent = msg;
-    toast.classList.remove('show');
+    toast.textContent = msg; toast.classList.remove('show');
     requestAnimationFrame(function () { requestAnimationFrame(function () {
       toast.classList.add('show');
       clearTimeout(t); t = setTimeout(function () { toast.classList.remove('show'); }, 2200);
     }); });
   }
+  function off(id, hide) {
+    var el = document.getElementById(id); if (!el) return;
+    if (hide) el.setAttribute('data-off',''); else el.removeAttribute('data-off');
+  }
 
   function paint() {
-    [['kindRow', 'kind'], ['privRow', 'priv']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb']].forEach(function (p) {
       var row = document.getElementById(p[0]);
-      [].forEach.call(row.children, function (b) {
-        b.classList.toggle('on', (b.dataset.kind || b.dataset.priv) === state[p[1]]);
-      });
+      [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
-    toggle(document.getElementById('kindBlock'), state.kind === '1');
-    toggle(document.getElementById('privOpen'), state.priv === 'open');
-    toggle(document.getElementById('privFold'), state.priv === 'fold');
+    [].forEach.call(document.getElementById('rpKinds').children, function (b) {
+      b.classList.toggle('on', b.dataset.k === state.kind);
+    });
+    [].forEach.call(document.getElementById('ctKinds').children, function (b) {
+      b.classList.toggle('on', b.dataset.c === state.ct);
+    });
+
+    var isRecipe = state.kind === 'recipe';
+    // 갈래 안에 따라 레시피 칸을 얼마나 보여줄지
+    var showName = isRecipe && (state.br === 'full' || state.br === 'mid');
+    var showRest = isRecipe && state.br === 'full';
+    off('recipeFull', !(showName || showRest));
+    off('orderBlock', !showRest); off('ingBlock', !showRest);
+    off('stepBlock', !showRest); off('tipBlock', !showRest); off('srcBlock', !showRest);
+    // 「그대로」일 때는 레시피에 내용 칸이 없다
+    off('bodyBlock', isRecipe && state.br === 'full');
+    off('lead', !(isRecipe && state.br === 'full'));
+
+    document.getElementById('bodyLabel').textContent =
+      isRecipe ? '레시피를 아는 만큼 적어 주세요' : '내용';
+
+    // 연락처 종류에 맞춰 안내문·자판
+    var ct = document.getElementById('rCt');
+    if (state.ct === 'email') { ct.type = 'email'; ct.placeholder = '답변을 받으실 이메일'; }
+    else { ct.type = 'text'; ct.placeholder = '인스타그램 아이디 (@ 없이)'; }
+
+    body.classList.toggle('show-bar', state.pb === '1');
+    renderAuto();
   }
-  function toggle(el, on) { if (on) el.removeAttribute('data-off'); else el.setAttribute('data-off', ''); }
+
+  // 진행바 — 스크롤 진행도
+  window.addEventListener('scroll', function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    document.getElementById('barFill').style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+  }, { passive: true });
 
   document.getElementById('panel').addEventListener('click', function (e) {
-    var b = e.target.closest('button');
-    if (!b || b.id === 'hide') return;
-    if (b.dataset.kind) state.kind = b.dataset.kind;
-    else if (b.dataset.priv) state.priv = b.dataset.priv;
+    var b = e.target.closest('button'); if (!b || b.id === 'hide') return;
+    if (b.dataset.br) state.br = b.dataset.br;
+    else if (b.dataset.fh) state.fh = b.dataset.fh;
+    else if (b.dataset.pb) state.pb = b.dataset.pb;
     else return;
     paint();
   });
-
   document.getElementById('hide').addEventListener('click', function () {
     body.classList.add('previewing');
-    setTimeout(function () { body.classList.remove('previewing'); }, 5000);
+    setTimeout(function () { body.classList.remove('previewing'); }, 6000);
   });
 
   paint();
