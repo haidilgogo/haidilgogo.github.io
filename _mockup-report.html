@@ -224,7 +224,7 @@ body.pick-radio .rp-kinds--pair .rp-kind::before { margin-right: 8px; }
 .rp-why {
   /* 아래 16px — 버튼에 딱 붙으면 버튼 딱지처럼 보인다(2026-08-06 사용자 지적).
      앱 `.sync-msg` 의 「위 14 / 아래 16」과 같은 값이다. */
-  margin: 14px 0 16px; font-size: 13px; font-weight: 600; line-height: 1.55;
+  margin: 0 0 16px; font-size: 13px; font-weight: 600; line-height: 1.55;
   text-align: center; color: var(--brand-red);
 }
 .rp-why:empty { display: none; }
@@ -305,7 +305,9 @@ body.previewing #showPanel { display: block; }
   box-sizing: border-box;
   padding-bottom: 300px;   /* 목업 조작판 자리 — 아래 previewing 이 진짜 값이다 */
 }
-#submitWrap { margin-top: auto; padding-top: 20px; }
+/* ⚠️ 위 여백이 세 군데(폼 사이 18 + 여기 + 이유 위)에서 겹쳐 52px 이 됐다(2026-08-06 사용자 지적).
+   여기를 6 으로 줄이고 이유 쪽 위 여백을 0 으로 두어 **24px** 로 맞춘다. */
+#submitWrap { margin-top: auto; padding-top: 6px; }
 /* 🔴 내용 칸이 남는 높이를 다 먹는다(2026-08-06 사용자 지시).
    `min-height: 0` 이 있어야 flex 자식이 제대로 줄어든다 — 없으면 내용이 넘칠 때 안 줄어들어
    버튼이 화면 밖으로 밀려난다.
@@ -466,11 +468,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
            같은 말을 두 번 하고 있었다. -->
 
       <!-- 🔴 「답변이 필요 없어요」를 고르면 이 묶음이 통째로 사라진다 — 받는 게 없으니 동의도 없다 -->
-      <div id="agreeWrap" style="display:flex;flex-direction:column;gap:8px" data-off>
-      <div class="rp-agree">
-        <input type="checkbox" id="rpAgree">
-        <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
-      </div>
+      <!-- 🔴 **내용이 먼저, 체크박스가 나중**이다(2026-08-06 사용자 지적으로 뒤집었다).
+           읽고 나서 동의하는 것이 순서고, 체크가 위에 있으면 **무엇에 동의하는지 모르고
+           체크하는 모양**이 된다. 법도 「알린 뒤 동의」 순서다. -->
+      <div id="agreeWrap" style="display:flex;flex-direction:column;gap:10px" data-off>
       <div class="rp-privacy">
         <ul>
           <!-- 🔴 두 줄로 나눈다(2026-08-06 사용자 지시) — 한 줄이면 「1가지」와 「둘 중 선택」이
@@ -490,6 +491,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
         동의하지 않으시면 위에서 <b>「답변이 필요 없어요」</b>를 선택해 주세요.<br>
         제보 · 문의는 그대로 접수되며, <b>답변만 받으실 수 없습니다.</b>
         </span>
+      </div>
+      <div class="rp-agree">
+        <input type="checkbox" id="rpAgree">
+        <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
       </div>
       </div>
     </div>
@@ -760,7 +765,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     //    아래 검사 문구도 같은 말로 맞춰 뒀다.
     sub.textContent = isInsta
       ? '답변을 받으실 인스타그램 계정을 입력해 주세요.'
-      : '답변을 받으실 이메일을 입력해 주세요.';
+      : '답변을 받으실 이메일 주소를 입력해 주세요.';
 
     // 도메인 「직접 입력」
     var dom = document.getElementById('rMailDom');
