@@ -24,11 +24,11 @@
 .rp-form { display: flex; flex-direction: column; flex: 1; gap: 18px; margin-top: 18px; padding: 0 22px; }
 .rp-block { display: flex; flex-direction: column; gap: 8px; }
 .rp-label { font-size: 13px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
-.rp-opt { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-/* ⑦ 「선택」 꼬리표 끄기 — 별표가 필수를 표시하면 별표 없는 것은 저절로 선택이라
-   같은 말을 두 방향에서 두 번 하게 된다. 레시피 갈래에서는 「선택」이 여섯 번 반복된다. */
-body.opt-off .rp-opt { display: none; }
-/* 필수 표시 — 구글폼과 같은 방식(빨강 별표). 「선택」 꼬리표와 짝을 이룬다. */
+/* 🔴 「선택」 꼬리표는 **없앴다**(2026-08-07 사용자 확정) — 필수는 별표 하나로만 표시한다.
+   별표가 필수를 가리키면 별표 없는 칸은 저절로 선택이라, 꼬리표는 같은 말을 반대 방향에서
+   한 번 더 하는 것이었다(레시피 갈래에서만 다섯 번 반복됐다).
+   ⚠️ 되살리지 말 것. `.rp-opt` 클래스와 조작판 항목도 같이 지웠다. */
+/* 필수 표시 — 구글폼과 같은 방식(빨강 별표). */
 .rp-req { color: var(--brand-red); font-weight: 800; }
 /* 별표 안내 한 줄 — 색은 ⑥번으로 갈아 끼운다.
    ⚠️ 기본을 회색으로 둔 이유: 이 사이트에서 빨강은 「누르는 것·중요한 것」의 색이라
@@ -409,7 +409,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
       </div>
 
       <div class="rp-block" id="orderBlock" style="margin-top:18px">
-        <span class="rp-label">매장에서 주문해야 하는 항목 <span class="rp-opt">선택</span></span>
+        <span class="rp-label">매장에서 주문해야 하는 항목</span>
         <div class="rp-auto" id="orderAuto">
           <div class="stamp-field stamp-field--light-ph">
             <input type="text" id="rOrder" placeholder="예) 공깃밥, 청유마라훠궈" autocomplete="off">
@@ -421,25 +421,25 @@ body.previewing .column-sheet { padding-bottom: 28px; }
       </div>
 
       <div class="rp-block" id="ingBlock" style="margin-top:18px">
-        <span class="rp-label">소스바에서 담는 재료와 양 <span class="rp-opt">선택</span></span>
+        <span class="rp-label">소스바에서 담는 재료와 양</span>
         <textarea class="rp-textarea" id="rIng" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"></textarea>
         <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요. 정확하지 않아도 괜찮습니다.</p>
       </div>
 
       <div class="rp-block" id="stepBlock" style="margin-top:18px">
-        <span class="rp-label">만드는 법 <span class="rp-opt">선택</span></span>
+        <span class="rp-label">만드는 법</span>
         <!-- ⚠️ 칸 안 예시에는 마침표를 안 붙인다(2026-08-07 사용자 확정) — 예시는 완결된 문장이 아니라
              「이렇게 생긴 걸 적으세요」라고 보여주는 조각이고, 마침표가 있으면 진짜 입력값처럼 보인다. -->
         <textarea class="rp-textarea" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
       </div>
 
       <div class="rp-block" id="tipBlock" style="margin-top:18px">
-        <span class="rp-label">더 맛있게 먹는 팁 <span class="rp-opt">선택</span></span>
+        <span class="rp-label">더 맛있게 먹는 팁</span>
         <textarea class="rp-textarea" placeholder="예) 고수를 더 올려 먹으면 맛있다"></textarea>
       </div>
 
       <div class="rp-block" id="srcBlock" style="margin-top:18px">
-        <span class="rp-label">어디서 보셨나요? <span class="rp-opt">선택</span></span>
+        <span class="rp-label">어디서 보셨나요?</span>
         <textarea class="rp-textarea" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요"></textarea>
       </div>
     </div>
@@ -573,17 +573,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-fh="c">다 · 안 맞을 때만</button>
   </div>
 
-  <h4>③ 「선택」 꼬리표 <span style="color:#9A8A83;font-weight:600">(레시피 갈래에만 5개)</span></h4>
-  <div class="prow" id="opRow">
-    <button data-op="off">뺀다 (권함)</button>
-    <button data-op="on">둔다</button>
-  </div>
-
   <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
     ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 ·
-    진행바 가로 · 연락처 2열 · 흰색 + 그림자 + 동그라미 · <b>이메일 한 칸</b><br>
-    ⏸ <b>레시피 갈래 조작은 걷어냈습니다</b> — 갈래 칸 수 · 자동완성 안내 · <b>「선택」 꼬리표</b><br>
-    &nbsp;&nbsp;(「선택」은 연락처가 별표로 바뀌면서 <b>레시피 갈래에만 5개</b> 남았습니다)<br>
+    진행바 가로 · 연락처 2열 · 흰색 + 그림자 + 동그라미 · 이메일 한 칸 ·
+    <b>「선택」 꼬리표 없음(필수는 별표로만)</b> · 이름 칸 도움말은 라벨 아래<br>
     (개별 미세조정은 말씀해 주시면 그때그때 반영합니다)
   </p>
 
@@ -602,7 +595,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   /* 🔴 정해진 것은 조작판에서 뺀다 — 미결만 남긴다(2026-08-06 사용자 지시).
      확정: 진행바 가로 · 고르는 상자 = **흰색 + 그림자 + 동그라미**.
      ⏸ 레시피 갈래 조작(br·fh)은 지금 안 쓰므로 걷어냈다. 값은 남겨 두어 화면은 그대로 돈다. */
-  var state = { br: 'full', fh: 'b', op: 'on', ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
+  var state = { br: 'full', fh: 'b', ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -751,8 +744,8 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    // 레시피 갈래용 조작 셋을 되살렸다(2026-08-07)
-    [['brRow','br','br'],['fhRow','fh','fh'],['opRow','op','op']].forEach(function (p) {
+    // 레시피 갈래용 조작 — ③「선택」 꼬리표는 확정되어 걷어냈다(2026-08-07)
+    [['brRow','br','br'],['fhRow','fh','fh']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       if (!row) return;
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
@@ -846,7 +839,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     off('rMailDomSelf', dom.value !== '__self');
 
     body.classList.add('bar-h');          // 진행바 가로 — 확정
-    body.classList.toggle('opt-off', state.op === 'off');
     body.classList.toggle('pick-fill', state.bg === 'fill' || state.bg === 'fillshadow');
     body.classList.toggle('pick-shadow', state.bg === 'shadow' || state.bg === 'fillshadow');
     body.classList.toggle('pick-radio', state.mk === 'radio');
@@ -867,7 +859,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     var b = e.target.closest('button'); if (!b || b.id === 'hide') return;
     if (b.dataset.br) state.br = b.dataset.br;
     else if (b.dataset.fh) state.fh = b.dataset.fh;
-    else if (b.dataset.op) state.op = b.dataset.op;
     else if (b.dataset.bg) state.bg = b.dataset.bg;
     else if (b.dataset.mk) state.mk = b.dataset.mk;
     else return;
