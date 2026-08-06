@@ -421,7 +421,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
       <!-- 쪼갠 안 (@ 뒤 드롭다운) -->
       <div class="rp-mail" id="ctSplit" data-off>
         <div class="stamp-field stamp-field--light-ph">
-          <input type="text" id="rMailId" placeholder="qwerty" autocomplete="off">
+          <input type="text" id="rMailId" placeholder="id" autocomplete="off">
         </div>
         <span class="rp-at">@</span>
         <div class="stamp-field" id="rMailDomWrap">
@@ -703,8 +703,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     off('ctSplit', !splitMail);
     off('agreeWrap', !(isMail || isInsta));
     off('ctHelp', state.ct !== null);
-    if (isInsta) { ct.type = 'text'; ct.placeholder = 'qwerty'; ct.autocomplete = 'off'; }
-    else { ct.type = 'email'; ct.placeholder = 'qwerty@abc.com'; ct.autocomplete = 'email'; }
+    /* 🔴 예시 도메인은 `example.com` 이다 — RFC 2606 이 **예시 전용으로 예약**한 것이라
+       절대 실제 사이트가 아니다. ⚠️ `abc.com` 같은 흔한 예시는 **실제로 있는 도메인**이다. */
+    if (isInsta) { ct.type = 'text'; ct.placeholder = 'id'; ct.autocomplete = 'off'; }
+    else { ct.type = 'email'; ct.placeholder = 'id@example.com'; ct.autocomplete = 'email'; }
 
     // 칸 위 라벨 — 「입력해 주세요」는 띄어 쓴다(사이트 표기와 맞춤)
     var sub = document.getElementById('ctSub');
