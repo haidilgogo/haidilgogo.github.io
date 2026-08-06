@@ -51,6 +51,11 @@
 }
 .rp-kind.on { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
 .rp-kind:active { transform: scale(.985); }   /* 앱 공통 누름 세기 */
+/* 🔴 연락처 종류는 **가로 두 칸**이다. 첫 질문과 같은 세로 상자로 두면 「이메일」 한 칸이
+   화면 폭을 통째로 먹어 첫 질문보다 무거워 보인다(2026-08-06 렌더해 보고 갈랐다).
+   상자 생김새(테두리·모서리 12·고른 것 빨강)는 같게 두어 말이 통일된다. */
+.rp-kinds--inline { flex-direction: row; }
+.rp-kinds--inline .rp-kind { flex: 1; justify-content: center; min-height: 44px; }
 
 /* 자동완성 — 앱의 .stamp-dd-menu 를 그대로 빌린다 */
 .rp-auto { position: relative; }
@@ -80,8 +85,24 @@
 .rp-privacy b { color: var(--text-dark); font-weight: 700; }
 .rp-privacy ul { margin: 6px 0 0; padding-left: 15px; }
 
-#rpSubmit { width: 100%; }
-.rp-submit-wrap { margin-top: 6px; }
+/* 두 버튼 — 🔴 앱의 내 코드 시트(.sync-actions)와 같은 값을 쓴다.
+   거기 주석에 「둘 중 실제로 권하는 행동에 강조색을 준다」고 근거가 적혀 있고,
+   그 방식이 곧 **권하는 행동 = 오른쪽 + 강조색**이다. iOS·안드로이드 관습과도 같다. */
+.rp-actions { display: flex; gap: 8px; margin-top: 6px; }
+.rp-btn {
+  flex: 1; padding: 13px 0; border-radius: 14px; border: 1px solid var(--card-border);
+  background: #fff; font-family: inherit; font-size: 15px; font-weight: 700; color: #4D4139;
+  -webkit-tap-highlight-color: transparent; transition: transform .08s ease, background .15s, opacity .15s;
+}
+.rp-btn:active { transform: scale(.98); background: var(--bg-cream); }
+.rp-btn--go { background: var(--brand-red); border-color: var(--brand-red); color: #fff; font-weight: 800; }
+.rp-btn--go:active { background: var(--brand-red-active); }
+/* 🔴 필수값 전까지 비활성 — 「왜 안 눌리는지」를 아래 한 줄로 같이 알려준다.
+   비활성만 걸고 이유를 안 적으면 사용자가 무엇을 안 채웠는지 모른 채 헤맨다. */
+.rp-btn--go:disabled { background: #DCCFC6; border-color: #DCCFC6; color: #fff; opacity: 1; }
+.rp-why { margin-top: 8px; font-size: 12px; color: var(--text-muted); text-align: center; }
+/* ⑤ 좌우 바꾸기 */
+body.swap .rp-actions { flex-direction: row-reverse; }
 
 /* 진행바 (① 번호로 켜고 끈다) */
 #bar { position: sticky; top: 65px; z-index: 25; height: 3px; background: rgba(43,18,13,.08); display: none; }
@@ -215,7 +236,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     <!-- ── 연락처 ── -->
     <div class="rp-block" id="ctBlock">
       <span class="rp-label">연락처 <span class="rp-opt">선택</span></span>
-      <div class="rp-kinds" id="ctKinds">
+      <div class="rp-kinds rp-kinds--inline" id="ctKinds">
         <button type="button" class="rp-kind on" data-c="email">이메일</button>
         <button type="button" class="rp-kind" data-c="insta">인스타그램</button>
       </div>
@@ -238,8 +259,12 @@ body.previewing .column-sheet { padding-bottom: 60px; }
       </div>
     </div>
 
-    <div class="rp-submit-wrap" id="submitWrap">
-      <button type="button" class="stamp-submit" id="rpSubmit">보내기</button>
+    <div id="submitWrap">
+      <div class="rp-actions">
+        <button type="button" class="rp-btn" id="rpClose">닫기</button>
+        <button type="button" class="rp-btn rp-btn--go" id="rpSubmit" disabled>보내기</button>
+      </div>
+      <p class="rp-why" id="rpWhy"></p>
     </div>
   </form>
 </main>
@@ -274,6 +299,12 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     <button data-gp="tight">3 · 촘촘</button>
   </div>
 
+  <h4>⑤ 버튼 자리</h4>
+  <div class="prow" id="swRow">
+    <button data-sw="0">닫기 왼 · 보내기 오</button>
+    <button data-sw="1">반대로</button>
+  </div>
+
   <button id="hide">조작판 숨기고 보기 (6초)</button>
 </div>
 
@@ -282,7 +313,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
 (function () {
   var body = document.body;
   // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
-  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', kind: null, ct: 'email' };
+  var state = { br: 'full', fh: 'b', pb: '0', gp: 'loose', sw: '0', kind: null, ct: 'email' };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -348,6 +379,42 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     state.ct = b.dataset.c; paint();
   });
 
+  /* 🔴 보내기는 필수값이 찰 때까지 비활성(사용자 지시).
+     ⚠️ 비활성만 걸면 「왜 안 눌리는지」를 모른다 → 아래 한 줄로 이유를 같이 적는다.
+     🔴 연락처를 적었으면 **동의 체크도 필수**다 — 동의 없이 개인정보를 받으면 안 된다. */
+  function checkReady() {
+    var btn = document.getElementById('rpSubmit'), why = document.getElementById('rpWhy');
+    var name = document.getElementById('rName').value.trim();
+    var bodyV = document.getElementById('rBody').value.trim();
+    var ctV = document.getElementById('rCt').value.trim();
+    var agreed = document.getElementById('rpAgree').checked;
+    var isRecipe = state.kind === 'recipe';
+    var needName = isRecipe && (state.br === 'full' || state.br === 'mid');
+    var reason = '';
+
+    if (state.kind === null) reason = '';
+    else if (needName && !name) reason = '레시피 이름을 적어 주세요.';
+    else if (!needName && !bodyV) reason = '내용을 적어 주세요.';
+    else if (ctV && !agreed) reason = '연락처를 적으셨으면 개인정보 수집 · 이용에 동의해 주세요.';
+
+    btn.disabled = reason !== '' || state.kind === null;
+    why.textContent = btn.disabled ? reason : '';
+  }
+  ['rName','rBody','rCt'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', checkReady);
+  });
+  document.getElementById('rpAgree').addEventListener('change', checkReady);
+
+  // 닫기 — 🔴 credits.html 과 같은 방식: 같은 사이트에서 왔으면 왔던 자리로, 아니면 홈으로.
+  //        ⚠️ 다만 여기는 폼이라 **적던 글이 있으면 한 번 묻는다**.
+  document.getElementById('rpClose').addEventListener('click', function () {
+    var dirty = ['rName','rBody','rCt'].some(function (id) { return document.getElementById(id).value.trim(); });
+    if (dirty && !confirm('적으신 내용이 사라집니다. 닫을까요?')) return;
+    var same = false;
+    try { same = new URL(document.referrer).origin === location.origin; } catch (e) {}
+    if (same) history.back(); else location.href = './';
+  });
+
   var toast = document.getElementById('toast'), t = null;
   document.getElementById('rpSubmit').addEventListener('click', function () {
     show('목업이라 실제로는 안 갑니다');
@@ -365,7 +432,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp']].forEach(function (p) {
+    [['brRow','br','br'],['fhRow','fh','fh'],['pbRow','pb','pb'],['gpRow','gp','gp'],['swRow','sw','sw']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
@@ -401,7 +468,9 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     body.classList.toggle('show-bar', state.pb === '1');
     body.classList.toggle('gap-mid', state.gp === 'mid');
     body.classList.toggle('gap-tight', state.gp === 'tight');
+    body.classList.toggle('swap', state.sw === '1');
     renderAuto();
+    checkReady();
   }
 
   // 진행바 — 스크롤 진행도
@@ -416,6 +485,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     else if (b.dataset.fh) state.fh = b.dataset.fh;
     else if (b.dataset.pb) state.pb = b.dataset.pb;
     else if (b.dataset.gp) state.gp = b.dataset.gp;
+    else if (b.dataset.sw) state.sw = b.dataset.sw;
     else return;
     paint();
   });
