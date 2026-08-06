@@ -463,51 +463,22 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 <div class="share-toast" id="toast">보내주셔서 고맙습니다!</div>
 
 <div id="panel">
-  <h4>① 갈래 — 레시피를 고르면 얼마나 나오나</h4>
-  <div class="prow" id="brRow">
-    <button data-br="full">1 · 그대로 (6칸)</button>
-    <button data-br="min">2 · 줄인 안 (1칸)</button>
-    <button data-br="mid">3 · 중간 (2칸)</button>
-  </div>
-
-  <h4>② 목록에 없을 때 안내 (주문 항목 칸)</h4>
-  <div class="prow" id="fhRow">
-    <button data-fh="a">가 · 늘 보임</button>
-    <button data-fh="b">나 · 목록 맨 아래</button>
-    <button data-fh="c">다 · 안 맞을 때만</button>
-  </div>
-
-  <h4>③ 「선택」 꼬리표</h4>
+  <h4>① 「선택」 꼬리표</h4>
   <div class="prow" id="opRow">
     <button data-op="off">뺀다 (권함)</button>
     <button data-op="on">둔다</button>
   </div>
 
-  <h4>④ 이메일 칸</h4>
+  <h4>② 이메일 칸</h4>
   <div class="prow" id="mlRow">
     <button data-ml="one">한 칸 (권함)</button>
     <button data-ml="split">아이디 @ 도메인▾</button>
   </div>
 
-  <h4>⑤ 고르는 상자 — 바탕</h4>
-  <div class="prow" id="bgRow">
-    <button data-bg="white">흰색</button>
-    <button data-bg="fill">크림 면</button>
-  </div>
-  <div class="prow" id="bgRow2" style="margin-top:6px">
-    <button data-bg="shadow">흰색 + 그림자</button>
-    <button data-bg="fillshadow">크림 + 그림자</button>
-  </div>
-
-  <h4>⑥ 고르는 상자 — 표시 <span style="color:#9A8A83;font-weight:600">(⑤와 겹쳐 씁니다)</span></h4>
-  <div class="prow" id="mkRow">
-    <button data-mk="radio">동그라미</button>
-    <button data-mk="chev">화살표</button>
-    <button data-mk="none">없음</button>
-  </div>
-
   <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
-    ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 · <b>진행바 가로</b><br>
+    ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 ·
+    진행바 가로 · 연락처 2열 · <b>흰색 + 그림자 + 동그라미</b><br>
+    ⏸ <b>레시피 갈래 조작은 걷어냈습니다</b> (갈래 칸 수 · 자동완성 안내) — 나중에 되살립니다<br>
     (개별 미세조정은 말씀해 주시면 그때그때 반영합니다)
   </p>
 
@@ -523,8 +494,10 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   /* 🔴 정해진 것은 조작판에서 뺐다(2026-08-06 사용자 지시) — 미결만 남긴다.
      간격 = 넉넉 · 버튼 자리 = 닫기 왼/보내기 오 · 「* 표시는 필수」 = 회색. */
   // 🔴 ct 도 처음엔 **아무것도 안 골라진 상태**(null)로 시작한다(2026-08-06 사용자 지시)
-  /* 진행바 = 가로로 확정(2026-08-06 사용자 확정) — 조작판에서 뺐다. */
-  var state = { br: 'full', fh: 'b', op: 'on', ml: 'one', bg: 'white', mk: 'radio', kind: null, ct: null };
+  /* 🔴 정해진 것은 조작판에서 뺀다 — 미결만 남긴다(2026-08-06 사용자 지시).
+     확정: 진행바 가로 · 고르는 상자 = **흰색 + 그림자 + 동그라미**.
+     ⏸ 레시피 갈래 조작(br·fh)은 지금 안 쓰므로 걷어냈다. 값은 남겨 두어 화면은 그대로 돈다. */
+  var state = { br: 'full', fh: 'b', op: 'on', ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -662,9 +635,9 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
 
   function paint() {
-    [['brRow','br','br'],['fhRow','fh','fh'],['opRow','op','op'],['mlRow','ml','ml'],
-     ['bgRow','bg','bg'],['bgRow2','bg','bg'],['mkRow','mk','mk']].forEach(function (p) {
+    [['opRow','op','op'],['mlRow','ml','ml']].forEach(function (p) {
       var row = document.getElementById(p[0]);
+      if (!row) return;   // 조작판에서 뺀 항목은 건너뛴다
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
     });
     [].forEach.call(document.getElementById('rpKinds').children, function (b) {
