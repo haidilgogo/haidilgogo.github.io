@@ -38,13 +38,19 @@
 .rp-textarea::placeholder { color: var(--text-muted); opacity: 1; }
 .rp-count { font-size: 11px; color: var(--text-muted); text-align: right; }
 
-.rp-kinds { display: flex; flex-wrap: wrap; gap: 7px; }
+/* 🔴 알약이 아니라 **세로로 쌓인 둥근 상자**(2026-08-06 사용자 지시).
+   상자 값은 앱 입력칸(.stamp-field)과 같다 — 흰 배경 · 1.5px 테두리 · radius 12 · min-height 44. */
+.rp-kinds { display: flex; flex-direction: column; gap: 7px; }
 .rp-kind {
-  border: 1.5px solid var(--card-border); background: #fff; border-radius: 999px;
-  padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--text-muted);
+  display: flex; align-items: center; width: 100%; text-align: left;
+  border: 1.5px solid var(--card-border); background: #fff; border-radius: 12px;
+  min-height: 48px; padding: 0 14px; box-sizing: border-box;
+  font-size: 14px; font-weight: 600; color: var(--text-muted);
   font-family: inherit; -webkit-tap-highlight-color: transparent;
+  transition: background .12s, border-color .12s, color .12s, transform .08s;
 }
 .rp-kind.on { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
+.rp-kind:active { transform: scale(.985); }   /* 앱 공통 누름 세기 */
 
 /* 자동완성 — 앱의 .stamp-dd-menu 를 그대로 빌린다 */
 .rp-auto { position: relative; }
@@ -132,8 +138,9 @@ body.previewing .column-sheet { padding-bottom: 60px; }
 
     <div class="rp-block">
       <span class="rp-label">어떤 이야기인가요?</span>
+      <!-- 🔴 기본값 없음 — 고르기 전에는 아래를 아예 안 보여준다(2026-08-06 사용자 지시) -->
       <div class="rp-kinds" id="rpKinds">
-        <button type="button" class="rp-kind on" data-k="recipe">레시피 추가</button>
+        <button type="button" class="rp-kind" data-k="recipe">레시피 추가</button>
         <button type="button" class="rp-kind" data-k="bug">잘못된 정보 · 오류</button>
         <button type="button" class="rp-kind" data-k="etc">기타 문의</button>
       </div>
@@ -191,7 +198,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
     </div>
 
     <!-- ── 연락처 ── -->
-    <div class="rp-block">
+    <div class="rp-block" id="ctBlock">
       <span class="rp-label">연락처 <span class="rp-opt">선택</span></span>
       <div class="rp-kinds" id="ctKinds">
         <button type="button" class="rp-kind on" data-c="email">이메일</button>
@@ -216,7 +223,7 @@ body.previewing .column-sheet { padding-bottom: 60px; }
       </div>
     </div>
 
-    <div class="rp-submit-wrap">
+    <div class="rp-submit-wrap" id="submitWrap">
       <button type="button" class="stamp-submit" id="rpSubmit">보내기</button>
     </div>
   </form>
@@ -252,7 +259,8 @@ body.previewing .column-sheet { padding-bottom: 60px; }
 <script>
 (function () {
   var body = document.body;
-  var state = { br: 'full', fh: 'b', pb: '0', kind: 'recipe', ct: 'email' };
+  // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
+  var state = { br: 'full', fh: 'b', pb: '0', kind: null, ct: 'email' };
 
   // 자동완성 목록 = 메뉴 130 + 육수 12
   var NAMES = [];
@@ -346,16 +354,19 @@ body.previewing .column-sheet { padding-bottom: 60px; }
       b.classList.toggle('on', b.dataset.c === state.ct);
     });
 
+    // 🔴 고르기 전에는 아래를 통째로 안 보여준다
+    var picked = state.kind !== null;
     var isRecipe = state.kind === 'recipe';
-    // 갈래 안에 따라 레시피 칸을 얼마나 보여줄지
-    var showName = isRecipe && (state.br === 'full' || state.br === 'mid');
-    var showRest = isRecipe && state.br === 'full';
+    var showName = picked && isRecipe && (state.br === 'full' || state.br === 'mid');
+    var showRest = picked && isRecipe && state.br === 'full';
     off('recipeFull', !(showName || showRest));
     off('orderBlock', !showRest); off('ingBlock', !showRest);
     off('stepBlock', !showRest); off('tipBlock', !showRest); off('srcBlock', !showRest);
     // 「그대로」일 때는 레시피에 내용 칸이 없다
-    off('bodyBlock', isRecipe && state.br === 'full');
-    off('lead', !(isRecipe && state.br === 'full'));
+    off('bodyBlock', !picked || (isRecipe && state.br === 'full'));
+    off('lead', !(picked && isRecipe && state.br === 'full'));
+    off('ctBlock', !picked);
+    off('submitWrap', !picked);
 
     document.getElementById('bodyLabel').textContent =
       isRecipe ? '레시피를 아는 만큼 적어 주세요' : '내용';
