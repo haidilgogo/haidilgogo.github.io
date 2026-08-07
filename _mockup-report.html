@@ -458,7 +458,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
      구글폼은 예시 칸이 따로 없어 라벨에 다 넣어야 했지만 우리는 나눌 수 있다.
      원문은 426px 라 390px 폰(칸 폭 346px)에서도 두 줄이었다. 지금은 286px. -->
 <span class="rp-label">이 레시피를 어디서 보신 적이 있다면 출처를 알려 주세요!</span>
-        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요"></textarea>
+        <!-- 🔴 「링크를 붙여 주셔도 좋아요」는 **예시가 아니라 안내**라 도움말로 올렸다(2026-08-07 사용자 지적).
+             칸 안은 「이렇게 생긴 걸 적으세요」를 보여주는 자리다 — 부탁하는 말이 거기 있으면 안 된다.
+             ⚠️ 그래서 예시 둘째 줄에는 **진짜 링크 모양**을 넣었다. 없으면 「링크를 붙이라」고 해 놓고
+                정작 어떤 꼴인지는 안 보여주는 셈이 된다. -->
+        <p class="rp-help">링크를 붙여 주셔도 좋아요.</p>
+        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;https://youtu.be/abcd1234"></textarea>
       </div>
     </div>
 
