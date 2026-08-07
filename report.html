@@ -741,8 +741,13 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   function 보낸뒤화면() {
     off('rpForm', true);
     off('rpNote', true);
-    var sub = document.querySelector('.credit-sub');
-    if (sub) sub.setAttribute('data-off', '');
+    /* 🔴 머리글(「✉ 제보 · 문의」)을 통째로 감춘다(2026-08-07 사용자 지적) —
+       말풍선이 이미 「접수되었어요」라고 말하고 있어 같은 화면에서 두 번 말하는 꼴이었다. */
+    var head = document.querySelector('.credit-head');
+    if (head) head.setAttribute('data-off', '');
+    /* 🔴 **가로 진행바**도 감춘다 — 이 화면은 내릴 것이 없어서 늘 꽉 찬 빨간 줄로만 보인다.
+       진행도를 알려 주는 게 아니라 그냥 선 하나가 그어져 있는 셈이다. */
+    off('bar', true);
     // 연락처를 준 사람에게만 답변 줄을 보여준다
     off('rpDoneReply', !(state.ct === 'email' || state.ct === 'insta'));
     off('rpDone', false);
