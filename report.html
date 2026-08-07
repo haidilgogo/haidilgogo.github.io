@@ -209,8 +209,15 @@ body.swap .rp-actions { flex-direction: row-reverse; }
 .rp-done-title { margin: 0 0 12px; font-size: 19px; font-weight: 800; color: var(--text-dark); }
 .rp-done-body { margin: 0 0 6px; font-size: 13.5px; line-height: 1.7; color: var(--text-muted); }
 .rp-done-body:last-of-type { margin-bottom: 0; }
-/* 닫기 하나뿐일 때 — 둘일 때(.rp-actions)와 같은 높이·모양을 쓰되 폭만 나누지 않는다 */
-.rp-actions--one { margin-top: 26px; }
+/* 🔴 보낸 뒤의 닫기는 **화면 아래**다(2026-08-07 사용자 지시).
+   `position: fixed` 는 안 쓴다 — 폼 쪽 버튼과 같은 이유다(아이폰에서 키보드·주소창과 엉킨다).
+   대신 `.rp-done` 이 남는 높이를 먹고(flex:1) 버튼에 `margin-top:auto` 를 준다.
+   → 글이 짧으면 아래로 내려가고, 길어지면 글을 따라온다. 겹치지 않는다. */
+.rp-done { display: flex; flex-direction: column; flex: 1; }
+.rp-actions--one { margin-top: auto; padding-top: 26px; }
+/* 🔴 폭은 **폼의 「닫기」와 같게** 맞춘다 — 두 칸으로 나눠 쓰던 그 폭이라 눈에 익다.
+   (두 버튼일 때 gap 이 8px 이므로 절반에서 4px 을 뺀다) */
+.rp-actions--one .rp-btn { flex: none; width: calc(50% - 4px); margin: 0 auto; }
 
 /* 진행바 — 가로(위) 하나로 확정(2026-08-06).
    🔴 세로바 안은 버렸다. 사실상 스크롤바라 「스크롤바를 어디서도 안 보인다」는 절대 규칙과 부딪친다. */
