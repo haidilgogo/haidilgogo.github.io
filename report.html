@@ -331,7 +331,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       <div class="rp-block">
         <!-- ⚠️ 구글폼 원문은 「적어주세요」인데 **「적어 주세요」로 띄웠다** — 사이트 표기를 맞춘 것이다
              (`credits.html`·이 폼 머리글의 「알려 주세요」와 같은 규칙, 2026-08-06 사용자 확정). -->
-        <span class="rp-label">레시피 이름을 적어 주세요! <span class="rp-req">*</span></span>
+        <span class="rp-label">레시피 이름을 입력해 주세요! <span class="rp-req">*</span></span>
         <!-- 🔴 자리는 **라벨 아래·칸 위**로 확정(2026-08-07 사용자 「나 안」 채택).
              구글폼 제목의 「(소스, 육수, 밥, 면, 기타)」가 하던 「소스 말고도 된다」는 신호를 여기서 준다.
              ⚠️ 원문 그대로 못 옮긴다 — 「육수」·「밥/면/기타」는 **옛 분류**다. 2026-07-21에
@@ -352,7 +352,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       </div>
 
       <div class="rp-block" id="orderBlock" style="margin-top:18px">
-        <span class="rp-label">매장에서 주문해야 하는 항목이 있다면 적어 주세요!</span>
+        <span class="rp-label">매장에서 주문해야 하는 항목이 있다면 입력해 주세요!</span>
         <!-- 🔴 **여러 줄이다**(2026-08-07 사용자 지적으로 한 줄 칸에서 바꿨다).
              실제 데이터가 그렇다 — `script.js` 에서 주문 항목이 있는 레시피 17개 중 **9개가 2개 이상**이고
              3개짜리도 여럿이다(우유/청유 마라훠궈 · 팡가시우메기 1인분 · 공깃밥 1공기).
@@ -378,7 +378,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
         <!-- ⚠️ 구글폼 원문의 「아는 대로 편하게」를 뺐다(2026-08-07 사용자 확정) — 칸 아래 도움말이
      이미 「정확하지 않아도 괜찮습니다.」라고 같은 말을 한다. 원문(298px)은 320px 폰의
      칸 폭(276px)을 넘어 두 줄로 감기기도 했다. 지금은 210px 로 두 폰 다 한 줄이다. -->
-<span class="rp-label">소스바에서 담는 재료와 양을 적어 주세요!</span>
+<span class="rp-label">소스바에서 담는 재료와 양을 입력해 주세요!</span>
         <!-- 🔴 도움말은 **라벨 아래 · 칸 위**다(2026-08-07 사용자 지시) — 이름 칸과 같은 자리다.
              적기 전에 「어떻게 적는 칸인지」를 알아야 하므로 칸 아래가 아니라 위에 둔다. -->
         <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
@@ -695,7 +695,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
     else if (state.ct === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctV))
       reason = '이메일 주소 형식이 아니에요.';
     else if (state.ct === 'insta' && !/^[A-Za-z0-9._]+$/.test(ctV))
-      reason = '인스타그램 계정은 영문 · 숫자 · _ · . 만 쓸 수 있어요.';
+      reason = '인스타그램 계정에는 영문·숫자·밑줄·마침표만 쓸 수 있어요.';
     else if (state.ct !== 'none' && !agreed) reason = '개인정보 수집 · 이용에 동의해 주세요.';
 
     btn.disabled = reason !== '' || state.kind === null;
