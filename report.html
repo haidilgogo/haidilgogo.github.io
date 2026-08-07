@@ -767,7 +767,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
     /* 무엇이 실릴지를 콘솔에도 찍는다 — 숨긴 칸이 딸려 가지 않는지 눈으로 확인할 수 있다. */
     console.log('[보낼 값]\n' + rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n'));
 
-    if (!SEND_URL) { show('아직 보낼 곳이 연결되지 않았습니다'); return; }
+    if (!SEND_URL) { show('지금은 보낼 수 없어요. 잠시 후에 다시 시도해 주세요.'); return; }
 
     /* 🔴 누른 순간 표시가 있어야 한다(2026-08-07 사용자 지적) — 문지기에 다녀오는 데
        1~3초가 걸리는데(구글 서버가 쉬다 깨면 더), 그동안 화면이 죽은 것처럼 보였다. */
@@ -780,12 +780,17 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
        문지기는 `e.postData.contents` 를 JSON 으로 읽으므로 형식은 문제없다. */
     fetch(SEND_URL, { method: 'POST', body: JSON.stringify({ rows: rows }) })
       .then(function (r) { return r.json(); })
+  /* 🔴 실패 문구는 **둘로 나눠 둔다**(2026-08-07 사용자 확정).
+     인터넷이 끊긴 것은 **우리 오류가 아니고**, 그때 사람이 할 수 있는 일도 다르다 —
+     연결을 확인하는 것과 그냥 기다리는 것. 그래서 「오류로 인해」로 뭉뚱그리지 않는다.
+     ⚠️ 연타(20초)와 서버 오류는 **한 문구**다 — 둘 다 사람이 할 일은 「조금 있다 다시」로 같다.
+        문구가 갈려도 행동이 안 달라지면 가를 이유가 없다. */
       .then(function (j) {
         if (j && j.ok) { 보낸뒤화면(); }
-        else { 되살리기(); show('보내지 못했습니다. 잠시 뒤 다시 해 주세요.'); }
+        else { 되살리기(); show('보내지 못했어요. 잠시 후에 다시 시도해 주세요.'); }
       })
       .catch(function () {
-        되살리기(); show('보내지 못했습니다. 인터넷 연결을 확인해 주세요.');
+        되살리기(); show('보내지 못했어요. 인터넷 연결을 확인해 주세요.');
       });
 
     function 되살리기() { btn.disabled = false; btn.textContent = 원래글씨; }
