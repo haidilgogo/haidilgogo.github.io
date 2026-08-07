@@ -168,6 +168,10 @@
 .rp-privacy ul { margin: 6px 0 0; padding-left: 15px; }
 /* 🔴 상자 밖으로 나왔다(2026-08-07) — 그래서 색·크기를 여기서 직접 준다.
    전에는 `.rp-privacy` 안에 있어서 상자 스타일을 물려받았다. 간격은 묶음의 gap(10px)이 준다. */
+.rp-privacy-more {
+  display: inline-block; margin-top: 9px; font-size: 11.5px; font-weight: 700;
+  color: var(--text-dark); text-decoration: underline; text-underline-offset: 2px;
+}
 .rp-privacy-optout {
   display: block; font-size: 12px; line-height: 1.65; color: var(--text-muted);
 }
@@ -485,6 +489,10 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
           <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
           <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
         </ul>
+        <!-- 🔴 처리방침으로 가는 길(2026-08-07). 여기가 **개인정보를 받는 유일한 자리**라
+             푸터보다 여기서 닿는 것이 실제로 쓸모 있다.
+             ⚠️ 체크박스 라벨 안에 넣지 말 것 — 라벨을 누르면 체크가 토글돼서 링크와 싸운다. -->
+        <a class="rp-privacy-more" href="privacy.html">개인정보 처리방침 자세히 보기</a>
       </div>
       <!-- 🔴 「동의하지 않으셔도 접수됩니다」는 **틀린 말이 됐다**(2026-08-06 사용자 지적).
            연락처를 셋 중 고르는 구조로 바꾸면서, 이메일·인스타를 고르면 동의가 필수가 되어
