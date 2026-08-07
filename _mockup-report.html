@@ -67,11 +67,14 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
   font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   font-size: 16px; font-weight: 400; line-height: 1.65; color: var(--text-dark);
   resize: none; outline: none;
-  /* 🔴 5줄이 보이는 높이(2026-08-06 사용자 지시).
-     16 × 1.65 = 26.4 → 5줄 = 132. + 위아래 여백 24 + **테두리 3** = 159 → 160.
-     ⚠️ box-sizing 이 border-box 라 테두리까지 이 값 안에 든다. 처음에 테두리를 빼먹어
-        156 으로 뒀다가 4줄만 보였다. 글자 크기·줄간격을 바꾸면 이 값도 다시 잴 것. */
-  min-height: 160px;
+  /* 🔴 **3줄로 시작해서 치는 만큼 자란다**(2026-08-07 사용자 확정).
+     16 × 1.65 = 26.4 → 3줄 = 79.2. + 위아래 여백 24 + **테두리 3** = 106.2 → 106.
+     ⚠️ box-sizing 이 border-box 라 테두리까지 이 값 안에 든다. 예전에 테두리를 빼먹어
+        156 으로 뒀다가 4줄만 보인 적이 있다. 글자 크기·줄간격을 바꾸면 이 값도 다시 잴 것.
+     ⚠️ 5줄(160px)이었던 것을 줄인 이유: 긴 칸 다섯 개가 **빈 채로 800px(폼 전체의 36%)** 을
+        먹고 있었다. 길어서 지치는 원인은 칸 수가 아니라 이 빈 높이였다.
+     🔴 `min-height` 라서 아래 `grow()` 가 넣는 height 보다 **이 값이 바닥으로 이긴다.** */
+  min-height: 106px;
 }
 /* 입력칸(한 줄)도 같은 이유로 16px */
 .stamp-field input { font-size: 16px; }
@@ -463,7 +466,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
       <!-- ⚠️ 여기에 기본 예시를 적어 두지 않는다(2026-08-07 사용자 지시로 지웠다) — 화면에 절대 안 뜬다.
            갈래를 고르는 순간 아래 JS(`PH`)가 갈래별 예시로 항상 덮어쓰고, 고르기 전에는
            이 묶음 자체가 감춰져 있다. 적어 두면 「어디에도 없는 문구」가 코드에만 남는다. -->
-      <textarea class="rp-textarea rp-textarea--tall" id="rBody" maxlength="1000"></textarea>
+      <textarea class="rp-textarea" id="rBody" maxlength="1000"></textarea>
       <span class="rp-count" id="rpCount">0 / 1000자</span>
     </div>
 
@@ -738,6 +741,20 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   }
   ['rName','rBody','rCt','rMailId','rMailDomInput'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', checkReady);
+  });
+
+  /* 🔴 긴 칸은 **치는 만큼 자란다**(2026-08-07 사용자 확정) — 3줄로 시작하되 갑갑하지 않게.
+     ⚠️ `height:auto` 로 한 번 되돌린 뒤 재야 한다. 안 그러면 **줄어들 때 안 줄어든다**
+        (이미 늘려 둔 height 때문에 scrollHeight 가 그 값에 붙들린다).
+     ⚠️ 테두리 두께를 더한다 — box-sizing 이 border-box 라 height 에 테두리가 포함되는데
+        scrollHeight 는 테두리를 안 센다. 안 더하면 칠 때마다 3px 씩 모자라 실금이 생긴다.
+     🔴 3줄 바닥은 CSS 의 `min-height:106px` 이 지킨다. 여기서 따로 안 막는다. */
+  function grow(el) {
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight + (el.offsetHeight - el.clientHeight)) + 'px';
+  }
+  [].forEach.call(document.querySelectorAll('.rp-textarea'), function (el) {
+    el.addEventListener('input', function () { grow(el); });
   });
   document.getElementById('rpAgree').addEventListener('change', checkReady);
   document.getElementById('rMailDom').addEventListener('change', paint);
