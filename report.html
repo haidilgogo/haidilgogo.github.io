@@ -204,7 +204,8 @@ body.swap .rp-actions { flex-direction: row-reverse; }
 
 /* 보낸 뒤 화면 — 폼과 같은 좌우 여백(22px)을 쓰고, 가운데로 모은다 */
 .rp-done { padding: 40px 22px 0; text-align: center; }
-.rp-done-ic { font-size: 40px; line-height: 1; margin-bottom: 14px; }
+/* 마스코트 — 세로가 긴 그림(420×540)이라 **높이로** 크기를 잡는다 */
+.rp-done-ic { display: block; width: auto; height: 132px; margin: 0 auto 14px; }
 .rp-done-title { margin: 0 0 12px; font-size: 19px; font-weight: 800; color: var(--text-dark); }
 .rp-done-body { margin: 0 0 6px; font-size: 13.5px; line-height: 1.7; color: var(--text-muted); }
 .rp-done-body:last-of-type { margin-bottom: 0; }
@@ -512,7 +513,14 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
        ⚠️ 갈래(레시피·오류·기타)별로 문구를 가르지 않는다 — 셋 다 「받았다·고맙다」가 핵심이라
           갈릴 이유가 적고, 세 벌이 되면 나중에 한쪽만 고쳐 어긋난다. -->
   <div class="rp-done" id="rpDone" data-off>
-    <div class="rp-done-ic" aria-hidden="true">💌</div>
+    <!-- 🔴 이모지(💌) 대신 마스코트 그림이다(2026-08-07 사용자 확정).
+         이모지는 **기기마다 모양이 다르게 그려진다** — 애플·안드로이드·윈도우가 각자 그린다.
+         그림으로 두면 어디서 보든 같고, 이 사이트만의 것이 된다.
+         원본은 `data/mascot/02_export/감자-제보접수완료.png` (1254 정사각 투명 PNG).
+         ⚠️ 다시 만들 때는 **빈 여백을 잘라내고** 폭 420px webp 로 내보낸다 — 여백이 남아 있으면
+            화면에서 그림만 작아 보인다(실제로 원본은 위아래에 여백이 있었다). -->
+    <img class="rp-done-ic" src="assets/mascot/gamja-letter.webp" width="420" height="540"
+         alt="" draggable="false" decoding="async">
     <h2 class="rp-done-title">제보 · 문의가 접수되었어요!</h2>
     <p class="rp-done-body">소중한 의견 감사합니다.</p>
     <p class="rp-done-body" id="rpDoneReply" data-off>모든 의견에 답변드리지는 못하는 점 양해 부탁드립니다.</p>
