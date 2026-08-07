@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제보 · 문의 · 하딜고고</title>
+<meta name="description" content="하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요.">
+<link rel="canonical" href="https://haidilgogo.com/report.html">
+<meta name="robots" content="noindex, follow">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="styles.css?v=756">
+<link rel="stylesheet" href="article.css?v=23">
+<meta name="theme-color" content="#FCF9F5">
+<style>
+/* ===== 목업 전용. 앱 파일은 안 건드린다 =====
+   🔴 입력칸(.stamp-field)·보내기(.stamp-submit)·토스트(.share-toast)·아래로 뜨는 목록
+      (.stamp-dd-menu)은 **앱 것을 그대로 빌린다.** 새로 그리면 앱과 따로 논다. */
+
+/* 🔴 .column-sheet 은 좌우 여백이 없다 — 자식이 각자 갖는다(.credit-head 22px). */
+/* 🔴 설명문 → 첫 질문 사이는 **20px** 이다(2026-08-06 사용자 지시).
+   기준은 `credits.html` 의 「설명문 → 인물 사진」 간격이고, 재 보니 20px 였다
+   (`.credit-sec` 의 padding-top 18px 에서 나온다). 여기서 margin-top 18 + 2 = 20. */
+/* 🔴 `flex: 1` 이 있어야 폼이 남는 높이를 차지하고, 그래야 안에 있는 버튼 묶음의
+   `margin-top: auto` 가 먹는다. 이게 없으면 버튼이 내용 바로 밑에 붙어 버린다. */
+.rp-form { display: flex; flex-direction: column; flex: 1; gap: 18px; margin-top: 18px; padding: 0 22px; }
+.rp-block { display: flex; flex-direction: column; gap: 8px; }
+.rp-label { font-size: 13px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
+/* 🔴 「선택」 꼬리표는 **없앴다**(2026-08-07 사용자 확정) — 필수는 별표 하나로만 표시한다.
+   별표가 필수를 가리키면 별표 없는 칸은 저절로 선택이라, 꼬리표는 같은 말을 반대 방향에서
+   한 번 더 하는 것이었다(레시피 갈래에서만 다섯 번 반복됐다).
+   ⚠️ 되살리지 말 것. `.rp-opt` 클래스와 조작판 항목도 같이 지웠다. */
+/* 필수 표시 — 구글폼과 같은 방식(빨강 별표). */
+.rp-req { color: var(--brand-red); font-weight: 800; }
+/* 별표 안내 한 줄 — 색은 ⑥번으로 갈아 끼운다.
+   ⚠️ 기본을 회색으로 둔 이유: 이 사이트에서 빨강은 「누르는 것·중요한 것」의 색이라
+      안내문에 쓰면 경고처럼 읽힌다. 필수는 한 번에 둘뿐이고 나머지엔 「선택」이 적혀 있다. */
+/* ⚠️ 간격은 `padding` 이 아니라 `margin` 으로 준다 — padding 으로 주면 상자 위끝은 그대로라
+   재는 값과 눈에 보이는 것이 어긋난다(실제로 2px 로 재져서 헷갈렸다). */
+.rp-note {
+  margin: 18px 22px 0;
+  font-size: 12px; font-weight: 600; color: var(--text-muted);
+}
+.rp-form { margin-top: 8px; }
+/* ⚠️ `<p>` 의 기본 margin(위아래 약 12px)을 지운다 — 안 지우면 `.rp-block` 의 gap(8px) 에
+   그 값이 더해져서 도움말만 혼자 떠 보인다(2026-08-07 실제로 그랬다). 간격은 gap 한 곳에서만 준다. */
+.rp-help { margin: 0; font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+/* 칸 바로 위 작은 라벨 — 위 질문(.rp-label 13px)보다 한 단계 작게 두어 딸린 것으로 읽히게 한다.
+   ⚠️ 칸 안 예시(placeholder)와 역할이 다르다: 라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. */
+.rp-sublabel { font-size: 12.5px; font-weight: 700; color: var(--text-dark); }
+.rp-lead {
+  margin: 0; padding: 12px 14px; background: #F6F1EA; border-radius: 11px;
+  font-size: 12.5px; line-height: 1.7; color: var(--text-muted);
+}
+.rp-lead b { color: var(--text-dark); }
+
+/* 🔴 글자는 **16px** 이다. 14px 로 두면 **아이폰에서 칸을 누를 때 화면이 자동으로 확대된다**
+   (2026-08-06 사용자가 실기기에서 발견). iOS 사파리는 16px 미만 입력칸에서 그렇게 동작한다.
+   앱도 이미 같은 이유로 검색창만 16px 로 올려 뒀다(`@media all { .search-input { font-size:16px } }`).
+   ⚠️ 앱의 `.stamp-field input` 은 아직 14px 이라 **기록하기·내 코드 시트는 지금도 확대된다** —
+      별건이라 전수조사 항목으로 적어 뒀다. */
+.rp-textarea {
+  background: #fff; border: 1.5px solid var(--card-border); border-radius: 12px;
+  padding: 12px 13px; box-sizing: border-box; width: 100%;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+  font-size: 16px; font-weight: 400; line-height: 1.65; color: var(--text-dark);
+  resize: none; outline: none;
+  /* 🔴 **3줄로 시작해서 치는 만큼 자란다**(2026-08-07 사용자 확정).
+     16 × 1.65 = 26.4 → 3줄 = 79.2. + 위아래 여백 24 + **테두리 3** = 106.2 → 106.
+     ⚠️ box-sizing 이 border-box 라 테두리까지 이 값 안에 든다. 예전에 테두리를 빼먹어
+        156 으로 뒀다가 4줄만 보인 적이 있다. 글자 크기·줄간격을 바꾸면 이 값도 다시 잴 것.
+     ⚠️ 5줄(160px)이었던 것을 줄인 이유: 긴 칸 다섯 개가 **빈 채로 800px(폼 전체의 36%)** 을
+        먹고 있었다. 길어서 지치는 원인은 칸 수가 아니라 이 빈 높이였다.
+     🔴 `min-height` 라서 아래 `grow()` 가 넣는 height 보다 **이 값이 바닥으로 이긴다.** */
+  min-height: 106px;
+}
+/* 입력칸(한 줄)도 같은 이유로 16px */
+.stamp-field input { font-size: 16px; }
+/* 칸 안 고정 라벨(`@`)도 입력 글자와 같은 16px 로 — 앱 기본값 14px 이면 아래위로 어긋나 보인다 */
+#ctPrefix { font-size: 16px; font-weight: 400; }
+/* 🔴 **예시(placeholder)만 14px 로 줄인다**(2026-08-07 사용자 지적 — 예시가 너무 커 보였다).
+   ⚠️ 칸 자체(`font-size:16px`)는 절대 안 건드린다. 아이폰이 화면을 확대할지 말지는
+      **칸의 글자 크기**를 보고 정하지, 예시 글씨 크기는 보지 않는다. 그래서 이 방법이면
+      확대는 안 나면서 예시만 작아진다.
+   ⚠️ 사람이 실제로 치는 글자는 그대로 16px 다 — 예시보다 커지는 게 정상이다.
+   🔴 실기기에서 「칸을 눌렀을 때 확대되지 않는지」 확인할 것. 확대되면 이 규칙을 지우면 된다. */
+.rp-textarea::placeholder,
+.stamp-field input::placeholder { font-size: 14px; }
+.rp-textarea::placeholder { color: var(--text-muted); opacity: 1; }
+.rp-count { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+/* 🔴 알약이 아니라 **세로로 쌓인 둥근 상자**(2026-08-06 사용자 지시).
+   상자 값은 앱 입력칸(.stamp-field)과 같다 — 흰 배경 · 1.5px 테두리 · radius 12 · min-height 44. */
+.rp-kinds { display: flex; flex-direction: column; gap: 7px; }
+.rp-kind {
+  display: flex; align-items: center; width: 100%; text-align: left;
+  border: 1.5px solid var(--card-border); background: #fff; border-radius: 12px;
+  min-height: 48px; padding: 0 14px; box-sizing: border-box;
+  font-size: 14px; font-weight: 600; color: var(--text-muted);
+  font-family: inherit; -webkit-tap-highlight-color: transparent;
+  transition: background .12s, border-color .12s, color .12s, transform .08s;
+}
+.rp-kind.on { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
+/* 🔴 손끝 반응은 **앱 공통 규칙 그대로**다(2026-08-04 확정, 메뉴 카드 .mn-card 와 같은 값):
+   올리면 테두리 로즈 · 누르면 로즈 + scale(.985).
+   `--card-hover-border`(#D98476)는 앱이 「카드 hover/누름 테두리」로 **예약해 둔 색**이라 새로 안 고른다.
+   ⚠️ 인계 문서에 「누름 세기는 로즈 + 살짝(.985)로 확정 — 다시 묻지 말 것」이라고 적혀 있다.
+   🔴 hover 는 반드시 `@media (hover: hover)` 안에 둔다 — 안 그러면 터치 기기에서
+      한 번 누른 뒤 색이 **눌어붙는다**(2026-07-25 상단바 아이콘에서 실제로 겪었다). */
+@media (hover: hover) {
+  .rp-kind:hover { border-color: var(--card-hover-border); }
+}
+.rp-kind:active { transform: scale(.985); border-color: var(--card-hover-border); }
+
+/* 🔴 「누르는 상자」와 「적는 칸」이 똑같이 생겼던 것(2026-08-06 사용자 지적).
+   앱 입력칸(.stamp-field)의 값을 그대로 빌려 쓴 탓이다 — 흰 배경·1.5px 테두리·모서리 12.
+   「앱과 통일」을 노렸는데 너무 통일해서 **무엇이 눌리는지 안 읽혔다.**
+   아래 셋을 번호로 비교한다. */
+
+/* 🔴 바탕과 표시는 **따로 고른다**(2026-08-06 사용자 지시) — 면 + 동그라미처럼 겹쳐 쓸 수 있다. */
+
+/* 표시 ① 동그라미 — 「고르는 것」임을 가장 분명히 말한다(구글폼과 같은 관용구) */
+.rp-kind::before {
+  content: ''; flex: none; width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--card-border); margin-right: 11px;
+  transition: border-color .12s, background .12s;
+}
+.rp-kind.on::before {
+  border-color: #fff;
+  background: radial-gradient(circle, #fff 0 46%, transparent 47%);
+}
+
+/* 바탕 ③④ 그림자 — 🔴 「눌릴 것 같은 느낌」은 색이 아니라 **떠 있음**에서 온다(2026-08-06 사용자 지적).
+   🔴 크게 키우지 말 것 — 아이폰 사파리에서 **가로 구분선이 생긴다**(2026-08-04 탭바에서 실제로 겪었다.
+      바깥 끝이 10px 을 넘으면 그 끝에서 선이 보인다). 그래서 탭바와 같은 방식으로 **작게 두 겹**이다.
+   ⚠️ 고른 상자(빨강)는 그림자를 조금 진하게 — 밝은 면과 같은 값이면 안 떠 보인다. */
+.rp-kind {
+  box-shadow: 0 1px 2px rgba(43, 18, 13, .10), 0 2px 6px rgba(43, 18, 13, .09);
+}
+.rp-kind.on {
+  box-shadow: 0 1px 3px rgba(178, 40, 24, .28), 0 3px 8px rgba(178, 40, 24, .22);
+}
+.rp-kind:active { box-shadow: 0 1px 2px rgba(43, 18, 13, .12); } /* 누르면 내려앉는다 */
+
+/* 🔴 연락처 종류는 **가로 두 칸**이다. 첫 질문과 같은 세로 상자로 두면 「이메일」 한 칸이
+   화면 폭을 통째로 먹어 첫 질문보다 무거워 보인다(2026-08-06 렌더해 보고 갈랐다).
+   상자 생김새(테두리·모서리 12·고른 것 빨강)는 같게 두어 말이 통일된다. */
+/* 🔴 연락처는 **맨 위 한 줄 전체 + 아래 2열**(2026-08-06 사용자 제안).
+   2열/한 줄 섞는 방식 자체는 앱의 기록하기 「동행 고르기」(.stamp-dd-menu--grid)와 같다.
+   🔴 「답변이 필요 없어요」가 **위**다 — 처음엔 아래로 뒀는데 되돌렸다.
+      이유: **이메일·인스타 바로 아래에 입력 칸이 붙어야** 무엇을 골랐는지 눈으로 이어진다.
+      사이에 다른 상자가 끼면 그 연결이 끊긴다. */
+.rp-kinds--pair { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.rp-kinds--pair .rp-kind { justify-content: center; min-height: 46px; }
+.rp-kinds--pair .rp-kind:first-child { grid-column: 1 / -1; }
+/* 2열은 폭이 좁다 — 동그라미와 글자 사이를 줄인다 */
+.rp-kinds--pair .rp-kind::before { margin-right: 8px; }
+
+/* 자동완성 — 앱의 .stamp-dd-menu 를 그대로 빌린다 */
+
+/* 이메일을 아이디 @ 도메인으로 쪼갠 안 */
+.rp-agree { display: flex; align-items: flex-start; gap: 9px; }
+.rp-agree input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--brand-red); flex: none; }
+.rp-agree label { font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.5; }
+.rp-privacy { background: #F6F1EA; border-radius: 11px; padding: 12px 13px; font-size: 11.5px; line-height: 1.7; color: var(--text-muted); }
+.rp-privacy b { color: var(--text-dark); font-weight: 700; }
+.rp-privacy ul { margin: 6px 0 0; padding-left: 15px; }
+/* 🔴 상자 밖으로 나왔다(2026-08-07) — 그래서 색·크기를 여기서 직접 준다.
+   전에는 `.rp-privacy` 안에 있어서 상자 스타일을 물려받았다. 간격은 묶음의 gap(10px)이 준다. */
+.rp-privacy-optout {
+  display: block; font-size: 12px; line-height: 1.65; color: var(--text-muted);
+}
+.rp-privacy-optout b { color: var(--text-dark); font-weight: 700; }
+
+/* 두 버튼 — 🔴 앱의 내 코드 시트(.sync-actions)와 같은 값을 쓴다.
+   거기 주석에 「둘 중 실제로 권하는 행동에 강조색을 준다」고 근거가 적혀 있고,
+   그 방식이 곧 **권하는 행동 = 오른쪽 + 강조색**이다. iOS·안드로이드 관습과도 같다. */
+.rp-actions { display: flex; gap: 8px; margin-top: 6px; }
+.rp-btn {
+  flex: 1; padding: 13px 0; border-radius: 14px; border: 1px solid var(--card-border);
+  background: #fff; font-family: inherit; font-size: 15px; font-weight: 700; color: #4D4139;
+  -webkit-tap-highlight-color: transparent; transition: transform .08s ease, background .15s, opacity .15s;
+}
+.rp-btn:active { transform: scale(.98); background: var(--bg-cream); }
+.rp-btn--go { background: var(--brand-red); border-color: var(--brand-red); color: #fff; font-weight: 800; }
+.rp-btn--go:active { background: var(--brand-red-active); }
+/* 🔴 필수값 전까지 비활성 — 「왜 안 눌리는지」를 같이 알려준다.
+   비활성만 걸고 이유를 안 적으면 사용자가 무엇을 안 채웠는지 모른 채 헤맨다. */
+.rp-btn--go:disabled { background: #DCCFC6; border-color: #DCCFC6; color: #fff; opacity: 1; }
+/* 🔴 자리와 색은 앱의 `.sync-msg`(내 코드 시트)를 그대로 쓴다 —
+   **버튼 바로 위** · 가운데 정렬 · 13px/600 · 막힌 것은 `--sync-msg--bad` 와 같은 브랜드 빨강.
+   거기 주석에 「복사·보내기 결과는 그 버튼 **바로 위**에 뜬다」고 근거가 적혀 있다.
+   ⚠️ 여백도 그 방식(위 14 / 아래 16)을 따른다 — 설명 문단에 딱 붙으면 한 문장처럼 보인다. */
+.rp-why {
+  /* 아래 16px — 버튼에 딱 붙으면 버튼 딱지처럼 보인다(2026-08-06 사용자 지적).
+     앱 `.sync-msg` 의 「위 14 / 아래 16」과 같은 값이다. */
+  margin: 0 0 16px; font-size: 13px; font-weight: 600; line-height: 1.55;
+  text-align: center; color: var(--brand-red);
+}
+.rp-why:empty { display: none; }
+/* ⑤ 좌우 바꾸기 */
+body.swap .rp-actions { flex-direction: row-reverse; }
+
+/* 보낸 뒤 화면 — 폼과 같은 좌우 여백(22px)을 쓰고, 가운데로 모은다 */
+.rp-done { padding: 40px 22px 0; text-align: center; }
+.rp-done-ic { font-size: 40px; line-height: 1; margin-bottom: 14px; }
+.rp-done-title { margin: 0 0 12px; font-size: 19px; font-weight: 800; color: var(--text-dark); }
+.rp-done-body { margin: 0 0 6px; font-size: 13.5px; line-height: 1.7; color: var(--text-muted); }
+.rp-done-body:last-of-type { margin-bottom: 0; }
+/* 닫기 하나뿐일 때 — 둘일 때(.rp-actions)와 같은 높이·모양을 쓰되 폭만 나누지 않는다 */
+.rp-actions--one { margin-top: 26px; }
+
+/* 진행바 — 가로(위) 하나로 확정(2026-08-06).
+   🔴 세로바 안은 버렸다. 사실상 스크롤바라 「스크롤바를 어디서도 안 보인다」는 절대 규칙과 부딪친다. */
+#bar { position: sticky; top: 65px; z-index: 25; height: 3px; background: rgba(43,18,13,.08); }
+#barFill { height: 100%; width: 0; background: var(--brand-red); transition: width .2s ease; }
+
+[data-off] { display: none !important; }
+
+/* 🔴 닫기·보내기를 **화면 아래쪽으로 내린다**(2026-08-06 사용자 지시).
+   `position: fixed` 는 쓰지 않는다 — 아이폰에서 키보드가 올라오면 화면 아래 고정 요소가
+   말썽이고, 글 쓰는 폼에서는 특히 위험하다.
+   대신 본문을 한 화면 높이로 깔고 버튼 묶음에 `margin-top: auto` 를 준다.
+   → **내용이 짧으면 버튼이 아래로 내려가고, 길면 그냥 내용을 따라온다.** 겹치지 않는다.
+   🔴 `vh` 가 아니라 `svh` 다(앱 `.page` 와 같은 이유 — 주소창이 보일 때 안 넘친다).
+      위 `vh` 줄은 구형 브라우저 폴백이라 남겨 둔다. 65px = 상단바 높이. */
+/* 🔴 선택자에 `.art-page` 를 같이 적어야 한다 — `article.css` 에
+   `.art-page .column-sheet { min-height: 0 }` 이 있어서 `.column-sheet` 하나로는 진다.
+   (실제로 그렇게 썼다가 버튼이 안 내려갔다.) */
+.art-page .column-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 65px);
+  min-height: calc(100svh - 65px);
+  box-sizing: border-box;
+  padding-bottom: 28px;
+}
+/* ⚠️ 위 여백이 세 군데(폼 사이 18 + 여기 + 이유 위)에서 겹쳐 52px 이 됐다(2026-08-06 사용자 지적).
+   여기를 6 으로 줄이고 이유 쪽 위 여백을 0 으로 두어 **24px** 로 맞춘다. */
+#submitWrap { padding-top: 6px; }
+/* 🔴 「화면 아래로 내리기」는 **갈래를 고르기 전에만** 한다(2026-08-06 사용자 지시로 갈랐다).
+   ① 고르기 전 — 상자 셋뿐이라 닫기가 위에 붙으면 휑하다 → 아래로 내린다.
+   ② 고른 뒤 — 칸이 늘어나므로 **내용 바로 뒤**에 붙는다.
+   ⚠️ 갈라 놓지 않으면 「고른 뒤」에도 auto 가 남는 공간을 밀어내 **299px 이 벌어졌다**(실측). */
+body:not(.has-pick) #submitWrap { margin-top: auto; }
+/* 🔴 내용 칸이 남는 높이를 다 먹는다(2026-08-06 사용자 지시).
+   `min-height: 0` 이 있어야 flex 자식이 제대로 줄어든다 — 없으면 내용이 넘칠 때 안 줄어들어
+   버튼이 화면 밖으로 밀려난다.
+   ⚠️ 레시피 6칸처럼 내용이 길어 남는 높이가 없을 때는 저절로 아무 일도 안 한다. */
+/* ⚠️ 늘려서 채우는 안은 접었다 — 재 보니 화면(695)에 이미 998px 이 들어가 있어 남는 자리가 없었다.
+   그래서 「5줄 고정」으로 간다(사용자 지시). 늘리려면 연락처를 접는 등 다른 것을 줄여야 한다. */
+</style>
+</head>
+<body class="art-page">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="./">
+      <img class="topbar-logo-mark" src="assets/icons/logo-mark-color-v2.png?v=1" width="25" height="22" draggable="false" alt="">
+      <span class="topbar-title">하딜고고</span>
+    </a>
+  </div>
+</header>
+<div id="bar"><div id="barFill"></div></div>
+
+<main class="column-sheet">
+  <div class="credit-head">
+    <!-- 🔴 아이콘은 **푸터 「제보 · 문의」 링크(.footer-report-ic)의 봉투를 글자까지 그대로** 가져온 것이다.
+         `credits.html` 이 이미 그렇게 되어 있다 — 제목 앞 ⓒ 와 푸터 링크 ⓒ 가 같은 SVG 다.
+         누른 링크와 도착한 화면이 같은 그림이라 「제대로 왔구나」가 읽힌다.
+         ⚠️ 푸터 아이콘을 바꾸면 여기도 같이 바꿀 것. 자동이 아니다. -->
+    <h1 class="credit-title"><svg class="credit-title-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>제보 · 문의</h1>
+    <!-- 지금 구글폼의 설명문 그대로(사용자 확인).
+         🔴 **강제 줄바꿈은 뺐다**(2026-08-07 사용자 지시) — 구글폼은 여기서 줄을 나눴지만
+            폼 폭이 좁아 어차피 감기고, `<br>` 이 있으면 「감긴 줄 + 나눈 줄」이 섞여 층이 진다. -->
+    <!-- ⚠️ 구글폼 원문은 「알려주세요」였는데 **「알려 주세요」로 고쳤다**(사용자 확정) —
+         `credits.html` 이 이미 「알려 주세요」라 사이트 안에서 표기를 맞춘 것이다. -->
+    <p class="credit-sub">하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요. 소중한 제보 감사합니다! ☺️</p>
+  </div>
+
+  <!-- ⚠️ 마침표를 붙였다(2026-08-07 사용자 확정) — 문장이면 마침표, 이름표면 없음이 이 폼의 기준인데
+       여기만 문장인데 빠져 있었다. -->
+  <p class="rp-note" id="rpNote"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요.</p>
+
+  <form class="rp-form" id="rpForm" onsubmit="return false">
+
+    <div class="rp-block">
+      <span class="rp-label">어떤 내용으로 문의하고 싶으신가요? <span class="rp-req">*</span></span>
+      <!-- 🔴 기본값 없음 — 고르기 전에는 아래를 아예 안 보여준다(2026-08-06 사용자 지시)
+           🔴 선택지 문구는 **지금 구글폼 그대로**다(사용자 지시). 줄여 쓰지 말 것. -->
+      <div class="rp-kinds" id="rpKinds">
+        <button type="button" class="rp-kind" data-k="recipe">레시피 추가해주세요!</button>
+        <button type="button" class="rp-kind" data-k="bug">잘못된 정보나 오류가 있어요!</button>
+        <button type="button" class="rp-kind" data-k="etc">기타 문의사항이 있습니다.</button>
+      </div>
+    </div>
+
+    <!-- 🔴 이 안내는 **세 갈래를 고른 아래**에 온다(2026-08-07 사용자 지시).
+         레시피 갈래에만 해당하는 말이라, 고르기 전 맨 위에 있으면 아직 상관없는 사람에게도 보였다.
+         ⚠️ 폼 안(`.rp-form`)으로 들어왔으므로 좌우 여백은 폼의 `padding: 0 22px` 가 준다 —
+            `.rp-lead` 에 가로 margin 을 다시 주면 22px 이 두 번 들어간다. -->
+    <!-- 🔴 **구글폼 설명문 세 줄 그대로**다(2026-08-07 사용자 지시). 줄바꿈 자리도 폼과 같다.
+         ⚠️ 셋째 줄을 빼먹었던 적이 있다 — 앞 두 줄은 「부담 갖지 마세요」지만
+            셋째 줄은 **「보내주셔도 다 못 올릴 수 있다」는 약속의 한계**라 성격이 다르다. 지우지 말 것.
+         ⚠️ 띄어쓰기만 사이트 표기에 맞췄다(적어주셔도 → 적어 주셔도 / 비워두셔도 → 비워 두셔도). -->
+    <div class="rp-lead" id="lead" data-off>
+      아는 만큼만 적어 주셔도 좋아요.<br>
+      <b>레시피 이름만 필수</b>이고, 나머지는 비워 두셔도 됩니다.<br>
+      사정에 따라 반영되지 않을 수도 있으니 양해 부탁드려요. 🙏
+    </div>
+
+    <!-- ── 레시피 갈래 ── -->
+    <div id="recipeFull">
+      <div class="rp-block">
+        <!-- ⚠️ 구글폼 원문은 「적어주세요」인데 **「적어 주세요」로 띄웠다** — 사이트 표기를 맞춘 것이다
+             (`credits.html`·이 폼 머리글의 「알려 주세요」와 같은 규칙, 2026-08-06 사용자 확정). -->
+        <span class="rp-label">레시피 이름을 적어 주세요! <span class="rp-req">*</span></span>
+        <!-- 🔴 자리는 **라벨 아래·칸 위**로 확정(2026-08-07 사용자 「나 안」 채택).
+             구글폼 제목의 「(소스, 육수, 밥, 면, 기타)」가 하던 「소스 말고도 된다」는 신호를 여기서 준다.
+             ⚠️ 원문 그대로 못 옮긴다 — 「육수」·「밥/면/기타」는 **옛 분류**다. 2026-07-21에
+                `육수 → 탕`, `밥·면·기타 → 히든메뉴`로 바뀌었다(`script.js` 의 `CATS`).
+             🔴 **순서는 소스 · 히든메뉴 · 탕이다**(2026-08-07 사용자 확정).
+                ⚠️ 사이트 탭 순서(`CATS` = 소스 · 탕 · 히든메뉴)와 **다르다** — 일부러 다른 것이니
+                   「탭이랑 안 맞는다」고 고치지 말 것. -->
+        <p class="rp-help">소스·히든메뉴·탕 무엇이든 좋아요.</p>
+        <div class="stamp-field stamp-field--light-ph">
+          <!-- 🔴 **소스 → 히든메뉴 → 탕 하나씩**이다(2026-08-07 사용자 확정) — 바로 위 도움말의
+               순서와 같게 맞춘 것이다. 도움말 순서를 바꾸면 여기도 같이 바꾼다.
+               ⚠️ 탕은 「마라훠궈탕」을 안 쓴다 — 아래 「주문해야 하는 항목」 예시가 「청유마라훠궈」라
+                  두 칸에 비슷한 이름이 붙으면 주문 항목인지 레시피 이름인지 헷갈린다.
+               ⚠️ 이름을 늘리지 말 것 — 넷이 되면(예: 「쑨디2호소스」를 되살리면) 306px 이 되어
+                  320px 폰의 칸 안폭(244px)에서 뒤가 잘린다. 지금은 219px 다. -->
+          <input type="text" id="rName" maxlength="50" placeholder="예) 건희소스, 희수국밥, 스키야키탕">
+        </div>
+      </div>
+
+      <div class="rp-block" id="orderBlock" style="margin-top:18px">
+        <span class="rp-label">매장에서 주문해야 하는 항목이 있다면 적어 주세요!</span>
+        <!-- 🔴 **여러 줄이다**(2026-08-07 사용자 지적으로 한 줄 칸에서 바꿨다).
+             실제 데이터가 그렇다 — `script.js` 에서 주문 항목이 있는 레시피 17개 중 **9개가 2개 이상**이고
+             3개짜리도 여럿이다(우유/청유 마라훠궈 · 팡가시우메기 1인분 · 공깃밥 1공기).
+             게다가 항목마다 **수량과 단위**가 붙어서 한 줄에 쉼표로 욱여넣으면 읽기도 옮기기도 나쁘다.
+             🔴 그래서 **자동완성을 걷어냈다.** 자동완성은 칸 전체를 검색어로 쓰는 구조라
+                여러 줄이 되면 「공깃밥 1공기 ⏎ 날계란」이 통째로 검색어가 되어 아무것도 안 맞는다.
+                줄 단위로 고쳐 붙일 수는 있으나 한글 조합 중에 목록이 튀기 쉬워 안 한다.
+                바로 아래 재료 칸도 정식 목록(`SAUCE_BAR`)이 있는데 같은 이유로 자동완성이 없다.
+             ⚠️ 잃는 것은 「정식 이름으로 적히게 하는 것」인데, 어차피 제보하는 사람은 정식 이름을 모르고
+                사이트에 옮길 때 `ORDER_ITEMS` 목록에 맞추는 절차가 `CLAUDE.md` 에 규칙으로 있다.
+             ⚠️ 예시는 재료 칸과 같은 꼴로 맞췄다 — 「예)」를 안 붙이고 **실제 적을 모양** 그대로 보여준다. -->
+        <!-- 🔴 도움말은 **라벨 아래 · 칸 위**다(2026-08-07 사용자 지시) — 이름 칸과 같은 자리다.
+             적기 전에 「어떻게 적는 칸인지」를 알아야 하므로 칸 아래가 아니라 위에 둔다. -->
+        <!-- 🔴 「정확하지 않아도 괜찮습니다.」를 뺐다(2026-08-07 사용자 지적) — **지킬 수 없는 약속**이었다.
+             양이 틀리면 그 레시피는 사이트에 못 올린다(틀린 비율로 올리면 따라 만든 사람이 이상한 소스를 먹는다).
+             ⚠️ 그렇다고 「정확히 적으세요」로 뒤집지도 말 것 — 헷갈리는 사람이 지어내면 그게 제일 나쁘다.
+                빈칸은 「모르는구나」 하고 넘어갈 수 있지만, 지어낸 값은 맞는 줄 알고 올라간다. -->
+        <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
+        <textarea class="rp-textarea" id="rOrder" maxlength="500" placeholder="공깃밥 1공기&#10;날계란 1개&#10;토마토탕훠궈"></textarea>
+      </div>
+
+      <div class="rp-block" id="ingBlock" style="margin-top:18px">
+        <!-- ⚠️ 구글폼 원문의 「아는 대로 편하게」를 뺐다(2026-08-07 사용자 확정) — 칸 아래 도움말이
+     이미 「정확하지 않아도 괜찮습니다.」라고 같은 말을 한다. 원문(298px)은 320px 폰의
+     칸 폭(276px)을 넘어 두 줄로 감기기도 했다. 지금은 210px 로 두 폰 다 한 줄이다. -->
+<span class="rp-label">소스바에서 담는 재료와 양을 적어 주세요!</span>
+        <!-- 🔴 도움말은 **라벨 아래 · 칸 위**다(2026-08-07 사용자 지시) — 이름 칸과 같은 자리다.
+             적기 전에 「어떻게 적는 칸인지」를 알아야 하므로 칸 아래가 아니라 위에 둔다. -->
+        <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
+        <textarea class="rp-textarea" id="rIng" maxlength="1000" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"></textarea>
+      </div>
+
+      <div class="rp-block" id="stepBlock" style="margin-top:18px">
+        <span class="rp-label">만드는 법이 있다면 알려 주세요!</span>
+        <!-- ⚠️ 칸 안 예시에는 마침표를 안 붙인다(2026-08-07 사용자 확정) — 예시는 완결된 문장이 아니라
+             「이렇게 생긴 걸 적으세요」라고 보여주는 조각이고, 마침표가 있으면 진짜 입력값처럼 보인다. -->
+        <!-- 🔴 1000자 제한(2026-08-07 사용자 지시) — 「내용」 칸과 같은 값이다.
+             ⚠️ `maxlength` 는 **넘으면 조용히 안 쳐진다.** 글자수 표시를 붙일지는 아직 안 정했다. -->
+        <textarea class="rp-textarea" id="rStep" maxlength="1000" placeholder="예) 홍탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
+      </div>
+
+      <div class="rp-block" id="tipBlock" style="margin-top:18px">
+        <span class="rp-label">더 맛있게 먹는 나만의 팁이 있다면 알려 주세요!</span>
+        <textarea class="rp-textarea" id="rTip" maxlength="1000" placeholder="예) 고수를 잔뜩 올려 먹으면 더 맛있다"></textarea>
+      </div>
+
+      <div class="rp-block" id="srcBlock" style="margin-top:18px">
+        <!-- ⚠️ 구글폼 원문의 뒷문장 「링크를 알려주셔도 좋아요!」를 뺐다(2026-08-07 사용자 확정) —
+     칸 안 예시 둘째 줄이 이미 「링크를 붙여 주셔도 좋아요」라고 같은 말을 한다.
+     구글폼은 예시 칸이 따로 없어 라벨에 다 넣어야 했지만 우리는 나눌 수 있다.
+     원문은 426px 라 390px 폰(칸 폭 346px)에서도 두 줄이었다. 지금은 286px. -->
+<span class="rp-label">이 레시피를 어디서 보신 적이 있다면 출처를 알려 주세요!</span>
+        <!-- 🔴 「링크를 붙여 주셔도 좋아요」는 **예시가 아니라 안내**라 도움말로 올렸다(2026-08-07 사용자 지적).
+             칸 안은 「이렇게 생긴 걸 적으세요」를 보여주는 자리다 — 부탁하는 말이 거기 있으면 안 된다.
+             ⚠️ 그래서 예시 둘째 줄에는 **진짜 링크 모양**을 넣었다. 없으면 「링크를 붙이라」고 해 놓고
+                정작 어떤 꼴인지는 안 보여주는 셈이 된다. -->
+        <p class="rp-help">링크를 붙여 주셔도 좋아요.</p>
+        <!-- 🔴 둘째 줄부터는 **공백 6칸**으로 「예) 」 아래에 줄을 맞춘다(2026-08-07 사용자 문안).
+             눈대중이 아니라 재서 골랐다 — 지금 예시 글씨(14px)로 「예) 」=20px, 6칸=21px 이 가장 가깝다
+             (5칸은 18px 로 2px 모자람). 오류·기타 갈래 예시도 같은 규칙을 쓴다.
+             ⚠️ 계정 이름은 **셋이 한 사람으로 읽히게** 맞춘다(@hong_gildong). 그리고 하딜고고 자신을
+                예시로 쓰지 않는다 — 이 칸은 「어디서 보셨나요」라, 하딜고고가 출처면 말이 어긋난다.
+             ⚠️ 링크는 **https** 로 적는다 — `http` 는 브라우저가 「안전하지 않음」이라 표시하고,
+                예시를 그대로 따라 적는 사람이 생긴다. 유튜브 채널 주소는 이제 `@핸들` 꼴이다.
+             ⚠️ **예시 글자 크기나 글꼴을 바꾸면 이 칸 수를 다시 잴 것.** 비례폭 글꼴이라 저절로 안 맞는다. -->
+        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 홍길동 채널&#10;      인스타그램 @hong_gildong&#10;      https://youtube.com/@hong_gildong"></textarea>
+      </div>
+    </div>
+
+    <!-- ── 오류 · 기타 갈래 (그리고 「줄인 안」의 레시피도 여기로) ── -->
+    <div class="rp-block" id="bodyBlock">
+      <span class="rp-label" id="bodyLabel">내용</span>
+      <!-- ⚠️ 여기에 기본 예시를 적어 두지 않는다(2026-08-07 사용자 지시로 지웠다) — 화면에 절대 안 뜬다.
+           갈래를 고르는 순간 아래 JS(`PH`)가 갈래별 예시로 항상 덮어쓰고, 고르기 전에는
+           이 묶음 자체가 감춰져 있다. 적어 두면 「어디에도 없는 문구」가 코드에만 남는다. -->
+      <textarea class="rp-textarea" id="rBody" maxlength="1000"></textarea>
+    </div>
+
+    <!-- ── 연락처 ── -->
+    <div class="rp-block" id="ctBlock">
+      <span class="rp-label">답변이 필요한 경우, 연락 가능한 연락처를 알려 주세요. <span class="rp-req">*</span></span>
+      <!-- 🔴 「선택 안 함」을 넣었기 때문에 별표를 붙여도 된다 —
+           **연락처를 주는 것**이 필수가 아니라 **셋 중 하나를 고르는 것**이 필수다.
+           동의를 강요하지 않으므로 개인정보보호법과도 어긋나지 않는다. -->
+      <div class="rp-kinds rp-kinds--pair" id="ctKinds">
+        <button type="button" class="rp-kind" data-c="none">답변이 필요 없어요</button>
+        <button type="button" class="rp-kind" data-c="email">이메일</button>
+        <button type="button" class="rp-kind" data-c="insta">인스타그램</button>
+      </div>
+
+      <!-- 🔴 칸 바로 위 라벨(2026-08-06 사용자 지시). 칸 안 예시와 역할이 다르다 —
+           라벨은 「무엇을 적는 칸인지」, 예시는 「어떻게 생겼는지」. -->
+      <span class="rp-sublabel" id="ctSub" data-off></span>
+
+      <!-- 한 칸 안.
+           🔴 인스타일 때는 칸 안에 `@` 를 박아 둔다(2026-08-06 사용자 지적 — `id` 두 글자만
+              떠 있으니 빈 칸처럼 보였다). 앱의 **칸 안 고정 라벨**(.stamp-field-label)을 그대로 쓴다.
+           🟢 덤: `@` 가 눈에 보이니 라벨에서 **「(@ 없이)」를 뺄 수 있다.** -->
+      <div class="stamp-field stamp-field--light-ph" id="ctOne">
+        <span class="stamp-field-label" id="ctPrefix" data-off>@</span>
+        <!-- 🔴 한글 입력을 **막지 않는다**(2026-08-06 판단). 한글은 자판에서 조합되며 만들어져서
+             입력 중에 지우면 글자가 튀거나 커서가 엉킨다(한국 사이트에서 흔한 버그).
+             옛 `ime-mode` CSS 는 이제 안 먹는다.
+             대신 ① 영문 자판이 뜨게 하고 ② 한글이 섞이면 **보내기를 잠근다**. -->
+        <input type="email" id="rCt" placeholder="id@example.com" autocomplete="email"
+               inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+      </div>
+
+      <!-- ⚠️ 「답변이 필요하시면 적어 주세요」를 뺐다(2026-08-06 사용자 지적) —
+           바로 위 질문이 이미 「답변이 필요한 경우, 연락 가능한 연락처를 알려 주세요」라
+           같은 말을 두 번 하고 있었다. -->
+
+      <!-- 🔴 「답변이 필요 없어요」를 고르면 이 묶음이 통째로 사라진다 — 받는 게 없으니 동의도 없다 -->
+      <!-- 🔴 **내용이 먼저, 체크박스가 나중**이다(2026-08-06 사용자 지적으로 뒤집었다).
+           읽고 나서 동의하는 것이 순서고, 체크가 위에 있으면 **무엇에 동의하는지 모르고
+           체크하는 모양**이 된다. 법도 「알린 뒤 동의」 순서다. -->
+      <div id="agreeWrap" style="display:flex;flex-direction:column;gap:10px" data-off>
+      <!-- 🔴 제목을 붙였다(2026-08-07 사용자 지적) — 다른 묶음은 다 굵은 라벨로 시작하는데
+           여기만 회색 상자가 불쑥 시작됐다.
+           🔴 별표는 **제목에** 붙인다. 이 동의는 실제로 필수다 — 체크를 안 하면 보내기가 잠긴다
+              (checkReady 의 「개인정보 수집 · 이용에 동의해 주세요.」).
+           ⚠️ 제목은 **이름표(명사)** 로 둔다. 바로 아래 체크박스가 이미 「…동의합니다.」라는 문장이라
+              제목까지 문장으로 하면 부탁하는 말이 두 줄 연달아 나온다. -->
+      <span class="rp-label">개인정보 수집 · 이용 동의 <span class="rp-req">*</span></span>
+      <div class="rp-privacy">
+        <ul>
+          <!-- 🔴 두 줄로 나눈다(2026-08-06 사용자 지시) — 한 줄이면 「1가지」와 「둘 중 선택」이
+               붙어 읽혀서 몇 개를 주는 건지 헷갈린다. 둘째 줄은 첫 줄 글자 자리에 맞춰 들어간다. -->
+          <li><b>수집 항목</b> 회신 받으실 연락처 1가지<br>- 이메일 주소 · 인스타그램 계정 중 선택</li>
+          <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
+          <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
+        </ul>
+      </div>
+      <!-- 🔴 「동의하지 않으셔도 접수됩니다」는 **틀린 말이 됐다**(2026-08-06 사용자 지적).
+           연락처를 셋 중 고르는 구조로 바꾸면서, 이메일·인스타를 고르면 동의가 필수가 되어
+           동의 없이는 보내기가 잠긴다.
+           🔴 그렇다고 지우면 안 된다 — 법은 **「거부할 권리와 그 불이익」**을 알리도록 한다.
+              지금 그 권리는 **「답변이 필요 없어요」를 고르는 것**으로 행사되므로 그 길을 적어 준다.
+           🔴 자리는 **상자 밖 · 상자 바로 아래**다(2026-08-07 사용자 확정). 두 가지를 같이 푼다 —
+              ① 상자 안에 두면 목록의 네 번째 항목처럼 읽혀 억지로 띄워 놔야 했다(상자 안 세 줄은
+                 「무엇을 받는지」 사실 나열이고 이 문장은 「안 줘도 되는 길」 안내라 성격이 다르다).
+              ② 제목 아래(상자 위)로 올려도 봤지만, 무엇을 받는지 알기 전에 「거부하려면」이 먼저 나온다.
+                 여기 두면 **무엇을 받는지 → 안 주면 어떻게 되는지 → 체크** 순서가 되어
+                 판단에 필요한 말이 결정 바로 앞에 붙는다.
+           ⚠️ 「골라」가 아니라 「선택해」다 — 상자 안 줄이 이미 「…중 선택」이라 말이 통일된다. -->
+      <span class="rp-privacy-optout">
+      동의하지 않으시면 위에서 <b>「답변이 필요 없어요」</b>를 선택해 주세요.<br>
+      제보 · 문의는 그대로 접수되며, <b>답변만 받으실 수 없습니다.</b>
+      </span>
+      <div class="rp-agree">
+        <input type="checkbox" id="rpAgree">
+        <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
+      </div>
+      </div>
+    </div>
+
+    <div id="submitWrap">
+      <!-- 🔴 이유는 **버튼 위**다(2026-08-06 사용자 지시). 아래 있으면 버튼을 보고 있는 눈에
+           안 들어온다. 앱의 내 코드 시트(.sync-msg)도 같은 자리를 쓴다. -->
+      <p class="rp-why" id="rpWhy"></p>
+      <div class="rp-actions">
+        <button type="button" class="rp-btn" id="rpClose">닫기</button>
+        <button type="button" class="rp-btn rp-btn--go" id="rpSubmit" disabled>보내기</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- ══ 보낸 뒤 화면 (2026-08-07 사용자 문안) ══════════════════════════════
+       🔴 **페이지를 안 떠난다.** 폼만 사라지고 이 화면이 그 자리에 선다.
+          창을 닫아 버리는 안은 버렸다 — 갑자기 튕기면 「보내진 게 맞나?」가 오히려 커진다.
+       🔴 답변 줄(`rpDoneReply`)은 **연락처를 주신 분에게만** 뜬다.
+          「답변이 필요 없어요」를 고른 분께 「답변을 못 드릴 수 있다」고 말하는 것은 쓸데없는 말이다.
+       ⚠️ 갈래(레시피·오류·기타)별로 문구를 가르지 않는다 — 셋 다 「받았다·고맙다」가 핵심이라
+          갈릴 이유가 적고, 세 벌이 되면 나중에 한쪽만 고쳐 어긋난다. -->
+  <div class="rp-done" id="rpDone" data-off>
+    <div class="rp-done-ic" aria-hidden="true">💌</div>
+    <h2 class="rp-done-title">제보 · 문의가 접수되었어요!</h2>
+    <p class="rp-done-body">소중한 의견 감사합니다.</p>
+    <p class="rp-done-body" id="rpDoneReply" data-off>모든 의견에 답변드리지는 못하는 점 양해 부탁드립니다.</p>
+    <p class="rp-done-body">더 나은 하딜고고가 되도록 노력하겠습니다.</p>
+    <div class="rp-actions rp-actions--one">
+      <button type="button" class="rp-btn" id="rpDoneClose">닫기</button>
+    </div>
+  </div>
+</main>
+
+<div class="share-toast" id="toast">보내주셔서 고맙습니다!</div>
+
+<script>
+(function () {
+  var body = document.body;
+  // 🔴 kind 는 처음에 **아무것도 안 골라진 상태**(null)로 시작한다
+  /* 🔴 정해진 것은 조작판에서 뺐다(2026-08-06 사용자 지시) — 미결만 남긴다.
+     간격 = 넉넉 · 버튼 자리 = 닫기 왼/보내기 오 · 「* 표시는 필수」 = 회색. */
+  // 🔴 ct 도 처음엔 **아무것도 안 골라진 상태**(null)로 시작한다(2026-08-06 사용자 지시)
+  /* 🔴 정해진 것은 조작판에서 뺀다 — 미결만 남긴다(2026-08-06 사용자 지시).
+     확정: 진행바 가로 · 고르는 상자 = **흰색 + 그림자 + 동그라미**.
+     ⏸ 남은 미결은 ① 갈래 칸 수(br) 하나다. */
+  var state = { kind: null, ct: null };   // 🔴 둘 다 **아무것도 안 골라진 상태**로 시작한다
+
+  /* 🔴 자동완성은 걷어냈다(2026-08-07 사용자 확정) — 주문 항목 칸이 여러 줄이 되면서
+     칸 전체를 검색어로 쓰던 구조가 성립하지 않는다. 되살리려면 줄 단위로 다시 짜야 하고,
+     한글 조합 중에 목록이 튀는 문제를 각오해야 한다. 자세한 배경은 주문 항목 칸의 주석 참고.
+     ⚠️ 같이 지운 것: `menu-data.js` 불러오기 · 조작판 ②번 · `state.fh` · `.rp-auto*`/`.rp-nomatch` CSS. */
+
+  /* 🔴 글자수는 **제한의 90%를 넘을 때만** 보인다(2026-08-07 사용자 확정).
+     ⚠️ 왜 필요한가: `maxlength` 는 넘으면 **아무 말 없이 안 쳐진다.** 길게 쓰던 사람이
+        「왜 안 써지지」 하고 헤맨다. 그렇다고 늘 띄우면 숫자 넷이 상시로 떠 폼이 시끄럽다.
+     🔴 90% 라는 비율로 잡은 이유: 칸마다 제한이 다르다(이름 50 · 주문 500 · 나머지 1000).
+        「900자부터」처럼 숫자로 박으면 이름 칸(50자)에서는 영영 안 뜬다.
+     ⚠️ 표시 자리는 **칸 바로 아래**다. 이름 칸은 상자(.stamp-field)로 한 겹 싸여 있어서
+        칸이 아니라 그 상자 뒤에 붙인다 — 안 그러면 상자 **안**에 들어가 버린다. */
+  [].forEach.call(document.querySelectorAll('[maxlength]'), function (el) {
+    var max = +el.getAttribute('maxlength');
+    var tag = document.createElement('span');
+    tag.className = 'rp-count';
+    tag.setAttribute('data-off', '');
+    var anchor = el.closest('.stamp-field') || el;
+    anchor.parentNode.insertBefore(tag, anchor.nextSibling);
+    function upd() {
+      var n = el.value.length;
+      if (n >= max * 0.9) {
+        tag.textContent = n + ' / ' + max + '자';
+        tag.removeAttribute('data-off');
+      } else tag.setAttribute('data-off', '');
+    }
+    el.addEventListener('input', upd);
+    upd();
+  });
+
+  /* 🔴 iOS 사파리는 **터치 리스너가 하나도 없으면 `:active` 를 아예 안 켠다**
+     (2026-08-04 `_press-compare.html` 에서 실제로 겪었다 — 눌러도 아무 반응이 없었다).
+     아무 일도 안 하는 리스너 하나로 켜진다. 지우면 폰에서만 누름 반응이 사라진다. */
+  document.addEventListener('touchstart', function () {}, { passive: true });
+
+  // 종류 고르기
+  document.getElementById('rpKinds').addEventListener('click', function (e) {
+    var b = e.target.closest('.rp-kind'); if (!b) return;
+    state.kind = b.dataset.k; paint();
+  });
+  document.getElementById('ctKinds').addEventListener('click', function (e) {
+    var b = e.target.closest('.rp-kind'); if (!b) return;
+    state.ct = b.dataset.c; paint();
+  });
+
+  /* 연락처 값 — 보내기 잠금(checkReady)과 보낼 값 모으기(collect)가 **같은 값**을 봐야 해서 한 곳에 뒀다.
+     ⚠️ 이메일은 **한 칸**으로 확정됐다(2026-08-06). 「id + @ + 도메인 고르기」로 쪼개는 안은 버렸다. */
+  function ctValue() {
+    return document.getElementById('rCt').value.trim();
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     🔴 보낼 값 모으기 — **화면에 보이는 칸만 담는다**(2026-08-07 사용자 확정)
+     ══════════════════════════════════════════════════════════════════════
+     ⚠️ 왜 필요한가: 갈래나 연락처를 바꾸면 칸이 **화면에서만 사라지고 값은 남는다.**
+        그대로 보내면 사람이 「안 주겠다」고 한 것까지 메일에 실린다. 실제로 이렇게 된다 —
+        이메일을 적고 동의까지 한 사람이 마음을 바꿔 「답변이 필요 없어요」를 고르면
+        화면에선 사라지지만 값은 남아 있어, 받는 메일에 그 이메일 주소와 「동의함」이 찍힌다.
+        **안 받겠다고 한 개인정보를 받아 버리는 것**이라 그냥 두면 안 된다.
+     🔴 그래서 규칙을 「어느 갈래면 어느 칸」이라고 따로 적지 않는다 — 그렇게 적으면
+        나중에 칸이 늘 때 여기를 같이 못 고쳐서 어긋난다. **눈에 보이는지**를 직접 보고 담는다.
+        `offsetParent === null` 이면 화면에 없다는 뜻이다(`data-off` 로 숨긴 것이 여기 걸린다).
+     ⚠️ 진짜 전송(Web3Forms 등)을 붙일 때는 **반드시 이 함수가 돌려준 것만** 보낸다.
+        폼을 통째로 `new FormData(form)` 으로 보내면 숨긴 칸이 전부 딸려 가서 도로아미타불이다. */
+  function onScreen(el) { return !!el && el.offsetParent !== null; }
+
+  var SEND_FIELDS = [
+    ['rName',  '레시피 이름'],
+    ['rOrder', '매장에서 주문해야 하는 항목'],
+    ['rIng',   '소스바에서 담는 재료와 양'],
+    ['rStep',  '만드는 법'],
+    ['rTip',   '더 맛있게 먹는 팁'],
+    ['rSrc',   '출처'],
+    ['rBody',  '내용']
+  ];
+
+  function collect() {
+    var KIND = { recipe: '레시피 추가', bug: '잘못된 정보 · 오류', etc: '기타 문의' };
+    var CT   = { none: '답변이 필요 없어요', email: '이메일', insta: '인스타그램' };
+    var out = [];
+
+    out.push(['문의 종류', KIND[state.kind] || '']);
+
+    SEND_FIELDS.forEach(function (f) {
+      var el = document.getElementById(f[0]);
+      if (!onScreen(el)) return;                 // 🔴 화면에 없으면 안 싣는다
+      var v = el.value.trim();
+      if (v) out.push([f[1], v]);
+    });
+
+    out.push(['연락처', CT[state.ct] || '']);
+    /* 🔴 「답변이 필요 없어요」면 여기서 끝이다 — 연락처도 동의도 안 담는다.
+       받는 개인정보가 없는데 「동의함」만 기록으로 남으면 사실과 다른 기록이 된다. */
+    if (state.ct === 'email' || state.ct === 'insta') {
+      out.push([state.ct === 'insta' ? '인스타그램 계정' : '이메일 주소', ctValue()]);
+      out.push(['개인정보 수집 · 이용 동의',
+                document.getElementById('rpAgree').checked ? '동의함' : '동의 안 함']);
+    }
+    return out;
+  }
+
+  /* 🔴 보내기는 필수값이 찰 때까지 비활성(사용자 지시).
+     ⚠️ 비활성만 걸면 「왜 안 눌리는지」를 모른다 → 아래 한 줄로 이유를 같이 적는다.
+     🔴 연락처를 적었으면 **동의 체크도 필수**다 — 동의 없이 개인정보를 받으면 안 된다. */
+  function checkReady() {
+    var btn = document.getElementById('rpSubmit'), why = document.getElementById('rpWhy');
+    var name = document.getElementById('rName').value.trim();
+    var bodyV = document.getElementById('rBody').value.trim();
+    var agreed = document.getElementById('rpAgree').checked;
+    var isRecipe = state.kind === 'recipe';
+    var needName = isRecipe;   // 레시피 갈래면 이름은 늘 필수다
+    var reason = '';
+
+    var ctV = ctValue();
+
+    if (state.kind === null) reason = '';
+    else if (needName && !name) reason = '레시피 이름을 적어 주세요.';
+    else if (!needName && !bodyV) reason = '내용을 적어 주세요.';
+    // 🔴 연락처는 **셋 중 하나를 고르는 것**이 필수다(값을 주는 것이 아니라)
+    else if (state.ct === null) reason = '연락처를 어떻게 하실지 선택해 주세요.';
+    // 🔴 무엇을 골랐는지에 따라 이유도 갈린다(2026-08-06 사용자 지시) —
+    //    「연락처를 적어 주세요」로는 어느 칸을 말하는지 한 번 더 생각해야 한다.
+    else if (state.ct === 'email' && !ctV) reason = '이메일 주소를 입력해 주세요.';
+    else if (state.ct === 'insta' && !ctV) reason = '인스타그램 계정을 입력해 주세요.';
+    /* 🔴 한글이 섞이면 여기서 잡는다 — 입력 중에 지우지 않고 **보내기만 잠근다**.
+       조합 중인 글자를 건드리지 않으니 커서가 안 엉킨다. */
+    else if (state.ct === 'email' && /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(ctV))
+      reason = '이메일 주소는 영문으로 적어 주세요.';
+    else if (state.ct === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctV))
+      reason = '이메일 주소 형식이 아니에요. (예: id@example.com)';
+    else if (state.ct === 'insta' && !/^[A-Za-z0-9._]+$/.test(ctV))
+      reason = '인스타그램 계정은 영문 · 숫자 · _ · . 만 쓸 수 있어요.';
+    else if (state.ct !== 'none' && !agreed) reason = '개인정보 수집 · 이용에 동의해 주세요.';
+
+    btn.disabled = reason !== '' || state.kind === null;
+    why.textContent = btn.disabled ? reason : '';
+  }
+  ['rName','rBody','rCt'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', checkReady);
+  });
+
+  /* 🔴 긴 칸은 **치는 만큼 자란다**(2026-08-07 사용자 확정) — 3줄로 시작하되 갑갑하지 않게.
+     ⚠️ `height:auto` 로 한 번 되돌린 뒤 재야 한다. 안 그러면 **줄어들 때 안 줄어든다**
+        (이미 늘려 둔 height 때문에 scrollHeight 가 그 값에 붙들린다).
+     ⚠️ 테두리 두께를 더한다 — box-sizing 이 border-box 라 height 에 테두리가 포함되는데
+        scrollHeight 는 테두리를 안 센다. 안 더하면 칠 때마다 3px 씩 모자라 실금이 생긴다.
+     🔴 3줄 바닥은 CSS 의 `min-height:106px` 이 지킨다. 여기서 따로 안 막는다. */
+  function grow(el) {
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight + (el.offsetHeight - el.clientHeight)) + 'px';
+  }
+  [].forEach.call(document.querySelectorAll('.rp-textarea'), function (el) {
+    el.addEventListener('input', function () { grow(el); });
+  });
+  document.getElementById('rpAgree').addEventListener('change', checkReady);
+
+  // 닫기 — 🔴 credits.html 과 같은 방식: 같은 사이트에서 왔으면 왔던 자리로, 아니면 홈으로.
+  //        ⚠️ 다만 여기는 폼이라 **적던 글이 있으면 한 번 묻는다**.
+  function 나가기() {
+    var same = false;
+    try { same = new URL(document.referrer).origin === location.origin; } catch (e) {}
+    if (same) history.back(); else location.href = './';
+  }
+  document.getElementById('rpClose').addEventListener('click', function () {
+    var dirty = ['rName','rBody','rCt'].some(function (id) { return document.getElementById(id).value.trim(); });
+    if (dirty && !confirm('적으신 내용이 사라집니다. 닫을까요?')) return;
+    나가기();
+  });
+  /* 🔴 보낸 뒤의 닫기는 **묻지 않는다** — 이미 보냈으니 사라질 글이 없다 */
+  document.getElementById('rpDoneClose').addEventListener('click', 나가기);
+
+  var toast = document.getElementById('toast'), t = null;
+  /* 🔴 보낼 곳 — 문지기(구글 앱스 스크립트) 웹 앱의 `/exec` 주소를 여기 넣는다.
+     **비어 있으면 아무 데도 안 보내고 콘솔에만 찍는다**(지금 상태). 그래서 이 페이지를
+     그대로 올려도 사고가 안 난다.
+     🟢 이 주소는 비밀이 아니다 — 누구나 폼에서 부르는 주소다. 진짜 열쇠(디스코드 웹훅)는
+        문지기 안 「스크립트 속성」에 있고 여기로는 안 나온다. 그래서 공개 저장소에 있어도 된다. */
+  var SEND_URL = 'https://script.google.com/macros/s/AKfycbzYC4mdKWlI2yqo6klnf83jGcD_qCW2FzDAT0z33k10KckN2n0d6Vw258MU3-YkJFQO/exec';
+
+  /* 보낸 뒤 — 폼을 걷고 그 자리에 성공 화면을 세운다.
+     ⚠️ 머리글의 설명문(「…알려 주세요」)도 같이 감춘다. 이미 보낸 사람에게는 맞지 않는 말이다. */
+  function 보낸뒤화면() {
+    off('rpForm', true);
+    off('rpNote', true);
+    var sub = document.querySelector('.credit-sub');
+    if (sub) sub.setAttribute('data-off', '');
+    // 연락처를 준 사람에게만 답변 줄을 보여준다
+    off('rpDoneReply', !(state.ct === 'email' || state.ct === 'insta'));
+    off('rpDone', false);
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('rpSubmit').addEventListener('click', function () {
+    var btn = this;
+    var rows = collect();
+    /* 무엇이 실릴지를 콘솔에도 찍는다 — 숨긴 칸이 딸려 가지 않는지 눈으로 확인할 수 있다. */
+    console.log('[보낼 값]\n' + rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n'));
+
+    if (!SEND_URL) { show('아직 보낼 곳이 연결되지 않았습니다'); return; }
+
+    /* 🔴 누른 순간 표시가 있어야 한다(2026-08-07 사용자 지적) — 문지기에 다녀오는 데
+       1~3초가 걸리는데(구글 서버가 쉬다 깨면 더), 그동안 화면이 죽은 것처럼 보였다. */
+    btn.disabled = true;
+    var 원래글씨 = btn.textContent;
+    btn.textContent = '보내는 중…';
+    /* ⚠️ **헤더를 붙이지 않는다.** `Content-Type` 을 지정하면 브라우저가 먼저 확인(preflight)을
+       보내는데, 앱스 스크립트는 그 확인에 답하지 못해 **전송이 통째로 막힌다.**
+       문자열 본문만 주면 브라우저가 알아서 `text/plain` 으로 보내고 확인 단계가 없다.
+       문지기는 `e.postData.contents` 를 JSON 으로 읽으므로 형식은 문제없다. */
+    fetch(SEND_URL, { method: 'POST', body: JSON.stringify({ rows: rows }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) { 보낸뒤화면(); }
+        else { 되살리기(); show('보내지 못했습니다. 잠시 뒤 다시 해 주세요.'); }
+      })
+      .catch(function () {
+        되살리기(); show('보내지 못했습니다. 인터넷 연결을 확인해 주세요.');
+      });
+
+    function 되살리기() { btn.disabled = false; btn.textContent = 원래글씨; }
+    /* ⏸ **보낸 뒤 화면은 아직 안 정했다.** 지금은 토스트 한 줄이고, 설계 문서에는
+       「페이지를 안 떠나고 그 자리에서 성공 화면으로」라고만 적혀 있다. 사용자님 확인 필요.
+       ⏸ 위 실패 문구 둘도 확정 전이다(설계 문서의 「확정 없이 넣은 문구」 목록에 있다). */
+  });
+  function show(msg) {
+    toast.textContent = msg; toast.classList.remove('show');
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      toast.classList.add('show');
+      clearTimeout(t); t = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+    }); });
+  }
+  function off(id, hide) {
+    var el = document.getElementById(id); if (!el) return;
+    if (hide) el.setAttribute('data-off',''); else el.removeAttribute('data-off');
+  }
+
+  function paint() {
+    // 레시피 갈래용 조작 — ③「선택」 꼬리표는 확정되어 걷어냈다(2026-08-07)
+    [].forEach.call(document.getElementById('rpKinds').children, function (b) {
+      b.classList.toggle('on', b.dataset.k === state.kind);
+    });
+    [].forEach.call(document.getElementById('ctKinds').children, function (b) {
+      b.classList.toggle('on', b.dataset.c === state.ct);
+    });
+
+    // 🔴 고르기 전에는 아래를 통째로 안 보여준다
+    var picked = state.kind !== null;
+    var isRecipe = state.kind === 'recipe';
+    /* 🔴 레시피 갈래는 **6칸으로 확정**됐다(2026-08-07 사용자 확정) — 「중간(2칸)·줄인 안(1칸)」은
+       더 안 본다. 6칸이어야 사이트에 올릴 수 있는 레시피가 들어온다(특히 재료와 양).
+       부담은 「필수는 이름 하나」·안내 상자·라벨의 「있다면」이 이미 낮춰 준다. */
+    var showRecipe = picked && isRecipe;
+    off('recipeFull', !showRecipe);
+    off('orderBlock', !showRecipe); off('ingBlock', !showRecipe);
+    off('stepBlock', !showRecipe); off('tipBlock', !showRecipe); off('srcBlock', !showRecipe);
+    // 레시피 갈래에는 「내용」 칸이 없다 — 여섯 칸이 그 자리를 대신한다
+    off('bodyBlock', !picked || isRecipe);
+    off('lead', !showRecipe);
+    off('ctBlock', !picked);
+    body.classList.toggle('has-pick', picked);   // 버튼을 아래로 내릴지 정한다(위 CSS 참고)
+    // 🔴 아무것도 안 골랐을 때도 **닫기는 보인다**(2026-08-06 사용자 지시).
+    //    나가는 길은 언제나 있어야 한다. 보내기만 감춘다 — 보낼 것이 없으니까.
+    off('submitWrap', false);
+    off('rpSubmit', !picked);
+
+    /* 🔴 갈래마다 묻는 말이 다르다(2026-08-06 사용자 지시).
+       구글폼은 두 갈래를 한 섹션으로 합쳐 같은 문구를 보여줬는데, 우리는 한 화면이라 나눌 수 있다.
+       ⚠️ 「알려 주세요」는 띄어 쓴다 — 사이트 표기를 `credits.html` 에 맞춘 것이다. */
+    var LABEL = {
+      bug:    '어떤 점이 잘못되었는지, 어떤 오류가 있는지 알려 주세요.',
+      etc:    '문의하실 내용을 적어 주세요.',
+      recipe: '레시피를 아는 만큼 적어 주세요.'
+    };
+    /* 🔴 둘째 줄부터는 **공백 6칸**으로 「예) 」 아래에 줄을 맞춘다(2026-08-06 사용자 지시).
+       눈대중으로 고르지 않았다 — 예시 글씨 **14px** 로 재서 「예) 」=20px, 공백 6칸=21px 로
+       가장 가까웠다(5칸은 18px 로 2px 모자람).
+       ⚠️ **예시 글자 크기나 글꼴을 바꾸면 이 칸 수를 다시 재야 한다.** 비례폭 글꼴이라 저절로 안 맞는다. */
+    var SP = '      '; // 공백 6칸
+    var PH = {
+      bug: '예) 코엑스점 영업시간이 실제와 달라요\n' + SP + '건희소스 레시피가 틀렸어요',
+      /* ⚠️ 「강아지가 귀여워요」는 여기로 옮겼다 — 오류 갈래 라벨(「잘못된 점」)과 어긋났다.
+         🔴 셋째 줄에 **소스 이름을 안 쓴다**(2026-08-06 사용자 확정) — 실제 이름을 쓰면
+            「그 레시피가 남의 것이다」라고 저작자를 지목하는 꼴이 되고, `○○` 로 가려도
+            읽는 사람이 한 번 더 생각해야 한다. 이름 없이 말이 되면 그게 낫다. */
+      etc: '예) 스티커 탭에 있는 강아지가 너무 귀여워요\n' + SP + '이런 기능이 있으면 좋겠어요\n' + SP + '제 레시피인데 출처를 바꿔주세요',
+      recipe: '아는 만큼만 적어 주세요.'
+    };
+    document.getElementById('bodyLabel').innerHTML =
+      (LABEL[state.kind] || '내용') + ' <span class="rp-req">*</span>';
+    if (PH[state.kind]) document.getElementById('rBody').placeholder = PH[state.kind];
+
+    /* 연락처 — 고른 종류에 따라 칸·동의·안내문이 달라진다.
+       🔴 「답변이 필요 없어요」를 고르면 **개인정보를 아예 안 받으므로** 동의 줄도 감춘다. */
+    var ct = document.getElementById('rCt');
+    var isMail = state.ct === 'email', isInsta = state.ct === 'insta', isNone = state.ct === 'none';
+    off('ctOne', !(isMail || isInsta));
+    off('agreeWrap', !(isMail || isInsta));
+    /* 🔴 예시 도메인은 `example.com` 이다 — RFC 2606 이 **예시 전용으로 예약**한 것이라
+       절대 실제 사이트가 아니다. ⚠️ `abc.com` 같은 흔한 예시는 **실제로 있는 도메인**이다. */
+    if (isInsta) {
+      ct.type = 'text'; ct.placeholder = 'id'; ct.autocomplete = 'off';
+      ct.inputMode = 'text';   // 인스타 아이디엔 @·. 자판이 필요 없다
+    } else {
+      ct.type = 'email'; ct.placeholder = 'id@example.com'; ct.autocomplete = 'email';
+      ct.inputMode = 'email';  // @ 와 . 이 있는 영문 자판
+    }
+    off('ctPrefix', !isInsta);   // 칸 안 `@` 는 인스타일 때만
+
+    // 칸 위 라벨 — 「입력해 주세요」는 띄어 쓴다(사이트 표기와 맞춤)
+    var sub = document.getElementById('ctSub');
+    off('ctSub', !(isMail || isInsta));
+    // ⚠️ 인스타는 「아이디」가 아니라 **「계정」**이다(2026-08-06 사용자 지시).
+    //    아래 검사 문구도 같은 말로 맞춰 뒀다.
+    /* 🔴 별표를 붙인다(2026-08-07 사용자 확정). 이 칸은 **비우면 보내기가 잠긴다**(checkReady 참고)
+       — 즉 실제로 필수인데 표시만 없었다. 「* 표시는 필수」 안내와 어긋나 있었다.
+       ⚠️ 그래서 textContent 가 아니라 innerHTML 이다 — 별표가 빨간 `<span>` 이라 태그가 필요하다.
+       ⚠️ 위 라벨(연락처 질문)에도 별표가 있어 이 묶음엔 별표가 둘이다. 뜻이 다르다 —
+          위 = 셋 중 하나를 고르는 것이 필수, 여기 = 고른 칸을 채우는 것이 필수. */
+    sub.innerHTML = (isInsta
+      ? '답변을 받으실 인스타그램 계정을 입력해 주세요.'
+      : '답변을 받으실 이메일 주소를 입력해 주세요.') + ' <span class="rp-req">*</span>';
+
+    checkReady();
+  }
+
+  // 진행바 — 스크롤 진행도
+  window.addEventListener('scroll', function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    var pct = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+    document.getElementById('barFill').style.width = pct;
+  }, { passive: true });
+
+  paint();
+})();
+</script>
+<style>
+.rp-done { text-align:center }
+.gamja-a { width:150px; height:auto; display:block; margin:0 auto 6px }
+</style><script>window.addEventListener('load',function(){
+  document.getElementById('rpForm').setAttribute('data-off','');
+  document.getElementById('rpNote').setAttribute('data-off','');
+  document.querySelector('.credit-sub').setAttribute('data-off','');
+  document.getElementById('rpDone').removeAttribute('data-off');
+  document.getElementById('rpDoneReply').removeAttribute('data-off');
+
+  document.querySelector('.rp-done-ic').innerHTML = '<img class="gamja-a" src="_gamja.webp" alt="">';
+});</script>
+</body>
+</html>
