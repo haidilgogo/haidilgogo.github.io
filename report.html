@@ -226,6 +226,10 @@ body.swap .rp-actions { flex-direction: row-reverse; }
 /* 진행바 — 가로(위) 하나로 확정(2026-08-06).
    🔴 세로바 안은 버렸다. 사실상 스크롤바라 「스크롤바를 어디서도 안 보인다」는 절대 규칙과 부딪친다. */
 #bar { position: sticky; top: 65px; z-index: 25; height: 3px; background: rgba(43,18,13,.08); }
+/* 🔴 **갈래를 고르기 전에는 안 보인다**(2026-08-07 사용자 지적).
+   고르기 전에는 상자 셋뿐이라 내릴 것이 없고, 그러면 진행바가 늘 꽉 찬 빨간 줄로만 보인다.
+   진행도를 알려 주는 게 아니라 선 하나가 그어져 있는 셈이다. 접수 완료 화면도 같은 이유로 감춘다. */
+body:not(.has-pick) #bar { display: none; }
 #barFill { height: 100%; width: 0; background: var(--brand-red); transition: width .2s ease; }
 
 [data-off] { display: none !important; }
