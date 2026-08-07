@@ -442,12 +442,14 @@ body.previewing .column-sheet { padding-bottom: 28px; }
         <span class="rp-label">만드는 법이 있다면 알려 주세요!</span>
         <!-- ⚠️ 칸 안 예시에는 마침표를 안 붙인다(2026-08-07 사용자 확정) — 예시는 완결된 문장이 아니라
              「이렇게 생긴 걸 적으세요」라고 보여주는 조각이고, 마침표가 있으면 진짜 입력값처럼 보인다. -->
-        <textarea class="rp-textarea" id="rStep" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
+        <!-- 🔴 1000자 제한(2026-08-07 사용자 지시) — 「내용」 칸과 같은 값이다.
+             ⚠️ `maxlength` 는 **넘으면 조용히 안 쳐진다.** 글자수 표시를 붙일지는 아직 안 정했다. -->
+        <textarea class="rp-textarea" id="rStep" maxlength="1000" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
       </div>
 
       <div class="rp-block" id="tipBlock" style="margin-top:18px">
         <span class="rp-label">더 맛있게 먹는 나만의 팁이 있다면 알려 주세요!</span>
-        <textarea class="rp-textarea" id="rTip" placeholder="예) 고수를 더 올려 먹으면 맛있다"></textarea>
+        <textarea class="rp-textarea" id="rTip" maxlength="1000" placeholder="예) 고수를 더 올려 먹으면 맛있다"></textarea>
       </div>
 
       <div class="rp-block" id="srcBlock" style="margin-top:18px">
