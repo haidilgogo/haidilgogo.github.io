@@ -895,6 +895,17 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   }, { passive: true });
 
   paint();
+
+  /* 🟢 미리보기 — `?done=1` 로 열면 **아무것도 안 보내고** 접수 완료 화면만 띄운다.
+     화면을 손볼 때마다 실제로 한 건씩 보내지 않아도 된다(시트·디스코드에 시험 줄이 안 쌓인다).
+     `?done=2` 는 연락처를 주신 경우(답변 줄이 함께 뜬다).
+     ⚠️ 보내는 길과는 아무 상관이 없다 — 이 갈래로는 `collect()` 도 `fetch` 도 안 돈다. */
+  var 미리 = new URLSearchParams(location.search).get('done');
+  if (미리) {
+    state.ct = (미리 === '2') ? 'email' : 'none';
+    보낸뒤화면();
+  }
+
 })();
 </script>
 </body>
