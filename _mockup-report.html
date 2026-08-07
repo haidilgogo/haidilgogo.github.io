@@ -77,6 +77,14 @@ body:not(.note-off) .rp-form { margin-top: 8px; }
 .stamp-field input { font-size: 16px; }
 /* 칸 안 고정 라벨(`@`)도 입력 글자와 같은 16px 로 — 앱 기본값 14px 이면 아래위로 어긋나 보인다 */
 #ctPrefix { font-size: 16px; font-weight: 400; }
+/* 🔴 **예시(placeholder)만 14px 로 줄인다**(2026-08-07 사용자 지적 — 예시가 너무 커 보였다).
+   ⚠️ 칸 자체(`font-size:16px`)는 절대 안 건드린다. 아이폰이 화면을 확대할지 말지는
+      **칸의 글자 크기**를 보고 정하지, 예시 글씨 크기는 보지 않는다. 그래서 이 방법이면
+      확대는 안 나면서 예시만 작아진다.
+   ⚠️ 사람이 실제로 치는 글자는 그대로 16px 다 — 예시보다 커지는 게 정상이다.
+   🔴 실기기에서 「칸을 눌렀을 때 확대되지 않는지」 확인할 것. 확대되면 이 규칙을 지우면 된다. */
+.rp-textarea::placeholder,
+.stamp-field input::placeholder { font-size: 14px; }
 .rp-textarea::placeholder { color: var(--text-muted); opacity: 1; }
 .rp-count { font-size: 11px; color: var(--text-muted); text-align: right; }
 
