@@ -169,25 +169,6 @@ body.pick-chev .rp-kind.on::after { border-color: #fff; }
 body.pick-radio .rp-kinds--pair .rp-kind::before { margin-right: 8px; }
 
 /* 자동완성 — 앱의 .stamp-dd-menu 를 그대로 빌린다 */
-.rp-auto { position: relative; }
-.rp-auto-menu {
-  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-  background: var(--bg-cream); border-radius: 12px; padding: 4px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .12); z-index: 30;
-  max-height: 232px; overflow-y: auto; display: none;
-}
-.rp-auto.open .rp-auto-menu { display: block; }
-.rp-auto-item {
-  display: block; width: 100%; text-align: left; border: none; background: transparent;
-  color: var(--text-muted); font-family: inherit; font-size: 13.5px; font-weight: 600;
-  padding: 10px 11px; border-radius: 9px; -webkit-tap-highlight-color: transparent;
-}
-.rp-auto-item:active { background: rgba(0,0,0,.06); }
-.rp-auto-item b { color: var(--brand-red); font-weight: 800; }
-/* 안 「나」 — 목록 맨 아래 「'○○'(으)로 적기」 확인 줄 */
-.rp-auto-free { border-top: 1px solid var(--card-border); margin-top: 4px; padding-top: 8px; color: var(--text-dark); }
-/* 안 「다」 — 안 맞을 때만 뜨는 한 줄 */
-.rp-nomatch { font-size: 12px; color: var(--text-muted); }
 
 /* 이메일을 아이디 @ 도메인으로 쪼갠 안 */
 .rp-mail { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -422,14 +403,19 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
       <div class="rp-block" id="orderBlock" style="margin-top:18px">
         <span class="rp-label">매장에서 주문해야 하는 항목이 있다면 적어 주세요!</span>
-        <div class="rp-auto" id="orderAuto">
-          <div class="stamp-field stamp-field--light-ph">
-            <input type="text" id="rOrder" placeholder="예) 공깃밥, 청유마라훠궈" autocomplete="off">
-          </div>
-          <div class="rp-auto-menu" id="orderMenu"></div>
-        </div>
-        <p class="rp-help" id="freeHelpA" data-off>목록에 없으면 그냥 적으셔도 됩니다.</p>
-        <p class="rp-nomatch" id="freeHelpC" data-off></p>
+        <!-- 🔴 **여러 줄이다**(2026-08-07 사용자 지적으로 한 줄 칸에서 바꿨다).
+             실제 데이터가 그렇다 — `script.js` 에서 주문 항목이 있는 레시피 17개 중 **9개가 2개 이상**이고
+             3개짜리도 여럿이다(우유/청유 마라훠궈 · 팡가시우메기 1인분 · 공깃밥 1공기).
+             게다가 항목마다 **수량과 단위**가 붙어서 한 줄에 쉼표로 욱여넣으면 읽기도 옮기기도 나쁘다.
+             🔴 그래서 **자동완성을 걷어냈다.** 자동완성은 칸 전체를 검색어로 쓰는 구조라
+                여러 줄이 되면 「공깃밥 1공기 ⏎ 날계란」이 통째로 검색어가 되어 아무것도 안 맞는다.
+                줄 단위로 고쳐 붙일 수는 있으나 한글 조합 중에 목록이 튀기 쉬워 안 한다.
+                바로 아래 재료 칸도 정식 목록(`SAUCE_BAR`)이 있는데 같은 이유로 자동완성이 없다.
+             ⚠️ 잃는 것은 「정식 이름으로 적히게 하는 것」인데, 어차피 제보하는 사람은 정식 이름을 모르고
+                사이트에 옮길 때 `ORDER_ITEMS` 목록에 맞추는 절차가 `CLAUDE.md` 에 규칙으로 있다.
+             ⚠️ 예시는 재료 칸과 같은 꼴로 맞췄다 — 「예)」를 안 붙이고 **실제 적을 모양** 그대로 보여준다. -->
+        <textarea class="rp-textarea" id="rOrder" placeholder="공깃밥 1공기&#10;날계란 1개&#10;토마토탕훠궈"></textarea>
+        <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요. 정확하지 않아도 괜찮습니다.</p>
       </div>
 
       <div class="rp-block" id="ingBlock" style="margin-top:18px">
@@ -597,13 +583,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     <button data-br="min">줄인 안 (1칸)</button>
   </div>
 
-  <h4>② 자동완성 — 목록에 없을 때 안내 (주문 항목 칸)</h4>
-  <div class="prow" id="fhRow">
-    <button data-fh="a">가 · 늘 보임</button>
-    <button data-fh="b">나 · 목록 맨 아래</button>
-    <button data-fh="c">다 · 안 맞을 때만</button>
-  </div>
-
   <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
     ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 ·
     진행바 가로 · 연락처 2열 · 흰색 + 그림자 + 동그라미 · 이메일 한 칸 ·
@@ -615,7 +594,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 </div>
 <button id="showPanel" type="button">조작판 ▲</button>
 
-<script src="menu-data.js?v=5"></script>
 <script>
 (function () {
   var body = document.body;
@@ -625,58 +603,13 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   // 🔴 ct 도 처음엔 **아무것도 안 골라진 상태**(null)로 시작한다(2026-08-06 사용자 지시)
   /* 🔴 정해진 것은 조작판에서 뺀다 — 미결만 남긴다(2026-08-06 사용자 지시).
      확정: 진행바 가로 · 고르는 상자 = **흰색 + 그림자 + 동그라미**.
-     ⏸ 레시피 갈래 조작(br·fh)은 지금 안 쓰므로 걷어냈다. 값은 남겨 두어 화면은 그대로 돈다. */
-  var state = { br: 'full', fh: 'b', ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
+     ⏸ 남은 미결은 ① 갈래 칸 수(br) 하나다. */
+  var state = { br: 'full', ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
 
-  // 자동완성 목록 = 메뉴 130 + 육수 12
-  var NAMES = [];
-  try {
-    var D = window.MENU_DATA;
-    D.tabs.forEach(function (t) { t.items.forEach(function (i) { NAMES.push(i.n); }); });
-    D.broths.forEach(function (b) { if (NAMES.indexOf(b.n) < 0) NAMES.push(b.n); });
-  } catch (e) {}
-
-  var auto = document.getElementById('orderAuto');
-  var menu = document.getElementById('orderMenu');
-  var inp  = document.getElementById('rOrder');
-  var helpC = document.getElementById('freeHelpC');
-
-  function esc(s) { return s.replace(/[&<>]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
-
-  function renderAuto() {
-    var q = inp.value.trim();
-    if (!q) { auto.classList.remove('open'); helpC.setAttribute('data-off',''); return; }
-    var hits = NAMES.filter(function (n) { return n.indexOf(q) >= 0; }).slice(0, 8);
-    var html = hits.map(function (n) {
-      return '<button type="button" class="rp-auto-item" data-v="' + esc(n) + '">' +
-        esc(n).replace(esc(q), '<b>' + esc(q) + '</b>') + '</button>';
-    }).join('');
-
-    // 안 「나」 — 맨 아래 확인 줄
-    if (state.fh === 'b') {
-      html += '<button type="button" class="rp-auto-item rp-auto-free" data-v="' + esc(q) + '">' +
-        '「' + esc(q) + '」(으)로 적기</button>';
-    }
-    menu.innerHTML = html;
-    auto.classList.toggle('open', html !== '');
-
-    // 안 「다」 — 안 맞을 때만 한 줄
-    if (state.fh === 'c' && hits.length === 0) {
-      helpC.textContent = '목록에 없는 이름이에요. 그대로 보내집니다.';
-      helpC.removeAttribute('data-off');
-    } else helpC.setAttribute('data-off','');
-  }
-  inp.addEventListener('input', renderAuto);
-  inp.addEventListener('focus', renderAuto);
-  menu.addEventListener('click', function (e) {
-    var b = e.target.closest('.rp-auto-item');
-    if (!b) return;
-    inp.value = b.dataset.v;
-    auto.classList.remove('open');
-  });
-  document.addEventListener('click', function (e) {
-    if (!auto.contains(e.target)) auto.classList.remove('open');
-  });
+  /* 🔴 자동완성은 걷어냈다(2026-08-07 사용자 확정) — 주문 항목 칸이 여러 줄이 되면서
+     칸 전체를 검색어로 쓰던 구조가 성립하지 않는다. 되살리려면 줄 단위로 다시 짜야 하고,
+     한글 조합 중에 목록이 튀는 문제를 각오해야 한다. 자세한 배경은 주문 항목 칸의 주석 참고.
+     ⚠️ 같이 지운 것: `menu-data.js` 불러오기 · 조작판 ②번 · `state.fh` · `.rp-auto*`/`.rp-nomatch` CSS. */
 
   // 글자 수
   var ta = document.getElementById('rBody'), cnt = document.getElementById('rpCount');
@@ -832,7 +765,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
   function paint() {
     // 레시피 갈래용 조작 — ③「선택」 꼬리표는 확정되어 걷어냈다(2026-08-07)
-    [['brRow','br','br'],['fhRow','fh','fh']].forEach(function (p) {
+    [['brRow','br','br']].forEach(function (p) {
       var row = document.getElementById(p[0]);
       if (!row) return;
       [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
@@ -930,7 +863,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     body.classList.toggle('pick-shadow', state.bg === 'shadow' || state.bg === 'fillshadow');
     body.classList.toggle('pick-radio', state.mk === 'radio');
     body.classList.toggle('pick-chev', state.mk === 'chev');
-    renderAuto();
     checkReady();
   }
 
@@ -945,7 +877,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   document.getElementById('panel').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b || b.id === 'hide') return;
     if (b.dataset.br) state.br = b.dataset.br;
-    else if (b.dataset.fh) state.fh = b.dataset.fh;
     else if (b.dataset.bg) state.bg = b.dataset.bg;
     else if (b.dataset.mk) state.mk = b.dataset.mk;
     else return;
