@@ -202,6 +202,15 @@
 /* ⑤ 좌우 바꾸기 */
 body.swap .rp-actions { flex-direction: row-reverse; }
 
+/* 보낸 뒤 화면 — 폼과 같은 좌우 여백(22px)을 쓰고, 가운데로 모은다 */
+.rp-done { padding: 40px 22px 0; text-align: center; }
+.rp-done-ic { font-size: 40px; line-height: 1; margin-bottom: 14px; }
+.rp-done-title { margin: 0 0 12px; font-size: 19px; font-weight: 800; color: var(--text-dark); }
+.rp-done-body { margin: 0 0 6px; font-size: 13.5px; line-height: 1.7; color: var(--text-muted); }
+.rp-done-body:last-of-type { margin-bottom: 0; }
+/* 닫기 하나뿐일 때 — 둘일 때(.rp-actions)와 같은 높이·모양을 쓰되 폭만 나누지 않는다 */
+.rp-actions--one { margin-top: 26px; }
+
 /* 진행바 — 가로(위) 하나로 확정(2026-08-06).
    🔴 세로바 안은 버렸다. 사실상 스크롤바라 「스크롤바를 어디서도 안 보인다」는 절대 규칙과 부딪친다. */
 #bar { position: sticky; top: 65px; z-index: 25; height: 3px; background: rgba(43,18,13,.08); }
@@ -272,7 +281,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
 
   <!-- ⚠️ 마침표를 붙였다(2026-08-07 사용자 확정) — 문장이면 마침표, 이름표면 없음이 이 폼의 기준인데
        여기만 문장인데 빠져 있었다. -->
-  <p class="rp-note"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요.</p>
+  <p class="rp-note" id="rpNote"><span class="rp-req">*</span> 표시는 필수로 입력하셔야 해요.</p>
 
   <form class="rp-form" id="rpForm" onsubmit="return false">
 
@@ -494,6 +503,24 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       </div>
     </div>
   </form>
+
+  <!-- ══ 보낸 뒤 화면 (2026-08-07 사용자 문안) ══════════════════════════════
+       🔴 **페이지를 안 떠난다.** 폼만 사라지고 이 화면이 그 자리에 선다.
+          창을 닫아 버리는 안은 버렸다 — 갑자기 튕기면 「보내진 게 맞나?」가 오히려 커진다.
+       🔴 답변 줄(`rpDoneReply`)은 **연락처를 주신 분에게만** 뜬다.
+          「답변이 필요 없어요」를 고른 분께 「답변을 못 드릴 수 있다」고 말하는 것은 쓸데없는 말이다.
+       ⚠️ 갈래(레시피·오류·기타)별로 문구를 가르지 않는다 — 셋 다 「받았다·고맙다」가 핵심이라
+          갈릴 이유가 적고, 세 벌이 되면 나중에 한쪽만 고쳐 어긋난다. -->
+  <div class="rp-done" id="rpDone" data-off>
+    <div class="rp-done-ic" aria-hidden="true">💌</div>
+    <h2 class="rp-done-title">제보 · 문의가 접수되었어요!</h2>
+    <p class="rp-done-body">소중한 의견 감사합니다.</p>
+    <p class="rp-done-body" id="rpDoneReply" data-off>모든 의견에 답변드리지는 못하는 점 양해 부탁드립니다.</p>
+    <p class="rp-done-body">더 나은 하딜고고가 되도록 노력하겠습니다.</p>
+    <div class="rp-actions rp-actions--one">
+      <button type="button" class="rp-btn" id="rpDoneClose">닫기</button>
+    </div>
+  </div>
 </main>
 
 <div class="share-toast" id="toast">보내주셔서 고맙습니다!</div>
@@ -668,13 +695,18 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
 
   // 닫기 — 🔴 credits.html 과 같은 방식: 같은 사이트에서 왔으면 왔던 자리로, 아니면 홈으로.
   //        ⚠️ 다만 여기는 폼이라 **적던 글이 있으면 한 번 묻는다**.
-  document.getElementById('rpClose').addEventListener('click', function () {
-    var dirty = ['rName','rBody','rCt'].some(function (id) { return document.getElementById(id).value.trim(); });
-    if (dirty && !confirm('적으신 내용이 사라집니다. 닫을까요?')) return;
+  function 나가기() {
     var same = false;
     try { same = new URL(document.referrer).origin === location.origin; } catch (e) {}
     if (same) history.back(); else location.href = './';
+  }
+  document.getElementById('rpClose').addEventListener('click', function () {
+    var dirty = ['rName','rBody','rCt'].some(function (id) { return document.getElementById(id).value.trim(); });
+    if (dirty && !confirm('적으신 내용이 사라집니다. 닫을까요?')) return;
+    나가기();
   });
+  /* 🔴 보낸 뒤의 닫기는 **묻지 않는다** — 이미 보냈으니 사라질 글이 없다 */
+  document.getElementById('rpDoneClose').addEventListener('click', 나가기);
 
   var toast = document.getElementById('toast'), t = null;
   /* 🔴 보낼 곳 — 문지기(구글 앱스 스크립트) 웹 앱의 `/exec` 주소를 여기 넣는다.
@@ -684,6 +716,19 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
         문지기 안 「스크립트 속성」에 있고 여기로는 안 나온다. 그래서 공개 저장소에 있어도 된다. */
   var SEND_URL = 'https://script.google.com/macros/s/AKfycbzYC4mdKWlI2yqo6klnf83jGcD_qCW2FzDAT0z33k10KckN2n0d6Vw258MU3-YkJFQO/exec';
 
+  /* 보낸 뒤 — 폼을 걷고 그 자리에 성공 화면을 세운다.
+     ⚠️ 머리글의 설명문(「…알려 주세요」)도 같이 감춘다. 이미 보낸 사람에게는 맞지 않는 말이다. */
+  function 보낸뒤화면() {
+    off('rpForm', true);
+    off('rpNote', true);
+    var sub = document.querySelector('.credit-sub');
+    if (sub) sub.setAttribute('data-off', '');
+    // 연락처를 준 사람에게만 답변 줄을 보여준다
+    off('rpDoneReply', !(state.ct === 'email' || state.ct === 'insta'));
+    off('rpDone', false);
+    window.scrollTo(0, 0);
+  }
+
   document.getElementById('rpSubmit').addEventListener('click', function () {
     var btn = this;
     var rows = collect();
@@ -692,7 +737,11 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
 
     if (!SEND_URL) { show('아직 보낼 곳이 연결되지 않았습니다'); return; }
 
+    /* 🔴 누른 순간 표시가 있어야 한다(2026-08-07 사용자 지적) — 문지기에 다녀오는 데
+       1~3초가 걸리는데(구글 서버가 쉬다 깨면 더), 그동안 화면이 죽은 것처럼 보였다. */
     btn.disabled = true;
+    var 원래글씨 = btn.textContent;
+    btn.textContent = '보내는 중…';
     /* ⚠️ **헤더를 붙이지 않는다.** `Content-Type` 을 지정하면 브라우저가 먼저 확인(preflight)을
        보내는데, 앱스 스크립트는 그 확인에 답하지 못해 **전송이 통째로 막힌다.**
        문자열 본문만 주면 브라우저가 알아서 `text/plain` 으로 보내고 확인 단계가 없다.
@@ -700,12 +749,14 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
     fetch(SEND_URL, { method: 'POST', body: JSON.stringify({ rows: rows }) })
       .then(function (r) { return r.json(); })
       .then(function (j) {
-        if (j && j.ok) { show('보내주셔서 고맙습니다!'); }
-        else { btn.disabled = false; show('보내지 못했습니다. 잠시 뒤 다시 해 주세요.'); }
+        if (j && j.ok) { 보낸뒤화면(); }
+        else { 되살리기(); show('보내지 못했습니다. 잠시 뒤 다시 해 주세요.'); }
       })
       .catch(function () {
-        btn.disabled = false; show('보내지 못했습니다. 인터넷 연결을 확인해 주세요.');
+        되살리기(); show('보내지 못했습니다. 인터넷 연결을 확인해 주세요.');
       });
+
+    function 되살리기() { btn.disabled = false; btn.textContent = 원래글씨; }
     /* ⏸ **보낸 뒤 화면은 아직 안 정했다.** 지금은 토스트 한 줄이고, 설계 문서에는
        「페이지를 안 떠나고 그 자리에서 성공 화면으로」라고만 적혀 있다. 사용자님 확인 필요.
        ⏸ 위 실패 문구 둘도 확정 전이다(설계 문서의 「확정 없이 넣은 문구」 목록에 있다). */
