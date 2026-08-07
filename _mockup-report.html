@@ -584,20 +584,14 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
 <div id="panel">
   <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#1E8A5F">
-    ✅ 오류 · 기타 갈래는 끝났습니다. 아래는 <b>레시피 갈래</b>용입니다.
+    ✅ 세 갈래 모두 끝났습니다. 갈아 끼울 것이 남아 있지 않습니다.
   </p>
 
-  <h4>① 레시피를 고르면 칸이 몇 개</h4>
-  <div class="prow" id="brRow">
-    <button data-br="full">그대로 (6칸)</button>
-    <button data-br="mid">중간 (2칸)</button>
-    <button data-br="min">줄인 안 (1칸)</button>
-  </div>
-
-  <p style="margin:14px 0 0;font-size:11.5px;line-height:1.6;color:#9A8A83">
+  <p style="margin:0;font-size:11.5px;line-height:1.6;color:#9A8A83">
     ✅ <b>정해진 것</b> — 간격 넉넉 · 닫기 왼/보내기 오 · 「* 표시는 필수」 회색 ·
     진행바 가로 · 연락처 2열 · 흰색 + 그림자 + 동그라미 · 이메일 한 칸 ·
-    <b>「선택」 꼬리표 없음(필수는 별표로만)</b> · 이름 칸 도움말은 라벨 아래<br>
+    <b>「선택」 꼬리표 없음(필수는 별표로만)</b> · 도움말은 라벨 아래 ·
+    <b>레시피 갈래 6칸</b> · 긴 칸 3줄 + 치는 만큼 자라기 · 자동완성 없음<br>
     (개별 미세조정은 말씀해 주시면 그때그때 반영합니다)
   </p>
 
@@ -615,7 +609,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
   /* 🔴 정해진 것은 조작판에서 뺀다 — 미결만 남긴다(2026-08-06 사용자 지시).
      확정: 진행바 가로 · 고르는 상자 = **흰색 + 그림자 + 동그라미**.
      ⏸ 남은 미결은 ① 갈래 칸 수(br) 하나다. */
-  var state = { br: 'full', ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
+  var state = { ml: 'one', bg: 'shadow', mk: 'radio', kind: null, ct: null };
 
   /* 🔴 자동완성은 걷어냈다(2026-08-07 사용자 확정) — 주문 항목 칸이 여러 줄이 되면서
      칸 전체를 검색어로 쓰던 구조가 성립하지 않는다. 되살리려면 줄 단위로 다시 짜야 하고,
@@ -712,7 +706,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     var bodyV = document.getElementById('rBody').value.trim();
     var agreed = document.getElementById('rpAgree').checked;
     var isRecipe = state.kind === 'recipe';
-    var needName = isRecipe && (state.br === 'full' || state.br === 'mid');
+    var needName = isRecipe;   // 레시피 갈래면 이름은 늘 필수다
     var reason = '';
 
     var ctV = ctValue();
@@ -790,11 +784,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
 
   function paint() {
     // 레시피 갈래용 조작 — ③「선택」 꼬리표는 확정되어 걷어냈다(2026-08-07)
-    [['brRow','br','br']].forEach(function (p) {
-      var row = document.getElementById(p[0]);
-      if (!row) return;
-      [].forEach.call(row.children, function (b) { b.classList.toggle('on', b.dataset[p[2]] === state[p[1]]); });
-    });
     [].forEach.call(document.getElementById('rpKinds').children, function (b) {
       b.classList.toggle('on', b.dataset.k === state.kind);
     });
@@ -805,14 +794,16 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     // 🔴 고르기 전에는 아래를 통째로 안 보여준다
     var picked = state.kind !== null;
     var isRecipe = state.kind === 'recipe';
-    var showName = picked && isRecipe && (state.br === 'full' || state.br === 'mid');
-    var showRest = picked && isRecipe && state.br === 'full';
-    off('recipeFull', !(showName || showRest));
-    off('orderBlock', !showRest); off('ingBlock', !showRest);
-    off('stepBlock', !showRest); off('tipBlock', !showRest); off('srcBlock', !showRest);
-    // 「그대로」일 때는 레시피에 내용 칸이 없다
-    off('bodyBlock', !picked || (isRecipe && state.br === 'full'));
-    off('lead', !(picked && isRecipe && state.br === 'full'));
+    /* 🔴 레시피 갈래는 **6칸으로 확정**됐다(2026-08-07 사용자 확정) — 「중간(2칸)·줄인 안(1칸)」은
+       더 안 본다. 6칸이어야 사이트에 올릴 수 있는 레시피가 들어온다(특히 재료와 양).
+       부담은 「필수는 이름 하나」·안내 상자·라벨의 「있다면」이 이미 낮춰 준다. */
+    var showRecipe = picked && isRecipe;
+    off('recipeFull', !showRecipe);
+    off('orderBlock', !showRecipe); off('ingBlock', !showRecipe);
+    off('stepBlock', !showRecipe); off('tipBlock', !showRecipe); off('srcBlock', !showRecipe);
+    // 레시피 갈래에는 「내용」 칸이 없다 — 여섯 칸이 그 자리를 대신한다
+    off('bodyBlock', !picked || isRecipe);
+    off('lead', !showRecipe);
     off('ctBlock', !picked);
     body.classList.toggle('has-pick', picked);   // 버튼을 아래로 내릴지 정한다(위 CSS 참고)
     // 🔴 아무것도 안 골랐을 때도 **닫기는 보인다**(2026-08-06 사용자 지시).
@@ -899,14 +890,9 @@ body.previewing .column-sheet { padding-bottom: 28px; }
     document.getElementById('vbarFill').style.height = pct;
   }, { passive: true });
 
-  document.getElementById('panel').addEventListener('click', function (e) {
-    var b = e.target.closest('button'); if (!b || b.id === 'hide') return;
-    if (b.dataset.br) state.br = b.dataset.br;
-    else if (b.dataset.bg) state.bg = b.dataset.bg;
-    else if (b.dataset.mk) state.mk = b.dataset.mk;
-    else return;
-    paint();
-  });
+  /* 🔴 조작판에 갈아 끼울 것이 하나도 안 남아서 클릭 처리도 걷어냈다(2026-08-07).
+     남은 것은 「정해진 것」 목록과 내리기 버튼뿐이다. 새 안을 비교해야 할 일이 생기면
+     이 자리에 다시 만들면 된다 — 그때도 **정해진 것은 올리지 말고 미결만** 올릴 것. */
   // 🔴 시간 제한 없이 내가 내렸다 올린다(2026-08-06 사용자 지시 — 6초는 너무 짧았다)
   document.getElementById('hide').addEventListener('click', function () {
     body.classList.add('previewing');
