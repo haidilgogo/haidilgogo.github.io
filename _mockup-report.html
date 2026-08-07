@@ -444,12 +444,12 @@ body.previewing .column-sheet { padding-bottom: 28px; }
              「이렇게 생긴 걸 적으세요」라고 보여주는 조각이고, 마침표가 있으면 진짜 입력값처럼 보인다. -->
         <!-- 🔴 1000자 제한(2026-08-07 사용자 지시) — 「내용」 칸과 같은 값이다.
              ⚠️ `maxlength` 는 **넘으면 조용히 안 쳐진다.** 글자수 표시를 붙일지는 아직 안 정했다. -->
-        <textarea class="rp-textarea" id="rStep" maxlength="1000" placeholder="예) 청유마라훠궈탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
+        <textarea class="rp-textarea" id="rStep" maxlength="1000" placeholder="예) 홍탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
       </div>
 
       <div class="rp-block" id="tipBlock" style="margin-top:18px">
         <span class="rp-label">더 맛있게 먹는 나만의 팁이 있다면 알려 주세요!</span>
-        <textarea class="rp-textarea" id="rTip" maxlength="1000" placeholder="예) 고수를 더 올려 먹으면 맛있다"></textarea>
+        <textarea class="rp-textarea" id="rTip" maxlength="1000" placeholder="예) 고수를 잔뜩 올려 먹으면 더 맛있다"></textarea>
       </div>
 
       <div class="rp-block" id="srcBlock" style="margin-top:18px">
@@ -463,7 +463,11 @@ body.previewing .column-sheet { padding-bottom: 28px; }
              ⚠️ 그래서 예시 둘째 줄에는 **진짜 링크 모양**을 넣었다. 없으면 「링크를 붙이라」고 해 놓고
                 정작 어떤 꼴인지는 안 보여주는 셈이 된다. -->
         <p class="rp-help">링크를 붙여 주셔도 좋아요.</p>
-        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;https://youtu.be/abcd1234"></textarea>
+        <!-- 🔴 둘째 줄부터는 **공백 6칸**으로 「예) 」 아래에 줄을 맞춘다(2026-08-07 사용자 문안).
+             눈대중이 아니라 재서 골랐다 — 지금 예시 글씨(14px)로 「예) 」=20px, 6칸=21px 이 가장 가깝다
+             (5칸은 18px 로 2px 모자람). 오류·기타 갈래 예시도 같은 규칙을 쓴다.
+             ⚠️ **예시 글자 크기나 글꼴을 바꾸면 이 칸 수를 다시 잴 것.** 비례폭 글꼴이라 저절로 안 맞는다. -->
+        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 홍길동 채널&#10;      인스타그램 @dr_hong&#10;      http://youtube.com/gdhong"></textarea>
       </div>
     </div>
 
