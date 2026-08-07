@@ -400,7 +400,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
                   두 칸에 비슷한 이름이 붙으면 주문 항목인지 레시피 이름인지 헷갈린다.
                ⚠️ 이름을 늘리지 말 것 — 넷이 되면(예: 「쑨디2호소스」를 되살리면) 306px 이 되어
                   320px 폰의 칸 안폭(244px)에서 뒤가 잘린다. 지금은 219px 다. -->
-          <input type="text" id="rName" placeholder="예) 건희소스, 희수국밥, 스키야키탕">
+          <input type="text" id="rName" maxlength="50" placeholder="예) 건희소스, 희수국밥, 스키야키탕">
         </div>
       </div>
 
@@ -424,7 +424,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
              ⚠️ 그렇다고 「정확히 적으세요」로 뒤집지도 말 것 — 헷갈리는 사람이 지어내면 그게 제일 나쁘다.
                 빈칸은 「모르는구나」 하고 넘어갈 수 있지만, 지어낸 값은 맞는 줄 알고 올라간다. -->
         <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
-        <textarea class="rp-textarea" id="rOrder" placeholder="공깃밥 1공기&#10;날계란 1개&#10;토마토탕훠궈"></textarea>
+        <textarea class="rp-textarea" id="rOrder" maxlength="500" placeholder="공깃밥 1공기&#10;날계란 1개&#10;토마토탕훠궈"></textarea>
       </div>
 
       <div class="rp-block" id="ingBlock" style="margin-top:18px">
@@ -435,7 +435,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
         <!-- 🔴 도움말은 **라벨 아래 · 칸 위**다(2026-08-07 사용자 지시) — 이름 칸과 같은 자리다.
              적기 전에 「어떻게 적는 칸인지」를 알아야 하므로 칸 아래가 아니라 위에 둔다. -->
         <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
-        <textarea class="rp-textarea" id="rIng" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"></textarea>
+        <textarea class="rp-textarea" id="rIng" maxlength="1000" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"></textarea>
       </div>
 
       <div class="rp-block" id="stepBlock" style="margin-top:18px">
@@ -458,7 +458,7 @@ body.previewing .column-sheet { padding-bottom: 28px; }
      구글폼은 예시 칸이 따로 없어 라벨에 다 넣어야 했지만 우리는 나눌 수 있다.
      원문은 426px 라 390px 폰(칸 폭 346px)에서도 두 줄이었다. 지금은 286px. -->
 <span class="rp-label">이 레시피를 어디서 보신 적이 있다면 출처를 알려 주세요!</span>
-        <textarea class="rp-textarea" id="rSrc" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요"></textarea>
+        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 OOO 채널, 인스타그램 @abcdefg&#10;링크를 붙여 주셔도 좋아요"></textarea>
       </div>
     </div>
 
@@ -469,7 +469,6 @@ body.previewing .column-sheet { padding-bottom: 28px; }
            갈래를 고르는 순간 아래 JS(`PH`)가 갈래별 예시로 항상 덮어쓰고, 고르기 전에는
            이 묶음 자체가 감춰져 있다. 적어 두면 「어디에도 없는 문구」가 코드에만 남는다. -->
       <textarea class="rp-textarea" id="rBody" maxlength="1000"></textarea>
-      <span class="rp-count" id="rpCount">0 / 1000자</span>
     </div>
 
     <!-- ── 연락처 ── -->
@@ -618,9 +617,30 @@ body.previewing .column-sheet { padding-bottom: 28px; }
      한글 조합 중에 목록이 튀는 문제를 각오해야 한다. 자세한 배경은 주문 항목 칸의 주석 참고.
      ⚠️ 같이 지운 것: `menu-data.js` 불러오기 · 조작판 ②번 · `state.fh` · `.rp-auto*`/`.rp-nomatch` CSS. */
 
-  // 글자 수
-  var ta = document.getElementById('rBody'), cnt = document.getElementById('rpCount');
-  ta.addEventListener('input', function () { cnt.textContent = ta.value.length + ' / 1000자'; });
+  /* 🔴 글자수는 **제한의 90%를 넘을 때만** 보인다(2026-08-07 사용자 확정).
+     ⚠️ 왜 필요한가: `maxlength` 는 넘으면 **아무 말 없이 안 쳐진다.** 길게 쓰던 사람이
+        「왜 안 써지지」 하고 헤맨다. 그렇다고 늘 띄우면 숫자 넷이 상시로 떠 폼이 시끄럽다.
+     🔴 90% 라는 비율로 잡은 이유: 칸마다 제한이 다르다(이름 50 · 주문 500 · 나머지 1000).
+        「900자부터」처럼 숫자로 박으면 이름 칸(50자)에서는 영영 안 뜬다.
+     ⚠️ 표시 자리는 **칸 바로 아래**다. 이름 칸은 상자(.stamp-field)로 한 겹 싸여 있어서
+        칸이 아니라 그 상자 뒤에 붙인다 — 안 그러면 상자 **안**에 들어가 버린다. */
+  [].forEach.call(document.querySelectorAll('[maxlength]'), function (el) {
+    var max = +el.getAttribute('maxlength');
+    var tag = document.createElement('span');
+    tag.className = 'rp-count';
+    tag.setAttribute('data-off', '');
+    var anchor = el.closest('.stamp-field') || el;
+    anchor.parentNode.insertBefore(tag, anchor.nextSibling);
+    function upd() {
+      var n = el.value.length;
+      if (n >= max * 0.9) {
+        tag.textContent = n + ' / ' + max + '자';
+        tag.removeAttribute('data-off');
+      } else tag.setAttribute('data-off', '');
+    }
+    el.addEventListener('input', upd);
+    upd();
+  });
 
   /* 🔴 iOS 사파리는 **터치 리스너가 하나도 없으면 `:active` 를 아예 안 켠다**
      (2026-08-04 `_press-compare.html` 에서 실제로 겪었다 — 눌러도 아무 반응이 없었다).
