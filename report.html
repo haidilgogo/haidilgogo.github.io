@@ -213,8 +213,12 @@ body.swap .rp-actions { flex-direction: row-reverse; }
    `position: fixed` 는 안 쓴다 — 폼 쪽 버튼과 같은 이유다(아이폰에서 키보드·주소창과 엉킨다).
    대신 `.rp-done` 이 남는 높이를 먹고(flex:1) 버튼에 `margin-top:auto` 를 준다.
    → 글이 짧으면 아래로 내려가고, 길어지면 글을 따라온다. 겹치지 않는다. */
-.rp-done { display: flex; flex-direction: column; flex: 1; }
-.rp-actions--one { margin-top: auto; padding-top: 26px; }
+/* 🔴 **끝까지 내리지 않는다**(2026-08-07 사용자 지적 — 화면 아래에 딱 붙이니 가운데가 뻥 뚫렸다).
+   대신 감자·글·버튼을 **한 덩어리로 묶어 세로 가운데**에 놓는다. 위아래 여백이 비슷해지고
+   버튼도 글에서 알맞게 떨어진다. `justify-content: center` 가 그 일을 한다.
+   ⚠️ `margin-top: auto` 로 되돌리지 말 것 — 그게 끝까지 미는 것이다. */
+.rp-done { display: flex; flex-direction: column; flex: 1; justify-content: center; padding-bottom: 40px; }
+.rp-actions--one { margin-top: 34px; }
 /* 🔴 폭은 **폼의 「닫기」와 같게** 맞춘다 — 두 칸으로 나눠 쓰던 그 폭이라 눈에 익다.
    (두 버튼일 때 gap 이 8px 이므로 절반에서 4px 을 뺀다) */
 .rp-actions--one .rp-btn { flex: none; width: calc(50% - 4px); margin: 0 auto; }
