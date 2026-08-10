@@ -1379,24 +1379,9 @@ a[href] {
   transform: scale(.9);
 }
 
-/* 손가락으로 연 모달의 자동 초점에만 iOS 파란 네모를 숨긴다.
-   키보드로 연 경우엔 focus-silent가 붙지 않아 기본 초점 표시가 그대로 보인다. */
-/* 🔴 2026-08-09 — 아래 둘을 빠뜨려 **앱 설치 안내의 X 에 파란 테두리가 나왔다**(사용자 실기기 발견).
-   5-5 에서 칼럼·앱설치에 자동 초점(`focusDialogClose`)을 새로 붙이면서, 그 함수가 붙이는
-   `focus-silent` 를 받아 줄 CSS 를 여기 같이 안 넣었다.
-   ⚠️ **`focusDialogClose` 를 새 닫기 버튼에 쓸 때는 그 버튼 클래스를 반드시 이 목록에 추가할 것.**
-      안 그러면 손가락으로 열어도 iOS 파란 네모가 뜬다. */
-.modal-close.focus-silent:focus,
-.stamp-sheet-close.focus-silent:focus,
-.stamp-view-close.focus-silent:focus,
-.column-close.focus-silent:focus,
-.a2hs-close.focus-silent:focus,
-.story-close.focus-silent:focus,
-.celeb.focus-silent:focus {   /* 2026-08-09 스토리에도 자동 초점을 붙이며 같이 추가.
-                                 `.celeb` 은 **닫을 때 돌아가는 셀럽 카드**다 — 손가락으로 닫아도
-                                 파란 테두리가 남던 것을 사용자님이 실기기에서 잡으셨다. */
-  outline: none;
-}
+/* 🔴 `focus-silent` 규칙은 **여기 없다.** 파일 맨 아래 「초점 표시 감추기」 절로 옮겼다
+   (2026-08-10 구조 개선). 옮긴 이유와 지켜야 할 것은 그쪽 주석에 적어 두었다.
+   ⚠️ 여기에 클래스 이름을 다시 나열하지 말 것 — 그 방식이 못 따라와서 이미 세 번 샜다. */
 
 /* 🔴 화면을 옮긴 뒤 초점이 내려앉는 자리(2026-08-09) — 칼럼에서 「메뉴/레시피 보러 가기」로
    넘어왔을 때 쓴다. **글자 요소**(개수줄)라 누를 것이 없으므로 테두리를 그리지 않는다.
@@ -4922,7 +4907,11 @@ a[href] {
          스티커 입력칸(`.kbd-nav .stamp-field`)과 스토리 넘김 영역(`.kbd-nav .story-tap`).
          **`:focus-visible` 로 되돌리지 말 것.**
    ⚠️ `.kbd-nav` 는 `Tab` 을 누르면 붙고 손가락·마우스를 대면 떨어진다(`script.js` 의 keydown·
-      pointerdown 참고). 그래서 **키보드 사용자에게는 그대로 보이고** 손가락에는 안 보인다. */
+      pointerdown 참고). 그래서 **키보드 사용자에게는 그대로 보이고** 손가락에는 안 보인다.
+   🔴 **예외 하나**(2026-08-10 사용자님 확정) — 평소에는 `Tab` 만 이 표시를 켜지만,
+      **팝업을 닫고 돌아갈 때는 「키보드가 한 번이라도 끼었으면」 `applyReturnFocus` 가 다시 켠다.**
+      「손가락으로 열고 → 중간에 Tab → 손가락으로 닫기」에서도 확정 정책대로 테두리가 보이게 하려는 것이다.
+      그때도 표시는 **초점을 받은 그 요소에만** 나오고, 다음 손가락 입력에서 곧바로 꺼진다. */
 .card-open:focus,
 .browse-fav:focus,
 .hp-like:focus,
@@ -4931,12 +4920,34 @@ a[href] {
   outline: 2px solid var(--brand-red);
   outline-offset: -2px;   /* 카드 안쪽에 그린다 — 밖에 그리면 옆 카드와 겹친다 */
 }
+/* ══ 초점 표시 감추기(`focus-silent`) ══════════════════════════════════════════════
+   🔴 **손가락·마우스로만 여닫았을 때** 자동으로 옮긴 초점의 테두리를 감춘다.
+      키보드가 조금이라도 끼면 이 클래스가 **안 붙으므로** 표시는 그대로 보인다
+      (판정은 `script.js` 의 `applyReturnFocus` 가 한다).
+
+   🔴 **예전에는 클래스 이름을 하나씩 나열했다.** 그 방식이 못 따라와서 **세 번 샜다** —
+      `.column-close` · `.a2hs-close` · `.celeb`. 새 닫기 버튼이나 새 복귀 대상이 생길 때마다
+      사람이 목록에 손으로 더해야 했고, 빠뜨리면 **아이폰에서 파란 네모가 그대로 떴다.**
+      → 이제 **표시 자체를 대상으로 하는 규칙 하나**다. 목록을 되살리지 말 것.
+
+   🔴 지켜야 할 것 셋
+      ① `:focus` 와 `:focus-visible` 을 **둘 다** 덮는다. 아이폰 사파리는 손가락으로 눌러도
+         `:focus-visible` 로 치는 경우가 있어 한쪽만으로는 안 막힌다.
+      ② **위의 `.kbd-nav …:focus` 규칙들보다 뒤에 둔다.** 앞에 두면 순서에서 진다.
+         (`.kbd-nav` 가 붙는 때와 이 클래스가 붙는 때는 애초에 겹치지 않지만, 순서로도 못 박아 둔다.)
+      ③ 초점이 떠나거나 복귀가 실패하면 `script.js` 가 이 클래스를 **반드시 뗀다.**
+         남으면 나중의 **정상적인 키보드 초점 표시까지 감춘다.**
+   ⚠️ 그림자(`box-shadow`)로 테두리를 그리는 초점 규칙은 없다(실측). `outline` 만 덮으면 된다. */
 .kbd-nav .browse-fav:focus,
 .kbd-nav .hp-like:focus,
 .kbd-nav .hc-row-like:focus {
   outline: 2px solid var(--brand-red);
   outline-offset: -2px;
   border-radius: 8px;
+}
+.focus-silent:focus,
+.focus-silent:focus-visible {
+  outline: none;
 }
 
 /* 눌림 효과 — 예전엔 「카드가 눌렸고 하트는 안 눌렸을 때」로 걸렀다.

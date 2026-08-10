@@ -562,12 +562,29 @@
      (실제로 그랬다). 그래서 Tab 을 눌렀는지를 **직접 기록**해 그때만 테두리를 그린다.
      ⚠️ `pointerdown` 은 **마우스와 손가락을 모두** 잡는다. 그래서 둘 다 이 표시가 꺼진다.
      ⚠️ Tab 만 켠다 — Enter·Space 는 「옮겨 다니는 것」이 아니라 「누르는 것」이다.
+     🔴 **예외가 하나 있다**(2026-08-10 사용자님 확정). 평소에는 이렇게 `Tab` 만 켜지만,
+        **팝업을 닫고 돌아갈 때는 「키보드가 한 번이라도 끼었으면」 아래 `applyReturnFocus` 가
+        다시 켠다.** 확정된 정책이 「키보드가 조금이라도 끼면 테두리 보임」이기 때문이다.
+        그때도 표시는 **초점을 받은 그 요소에만** 나오고, 다음 손가락 입력에서 곧바로 다시 꺼진다.
      🔴 버튼(`.tab-btn`·카드 버튼)은 `:focus-visible` 로 이미 잘 갈리므로 **건드리지 않는다.**
      아래 `lastDialogInputWasKeyboard` 는 모달 첫 초점용으로 예전부터 있던 것이고 목적이 다르다. */
   let lastDialogInputWasKeyboard = false;
+  /* 🔴 **키보드 일련번호**(2026-08-10). 「마지막 입력 하나」로 판정하면 안 되기 때문에 만들었다.
+     아래 `pointerdown` 이 `lastDialogInputWasKeyboard` 를 **즉시 지운다.** 그래서
+     「손가락으로 연다 → 중간에 `Tab` → 손가락으로 닫는다」 를 닫는 순간의 값만 보면 **손가락**으로
+     읽어 테두리를 숨긴다. 확정된 정책은 **「키보드가 조금이라도 끼면 보임」** 이라 틀린 판정이다.
+     → 그래서 **한 번 올라가면 절대 안 내려가는 번호**를 따로 센다. 팝업을 열 때 번호를 적어 두고
+       닫을 때 견주면 **그 사이에 키보드가 끼었는지**를 알 수 있다.
+     ⚠️ `Esc` 는 **번호에만** 넣는다 — `lastDialogInputWasKeyboard` 는 건드리지 않는다.
+        그 값은 「대상 선정」과 「닫기 버튼 첫 초점」에도 쓰이므로 뜻을 바꾸면 안 된다.
+     ⚠️ 이 기록은 `capture` 단계라 `Esc` 로 창을 닫는 처리보다 **항상 먼저** 실행된다(확인함). */
+  let keyboardSeq = 0;
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ') {
       lastDialogInputWasKeyboard = true;
+    }
+    if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'Esc') {
+      keyboardSeq++;
     }
     if (e.key === 'Tab') document.documentElement.classList.add('kbd-nav');
   }, true);
@@ -588,11 +605,13 @@
       : null;
     lastPointerTarget = el instanceof HTMLElement ? el : null;
   }, true);
-  /* 팝업이 열릴 때 「닫으면 돌아갈 자리」를 고르는 **공통 함수**다.
+  /* 팝업이 열릴 때 「닫으면 돌아갈 자리」를 **고르는** 함수다.
      ⚠️ 마우스·손가락으로 연 경우에만 「누른 요소」를 쓴다. **키보드로 연 경우는 지금 그대로**
         `document.activeElement` 가 정답이다(그때는 초점이 실제로 그 버튼에 있다).
-     ⚠️ 「누른 요소」가 없으면(사진처럼 버튼이 아닌 것을 눌렀을 때) 예전 방식으로 물러선다. */
-  function popupOpener() {
+     ⚠️ 「누른 요소」가 없으면(사진처럼 버튼이 아닌 것을 눌렀을 때) 예전 방식으로 물러선다.
+     🔴 **고르는 방식은 2026-08-10 구조 개선에서도 한 줄도 바꾸지 않았다.** 바뀐 것은
+        「고른 뒤 무엇으로 감싸 돌려주는가」뿐이다(아래 `popupOpener`). */
+  function popupOpenerEl() {
     if (!lastDialogInputWasKeyboard && lastPointerTarget && lastPointerTarget.isConnected) {
       return lastPointerTarget;
     }
@@ -600,10 +619,135 @@
     if (active instanceof HTMLElement && active !== document.body) return active;
     return lastPointerTarget && lastPointerTarget.isConnected ? lastPointerTarget : null;
   }
+  /* 🔴 이제 **요소가 아니라 복귀표**를 돌려준다(2026-08-10, 2차).
+     돌아갈 자리만으로는 「테두리를 보일지」를 정할 수 없어서, **연 순간의 키보드 번호**를
+     같이 담아 두어야 하기 때문이다(위 `keyboardSeq` 주석 참고).
+     🔴 이 모양을 받는 곳이 열 곳이라 **한꺼번에 바꿨다.** 한 곳만 옛 방식으로 두면
+        `target.isConnected` 를 읽다가 **오류 없이 조용히** 초점 복귀만 안 되는 고장이 난다. */
+  function popupOpener() {
+    return makeReturnTicket(popupOpenerEl());
+  }
   function focusDialogClose(btn) {
     btn.classList.toggle('focus-silent', !lastDialogInputWasKeyboard);
     btn.addEventListener('blur', () => btn.classList.remove('focus-silent'), { once: true });
     btn.focus({ preventScroll: true });
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     🔴 팝업을 닫고 **돌아갈 자리에 초점을 주는 공용 함수**(2026-08-10).
+     🔴 **팝업 열 곳이 모두 이 함수를 거친다.** 닫기 함수에서 직접 `.focus()` 를 부르지 않는다
+        (`docs/.claude/audit/audit-focus.mjs` 가 커밋 전에 이것을 검사한다).
+     ⚠️ 열 곳을 **한 작업에서 한꺼번에** 연결했다. 나눠서 연결하면 아직 안 바꾼 곳이
+        복귀표를 요소로 잘못 읽어 **오류 없이 조용히** 초점 복귀만 안 되는 고장이 난다.
+        같은 이유로, 앞으로도 **한 곳만 옛 방식으로 되돌리지 말 것.**
+
+     ■ 무엇을 정하나 (2026-08-10 사용자님 확정)
+        | 언제                                   | 초점 복귀 | 테두리 |
+        | 키보드가 조금이라도 끼면(Tab·Enter·Space·Esc) | 한다 | 보인다 |
+        | 순수하게 손가락·마우스만                  | 한다 | 숨긴다 |
+        | 판단이 애매하면                          | 한다 | 보인다(안전한 쪽) |
+     🔴 **초점 복귀 자체는 없애지 않는다.** 아이폰 화면낭독기 사용자의 조작도 「손가락」이라,
+        손가락일 때 복귀를 끄면 그분들이 읽던 자리를 잃는다.
+     ───────────────────────────────────────────────────────────────────────── */
+
+  /* 팝업을 열 때 만드는 **복귀표**. 「어디로 돌아갈지」와 「그때의 키보드 번호」를 같이 담는다.
+     ⚠️ 「어디로 돌아갈지 고르는 일」은 여기서 하지 않는다 — 경로마다 지금 방식 그대로 두고,
+        고른 결과만 이 함수에 넣는다(스토리·확인창처럼 특수한 경로가 있다). */
+  function makeReturnTicket(el) {
+    return {
+      el: el instanceof HTMLElement ? el : null,
+      openSeq: keyboardSeq,                       // 열던 순간의 키보드 번호
+      openedByKeyboard: lastDialogInputWasKeyboard // 키보드로 열었나
+    };
+  }
+
+  /* 🔴 **번호는 그대로 두고 돌아갈 자리만 갈아 끼운다**(2026-08-10, 2차).
+     두 경우에 쓴다. 둘 다 「연 순간」과 「자리를 정하는 순간」이 다르다.
+     ① **스토리** — 돌아갈 셀럽 카드는 **닫을 때** 이름으로 새로 찾는다(카드가 매번 다시 그려진다).
+     ② **물러설 자리** — 원래 자리가 못 쓰게 됐을 때 닫기 버튼 등으로 물러선다.
+     🔴 번호를 새로 찍으면 **그 사이에 쓴 키보드가 통째로 지워져** 테두리가 잘못 숨는다.
+        그래서 **반드시 원래 표의 번호를 물려받는다.** */
+  function retargetReturnTicket(표, el) {
+    const 원본 = normalizeReturnTicket(표);
+    return {
+      el: el instanceof HTMLElement ? el : null,
+      openSeq: 원본 ? 원본.openSeq : null,                 // 원본이 없으면 「애매함」 → 테두리 보임
+      openedByKeyboard: 원본 ? 원본.openedByKeyboard : null
+    };
+  }
+
+  /* 요소를 그냥 받은 경우에도 복귀표로 바꿔 준다.
+     🔴 팝업끼리 넘기는 값(`pendingModalReturnFocus`)이 옛 모양(요소)으로 남아 있어도
+        조용히 깨지지 않게 하려는 안전장치다. 이때는 **번호를 모르므로 「애매함」** 으로 친다. */
+  function normalizeReturnTicket(값) {
+    if (!값) return null;
+    if (값 instanceof HTMLElement) return { el: 값, openSeq: null, openedByKeyboard: null };
+    if (typeof 값 === 'object' && 'el' in 값) return 값;
+    return null;
+  }
+
+  /* 이 팝업이 열려 있는 동안 **키보드가 한 번이라도 끼었나.**
+     🔴 판정 정보가 없거나 어긋나면 **참(=테두리 보임)** 으로 돌려준다. 안전한 쪽이다. */
+  function returnTicketUsedKeyboard(표) {
+    if (!표) return true;
+    if (표.openedByKeyboard) return true;
+    if (typeof 표.openSeq !== 'number') return true;   // 번호를 모른다 → 애매함
+    return keyboardSeq !== 표.openSeq;                 // 그 사이에 키보드가 끼었다
+  }
+
+  /* 🔴 실제로 `.focus()` 를 부르는 **유일한 복귀 지점.** 각 팝업 닫기 함수는 직접 부르지 않는다.
+     - 복귀 대상이 아직 화면에 있는지 본다(`isConnected`·`hidden`)
+     - `preventScroll` 로 화면이 튀지 않게 한다
+     - 위 정책대로 테두리 표시 여부를 정한다
+     - 🔴 초점이 실제로 안 갔으면 임시 클래스(`focus-silent`)를 **반드시 되돌린다** —
+       남으면 나중의 정상적인 키보드 초점 표시까지 감춘다
+     ⚠️ 「시트 안쪽으로 돌아가는」 경로(「나갈까요?」 확인창)가 있으므로
+        **「바깥 요소로만 복귀」를 전제하지 않는다.** 어디든 받은 자리로 간다. */
+  function applyReturnFocus(표) {
+    const 복귀표 = normalizeReturnTicket(표);
+    const el = 복귀표 && 복귀표.el;
+    if (!(el instanceof HTMLElement) || !el.isConnected || el.hidden) return false;
+    const 테두리숨김 = !returnTicketUsedKeyboard(복귀표);
+    const 지우기 = () => el.classList.remove('focus-silent');
+    const 뿌리 = document.documentElement;
+    const 켜져있었나 = 뿌리.classList.contains('kbd-nav');
+
+    if (테두리숨김) {
+      /* 순수하게 손가락·마우스만 → 테두리를 숨긴다 */
+      el.classList.add('focus-silent');
+      el.addEventListener('blur', 지우기, { once: true });
+    } else {
+      /* 🔴 키보드가 끼었거나 애매하다 → 테두리를 **보여야** 한다(2026-08-10 사용자님 확정, ㉯안).
+         ⚠️ `focus-silent` 를 안 붙이는 것만으로는 **부족하다.** 카드류는 `.kbd-nav` 가 있어야만
+            테두리를 그리는데(`styles.css` 의 `.kbd-nav .card-open:focus`), 그 표시는
+            **마지막 `pointerdown` 에서 이미 떨어져 있다.** 그대로 두면
+            「손가락으로 열고 → 중간에 Tab → 손가락으로 닫기」에서 테두리가 안 나온다.
+         → **초점을 주기 전에 다시 켠다.** 표시는 초점을 받은 그 요소에만 나오고,
+           다음 손가락·마우스 입력에서 위 `pointerdown` 이 곧바로 다시 끈다.
+         ⚠️ 앞 팝업에서 붙었을지 모르는 `focus-silent` 는 여기서 반드시 떼어 낸다. */
+      뿌리.classList.add('kbd-nav');
+      el.classList.remove('focus-silent');
+    }
+
+    el.focus({ preventScroll: true });
+    const 닿았다 = document.activeElement === el;
+
+    /* 🔴 초점이 실제로 안 갔으면 건드린 것을 전부 되돌린다.
+       남으면 엉뚱한 곳의 표시를 감추거나(`focus-silent`) 없던 표시를 만든다(`kbd-nav`). */
+    if (!닿았다) {
+      if (테두리숨김) { el.removeEventListener('blur', 지우기); 지우기(); }
+      else if (!켜져있었나) 뿌리.classList.remove('kbd-nav');
+    }
+    return 닿았다;
+  }
+
+  /* 팝업 닫기 함수가 부르는 바깥문. 기본은 **다음 프레임**에 실행한다
+     (지금까지 열 곳이 모두 `requestAnimationFrame` 으로 감싸 온 것과 같은 시점이다).
+     ⚠️ `{ immediate: true }` 는 **함수 단위 시험용**이다 — 실제 팝업에서는 쓰지 않는다. */
+  function restorePopupFocus(표, options) {
+    if (options && options.immediate) return applyReturnFocus(표);
+    requestAnimationFrame(() => applyReturnFocus(표));
+    return null;   // 「예약했다」는 뜻. 성공 여부는 이 시점에 알 수 없다
   }
   /* 🔴 **`visibility` 로 여닫는 시트 전용** 첫 초점 (2026-08-09 · 코덱스가 맥 크롬에서 발견).
      내 코드·기록하기·내 메뉴·스티커 보기 넷은 닫혀 있을 때 `visibility: hidden` 이고
@@ -1867,6 +2011,7 @@
      보고 있을 수 있다. 그때 **지금 사람**의 카드로 돌려보내면 **누른 적도 없는 카드**로 간다.
      그래서 「처음 누른 그 카드」로 돌아가려고 이름을 따로 들고 있는다. */
   let storyOpenPerson = null;
+  let storyReturnTicket = null;   // 연 순간의 키보드 번호를 담아 두는 복귀표(2026-08-10, 2차)
 
   // 한 사람의 스토리를 뷰어에 채운다(뷰어를 여닫지는 않는다).
   // atEnd=true면 마지막 칸부터 — 앞사람으로 되돌아갈 때 인스타처럼 그 사람의 끝에서 시작한다.
@@ -1893,6 +2038,10 @@
     storyPersonIdx = storyPersons.indexOf(personName);
     if (!loadStoryPerson(personName)) return;
     storyOpenPerson = personName;   // 닫을 때 돌아갈 카드(위 주석 참고)
+    /* 🔴 **자리는 닫을 때 정하지만 번호는 지금 찍어 둔다**(2026-08-10, 2차).
+       카드는 매번 다시 그려져서 요소를 지금 붙들어 둘 수 없다. 그래도 「스토리를 연 순간의
+       키보드 번호」는 지금이 아니면 알 수 없으므로, 자리를 비운 표를 먼저 만들어 둔다. */
+    storyReturnTicket = makeReturnTicket(null);
     /* 🔴 열 때도 끌어 닫기 뒤처리를 한 번 더 한다(2026-08-09) — 앞서 끌어 닫은 자리(`transform`)나
        대기 처리가 남아 있으면 **새 스토리가 화면 아래에서 열리거나 저절로 닫힌다.** */
     cancelDragClose();
@@ -2038,12 +2187,15 @@
     const 돌아갈곳 = storyReturnTarget();
     storyOpenPerson = null;
     syncPageBackgroundA11y();   // 뒤 화면 잠금을 푼다
-    /* 🔴 돌아갈 때도 `focusDialogClose` 를 쓴다(2026-08-09 사용자님 실기기 발견).
-       그냥 `focus()` 하면 **손가락으로 닫아도 셀럽 카드에 파란 테두리가 남는다** — 실제로 그랬다.
-       이 함수는 **키보드로 닫았을 때만** 테두리를 남긴다(그때는 어디로 갔는지 보여야 하니까).
-       🔴 짝이 되는 CSS 를 `styles.css` 의 `focus-silent` 목록에 **같이 넣어야 한다**(`.celeb`).
-          안 넣으면 클래스만 붙고 테두리는 그대로다. */
-    if (돌아갈곳) requestAnimationFrame(() => focusDialogClose(돌아갈곳));
+    /* 🔴 돌아갈 때는 **공용 복귀 함수**를 쓴다(2026-08-10, 2차).
+       그냥 `focus()` 하면 **손가락으로 닫아도 셀럽 카드에 파란 테두리가 남는다**(2026-08-09
+       사용자님 실기기 발견). 예전에는 `focusDialogClose` 로 막았는데, 그쪽은 **마지막 입력
+       하나**로 판정해서 「손가락으로 열고 → 중간에 Tab → 손가락으로 닫기」를 틀리게 봤다.
+       🔴 **자리는 위에서 이름으로 새로 찾은 그대로 쓴다** — 지금 보는 사람이 아니라
+          **처음 연 사람**의 카드다. 고르는 방식은 하나도 바꾸지 않았다. */
+    const 복귀표 = retargetReturnTicket(storyReturnTicket, 돌아갈곳);
+    storyReturnTicket = null;
+    if (돌아갈곳) restorePopupFocus(복귀표);
   }
 
   // 자동재생: 현재 진행바가 다 차면(animationend) 다음 칸으로
@@ -2574,11 +2726,18 @@
       document.documentElement.style.overflow = '';
     }
     syncPageBackgroundA11y();
-    const target = modalReturnFocus && modalReturnFocus.isConnected && !modalReturnFocus.hidden
-      ? modalReturnFocus
-      : (storyViewer.classList.contains('open') ? document.getElementById('storyClose') : null);
+    /* 🔴 `modalReturnFocus` 는 **복귀표**다(2026-08-10, 2차 · 요소가 아니다).
+       칼럼·가챠가 넘겨준 표(`pendingModalReturnFocus`)일 수도 있는데, 그때는 **그 팝업을 연
+       순간의 번호**가 들어 있다. 상세를 여닫는 동안 키보드가 끼었는지까지 그 번호로 가려진다.
+       ⚠️ 스토리 위에서 열린 상세는 원래 자리가 못 쓸 때 **스토리 X 로 물러선다** —
+          번호는 물려받는다(`retargetReturnTicket`). */
+    const 복귀표 = modalReturnFocus;
     modalReturnFocus = null;
-    if (target) requestAnimationFrame(() => target.focus());
+    const el = 복귀표 && 복귀표.el;
+    if (el && el.isConnected && !el.hidden) restorePopupFocus(복귀표);
+    else if (storyViewer.classList.contains('open')) {
+      restorePopupFocus(retargetReturnTicket(복귀표, document.getElementById('storyClose')));
+    }
   }
 
   function closeModal(options) {
@@ -2982,7 +3141,7 @@
        곧바로 뽑으면 — 깨우는 데 시간이 걸려 — **톡은 통째로 빠지고 반짝만 울리는**
        반쪽짜리가 됐다. 이제 시작할 때 한 번 정하고 그 답을 끝까지 쓴다.
        ⚠️ 늦게 깨어난 뒤 남은 톡을 다시 계산해 예약하지 않는다 — 중간 음부터 시작돼
-          더 어색하고, 타이밍을 실기기에서 다시 다 봐야 한다(사용자님·코덱스 확정). */
+          더 어색하고, 타이밍을 실기기에서 다시 다 봐야 한다(코덱스 권고 → 2026-08-10 사용자님 확정). */
     const 소리허용 = !!소리준비됨();
     // 재료 다섯 개가 떨어질 때 날 소리를 **여기서 미리 예약**한다(위 가챠방울소리예약 주석 참고)
     if (소리허용) 가챠방울소리예약(GACHA_DROPS.length);
@@ -3184,10 +3343,12 @@
     gachaRolling = false;
     if (gachaAnnounce) gachaAnnounce.textContent = '';   // 닫을 때도 비운다(위 openGacha 주석 참고)
     syncPageBackgroundA11y();
+    /* 🔴 `target` 은 **복귀표**다(2026-08-10, 2차). `{restoreFocus:false}` 로 부른 쪽이
+       이것을 **쪼개지 말고 통째로** 레시피 상세에 넘긴다(아래 `pendingModalReturnFocus`). */
     const target = gachaReturnFocus;
     gachaReturnFocus = null;
     if (options && options.restoreFocus === false) return target;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
     return target;
   }
 
@@ -3387,10 +3548,11 @@
     document.documentElement.style.overflow = '';
     columnOverlay.hidden = true;
     syncPageBackgroundA11y();
+    /* 🔴 `target` 은 **복귀표**다(2026-08-10, 2차) — 가챠와 같다. 통째로 넘긴다. */
     const target = columnReturnFocus;
     columnReturnFocus = null;
     if (options && options.restoreFocus === false) return target;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
     return target;
   }
   // ⚠️ 화살표 함수로 감싼다 — 그냥 넘기면 click 이벤트가 options 로 들어가 `restoreFocus` 를 잘못 읽는다
@@ -4372,9 +4534,9 @@
     if (stampAnimating) return; // 찍히는 중엔 닫기 무시(연출 보장)
     stampSheetOverlay.classList.remove('open');
     stampBaseline = null;       // 닫혔으니 비교 기준도 버린다
-    const target = stampSheetReturnFocus;
+    const target = stampSheetReturnFocus;   // 복귀표(2026-08-10, 2차)
     stampSheetReturnFocus = null;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
   }
 
   /* ══ 작성 중 나가기 확인 (2026-08-09, 5-5 추가 보완 · 사용자님 확정) ══════════════════
@@ -4556,7 +4718,10 @@
        위에서 기억해 둔 「작성창 안 마지막 자리」를 쓴다. 둘 다 없으면 아래 복귀에서 X 로 물러선다. */
     const 지금 = document.activeElement;
     const 안쪽 = (지금 instanceof HTMLElement && stampSheetEl && stampSheetEl.contains(지금)) ? 지금 : null;
-    leaveConfirmReturnFocus = 안쪽 || stampLastFocusInside || null;
+    /* 🔴 고르는 방식은 그대로다(2026-08-10, 2차) — `popupOpener()` 로 바꾸지 않는다.
+       이 창은 **기록 창 안쪽**으로 돌아가야 해서 다른 팝업과 기준이 다르다.
+       바뀐 것은 고른 자리를 **복귀표로 감싸는 것**뿐이다. */
+    leaveConfirmReturnFocus = makeReturnTicket(안쪽 || stampLastFocusInside || null);
     leaveConfirmPending = onLeave || null;
     leaveConfirmOverlay.inert = false;
     leaveConfirmOverlay.classList.add('open');
@@ -4584,11 +4749,14 @@
     /* 계속 작성 — **반드시 기록 창 안으로** 초점을 되돌린다.
        기억한 자리가 사라졌거나(다시 그려짐) 숨었거나 창 밖이면 **X 버튼으로 물러선다** —
        작성창 안에 확실히 있는 요소라 초점이 밖으로 새지 않는다. */
-    const 쓸만한가 = 복귀후보 && 복귀후보.isConnected && !복귀후보.hidden
-      && stampSheetEl && stampSheetEl.contains(복귀후보)
-      && 복귀후보.getClientRects().length > 0;
-    if (쓸만한가) requestAnimationFrame(() => 복귀후보.focus());
-    else if (stampSheetClose) requestAnimationFrame(() => focusDialogClose(stampSheetClose));
+    const 자리 = 복귀후보 && 복귀후보.el;   // 복귀후보는 **복귀표**다(2026-08-10, 2차)
+    const 쓸만한가 = 자리 && 자리.isConnected && !자리.hidden
+      && stampSheetEl && stampSheetEl.contains(자리)
+      && 자리.getClientRects().length > 0;
+    /* 🔴 물러설 때도 **번호를 물려받는다** — 새로 찍으면 확인창이 떠 있는 동안 쓴 키보드가
+       통째로 지워져 테두리가 잘못 숨는다. */
+    if (쓸만한가) restorePopupFocus(복귀후보);
+    else if (stampSheetClose) restorePopupFocus(retargetReturnTicket(복귀후보, stampSheetClose));
   }
   if (leaveConfirmBox) leaveConfirmBox.addEventListener('keydown', (e) => trapFocusWithin(leaveConfirmBox, e));
   if (leaveConfirmStay) leaveConfirmStay.addEventListener('click', () => closeLeaveConfirm(false));
@@ -4849,9 +5017,9 @@
   function closeStampView() {
     stampViewOverlay.classList.remove('open');
     resetStampViewDelete();
-    const target = stampViewReturnFocus;
+    const target = stampViewReturnFocus;   // 복귀표(2026-08-10, 2차)
     stampViewReturnFocus = null;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
   }
   stampViewClose.addEventListener('click', closeStampView);
   stampViewOverlay.addEventListener('click', (e) => { if (e.target === stampViewOverlay) closeStampView(); });
@@ -5078,9 +5246,9 @@
   function closeA2hs() {
     a2hsOverlay.classList.remove('open');
     syncPageBackgroundA11y();
-    const target = a2hsReturnFocus;
+    const target = a2hsReturnFocus;   // 복귀표(2026-08-10, 2차)
     a2hsReturnFocus = null;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
   }
   if (isIosSafariNotInstalled()) {
     showInstallBtns();
@@ -5175,7 +5343,12 @@
      `popupOpener` 를 본체에서만 만들고 메뉴 탭 IIFE 에서 그냥 불렀더니
      `ReferenceError: popupOpener is not defined` 로 **「내 메뉴」가 아예 안 열렸다.**
      이 파일은 IIFE 가 둘로 갈려 있다 — **경계를 넘는 것은 반드시 이 객체에 담아 건넨다.** */
-  window.haidilDialogA11y = { trapFocusWithin, focusDialogClose, focusDialogCloseWhenReady, syncPageBackgroundA11y, popupOpener };
+  /* 🔴 2026-08-10 (1차) — 초점 복귀 공용 함수 넷을 여기 같이 싣는다.
+     「내 메뉴」(두 번째 IIFE)도 2차에서 이 문으로 건너와 쓴다. 직접 부르면 그 탭이 죽는다. */
+  window.haidilDialogA11y = {
+    trapFocusWithin, focusDialogClose, focusDialogCloseWhenReady, syncPageBackgroundA11y, popupOpener,
+    makeReturnTicket, retargetReturnTicket, restorePopupFocus, normalizeReturnTicket, returnTicketUsedKeyboard
+  };
 
   async function shareSite() {
     const isLocalPreview = /^(localhost|127\.0\.0\.1|\d{1,3}(?:\.\d{1,3}){3})$/.test(location.hostname);
@@ -5680,10 +5853,10 @@
           2026-08-05 에 고친 사파리 주소창 버그가 되살아난다. */
     syncOverlay.inert = true;
     syncPageBackgroundA11y();
-    const target = syncReturnFocus;
+    const target = syncReturnFocus;   // 복귀표(2026-08-10, 2차)
     syncReturnFocus = null;
     if (options && options.restoreFocus === false) return;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
   }
 
   // 첫 기록을 남기면 코드를 만들고, 스티커 탭에 **띠 안내**를 띄운다.
@@ -6487,9 +6660,12 @@
   function openSheet() {
     /* 🔴 `A11Y.` 를 반드시 붙인다 — 이 함수들은 **본체 IIFE 에** 있다(위 A11Y 주석 참고).
        그냥 `popupOpener()` 라고 썼다가 `ReferenceError` 로 「내 메뉴」가 안 열린 적이 있다. */
+    /* 🔴 돌려받는 것은 **복귀표**다(2026-08-10, 2차) — 요소가 아니다.
+       ⚠️ 다리가 끊겼을 때의 물러설 값도 **같은 모양**으로 만든다. 요소를 그냥 넣으면
+          닫을 때 자료 모양을 잘못 읽는다. 번호를 모르므로 「애매함」 → 테두리 보임이 된다. */
     sheetReturnFocus = A11Y.popupOpener
       ? A11Y.popupOpener()
-      : (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+      : { el: document.activeElement instanceof HTMLElement ? document.activeElement : null, openSeq: null, openedByKeyboard: null };
     renderSheet();
     sheetOverlay.classList.add('open');
     sheetOverlay.setAttribute('aria-hidden', 'false');
@@ -6522,10 +6698,12 @@
     $('#potToggleBtn').classList.remove('is-open');
     document.documentElement.style.overflow = '';
     if (A11Y.syncPageBackgroundA11y) A11Y.syncPageBackgroundA11y();
-    const target = sheetReturnFocus;
+    const target = sheetReturnFocus;   // 복귀표(2026-08-10, 2차)
     sheetReturnFocus = null;
     if (options && options.restoreFocus === false) return;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    /* 🔴 `A11Y.` 를 반드시 붙인다 — 공용 복귀 함수는 **본체 IIFE 에** 있다(위 A11Y 주석 참고).
+       그냥 부르면 `ReferenceError` 로 「내 메뉴」가 통째로 안 열린다(2026-08-09 실제 사고). */
+    if (A11Y.restorePopupFocus) A11Y.restorePopupFocus(target);
   }
   /* 🔴 본체 IIFE(상단바 처리)가 이 시트를 닫을 수 있게 건넨다(2026-08-09).
      ⚠️ 반드시 `closeSheet` 를 건넨다 — 바깥에서 `classList.remove('open')` 만 하면
