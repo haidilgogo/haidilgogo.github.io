@@ -123,6 +123,54 @@ img {
   user-select: none;
 }
 
+/* 🔴 꾹 눌렀을 때 뜨는 **파란 선택창** 없애기 (2026-08-10 사용자님 확정)
+   누르려던 것을 꾹 눌렀는데 글자가 잡히며 복사 메뉴가 뜨던 것을 막는다.
+
+   🔴 **누르는 것에만 건다. 본문 글자는 그대로 둔다.**
+      레시피 재료·설명·아티클 본문은 **선택·복사·번역이 되어야 한다**(사용자님 확정).
+      ⚠️ 저작물 보호용이 아니다 — CSS 표준(css-ui-4)은 `user-select: none` 이 복제 방지
+         수단이 **아니라고 명시**하고, 애플도 **전역 차단을 하지 말라**고 안내한다
+         (TN2262: "Selection in webpages should never be globally disabled").
+         그래서 **필요한 요소에만** 건다.
+
+   🔴 **이름 목록을 만들지 않는다.** 누를 수 있는 것은 세 모양뿐이다(실측).
+      ① `button`(276) ② `a`(63) ③ `role="button"` 을 단 것 — **방문 기록 카드**가 이것이다
+      그리고 카드는 **카드 상자 + 그 안을 덮는 `.card-open` 버튼** 구조다(아래 별도 규칙).
+      그래서 **새 버튼·새 카드를 만들어도 자동으로 따라온다.**
+      ⚠️ ③을 빠뜨렸다가 **방문 기록 카드가 통째로 새어 나갔다**(2026-08-10 코덱스 지적).
+         스티커 기록이 하나도 없으면 그 카드가 **화면에 아예 안 그려져서** 못 보고 넘어갔다.
+         🔴 **없는 것을 세고 「없다」고 결론내지 말 것.**
+      ⚠️ `[data-id]` 를 기준으로 쓰지 말 것 — 그것은 「눌린다」가 아니라 「어느 레시피인가」다.
+         **가챠 결과 카드**가 반례다(`data-id` 를 갖지만 일부러 안 눌리게 만들었다).
+
+   🔴 **`:has()` 는 반드시 아래처럼 규칙을 나눠 쓴다**(2026-08-10 코덱스 지적).
+      쉼표로 묶인 선택자 중 **하나라도 모르면 브라우저는 그 규칙을 통째로 버린다.**
+      넷을 한 줄에 묶었더니 **`:has()` 를 모르는 옛 사파리(15.3 이하)에서 버튼·링크까지
+      전부 안 막혔다.** 나눠 두면 옛 기기에서도 **버튼·링크는 살아남는다.**
+
+   ⚠️ 입력칸·「내 데이터 코드」 6자리는 버튼도 카드도 아니라 **건드려지지 않는다**(확인함).
+      옛 복사 대비책이 만드는 임시 `textarea` 도 마찬가지라 그대로 동작한다. */
+button,
+a[href],
+[role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 🔴 카드 상자 — 안을 덮는 `.card-open` 버튼을 품은 것.
+   ⚠️ 위 규칙과 **반드시 따로 둔다**(바로 위 주석 참고). 합치면 옛 기기에서 전부 죽는다. */
+:has(> .card-open) {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 🔴 링크의 **꾹 누르기 메뉴는 살린다**(새 탭에서 열기·링크 복사) — 매장 지도·출처 링크에서 쓴다.
+   글자 선택과 이 메뉴는 **다른 설정**이라 나눠서 걸 수 있다.
+   ⚠️ 이미지가 들어간 링크는 위 `img` 규칙이 더 직접 걸린다. 실기기에서 따로 볼 것. */
+a[href] {
+  -webkit-touch-callout: default;
+}
+
 .page {
   /* 🔴 100vh 쓰지 말 것(2026-07-24). iOS Safari의 100vh는 "주소창이 숨겨진 상태"의 큰 높이라,
      주소창이 떠 있는 동안 페이지가 화면보다 ~100px 커져서 스티커·메뉴처럼 내용이 짧은 탭도
@@ -4863,18 +4911,29 @@ img {
 .hp-like { font-size: 14px; font-weight: 700; }   /* <i> 시절 값 유지 — font:inherit 가 덮어쓰므로 다시 준다 */
 
 /* 🔴 초점 표시는 **키보드 Tab 일 때만**.
-   마우스 클릭·손가락 터치로는 파란 기본 테두리가 뜨지 않는다(`:focus-visible` 이 그 구분을 해 준다). */
+
+   🔴 **조건이 `:focus-visible` 이 아니라 `.kbd-nav` + `:focus` 인 이유**(2026-08-10 실기기).
+      예전엔 `:focus-visible` 로 걸어 두고 「브라우저가 알아서 키보드와 손가락을 구분해 준다」고
+      믿었다. **아이폰이 그 믿음을 깼다** — 카드를 **길게 누르면 빨간 테두리가 떴다**
+      (사용자님이 아이폰에서 발견 · 홈 인기소스 건희소스 카드).
+      ⚠️ 글자 선택을 막은 뒤에 나타났다. 예전엔 길게 누르면 **글자가 잡혔는데**, 그 길을 막으니
+         사파리가 대신 **그 버튼에 초점을 주는** 쪽으로 반응한 것으로 보인다.
+      🔴 **이 앱에서 같은 함정에 걸린 것이 이번이 세 번째다.** 앞선 둘도 같은 방법으로 고쳤다 —
+         스티커 입력칸(`.kbd-nav .stamp-field`)과 스토리 넘김 영역(`.kbd-nav .story-tap`).
+         **`:focus-visible` 로 되돌리지 말 것.**
+   ⚠️ `.kbd-nav` 는 `Tab` 을 누르면 붙고 손가락·마우스를 대면 떨어진다(`script.js` 의 keydown·
+      pointerdown 참고). 그래서 **키보드 사용자에게는 그대로 보이고** 손가락에는 안 보인다. */
 .card-open:focus,
 .browse-fav:focus,
 .hp-like:focus,
 .hc-row-like:focus { outline: none; }
-.card-open:focus-visible {
+.kbd-nav .card-open:focus {
   outline: 2px solid var(--brand-red);
   outline-offset: -2px;   /* 카드 안쪽에 그린다 — 밖에 그리면 옆 카드와 겹친다 */
 }
-.browse-fav:focus-visible,
-.hp-like:focus-visible,
-.hc-row-like:focus-visible {
+.kbd-nav .browse-fav:focus,
+.kbd-nav .hp-like:focus,
+.kbd-nav .hc-row-like:focus {
   outline: 2px solid var(--brand-red);
   outline-offset: -2px;
   border-radius: 8px;
