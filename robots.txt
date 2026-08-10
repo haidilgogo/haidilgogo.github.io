@@ -1,5 +1,6 @@
 # 하딜고고 — 검색엔진 크롤러 안내 (2026-07-30 신설)
-# 전체 공개. 막을 페이지가 없다(사이트가 index.html 한 장이다).
+# 전체 공개. 막을 페이지가 없다(공개 대상 루트 HTML 7장 —
+# index · credits · guide · hotpot · cilantro · privacy · report).
 #
 # ⚠️ 내부 문서(CLAUDE.md·HANDOVER.md)는 여기서 막는 게 아니라 _config.yml의 exclude로
 #    배포 자체에서 뺐다. robots.txt는 "부탁"일 뿐이라 주소를 아는 사람은 그대로 읽을 수 있다.

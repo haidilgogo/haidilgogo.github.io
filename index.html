@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=757">
+<link rel="stylesheet" href="styles.css?v=771">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -392,7 +392,7 @@
       <section class="home-sec" id="homeCelebs">
         <!-- 별 = "셀럽 소스" 범례(2026-07-25): 카드·모달의 별이 무슨 뜻인지 여기서 학습하게 함.
              STAR_SVG(script.js)와 같은 모양·같은 골드 그라데이션(#starGold, 위 defs)을 정적으로 재사용. -->
-        <div class="home-sec-head"><h2 class="home-sec-title celeb-sec-title"><svg class="star-accent" viewBox="0 0 24 24" fill="url(#starGold)" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>셀럽 <span class="t-red">레시피</span></h2></div>
+        <div class="home-sec-head"><h2 class="home-sec-title celeb-sec-title focus-landing" tabindex="-1"><svg class="star-accent" viewBox="0 0 24 24" fill="url(#starGold)" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>셀럽 <span class="t-red">레시피</span></h2></div>
         <div class="celeb-rail" id="celebRail"></div>
       </section>
       <section class="home-sec" id="homePopular">
@@ -497,14 +497,22 @@
               <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
               <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <input class="search-input" id="searchInput" type="text" placeholder="검색">
+            <!-- 🔴 이름표(2026-08-09) — 화면에는 「검색」이라는 **자리표시 글자밖에 없어서**,
+                 화면낭독기로는 레시피 탭 검색인지 메뉴 탭 검색인지 구분되지 않았다(둘 다 「검색」).
+                 자리표시 글자는 치기 시작하면 사라지므로 이름 대신 쓸 수 없다 — `aria-label` 로 못 박는다.
+                 ⚠️ 눈에 보이는 「검색」을 이름 안에 그대로 품고 있어야 한다(음성으로 「검색」이라 불러도 먹힌다).
+                    그래서 「레시피 찾기」가 아니라 **「레시피 검색」**이다. 메뉴 탭도 같은 규칙이다. -->
+            <input class="search-input" id="searchInput" type="text" placeholder="검색" aria-label="레시피 검색">
             <button class="search-clear" id="searchClear" type="button" aria-label="검색어 지우기">&times;</button>
           </div>
         </div>
       </div>
       <!-- 개수 — 검색창 아래 왼쪽 정렬로 늘 보인다(2026-08-03 사용자 확정).
            카테고리에 따라 `레시피 33개`·`소스 20개`로 바뀌고, 검색 중엔 `검색 결과 4개`가 된다. -->
-      <p class="list-count" id="listCount"><span id="listTitle">레시피</span> <span class="count-num" id="countNum">0</span>개</p>
+      <!-- 🔴 `tabindex="-1"` 은 **화면에 아무 변화가 없다**(2026-08-09) — Tab 순서에도 안 들어간다.
+           칼럼에서 「레시피 보러 가기」로 넘어왔을 때 **초점이 내려앉을 자리**로만 쓴다.
+           그 자리를 안 정해 두면 칼럼이 닫히면서 초점이 <body> 로 빠져 낭독기 사용자가 길을 잃는다. -->
+      <p class="list-count focus-landing" id="listCount" tabindex="-1"><span id="listTitle">레시피</span> <span class="count-num" id="countNum">0</span>개</p>
       <div class="recipe-grid" id="recipeGrid"></div>
       <!-- 맨 위로(2026-08-03 사용자 확정) — 목록이 길어 끝까지 내려간 뒤 되올라가는 길.
            🔴 푸터 구분선 「위」다. 하단바에서 지금 탭을 한 번 더 눌러도 같은 일이 일어난다.
@@ -542,12 +550,14 @@
             <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          <input class="search-input" id="mnSearchInput" type="text" placeholder="검색">
+          <!-- 이름표 — 레시피 탭 검색창과 짝이다. 이유는 그쪽 주석 참고(2026-08-09) -->
+          <input class="search-input" id="mnSearchInput" type="text" placeholder="검색" aria-label="메뉴 검색">
           <button class="search-clear" id="mnSearchClear" type="button" aria-label="검색어 지우기">&times;</button>
         </div>
       </div>
       <!-- 개수 — 레시피 탭과 같은 자리(검색창 아래 왼쪽). 상위 분류 기준이다(하위를 눌러도 안 바뀐다) -->
-      <p class="list-count"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
+      <!-- 칼럼에서 「메뉴 보러 가기」로 넘어왔을 때 초점이 내려앉는 자리 — 이유는 레시피 탭 개수줄 주석 참고 -->
+      <p class="list-count focus-landing" id="mnListCount" tabindex="-1"><span id="mnCountLabel">전골</span> <span class="count-num" id="mnCountNum">0</span>개</p>
       <div id="mnBody"></div>
       <!-- 맨 위로 — 메뉴는 130개라 특히 필요하다. 푸터 구분선 「위」(2026-08-03 사용자 확정) -->
       <button class="to-top-btn" type="button">맨 위로</button>
@@ -721,7 +731,30 @@
 </nav>
 
 <!-- 내 메뉴 시트 — 상단바 냄비 아이콘에서 열림. (2026-08-04 「담은 목록」에서 개명) 스티커 시트(.stamp-sheet)와 같은 껍데기를 쓴다 -->
-<div class="stamp-sheet-overlay" id="mnSheetOverlay" aria-hidden="true">
+<!-- ══ 「작성 중인데 나갈까요?」 확인창 (2026-08-09, 5-5 추가 보완 · 사용자님 확정) ══════════
+     🔴 브라우저 기본 `confirm()` 을 안 쓴다(사용자님 지시) — 기기마다 모양이 다르고 문구를 못 고른다.
+     🔴 `role="alertdialog"` 다 — 그냥 `dialog` 가 아니다. **답을 해야 넘어가는 물음**이라
+        화면낭독기가 열리는 즉시 제목·설명을 읽어 주어야 한다.
+     ⚠️ 기록 창(#stampSheetOverlay) **위에** 뜬다. 그동안 기록 창과 상단바는 잠긴다(script.js).
+     ⚠️ 「계속 작성」이 **안전한 쪽**이라 열리면 거기에 초점이 간다. Esc·배경 클릭도 그것과 같다. -->
+<div class="leave-confirm-overlay" id="leaveConfirmOverlay" aria-hidden="true" inert>
+  <div class="leave-confirm" role="alertdialog" aria-modal="true"
+       aria-labelledby="leaveConfirmTitle" aria-describedby="leaveConfirmDesc">
+    <h2 class="leave-confirm-title" id="leaveConfirmTitle">작성 중인 내용을 그만둘까요?</h2>
+    <p class="leave-confirm-desc" id="leaveConfirmDesc">지금 나가면 입력한 내용이 사라져요.</p>
+    <div class="leave-confirm-actions">
+      <button class="leave-confirm-btn leave-confirm-btn--stay" id="leaveConfirmStay" type="button">계속 작성</button>
+      <button class="leave-confirm-btn leave-confirm-btn--go" id="leaveConfirmGo" type="button">나가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔴 `inert` 를 같이 건다(2026-08-09, 5-5 · 코덱스 지적으로 추가).
+     `visibility` 가 `transition` 으로 0.22초에 걸쳐 꺼지므로(styles.css 의 .stamp-sheet-overlay),
+     **닫은 직후 그 0.22초 동안은 아직 `visible`** 이라 Tab 이 안쪽 버튼에 닿는다.
+     `aria-hidden` 은 초점을 막지 못한다 — 초점을 막는 것은 `inert` 다.
+     ⚠️ 스티커 시트(#stampSheetOverlay)가 이미 같은 방식이다. 여닫을 때 JS 가 토글한다. -->
+<div class="stamp-sheet-overlay" id="mnSheetOverlay" aria-hidden="true" inert>
   <div class="stamp-sheet" role="dialog" aria-modal="true" aria-label="내 메뉴">
     <button class="stamp-sheet-close" id="mnSheetClose" type="button" aria-label="닫기">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
@@ -767,7 +800,11 @@
     </div>
     <!-- "직접 입력" 선택 시에만 나타나는 자유 입력 칸 -->
     <div class="stamp-fields" id="stampWithCustomWrap" hidden>
-      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">입력</span><input type="text" id="stampWith" maxlength="20" placeholder="자유롭게 입력해주세요(최대 20자)" autocomplete="off"></label>
+      <!-- 🔴 이름표(2026-08-09 코덱스 지적) — 감싼 `<label>` 덕에 연결은 돼 있었지만 이름이
+           「입력」뿐이라 **무슨 칸인지 알 수 없었다.** 위 질문(「누구와 함께 다녀오셨어요?」)은
+           칸과 이어져 있지 않아 소리로는 안 들린다. 화면은 그대로 두고 이름만 구체적으로 준다.
+           ⚠️ 화면에 보이는 「입력」을 이름 안에 그대로 품고 있어야 한다(음성 조작 때문). -->
+      <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">입력</span><input type="text" id="stampWith" maxlength="20" placeholder="자유롭게 입력해주세요(최대 20자)" autocomplete="off" aria-label="같이 간 사람 직접 입력"></label>
     </div>
     <p class="stamp-q">기억하고 싶은 게 있나요?</p>
     <div class="stamp-fields">
@@ -796,7 +833,8 @@
 </div>
 
 <!-- 내 데이터 코드 시트 — 기기 간 복구(2026-07-31). 입력 시트와 같은 오버레이 문법 -->
-<div class="stamp-sheet-overlay sync-sheet-overlay" id="syncSheetOverlay" aria-hidden="true">
+<!-- `inert` 를 같이 건다 — 이유는 위 #mnSheetOverlay 주석 참고(2026-08-09, 5-5) -->
+<div class="stamp-sheet-overlay sync-sheet-overlay" id="syncSheetOverlay" aria-hidden="true" inert>
   <div class="stamp-sheet sync-sheet" role="dialog" aria-modal="true" aria-label="내 데이터 코드">
     <button class="stamp-sheet-close" id="syncSheetClose" type="button" aria-label="닫기">
       <!-- 🔴 기록하기 시트(#stampSheetClose)와 **완전히 같은 X**여야 한다(2026-07-31 사용자 지시).
@@ -902,7 +940,14 @@
 
 <!-- 기획 칼럼 패널(고수 빼주세요! 등) — 홈 배너에서 열림. 스크롤되는 전체화면 시트 -->
 <div class="column-overlay" id="columnOverlay" hidden>
-  <div class="column-sheet" id="columnSheet" role="dialog" aria-label="칼럼">
+  <!-- 🔴 여기 적힌 「칼럼」은 **자리지킴이**다(2026-08-09 사용자 확정).
+       실제 이름은 열 때 `openColumn` 이 그 글의 제목(`col.title`)으로 **갈아 끼운다** —
+       안 그러면 가이드·훠궈·고수를 열어도 화면낭독기가 전부 「칼럼」이라고만 읽는다.
+       ⚠️ 화면의 제목(`#columnTitle`)을 가리키는 방법은 **쓰지 않는다.** 그 제목에는 장식 화살표
+          그림이 띄어쓰기 자리에 박혀 있어서, 그림이 안 읽히면 글자가 맞붙는다 —
+          「물어본**사람**~궁금한**사람**~」(2026-08-09 표준 계산기로 측정).
+          근거와 측정값은 `docs/review/대화상자-접근성-5-5-의견비교.md` 3-③ 에 있다. -->
+  <div class="column-sheet" id="columnSheet" role="dialog" aria-modal="true" aria-label="칼럼">
     <button class="column-close" id="columnClose" type="button" aria-label="닫기">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.02" stroke-linecap="round"/></g></svg>
     </button>
@@ -1013,7 +1058,12 @@
 <div class="share-toast" id="shareToast">링크가 복사되었어요!</div>
 
 <div class="a2hs-overlay" id="a2hsOverlay">
-  <div class="a2hs-card">
+  <!-- 🔴 대화상자로 알린다(2026-08-09, 5-5 · 사용자 승인으로 범위에 추가).
+       ⚠️ 이름을 `aria-labelledby="a2hs-title"` 로 주지 **않았다** — 제목에 `<br>` 이 있어
+          표준 계산기로 재 보니 「홈 화면에 추가하고**앱처럼**…」으로 **글자가 붙는다**(2026-08-09 측정).
+          그래서 같은 문구를 띄어쓰기만 살려 `aria-label` 로 적는다. **화면 문구는 그대로다.**
+       ⚠️ 문구를 고치면 여기 `aria-label` 도 같이 고칠 것 — 자동이 아니다. -->
+  <div class="a2hs-card" role="dialog" aria-modal="true" aria-label="홈 화면에 추가하고 앱처럼 편하게 열어보세요">
     <!-- 🔴 2026-08-04: <span>&times;</span> 였던 것을 다른 닫기 X 와 같은 <button> + SVG 로 바꿨다.
          2026-07-25 에 「&times; 글리프 → SVG 로 통일」을 했는데 이 모달만 빠져 있었다.
          버튼이 아니라 span 이라 키보드로 못 눌렀고, 터치 타겟도 글자 크기(20px)뿐이었다. -->
@@ -1048,7 +1098,9 @@
 </div>
 
 <!-- 셀럽 인스타 스토리 뷰어 (셀럽 원 클릭 → 그 인물 레시피를 스토리로. 탭 수동넘김, 끝나면 닫기) -->
-<div class="story-viewer" id="storyViewer" aria-hidden="true">
+<!-- 🔴 role·aria-modal·이름(2026-08-09) — 이름은 사람이 바뀔 때마다 script.js 가 갈아 끼운다
+     (「건희 스토리」). 마지막 칸에서 다음 셀럽으로 이어지므로 창이 열린 채 사람이 바뀐다. -->
+<div class="story-viewer" id="storyViewer" role="dialog" aria-modal="true" aria-hidden="true">
   <!-- 데스크탑에서도 사이트 본문과 같은 폰 너비(440px) 컬럼. 바깥은 배경 여백 -->
   <div class="story-phone">
     <!-- 현재 사진의 블러 확대본을 배경으로 깔아 풀블리드(새 이미지 없이). renderStorySlide가 매 칸 갱신 -->
@@ -1065,6 +1117,13 @@
     <div class="story-body" id="storyBody"></div>
     <!-- 이미지 탭하면 그 자리에 뜨는 작은 토글 → 누르면 레시피. 이미지 밖 탭하면 사라짐 -->
     <button class="story-recipe-toggle" id="storyRecipeToggle" type="button" hidden><span>레시피 보기</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <!-- 🔴 키보드·화면낭독기 전용 「레시피 보기」(2026-08-09). 평소엔 눈에 안 보이고 **초점이 올 때만** 나타난다.
+         위 `story-recipe-toggle` 은 **누른 자리 좌표**로 뜨는 것이라 키보드로는 영영 닿을 수 없었다.
+         🔴 반드시 `#storyBody` **밖**에 둔다 — 그 안은 칸이 바뀔 때마다 통째로 다시 그려져 버튼이 사라진다.
+         🔴 「이전」·「다음」 버튼에 이 일을 겹쳐 넣지 않는다 — 이름과 하는 일이 어긋나면 더 헷갈린다. -->
+    <button class="story-recipe-kbd" id="storyRecipeKbd" type="button">레시피 보기</button>
+    <!-- 칸이 바뀔 때 「건희 스토리, 2/4, 건희소스」만 한 번 알린다(본문 전체를 다시 읽히지 않는다) -->
+    <p class="sr-only" id="storyAnnounce" role="status" aria-live="polite"></p>
   </div>
 </div>
 
@@ -1072,12 +1131,21 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <!-- 오늘의 소스 가챠 -->
 <div class="gacha-overlay" id="gachaOverlay">
-  <div class="gacha-modal" id="gachaModal">
+  <!-- 🔴 대화상자로 알린다(2026-08-09, 5-5). 이름은 화면에 이미 있는 「오늘의 소스」를 그대로 쓴다 —
+       새 문구를 만들지 않는다(화면에 보이는 말과 소리로 듣는 말이 같아야 음성 조작이 먹는다). -->
+  <div class="gacha-modal" id="gachaModal" role="dialog" aria-modal="true" aria-labelledby="gachaTitle">
     <button class="modal-close gacha-close" id="gachaClose" type="button" aria-label="닫기">
       <!-- modalClose와 동일 X 아이콘(2026-07-25, &times; 글리프 → SVG로 통일) -->
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.02" stroke-linecap="round"/></g></svg>
     </button>
-    <div class="gacha-title">오늘의 소스</div>
+    <div class="gacha-title" id="gachaTitle">오늘의 소스</div>
+    <!-- 🔴 뽑기 결과를 화면낭독기에 한 번 알리는 자리(2026-08-09 사용자 지시).
+         화면에는 **아무것도 안 보인다**(.sr-only). 결과 카드가 떠도 낭독기는 스스로 말하지 않으므로
+         여기 글자를 넣어 「오늘의 소스는 ○○입니다」를 한 번 읽게 한다.
+         ⚠️ 비어 있는 채로 **미리 있어야 한다** — 글자를 넣는 순간에 만들면 낭독기가 놓친다.
+         ⚠️ `polite` 다 — 지금 읽고 있는 말을 끊지 않고 뒤에 이어 읽는다.
+         ⚠️ 창을 열고 닫을 때 비운다(script.js) — 안 비우면 다시 열 때 옛 결과를 또 읽는다. -->
+    <p class="sr-only" id="gachaAnnounce" role="status" aria-live="polite"></p>
     <div class="gacha-stage" id="gachaStage">
       <!-- 받침 매트: 크림색 그릇이 배경에 묻히지 않게 우드톤 매트를 깔아 대비 확보 -->
       <svg class="gacha-mat" id="gachaMat" viewBox="0 0 190 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1187,7 +1255,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=5"></script>
-<script src="script.js?v=636"></script>
+<script src="script.js?v=658"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

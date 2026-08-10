@@ -7,11 +7,10 @@
 <meta name="description" content="하딜고고에 추가되었으면 하는 레시피나, 잘못된 정보 또는 오류를 알려 주세요.">
 <link rel="canonical" href="https://haidilgogo.com/report.html">
 <meta name="robots" content="noindex, follow">
-<meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=757">
-<link rel="stylesheet" href="article.css?v=23">
+<link rel="stylesheet" href="styles.css?v=771">
+<link rel="stylesheet" href="article.css?v=24">
 <meta name="theme-color" content="#FCF9F5">
 <style>
 /* ===== 목업 전용. 앱 파일은 안 건드린다 =====
@@ -166,6 +165,12 @@
 .rp-privacy { background: #F6F1EA; border-radius: 11px; padding: 12px 13px; font-size: 11.5px; line-height: 1.7; color: var(--text-muted); }
 .rp-privacy b { color: var(--text-dark); font-weight: 700; }
 .rp-privacy ul { margin: 6px 0 0; padding-left: 15px; }
+/* 🔴 「수집 항목」이 둘이 되어(연락처 · 동의 여부) 속목록을 쓴다(2026-08-08).
+   대시 없이 줄만 바꾸면 위 줄의 연장처럼 읽혀서 몇 가지를 주는 건지 헷갈린다. */
+.rp-privacy ul ul { margin: 2px 0 0; padding-left: 14px; list-style: none; }
+.rp-privacy ul ul li { text-indent: -9px; padding-left: 9px; }
+.rp-privacy ul ul li::before { content: '· '; }
+.rp-privacy-sub { display: block; padding-left: 9px; text-indent: 0; }
 /* 🔴 상자 밖으로 나왔다(2026-08-07) — 그래서 색·크기를 여기서 직접 준다.
    전에는 `.rp-privacy` 안에 있어서 상자 스타일을 물려받았다. 간격은 묶음의 gap(10px)이 준다. */
 .rp-privacy-more {
@@ -335,7 +340,13 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       <div class="rp-block">
         <!-- ⚠️ 구글폼 원문은 「적어주세요」인데 **「적어 주세요」로 띄웠다** — 사이트 표기를 맞춘 것이다
              (`credits.html`·이 폼 머리글의 「알려 주세요」와 같은 규칙, 2026-08-06 사용자 확정). -->
-        <span class="rp-label">레시피 이름을 입력해 주세요! <span class="rp-req">*</span></span>
+        <!-- 🔴 별표는 이름에서 뺀다(2026-08-09 코덱스 지적) — 그냥 두면 화면낭독기가
+             「…입력해 주세요! **별표**」로 읽는다. 필수라는 것은 글자가 아니라 **상태**로 알린다
+             (칸의 `aria-required`). 화면에는 그대로 빨간 별표가 보인다.
+             ⚠️ `.rp-req` 를 일괄로 숨기면 안 된다 — 맨 위 안내문
+                「`*` 표시는 필수로 입력하셔야 해요.」(310줄)에도 같은 클래스가 쓰인다.
+                거기까지 숨기면 그 문장이 「표시는 필수로…」가 되어 말이 깨진다. -->
+        <span class="rp-label" id="rNameLabel">레시피 이름을 입력해 주세요! <span class="rp-req" aria-hidden="true">*</span></span>
         <!-- 🔴 자리는 **라벨 아래·칸 위**로 확정(2026-08-07 사용자 「나 안」 채택).
              구글폼 제목의 「(소스, 육수, 밥, 면, 기타)」가 하던 「소스 말고도 된다」는 신호를 여기서 준다.
              ⚠️ 원문 그대로 못 옮긴다 — 「육수」·「밥/면/기타」는 **옛 분류**다. 2026-07-21에
@@ -343,7 +354,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
              🔴 **순서는 소스 · 히든메뉴 · 탕이다**(2026-08-07 사용자 확정).
                 ⚠️ 사이트 탭 순서(`CATS` = 소스 · 탕 · 히든메뉴)와 **다르다** — 일부러 다른 것이니
                    「탭이랑 안 맞는다」고 고치지 말 것. -->
-        <p class="rp-help">소스·히든메뉴·탕 무엇이든 좋아요.</p>
+        <p class="rp-help" id="rNameHelp">소스·히든메뉴·탕 무엇이든 좋아요.</p>
         <div class="stamp-field stamp-field--light-ph">
           <!-- 🔴 **소스 → 히든메뉴 → 탕 하나씩**이다(2026-08-07 사용자 확정) — 바로 위 도움말의
                순서와 같게 맞춘 것이다. 도움말 순서를 바꾸면 여기도 같이 바꾼다.
@@ -351,12 +362,18 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
                   두 칸에 비슷한 이름이 붙으면 주문 항목인지 레시피 이름인지 헷갈린다.
                ⚠️ 이름을 늘리지 말 것 — 넷이 되면(예: 「쑨디2호소스」를 되살리면) 306px 이 되어
                   320px 폰의 칸 안폭(244px)에서 뒤가 잘린다. 지금은 219px 다. -->
-          <input type="text" id="rName" maxlength="50" placeholder="예) 건희소스, 희수국밥, 스키야키탕">
+          <!-- 🔴 라벨 연결(2026-08-09) — 칸을 감싼 것이 `<label>` 이 아니라 `<div>` 라
+               화면낭독기에는 위 문구가 이 칸의 이름으로 전달되지 않았다. 눈에 보이는 문구를
+               그대로 이름으로 삼는다(`aria-labelledby`), 도움말은 설명으로 붙인다(`aria-describedby`).
+               ⚠️ `<span>` 을 `<label for>` 로 바꾸지 않았다 — 그러면 문구를 눌렀을 때
+                  칸으로 초점이 튀어 **지금 없는 동작**이 생긴다. 화면·문구·동작은 그대로 두는 것이 조건이다. -->
+          <input type="text" id="rName" maxlength="50" placeholder="예) 건희소스, 희수국밥, 스키야키탕"
+                 aria-labelledby="rNameLabel" aria-describedby="rNameHelp" aria-required="true">
         </div>
       </div>
 
       <div class="rp-block" id="orderBlock" style="margin-top:18px">
-        <span class="rp-label">매장에서 주문해야 하는 항목이 있다면 입력해 주세요!</span>
+        <span class="rp-label" id="rOrderLabel">매장에서 주문해야 하는 항목이 있다면 입력해 주세요!</span>
         <!-- 🔴 **여러 줄이다**(2026-08-07 사용자 지적으로 한 줄 칸에서 바꿨다).
              실제 데이터가 그렇다 — `script.js` 에서 주문 항목이 있는 레시피 17개 중 **9개가 2개 이상**이고
              3개짜리도 여럿이다(우유/청유 마라훠궈 · 팡가시우메기 1인분 · 공깃밥 1공기).
@@ -374,33 +391,37 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
              양이 틀리면 그 레시피는 사이트에 못 올린다(틀린 비율로 올리면 따라 만든 사람이 이상한 소스를 먹는다).
              ⚠️ 그렇다고 「정확히 적으세요」로 뒤집지도 말 것 — 헷갈리는 사람이 지어내면 그게 제일 나쁘다.
                 빈칸은 「모르는구나」 하고 넘어갈 수 있지만, 지어낸 값은 맞는 줄 알고 올라간다. -->
-        <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
-        <textarea class="rp-textarea" id="rOrder" maxlength="500" placeholder="공깃밥 1공기&#10;날계란 1개&#10;토마토탕훠궈"></textarea>
+        <p class="rp-help" id="rOrderHelp">한 줄에 하나씩 적어 주시면 좋아요.</p>
+        <textarea class="rp-textarea" id="rOrder" maxlength="500" placeholder="공깃밥 1공기&#10;날계란 1개&#10;토마토탕훠궈"
+                  aria-labelledby="rOrderLabel" aria-describedby="rOrderHelp"></textarea>
       </div>
 
       <div class="rp-block" id="ingBlock" style="margin-top:18px">
         <!-- ⚠️ 구글폼 원문의 「아는 대로 편하게」를 뺐다(2026-08-07 사용자 확정) — 칸 아래 도움말이
      이미 「정확하지 않아도 괜찮습니다.」라고 같은 말을 한다. 원문(298px)은 320px 폰의
      칸 폭(276px)을 넘어 두 줄로 감기기도 했다. 지금은 210px 로 두 폰 다 한 줄이다. -->
-<span class="rp-label">소스바에서 담는 재료와 양을 입력해 주세요!</span>
+<span class="rp-label" id="rIngLabel">소스바에서 담는 재료와 양을 입력해 주세요!</span>
         <!-- 🔴 도움말은 **라벨 아래 · 칸 위**다(2026-08-07 사용자 지시) — 이름 칸과 같은 자리다.
              적기 전에 「어떻게 적는 칸인지」를 알아야 하므로 칸 아래가 아니라 위에 둔다. -->
-        <p class="rp-help">한 줄에 하나씩 적어 주시면 좋아요.</p>
-        <textarea class="rp-textarea" id="rIng" maxlength="1000" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"></textarea>
+        <p class="rp-help" id="rIngHelp">한 줄에 하나씩 적어 주시면 좋아요.</p>
+        <textarea class="rp-textarea" id="rIng" maxlength="1000" placeholder="땅콩참깨소스 2스푼&#10;다진 마늘 1스푼&#10;고수 조금"
+                  aria-labelledby="rIngLabel" aria-describedby="rIngHelp"></textarea>
       </div>
 
       <div class="rp-block" id="stepBlock" style="margin-top:18px">
-        <span class="rp-label">만드는 법이 있다면 알려 주세요!</span>
+        <span class="rp-label" id="rStepLabel">만드는 법이 있다면 알려 주세요!</span>
         <!-- ⚠️ 칸 안 예시에는 마침표를 안 붙인다(2026-08-07 사용자 확정) — 예시는 완결된 문장이 아니라
              「이렇게 생긴 걸 적으세요」라고 보여주는 조각이고, 마침표가 있으면 진짜 입력값처럼 보인다. -->
         <!-- 🔴 1000자 제한(2026-08-07 사용자 지시) — 「내용」 칸과 같은 값이다.
              ⚠️ `maxlength` 는 **넘으면 조용히 안 쳐진다.** 글자수 표시를 붙일지는 아직 안 정했다. -->
-        <textarea class="rp-textarea" id="rStep" maxlength="1000" placeholder="예) 홍탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"></textarea>
+        <textarea class="rp-textarea" id="rStep" maxlength="1000" placeholder="예) 홍탕에 익힌 메기살을 밥에 얹어 으깨 먹는다"
+                  aria-labelledby="rStepLabel"></textarea>
       </div>
 
       <div class="rp-block" id="tipBlock" style="margin-top:18px">
-        <span class="rp-label">더 맛있게 먹는 나만의 팁이 있다면 알려 주세요!</span>
-        <textarea class="rp-textarea" id="rTip" maxlength="1000" placeholder="예) 고수를 잔뜩 올려 먹으면 더 맛있다"></textarea>
+        <span class="rp-label" id="rTipLabel">더 맛있게 먹는 나만의 팁이 있다면 알려 주세요!</span>
+        <textarea class="rp-textarea" id="rTip" maxlength="1000" placeholder="예) 고수를 잔뜩 올려 먹으면 더 맛있다"
+                  aria-labelledby="rTipLabel"></textarea>
       </div>
 
       <div class="rp-block" id="srcBlock" style="margin-top:18px">
@@ -408,12 +429,12 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
      칸 안 예시 둘째 줄이 이미 「링크를 붙여 주셔도 좋아요」라고 같은 말을 한다.
      구글폼은 예시 칸이 따로 없어 라벨에 다 넣어야 했지만 우리는 나눌 수 있다.
      원문은 426px 라 390px 폰(칸 폭 346px)에서도 두 줄이었다. 지금은 286px. -->
-<span class="rp-label">레시피의 출처를 알려 주세요!</span>
+<span class="rp-label" id="rSrcLabel">레시피의 출처를 알려 주세요!</span>
         <!-- 🔴 「링크를 붙여 주셔도 좋아요」는 **예시가 아니라 안내**라 도움말로 올렸다(2026-08-07 사용자 지적).
              칸 안은 「이렇게 생긴 걸 적으세요」를 보여주는 자리다 — 부탁하는 말이 거기 있으면 안 된다.
              ⚠️ 그래서 예시 둘째 줄에는 **진짜 링크 모양**을 넣었다. 없으면 「링크를 붙이라」고 해 놓고
                 정작 어떤 꼴인지는 안 보여주는 셈이 된다. -->
-        <p class="rp-help">링크를 붙여 주셔도 좋아요.</p>
+        <p class="rp-help" id="rSrcHelp">링크를 붙여 주셔도 좋아요.</p>
         <!-- 🔴 둘째 줄부터는 **공백 6칸**으로 「예) 」 아래에 줄을 맞춘다(2026-08-07 사용자 문안).
              눈대중이 아니라 재서 골랐다 — 지금 예시 글씨(14px)로 「예) 」=20px, 6칸=21px 이 가장 가깝다
              (5칸은 18px 로 2px 모자람). 오류·기타 갈래 예시도 같은 규칙을 쓴다.
@@ -422,7 +443,8 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
              ⚠️ 링크는 **https** 로 적는다 — `http` 는 브라우저가 「안전하지 않음」이라 표시하고,
                 예시를 그대로 따라 적는 사람이 생긴다. 유튜브 채널 주소는 이제 `@핸들` 꼴이다.
              ⚠️ **예시 글자 크기나 글꼴을 바꾸면 이 칸 수를 다시 잴 것.** 비례폭 글꼴이라 저절로 안 맞는다. -->
-        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 홍길동 채널&#10;      인스타그램 @hong_gildong&#10;      https://youtube.com/@hong_gildong"></textarea>
+        <textarea class="rp-textarea" id="rSrc" maxlength="1000" placeholder="예) 유튜브 홍길동 채널&#10;      인스타그램 @hong_gildong&#10;      https://youtube.com/@hong_gildong"
+                  aria-labelledby="rSrcLabel" aria-describedby="rSrcHelp"></textarea>
       </div>
     </div>
 
@@ -432,7 +454,13 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       <!-- ⚠️ 여기에 기본 예시를 적어 두지 않는다(2026-08-07 사용자 지시로 지웠다) — 화면에 절대 안 뜬다.
            갈래를 고르는 순간 아래 JS(`PH`)가 갈래별 예시로 항상 덮어쓰고, 고르기 전에는
            이 묶음 자체가 감춰져 있다. 적어 두면 「어디에도 없는 문구」가 코드에만 남는다. -->
-      <textarea class="rp-textarea" id="rBody" maxlength="1000"></textarea>
+      <!-- 🔴 라벨 연결(2026-08-09) — 이 라벨은 **갈래를 고를 때마다 글자가 바뀐다**(paint 의 `LABEL`).
+           `aria-labelledby` 는 글자를 베껴 두는 것이 아니라 **그 칸을 가리키는 것**이라,
+           JS 가 문구를 바꾸면 화면낭독기가 읽는 이름도 저절로 따라간다. 손댈 곳이 한 곳으로 남는다. -->
+      <!-- 🔴 `aria-required` 를 정적으로 둬도 된다(2026-08-09) — 이 칸은 **화면에 있을 때는 늘 필수**다
+           (오류·기타 갈래에서만 뜨고, 그때는 checkReady 가 「내용을 입력해 주세요」로 잠근다).
+           숨은 동안은 조상이 `display:none` 이라 화면낭독기 목록에서 통째로 빠진다. -->
+      <textarea class="rp-textarea" id="rBody" maxlength="1000" aria-labelledby="bodyLabel" aria-required="true"></textarea>
     </div>
 
     <!-- ── 연락처 ── -->
@@ -461,8 +489,16 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
              입력 중에 지우면 글자가 튀거나 커서가 엉킨다(한국 사이트에서 흔한 버그).
              옛 `ime-mode` CSS 는 이제 안 먹는다.
              대신 ① 영문 자판이 뜨게 하고 ② 한글이 섞이면 **보내기를 잠근다**. -->
-        <input type="email" id="rCt" placeholder="id@example.com" autocomplete="email"
-               inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <!-- 🔴 `maxlength` 는 2026-08-08에 넣었다. 없던 동안은 이 칸만 한도가 없어서,
+             여기에 긴 글을 붙여넣으면 **정상 이용자도** 문지기의 총 6,000자 한도를 넘겨
+             「잠시 후에 다시」만 보고 영영 못 보내는 상태가 됐다.
+             254는 이메일 주소의 표준 상한이다(인스타 계정은 30자라 넉넉히 덮는다). -->
+        <!-- 🔴 라벨 연결(2026-08-09) — 이름은 바로 위 `#ctSub` 다. 이메일이냐 인스타그램이냐에 따라
+             문구가 바뀌는 자리라, 여기서 글자를 베끼지 않고 그 칸을 가리키기만 한다.
+             ⚠️ 칸 안 `@`(`#ctPrefix`)는 이름에 넣지 않는다 — 「@ 이메일 주소를…」처럼 읽힌다. -->
+        <input type="email" id="rCt" maxlength="254" placeholder="id@example.com" autocomplete="email"
+               inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false"
+               aria-labelledby="ctSub" aria-required="true">
       </div>
 
       <!-- ⚠️ 「답변이 필요하시면 적어 주세요」를 뺐다(2026-08-06 사용자 지적) —
@@ -485,9 +521,17 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
         <ul>
           <!-- 🔴 두 줄로 나눈다(2026-08-06 사용자 지시) — 한 줄이면 「1가지」와 「둘 중 선택」이
                붙어 읽혀서 몇 개를 주는 건지 헷갈린다. 둘째 줄은 첫 줄 글자 자리에 맞춰 들어간다. -->
-          <li><b>수집 항목</b> 회신 받으실 연락처 1가지<br>- 이메일 주소 · 인스타그램 계정 중 선택</li>
-          <li><b>이용 목적</b> 제보 · 문의에 대한 답변</li>
-          <li><b>보유 기간</b> 수집일로부터 <b>6개월</b> (기간이 지나면 자동으로 파기됩니다)</li>
+          <!-- 🔴 「개인정보 수집 · 이용 동의 여부」를 항목에 넣었다(2026-08-08). 실제로 그 값을
+               시트에 저장하고 처리방침 제1조에도 항목으로 적었으므로, 동의를 받을 때도 알려야 한다
+               (법 제15조 제2항). 방침에서 빼는 것이 아니라 폼을 방침에 맞추는 쪽이 맞다. -->
+          <li><b>수집 항목</b>
+            <ul>
+              <li>회신 받으실 연락처 1가지<span class="rp-privacy-sub">이메일 주소 · 인스타그램 계정 중 선택</span></li>
+              <li>개인정보 수집 · 이용 동의 여부</li>
+            </ul>
+          </li>
+          <li><b>이용 목적</b> 제보 · 문의에 대한 답변 및 동의 사실의 확인</li>
+          <li><b>보유 기간</b> 수집일로부터 <b>180일</b> (기간이 지나면 자동으로 파기됩니다)</li>
         </ul>
         <!-- 🔴 처리방침으로 가는 길(2026-08-07). 여기가 **개인정보를 받는 유일한 자리**라
              푸터보다 여기서 닿는 것이 실제로 쓸모 있다.
@@ -511,7 +555,12 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       제보 · 문의는 그대로 접수되며, <b>답변만 받으실 수 없습니다.</b>
       </span>
       <div class="rp-agree">
-        <input type="checkbox" id="rpAgree">
+        <!-- 🔴 이 체크는 화면에 있을 때는 늘 필수다 — 이메일·인스타를 고른 경우에만 뜨고,
+             그때 체크를 안 하면 보내기가 잠긴다(checkReady 의 「개인정보 수집 · 이용에 동의해 주세요.」).
+             ⚠️ 별표는 이 줄이 아니라 위 제목(「개인정보 수집 · 이용 동의 *」)에 붙어 있고,
+                그 별표는 이 체크박스의 이름에 안 섞인다(이름은 바로 옆 `<label for>` 문장이다).
+                그래서 여기는 숨길 별표가 없다. -->
+        <input type="checkbox" id="rpAgree" aria-required="true">
         <label for="rpAgree">개인정보 수집 · 이용에 동의합니다.</label>
       </div>
       </div>
@@ -772,8 +821,10 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   document.getElementById('rpSubmit').addEventListener('click', function () {
     var btn = this;
     var rows = collect();
-    /* 무엇이 실릴지를 콘솔에도 찍는다 — 숨긴 칸이 딸려 가지 않는지 눈으로 확인할 수 있다. */
-    console.log('[보낼 값]\n' + rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n'));
+    /* 🔴 전송값을 콘솔에 찍지 않는다(2026-08-08). 예전엔 숨긴 칸이 딸려 가지 않는지 눈으로
+       보려고 `console.log`로 전부 출력했는데, 거기에는 **연락처와 제보 본문**이 그대로
+       들어간다. 공용 기기·원격 디버깅·화면 공유·브라우저 확장에서 새어 나갈 수 있고
+       얻는 것이 없다. 숨긴 칸 검증이 필요하면 그때만 임시로 켤 것. */
 
     if (!SEND_URL) { show('지금은 보낼 수 없어요. 잠시 후에 다시 시도해 주세요.'); return; }
 
@@ -869,8 +920,11 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       etc: '예) 스티커 탭에 있는 강아지가 너무 귀여워요\n' + SP + '이런 기능이 있으면 좋겠어요\n' + SP + '제 레시피인데 출처를 바꿔주세요',
       recipe: '아는 만큼만 적어 주세요.'
     };
+    /* 🔴 별표에 `aria-hidden` 을 같이 넣는다(2026-08-09) — 이 라벨은 칸의 이름으로 읽히는데,
+       별표가 이름에 섞이면 「…알려 주세요. 별표」가 된다. 필수는 칸의 `aria-required` 가 알린다.
+       ⚠️ 여기서 빠뜨리면 화면에서만 멀쩡하고 소리에서 티가 난다 — 아래 `#ctSub` 도 같은 짝이다. */
     document.getElementById('bodyLabel').innerHTML =
-      (LABEL[state.kind] || '내용') + ' <span class="rp-req">*</span>';
+      (LABEL[state.kind] || '내용') + ' <span class="rp-req" aria-hidden="true">*</span>';
     if (PH[state.kind]) document.getElementById('rBody').placeholder = PH[state.kind];
 
     /* 연락처 — 고른 종류에 따라 칸·동의·안내문이 달라진다.
@@ -902,7 +956,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
           위 = 셋 중 하나를 고르는 것이 필수, 여기 = 고른 칸을 채우는 것이 필수. */
     sub.innerHTML = (isInsta
       ? '답변을 받으실 인스타그램 계정을 입력해 주세요.'
-      : '답변을 받으실 이메일 주소를 입력해 주세요.') + ' <span class="rp-req">*</span>';
+      : '답변을 받으실 이메일 주소를 입력해 주세요.') + ' <span class="rp-req" aria-hidden="true">*</span>';
 
     checkReady();
   }

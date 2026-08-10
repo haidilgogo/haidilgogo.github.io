@@ -21,6 +21,8 @@ assets/*.jpeg
 # 아이콘 원본 작업 폴더 (SVG 경로는 script.js에 인라인, 사이트는 src-bubble.png만 참조)
 assets/icons/src/
 _before-*
+_tmp-*
+_mockup-*
 
 # 감자 목업용 임시 스프라이트 프레임 (실체는 01_identity/03_codex-pet/).
 # 코덱스가 그린 일러스트가 확정되면 이 셋과 _mockup-gamja.html은 지운다.

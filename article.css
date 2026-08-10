@@ -279,7 +279,11 @@
   color: #C08A80;
   text-decoration: underline; text-decoration-color: #E4C0B8; text-underline-offset: 3px;
 }
-.credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+/* 🔴 hover 는 `@media (hover: hover)` 안에 둔다 (2026-08-09, 전수조사 6-2 → 6-3).
+   손가락에는 hover 가 없는데 브라우저가 흉내를 내서, 누르고 뗀 뒤 색이 남는다. */
+@media (hover: hover) {
+  .credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+}
 
 /* 출처 안내 문단 안의 링크(제보 폼) — **브랜드 빨강**(2026-08-05 사용자 지시).
    그전에는 본문과 같은 검정에 밑줄로만 링크임을 알렸는데, 눈에 안 띄어서 색을 줬다.
@@ -294,9 +298,13 @@
   text-decoration-color: var(--brand-red);
   text-underline-offset: 3px;
 }
-/* 기본이 이미 빨강이므로 누를 때는 **더 진한 빨강**으로 내려간다(`.credit-links a:hover` 와 같은 방식) */
-.credit-note a:hover,
-.credit-note a:active { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+/* 기본이 이미 빨강이므로 누를 때는 **더 진한 빨강**으로 내려간다(`.credit-links a:hover` 와 같은 방식)
+   🔴 `:hover` 와 `:active` 를 나눴다 (2026-08-09, 전수조사 6-2 → 6-3).
+      한 규칙일 때 통째로 미디어쿼리에 넣으면 **손가락으로 눌렀을 때 진해지는 반응까지 사라진다.** */
+@media (hover: hover) {
+  .credit-note a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
+}
+.credit-note a:active { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }   /* 터치 반응 — 미디어쿼리 밖 */
 
 /* 출처 페이지 하단 '닫기' — 앱 배너 시트의 닫기(.column-bottom-close)와 같은 모양·반응.
    두 곳의 '나가기'가 달라 보이면 안 된다. 아티클 3개의 빨간 CTA(.art-more-btn)와는
