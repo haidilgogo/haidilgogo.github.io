@@ -45,13 +45,63 @@
     { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 현대타워랜드 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
     { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
     // 오픈 예정(2026-07-24 추가) — 안산점과 같은 방식으로 STORE_CATCH만 'soon'을 둔다(제목 옆 배지는 사용자가 뺐음).
-    // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 발도장 매장 선택 비활성이 동시에 걸린다.
+    // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 스티커 매장 선택 비활성이 동시에 걸린다.
     // 🔴 주소는 도로명까지만 확정 — 건물명은 오픈 확정 후 사용자가 알려주면 채운다. 영업시간·전화도 그때.
     { region: '부산', name: '부산점',    addr: '부산 부산진구 중앙대로 654',                     hours: '미정' },
     { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
     { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
 
+  // 🔴 지점별 네이버 장소번호(2026-08-04). **지금은 아무 데도 안 쓴다** — 그래도 지우지 말 것.
+  //    핀 찍힌 지도를 열려고 모았는데, 네이버 모바일 웹이 바깥에서 들어오는 딥링크에는 핀을 안 찍어 줘서
+  //    결국 검색 형태로 갔다(아래 지도 버튼 주석에 시도한 주소들이 다 적혀 있다).
+  //    네이버가 정책을 바꾸거나 다른 길이 생기면 바로 쓸 수 있고, 14곳을 다시 뽑는 데 시간이 걸린다.
+  //    뽑는 법: m.map.naver.com/search?query=하이디라오+<지점>&mapMode=0 을 받아 오면 HTML 안에
+  //            "items":[{"id":<번호>,"name":"하이디라오 …"} 로 들어 있다. 14곳을 한 번에 훑어 뽑았다.
+  //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
+  //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
+  //    ⚠️ 오픈 예정(안산점·부산점)은 네이버에 아직 없어 번호가 없다. 그 둘은 지도 버튼 자체가 비활성이라
+  //       필요 없다. (부산점은 이름으로 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
+  //    뽑는 법: m.map.naver.com/search?query=하이디라오+<지점>&mapMode=0 을 받아 오면
+  //            HTML 안에 "items":[{"id":<번호>,"name":"하이디라오 …"} 로 들어 있다.
+  //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
+  //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
+  //    ⚠️ 오픈 예정(안산점·부산점)은 네이버에 아직 없어서 번호가 없다. 그 둘은 지도 버튼 자체가
+  //       비활성이라 필요 없다. (부산점은 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
+  // 🔴 지점별 카카오 장소번호(2026-08-04). 네이버와 **번호 체계가 다르다** — 서로 못 바꿔 쓴다.
+  //    뽑는 법: m.map.kakao.com/actions/searchView?q=하이디라오+<지점> 의 HTML 안
+  //            <li class="search_item base" data-id="<번호>"> 에 들어 있다.
+  //    ⚠️ 카카오 등록명이 우리와 다른 곳이 있다(번호로 걸어서 화면엔 영향 없다):
+  //       홍대점→홍대지점 · 코엑스점→COEX점 · 제주점→제주도점
+  //    ⚠️ 오픈 예정(안산점·부산점)은 번호가 없다. 지도 버튼 자체가 비활성이라 필요 없다.
+  const STORE_KAKAO_ID = {
+    '명동점': '1820258951',
+    '서초점': '1372079546',
+    '홍대점': '1622865435',
+    '건대점': '1026281815',
+    '영등포점': '1214126801',
+    '대학로점': '731469845',
+    '코엑스점': '576159166',
+    '가산점': '670610672',
+    '부천점': '481359274',
+    '부산역점': '957408853',
+    '대구점': '1203829931',
+    '제주점': '1143177072',
+  };
+  const STORE_NAVER_ID = {
+    '명동점': '1501495669',
+    '서초점': '38314432',
+    '홍대점': '653467130',
+    '건대점': '1588990046',
+    '영등포점': '1467350015',
+    '대학로점': '1583520034',
+    '코엑스점': '1950007630',
+    '가산점': '1364098721',
+    '부천점': '2027810824',
+    '부산역점': '1327035832',
+    '대구점': '2065069021',
+    '제주점': '2024934566',
+  };
   // 지점별 캐치테이블 예약·웨이팅 링크(있는 지점만 '예약' 버튼 표시). 키 = STORES의 name.
   // 안산점은 링크가 없어 예약 버튼 안 뜸.
   const STORE_CATCH = {
@@ -68,7 +118,7 @@
     '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
     '안산점': 'soon', // 2026-07-25 오픈 예정 — 캐치테이블 아직 안 열림. 열리면 'soon'을 실제 URL로 교체.
-    '부산점': 'soon', // 오픈 예정(서면) — 이 값이 발도장 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
+    '부산점': 'soon', // 오픈 예정(서면) — 이 값이 스티커 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
   };
 
   // 재료 표시 순서: SAUCE_BAR 배열 순서를 기준으로 자동 정렬(렌더 시에만 정렬, 원본 데이터는 그대로).
@@ -84,11 +134,11 @@
     .map((x) => x[0]);
 
   const RECIPES = [
-    { id: 's1', date: '2021-12-26', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스(단)_2021.jpg?v=3', imgFit: 'cover', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '오리지널 · 2021', source: '버블 건희', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 즐겨 먹는 콤보 소스 중 단맛 버전으로, 대한민국에서 가장 유명한 국민 소스이다.',
+    { id: 's1', date: '2021-12-26', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스(오리지널)_2021.jpg?v=3', imgFit: 'cover', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '오리지널 · 2021', source: '버블 건희', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 즐겨 먹는 콤보 소스 중 단맛 버전으로, 대한민국에서 가장 유명한 국민 소스이다.',
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '2.5', '스푼'], ['다진 마늘', '0.5', '스푼'], ['다진 파', '0.5', '스푼'], ['참깨', '1', '티스푼'], ['땅콩가루', '1', '티스푼'], ['마라시즈닝/고춧가루', '0.5', '티스푼'], ['고추기름', '1', '티스푼'], ['설탕', '0.3', '티스푼'], ['매운소고기소스', '0.5', '티스푼']],
       steps: [],
       tip: '너무 달면 설탕과 스위트칠리소스를 취향에 맞게 조절하기' },
-    { id: 's16', date: '2021-12-26', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스(짠)_2021.jpg?v=4', imgFit: 'cover', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '짭짤 · 2021', source: '버블 건희', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 즐겨 먹는 콤보 소스 중 짠맛 버전으로, 단맛 버전과 번갈아 먹으면 질리지 않고 단짠단짠으로 즐길 수 있다고 한다.',
+    { id: 's16', date: '2021-12-26', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스(짭짤)_2021.jpg?v=4', imgFit: 'cover', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '짭짤 · 2021', source: '버블 건희', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 즐겨 먹는 콤보 소스 중 짠맛 버전으로, 단맛 버전과 번갈아 먹으면 질리지 않고 단짠단짠으로 즐길 수 있다고 한다.',
       ings: [['소금', '3', '티스푼'], ['참기름', '3', '스푼'], ['고추기름', '0.5', '스푼'], ['다진 마늘', '1', '스푼'], ['참깨', '1', '티스푼'], ['마라시즈닝/고춧가루', '1', '티스푼']],
       steps: [],
       tip: '' },
@@ -116,7 +166,7 @@
       ings: [['양파', '', '넉넉하게'], ['간장소스', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고추기름', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['중국식초', '1', '스푼'], ['참기름', '0.5', '스푼'], ['태국고추', '', '넉넉하게']],
       steps: [],
       tip: '' },
-    { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤 아는 동생소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤 아는 동생소스', nameHtml: '라젤<span class="name-sub">(이 아는 동생)</span>소스', source: 'YouTube 라젤Razel', person: '라젤', desc: '유튜버 <b>라젤</b>이 <u>아는 동생이 진짜 건강하게 츠묵고 산다</u>며 소개한 소스이다.',
+    { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤(이 아는 동생)소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤(이 아는 동생)소스', nameHtml: '라젤<span class="name-sub">(이 아는 동생)</span>소스', source: 'YouTube 라젤Razel', person: '라젤', desc: '유튜버 <b>라젤</b>이 <u>아는 동생이 진짜 건강하게 츠묵고 산다</u>며 소개한 소스이다.',
       ings: [['참기름', '2', '스푼'], ['소금', '0.5', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['태국고추', '1', '스푼']],
       steps: [],
       tip: '' },
@@ -319,10 +369,9 @@
     }
   })();
 
-  // 2026-07-25 확정: 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 필터(AND) — 홈/브라우즈 구분은
-  // activeCat 등 필터값으로 유추하지 않고 이 browsing 플래그로 직접 관리한다(전체 탭 선택 상태와 홈이 값만으로는
-  // 구분 안 되기 때문). 브라우즈 진입 = enterBrowse/즐겨찾기버튼, 탈출 = 헤더 X(닫기) 버튼뿐.
-  let browsing = false;
+  // 2026-07-25 확정: 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 필터(AND).
+  // 🔴 옛 `browsing` 플래그는 없앴다(2026-08-03) — 홈이 탭으로 갈라져서 「지금 어느 화면인가」는
+  //    하단바 탭(activeSection)이 곧 답이다. 한 탭 안에서 두 화면을 오가던 시절의 장치였다.
   let activeCat = '전체';       // 브라우즈 중 선택된 카테고리 탭('전체' 포함)
   let personFilter = null;      // 셀럽 레일에서 인물을 고르면 그 사람 레시피만(다른 필터와 겹침)
   let query = '';
@@ -507,19 +556,263 @@
 
   // 모달을 연 입력 방식에 따라 첫 초점 표시를 구분한다.
   // 손가락/마우스로 열었을 땐 iOS의 파란 네모만 숨기고, 키보드로 열었을 땐 초점 표시를 유지한다.
+  /* 🔴 `kbd-nav` 는 「지금 Tab 으로 옮겨 다니는 중」이라는 표시다 (2026-08-08, 코덱스 지적).
+     글자 입력칸(`<input>`)은 **마우스로 눌러도 브라우저가 `:focus-visible` 로 친다.**
+     버튼과 달라서, 입력칸의 초점 테두리를 `:focus-visible` 로만 걸면 **마우스·손가락에도 나온다**
+     (실제로 그랬다). 그래서 Tab 을 눌렀는지를 **직접 기록**해 그때만 테두리를 그린다.
+     ⚠️ `pointerdown` 은 **마우스와 손가락을 모두** 잡는다. 그래서 둘 다 이 표시가 꺼진다.
+     ⚠️ Tab 만 켠다 — Enter·Space 는 「옮겨 다니는 것」이 아니라 「누르는 것」이다.
+     🔴 **예외가 하나 있다**(2026-08-10 사용자님 확정). 평소에는 이렇게 `Tab` 만 켜지만,
+        **팝업을 닫고 돌아갈 때는 「키보드가 한 번이라도 끼었으면」 아래 `applyReturnFocus` 가
+        다시 켠다.** 확정된 정책이 「키보드가 조금이라도 끼면 테두리 보임」이기 때문이다.
+        그때도 표시는 **초점을 받은 그 요소에만** 나오고, 다음 손가락 입력에서 곧바로 다시 꺼진다.
+     🔴 버튼(`.tab-btn`·카드 버튼)은 `:focus-visible` 로 이미 잘 갈리므로 **건드리지 않는다.**
+     아래 `lastDialogInputWasKeyboard` 는 모달 첫 초점용으로 예전부터 있던 것이고 목적이 다르다. */
   let lastDialogInputWasKeyboard = false;
+  /* 🔴 **키보드 일련번호**(2026-08-10). 「마지막 입력 하나」로 판정하면 안 되기 때문에 만들었다.
+     아래 `pointerdown` 이 `lastDialogInputWasKeyboard` 를 **즉시 지운다.** 그래서
+     「손가락으로 연다 → 중간에 `Tab` → 손가락으로 닫는다」 를 닫는 순간의 값만 보면 **손가락**으로
+     읽어 테두리를 숨긴다. 확정된 정책은 **「키보드가 조금이라도 끼면 보임」** 이라 틀린 판정이다.
+     → 그래서 **한 번 올라가면 절대 안 내려가는 번호**를 따로 센다. 팝업을 열 때 번호를 적어 두고
+       닫을 때 견주면 **그 사이에 키보드가 끼었는지**를 알 수 있다.
+     ⚠️ `Esc` 는 **번호에만** 넣는다 — `lastDialogInputWasKeyboard` 는 건드리지 않는다.
+        그 값은 「대상 선정」과 「닫기 버튼 첫 초점」에도 쓰이므로 뜻을 바꾸면 안 된다.
+     ⚠️ 이 기록은 `capture` 단계라 `Esc` 로 창을 닫는 처리보다 **항상 먼저** 실행된다(확인함). */
+  let keyboardSeq = 0;
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ') {
       lastDialogInputWasKeyboard = true;
     }
+    if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'Esc') {
+      keyboardSeq++;
+    }
+    if (e.key === 'Tab') document.documentElement.classList.add('kbd-nav');
   }, true);
-  document.addEventListener('pointerdown', () => {
+  /* 🔴 **팝업을 「연 자리」를 따로 적어 둔다** (2026-08-09 · 코덱스가 맥 사파리에서 발견).
+     **사파리는 마우스로 버튼을 눌러도 그 버튼에 초점을 주지 않는다.** 그래서 팝업들이
+     `document.activeElement` 를 복귀 대상으로 저장하면 **엉뚱한 자리**를 잡는다.
+     실제로 이런 일이 났다 — 셀럽 스토리를 열었다 닫으면 초점이 그 셀럽 카드에 놓이는데,
+     그 뒤 **레시피 카드를 마우스로 눌러** 상세를 열고 `Esc` 로 닫으면
+     **방금 누른 카드가 아니라 아까 그 셀럽 카드**로 돌아가며 파란 테두리가 남았다.
+     내 코드·가챠도 마우스로 열고 닫으면 그 버튼이 아니라 **페이지로** 돌아갔다.
+     🔴 **파란 테두리를 감추는 식으로 덮지 않는다** — 돌아갈 자리 자체를 바로잡는다. */
+  let lastPointerTarget = null;
+  document.addEventListener('pointerdown', (e) => {
     lastDialogInputWasKeyboard = false;
+    document.documentElement.classList.remove('kbd-nav');
+    const el = e.target instanceof Element
+      ? e.target.closest('button, a[href], [role="button"], [tabindex]:not([tabindex="-1"])')
+      : null;
+    lastPointerTarget = el instanceof HTMLElement ? el : null;
   }, true);
+  /* 팝업이 열릴 때 「닫으면 돌아갈 자리」를 **고르는** 함수다.
+     ⚠️ 마우스·손가락으로 연 경우에만 「누른 요소」를 쓴다. **키보드로 연 경우는 지금 그대로**
+        `document.activeElement` 가 정답이다(그때는 초점이 실제로 그 버튼에 있다).
+     ⚠️ 「누른 요소」가 없으면(사진처럼 버튼이 아닌 것을 눌렀을 때) 예전 방식으로 물러선다.
+     🔴 **고르는 방식은 2026-08-10 구조 개선에서도 한 줄도 바꾸지 않았다.** 바뀐 것은
+        「고른 뒤 무엇으로 감싸 돌려주는가」뿐이다(아래 `popupOpener`). */
+  function popupOpenerEl() {
+    if (!lastDialogInputWasKeyboard && lastPointerTarget && lastPointerTarget.isConnected) {
+      return lastPointerTarget;
+    }
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active !== document.body) return active;
+    return lastPointerTarget && lastPointerTarget.isConnected ? lastPointerTarget : null;
+  }
+  /* 🔴 이제 **요소가 아니라 복귀표**를 돌려준다(2026-08-10, 2차).
+     돌아갈 자리만으로는 「테두리를 보일지」를 정할 수 없어서, **연 순간의 키보드 번호**를
+     같이 담아 두어야 하기 때문이다(위 `keyboardSeq` 주석 참고).
+     🔴 이 모양을 받는 곳이 열 곳이라 **한꺼번에 바꿨다.** 한 곳만 옛 방식으로 두면
+        `target.isConnected` 를 읽다가 **오류 없이 조용히** 초점 복귀만 안 되는 고장이 난다. */
+  function popupOpener() {
+    return makeReturnTicket(popupOpenerEl());
+  }
   function focusDialogClose(btn) {
     btn.classList.toggle('focus-silent', !lastDialogInputWasKeyboard);
     btn.addEventListener('blur', () => btn.classList.remove('focus-silent'), { once: true });
     btn.focus({ preventScroll: true });
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     🔴 팝업을 닫고 **돌아갈 자리에 초점을 주는 공용 함수**(2026-08-10).
+     🔴 **팝업 열 곳이 모두 이 함수를 거친다.** 닫기 함수에서 직접 `.focus()` 를 부르지 않는다
+        (`docs/.claude/audit/audit-focus.mjs` 가 커밋 전에 이것을 검사한다).
+     ⚠️ 열 곳을 **한 작업에서 한꺼번에** 연결했다. 나눠서 연결하면 아직 안 바꾼 곳이
+        복귀표를 요소로 잘못 읽어 **오류 없이 조용히** 초점 복귀만 안 되는 고장이 난다.
+        같은 이유로, 앞으로도 **한 곳만 옛 방식으로 되돌리지 말 것.**
+
+     ■ 무엇을 정하나 (2026-08-10 사용자님 확정)
+        | 언제                                   | 초점 복귀 | 테두리 |
+        | 키보드가 조금이라도 끼면(Tab·Enter·Space·Esc) | 한다 | 보인다 |
+        | 순수하게 손가락·마우스만                  | 한다 | 숨긴다 |
+        | 판단이 애매하면                          | 한다 | 보인다(안전한 쪽) |
+     🔴 **초점 복귀 자체는 없애지 않는다.** 아이폰 화면낭독기 사용자의 조작도 「손가락」이라,
+        손가락일 때 복귀를 끄면 그분들이 읽던 자리를 잃는다.
+     ───────────────────────────────────────────────────────────────────────── */
+
+  /* 팝업을 열 때 만드는 **복귀표**. 「어디로 돌아갈지」와 「그때의 키보드 번호」를 같이 담는다.
+     ⚠️ 「어디로 돌아갈지 고르는 일」은 여기서 하지 않는다 — 경로마다 지금 방식 그대로 두고,
+        고른 결과만 이 함수에 넣는다(스토리·확인창처럼 특수한 경로가 있다). */
+  function makeReturnTicket(el) {
+    return {
+      el: el instanceof HTMLElement ? el : null,
+      openSeq: keyboardSeq,                       // 열던 순간의 키보드 번호
+      openedByKeyboard: lastDialogInputWasKeyboard // 키보드로 열었나
+    };
+  }
+
+  /* 🔴 **번호는 그대로 두고 돌아갈 자리만 갈아 끼운다**(2026-08-10, 2차).
+     두 경우에 쓴다. 둘 다 「연 순간」과 「자리를 정하는 순간」이 다르다.
+     ① **스토리** — 돌아갈 셀럽 카드는 **닫을 때** 이름으로 새로 찾는다(카드가 매번 다시 그려진다).
+     ② **물러설 자리** — 원래 자리가 못 쓰게 됐을 때 닫기 버튼 등으로 물러선다.
+     🔴 번호를 새로 찍으면 **그 사이에 쓴 키보드가 통째로 지워져** 테두리가 잘못 숨는다.
+        그래서 **반드시 원래 표의 번호를 물려받는다.** */
+  function retargetReturnTicket(표, el) {
+    const 원본 = normalizeReturnTicket(표);
+    return {
+      el: el instanceof HTMLElement ? el : null,
+      openSeq: 원본 ? 원본.openSeq : null,                 // 원본이 없으면 「애매함」 → 테두리 보임
+      openedByKeyboard: 원본 ? 원본.openedByKeyboard : null
+    };
+  }
+
+  /* 요소를 그냥 받은 경우에도 복귀표로 바꿔 준다.
+     🔴 팝업끼리 넘기는 값(`pendingModalReturnFocus`)이 옛 모양(요소)으로 남아 있어도
+        조용히 깨지지 않게 하려는 안전장치다. 이때는 **번호를 모르므로 「애매함」** 으로 친다. */
+  function normalizeReturnTicket(값) {
+    if (!값) return null;
+    if (값 instanceof HTMLElement) return { el: 값, openSeq: null, openedByKeyboard: null };
+    if (typeof 값 === 'object' && 'el' in 값) return 값;
+    return null;
+  }
+
+  /* 이 팝업이 열려 있는 동안 **키보드가 한 번이라도 끼었나.**
+     🔴 판정 정보가 없거나 어긋나면 **참(=테두리 보임)** 으로 돌려준다. 안전한 쪽이다. */
+  function returnTicketUsedKeyboard(표) {
+    if (!표) return true;
+    if (표.openedByKeyboard) return true;
+    if (typeof 표.openSeq !== 'number') return true;   // 번호를 모른다 → 애매함
+    return keyboardSeq !== 표.openSeq;                 // 그 사이에 키보드가 끼었다
+  }
+
+  /* 🔴 실제로 `.focus()` 를 부르는 **유일한 복귀 지점.** 각 팝업 닫기 함수는 직접 부르지 않는다.
+     - 복귀 대상이 아직 화면에 있는지 본다(`isConnected`·`hidden`)
+     - `preventScroll` 로 화면이 튀지 않게 한다
+     - 위 정책대로 테두리 표시 여부를 정한다
+     - 🔴 초점이 실제로 안 갔으면 임시 클래스(`focus-silent`)를 **반드시 되돌린다** —
+       남으면 나중의 정상적인 키보드 초점 표시까지 감춘다
+     ⚠️ 「시트 안쪽으로 돌아가는」 경로(「나갈까요?」 확인창)가 있으므로
+        **「바깥 요소로만 복귀」를 전제하지 않는다.** 어디든 받은 자리로 간다. */
+  function applyReturnFocus(표) {
+    const 복귀표 = normalizeReturnTicket(표);
+    const el = 복귀표 && 복귀표.el;
+    if (!(el instanceof HTMLElement) || !el.isConnected || el.hidden) return false;
+    const 테두리숨김 = !returnTicketUsedKeyboard(복귀표);
+    const 지우기 = () => el.classList.remove('focus-silent');
+    const 뿌리 = document.documentElement;
+    const 켜져있었나 = 뿌리.classList.contains('kbd-nav');
+
+    if (테두리숨김) {
+      /* 순수하게 손가락·마우스만 → 테두리를 숨긴다 */
+      el.classList.add('focus-silent');
+      el.addEventListener('blur', 지우기, { once: true });
+    } else {
+      /* 🔴 키보드가 끼었거나 애매하다 → 테두리를 **보여야** 한다(2026-08-10 사용자님 확정, ㉯안).
+         ⚠️ `focus-silent` 를 안 붙이는 것만으로는 **부족하다.** 카드류는 `.kbd-nav` 가 있어야만
+            테두리를 그리는데(`styles.css` 의 `.kbd-nav .card-open:focus`), 그 표시는
+            **마지막 `pointerdown` 에서 이미 떨어져 있다.** 그대로 두면
+            「손가락으로 열고 → 중간에 Tab → 손가락으로 닫기」에서 테두리가 안 나온다.
+         → **초점을 주기 전에 다시 켠다.** 표시는 초점을 받은 그 요소에만 나오고,
+           다음 손가락·마우스 입력에서 위 `pointerdown` 이 곧바로 다시 끈다.
+         ⚠️ 앞 팝업에서 붙었을지 모르는 `focus-silent` 는 여기서 반드시 떼어 낸다. */
+      뿌리.classList.add('kbd-nav');
+      el.classList.remove('focus-silent');
+    }
+
+    el.focus({ preventScroll: true });
+    const 닿았다 = document.activeElement === el;
+
+    /* 🔴 초점이 실제로 안 갔으면 건드린 것을 전부 되돌린다.
+       남으면 엉뚱한 곳의 표시를 감추거나(`focus-silent`) 없던 표시를 만든다(`kbd-nav`). */
+    if (!닿았다) {
+      if (테두리숨김) { el.removeEventListener('blur', 지우기); 지우기(); }
+      else if (!켜져있었나) 뿌리.classList.remove('kbd-nav');
+    }
+    return 닿았다;
+  }
+
+  /* 팝업 닫기 함수가 부르는 바깥문. 기본은 **다음 프레임**에 실행한다
+     (지금까지 열 곳이 모두 `requestAnimationFrame` 으로 감싸 온 것과 같은 시점이다).
+     ⚠️ `{ immediate: true }` 는 **함수 단위 시험용**이다 — 실제 팝업에서는 쓰지 않는다. */
+  function restorePopupFocus(표, options) {
+    if (options && options.immediate) return applyReturnFocus(표);
+    requestAnimationFrame(() => applyReturnFocus(표));
+    return null;   // 「예약했다」는 뜻. 성공 여부는 이 시점에 알 수 없다
+  }
+  /* 🔴 **`visibility` 로 여닫는 시트 전용** 첫 초점 (2026-08-09 · 코덱스가 맥 크롬에서 발견).
+     내 코드·기록하기·내 메뉴·스티커 보기 넷은 닫혀 있을 때 `visibility: hidden` 이고
+     0.22초에 걸쳐 켜진다(주소창 버그 때문에 `display:none` 을 못 쓴다 — `styles.css` 참고).
+     **안 보이는 요소에는 초점이 안 내려앉는다.** 그래서 여는 첫 프레임에 한 번만 부르면
+     `focus-silent` 클래스만 붙고 **초점은 뒤 상단바 버튼에 그대로 남았다** —
+     그 상태로 `Tab` 을 누르면 창 안이 아니라 **뒤 화면**으로 갔다.
+     → **초점이 실제로 닿을 때까지 다시 시도한다.**
+
+     🔴 **「몇 프레임」이 아니라 「몇 초」로 센다** (2026-08-09 · 코덱스 지적).
+        처음엔 15프레임으로 셌는데, **120Hz 화면에서는 그것이 0.125초밖에 안 돼**
+        0.22초 전환을 **다 덮지 못했다.** 화면이 빠를수록 일찍 포기하는 셈이었다.
+        그래서 **실제 흐른 시간**으로 바꿨다 — 0.4초까지 본다(전환 0.22초 + 여유).
+
+     🔴 **다음 셋 중 하나라도면 즉시 그만둔다** — 안 그러면 남의 조작을 방해한다.
+        ① 창이 이미 닫혔다(`.open` 이 없다) ② 버튼이 화면에서 빠졌다
+        ③ **초점이 창 안의 다른 요소로 갔다** — 사용자가 그것을 만졌다는 뜻이다
+
+     🔴 **③은 「창 안」으로 좁혀야 한다.** 처음에 「어디로든 갔으면 그만」으로 썼다가
+        **첫 초점이 아예 안 가는 것을 만들었다** — 크롬은 마우스로 누르면 **연 버튼**이 초점을
+        가지므로, 그것을 「사용자가 옮겼다」로 보고 곧바로 포기해 버렸다(실측으로 잡았다).
+        연 버튼은 **창 밖**이므로 이제 걸리지 않는다.
+
+     ⚠️ 표시 처리(`focus-silent`)는 **첫 번째에만** 한다 — 매번 부르면 blur 처리가 쌓인다.
+     ⚠️ 레시피 상세·스토리·가챠·칼럼은 `display` 로 여닫아 이 문제가 없다. **그쪽은 안 건드린다.** */
+  const SHEET_READY_MS = 400;   // 전환 0.22초 + 여유
+  function focusDialogCloseWhenReady(btn) {
+    if (!btn) return;
+    const 창 = btn.closest('.stamp-sheet-overlay, .stamp-view-overlay');
+    const 시작 = performance.now();
+    let 처음 = true;
+    const step = () => {
+      if (!btn.isConnected) return;                       // ② 버튼이 빠졌다
+      if (창 && !창.classList.contains('open')) return;    // ① 창이 닫혔다
+      const 지금초점 = document.activeElement;
+      if (지금초점 && 지금초점 !== btn && 창 && 창.contains(지금초점)) return;   // ③ 창 안 다른 곳으로 갔다
+      if (처음) { focusDialogClose(btn); 처음 = false; }
+      else btn.focus({ preventScroll: true });
+      if (document.activeElement === btn) return;          // 닿았다
+      if (performance.now() - 시작 >= SHEET_READY_MS) return;
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  /* 🔴 화면을 옮긴 뒤 초점이 내려앉을 자리로 보낸다(2026-08-09 사용자 지시, 5-5).
+     칼럼에서 「메뉴/레시피 보러 가기」를 누르면 칼럼이 닫히면서 **눌렀던 버튼이 사라진다.**
+     그대로 두면 초점이 <body> 로 빠져 화면낭독기 사용자는 새 화면이 온 것도 모른 채 길을 잃는다.
+     🔴 `preventScroll: true` 가 핵심이다 — 화면 전환은 이미 맨 위로 스크롤했는데
+        (`switchSection`·`render(true)`), 여기서 또 스크롤하면 **눈에 보이는 사람의 화면이 튄다.**
+     ⚠️ 검색창으로는 보내지 않는다(사용자 지시) — 갑자기 글자 입력칸에 들어가면 당황스럽다. */
+  function focusLanding(el) {
+    if (!el) return false;
+    el.focus({ preventScroll: true });
+    return document.activeElement === el;
+  }
+  /* 🔴 메뉴 화면의 착지 자리(2026-08-09) — 개수줄이 **늘 보이는 게 아니라서** 차례로 물러선다.
+     전골 탭에서는 「검색창·개수를 감춘다」가 규칙이라(2026-08-03 사용자 확정, `.page.mn-pot-tab`)
+     개수줄이 `display:none` 이 되고, 안 보이는 요소에는 초점이 안 내려앉는다.
+     ⚠️ 실제로 「메뉴 보러 가기」가 전골로 가므로 **이 경우가 기본**이다 —
+        처음에 개수줄만 노렸다가 초점이 레시피 화면에 남는 것을 실측으로 잡았다.
+     그때는 **지금 분류(전골)** 를 알려 주는 탭 버튼으로 보낸다. 사용자님이 「분류」도 착지로 허용했다. */
+  function focusMenuLanding() {
+    if (focusLanding(document.getElementById('mnListCount'))) return true;
+    return focusLanding(document.querySelector('#mnPotTab .tab-btn.active, #mnTabs .tab-btn.active'));
   }
 
   // 같은 레시피의 하트가 여러 곳에 동시에 그려져 있다(홈 인기소스 .hp-like / 홈 리스트·브라우즈 .hc-row-like).
@@ -592,7 +885,7 @@
         saveLikeCounts(); // ⚠️ saveLikes()를 쓰면 안 된다 — 위 주석 참고(하트 초기화 버그)
         if (!likesInitialSorted) {
           // 첫 도착: 인기순 그리드 재정렬 + 홈 인기소스 순위도 실데이터로 다시 그림
-          renderGrid();
+          renderList();
           if (typeof renderHomePopular === 'function') renderHomePopular();
           // 🔴 홈 탕·히든메뉴도 반드시 다시 그릴 것 (2026-07-30).
           //    이 둘도 byPopular로 정렬하는데 여기서 빠져 있어서, 첫 방문(localStorage 캐시가
@@ -600,7 +893,7 @@
           //    메기살덮밥(3개)이 홈 히든메뉴 상위 3칸에서 밀려 안 보였다 — 라이브에서 확인.
           //    refreshLikeCounts()는 숫자만 갱신하고 순서는 건드리지 않으므로 이걸로는 안 된다.
           if (typeof renderHomeCatList === 'function') renderHomeCatList('히든메뉴', hiddenGridEl);
-          if (typeof renderHomeCatGrid === 'function') renderHomeCatGrid('탕', tangGridEl);
+          // 🔴 전골은 여기서 다시 안 그린다 — 메뉴 육수라 좋아요와 무관하고 순서도 고정이다(2026-08-05)
           refreshLikeCounts();
         } else {
           refreshLikeCounts();
@@ -643,6 +936,10 @@
   const modalClose = document.getElementById('modalClose');
   const modalFavBtn = document.getElementById('modalFavBtn');
 
+  // 검색 보정: 괄호·공백을 뺀 형태로도 맞춘다(`라젤(이 아는 동생)소스` ↔ `라젤 이 아는 동생소스`)
+  // 🔴 괄호·공백만 친 경우 이 값이 빈 문자열이 되는데, 빈 문자열은 아무 이름에나 들어 있어서
+  //    그대로 쓰면 전부가 걸린다(2026-08-02 실제로 그랬다). 쓰는 쪽에서 반드시 비었는지 본다.
+  const 검색꼴 = (s) => (s || '').replace(/[()\s]/g, '');
   function getFiltered() {
     const q = query.trim();
     // 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 이중 필터(AND)다(2026-07-25 확정) —
@@ -655,8 +952,12 @@
       filtered = filtered.filter((r) => favorites.has(r.id));
     }
     if (q) {
+      const nq = 검색꼴(q);          // 비면 아래 보정을 건너뛴다 — 안 그러면 전부가 걸린다
       filtered = filtered.filter((r) =>
-        r.name.includes(q) || (r.ings || []).some((i) => i[0].includes(q))
+        // 괄호·공백을 뺀 형태로도 맞춰본다 — 화면에 보이는 대로 쳐도, 빼고 쳐도 찾아진다
+        // (예: `라젤(이 아는 동생)소스` ↔ `라젤 이 아는 동생소스`)
+        r.name.includes(q) || (nq && 검색꼴(r.name).includes(nq))
+        || (r.ings || []).some((i) => i[0].includes(q))
       );
     }
     // 정렬은 인기순 고정(2026-07-24 정렬 드롭다운 삭제 결정).
@@ -791,6 +1092,12 @@
     emoji: '🌿',
     ingFilter: '고수',             // 이 재료가 든 항목을 칼럼 하단에 자동 나열
     catFilter: '소스',             // 그중 이 카테고리만(요리·히든메뉴 제외, '소스'만)
+    /* 🔴 「고수가 들어간 메뉴」(2026-08-05 사용자 요청) — 소스 목록 바로 아래 절.
+       ⚠️ 소스는 재료(ingFilter)로 **자동 수집**되지만 메뉴는 **손으로 적는다.**
+          메뉴 데이터에는 재료가 없어서 모을 근거가 없다. 이름은 `MENU_DATA` 의 것과 글자까지 같아야 한다.
+       🔴 **여기가 원본이다.** 별도 주소 페이지(cilantro.html)는 복사본이고, 여기가 바뀌면
+          거기도 반드시 같이 바꾼다(사용자가 정한 규칙). */
+    menus: ['고수 듬뿍 훠궈', '고수'],
     body:
       // 도입부는 '훅 한 문장 + 설명 한 문단'으로 끊는다(2026-07-29). 안물안궁 도입부와 같은 꼴.
       '<p class="col-lead">고수를 한입 먹자마자 “어? 비누 맛인데?” 싶었다면 기분 탓만은 아니에요.</p>' +
@@ -1213,7 +1520,11 @@
       '<p class="col-outro col-outro--plain">소스바 앞에서 헤매지 않도록, <span class="col-brand">하딜고고</span>가 함께할게요.</p>' +
       // '레시피를 구경하며 기다려도 좋아요'를 실제로 이어주는 출구. 누르면 칼럼을 닫고 전체보기를 연다.
       // data-go 값으로 동작을 정한다(openColumn에서 배선) — 소스 카드의 data-rid와 같은 방식이다.
-      '<button class="col-cta" type="button" data-go="browse">레시피 보러 가기</button>',
+      '<button class="col-cta" type="button" data-go="browse">레시피 보러 가기</button>' +
+      // 🔴 메뉴로 가는 출구도 나란히(2026-08-05 사용자 요청). **전골로 보낸다** — 메뉴 탭의 기본 자리다.
+      //    ⚠️ 복사본(guide.html)에는 이 버튼이 없다. 거기 CTA 는 「하딜고고에서 더 보기」 링크 하나뿐이고
+      //       앱이 없어 탭 이동을 못 한다 — 소스 줄이 거기서 안 눌리는 것과 같은 경우다.
+      '<button class="col-cta" type="button" data-go="menu">메뉴 보러 가기</button>',
   };
 
   function pickMonthlyFeatures() {
@@ -1285,6 +1596,7 @@
       pill.style.transform = 'translateX(' + (base + frac * stride - pill.offsetWidth / 2) + 'px)';
     }
     monthlyUpdatePill = updatePill; // 섹션이 보이게 될 때(syncMonthlyFeature) 재배치용
+    syncMonthlyFeature();           // 만들었으면 편다 — 옛날엔 renderList 가 불러줬다(2026-08-03 홈 분리)
     mfScroll.addEventListener('scroll', updatePill, { passive: true });
     window.addEventListener('resize', updatePill);
     updatePill();
@@ -1335,16 +1647,6 @@
   const viewRecipeEl = document.getElementById('view-recipe');
   const listTitleEl = document.getElementById('listTitle');
 
-  function isHome() {
-    return !browsing;
-  }
-  function syncHome() {
-    const home = isHome();
-    viewRecipeEl.classList.toggle('is-home', home);
-    if (home) requestAnimationFrame(() => fitPopularTitles(popularRailEl));
-    // 검색창·카테고리탭·닫기버튼이 전부 list-head 안(개수 옆·윗줄)에 있어 홈에서는 list-head 자체가
-    // 숨겨지며 함께 숨음(2026-07-25) — 개별 요소 hidden 토글 불필요
-  }
   function browseTitle() {
     if (query.trim()) return '검색 결과';
     if (showFavoritesOnly) return '즐겨찾기';
@@ -1352,10 +1654,9 @@
     if (activeCat !== '전체') return activeCat;
     return '레시피';
   }
-  // 홈 섹션(전체 ›·아바타)에서 브라우즈로 들어감(cat/person) — 항상 홈에서만 호출되므로
-  // 즐겨찾기·검색은 이미 꺼져 있는 게 보장되지만 방어적으로 한 번 더 초기화
+  // 홈의 「전체보기」에서 레시피 탭으로 넘어감(2026-08-03) — 카테고리를 지정해 열고 하단바 표시도 바뀐다.
+  // 즐겨찾기·검색은 홈에서 켤 수 없지만 방어적으로 한 번 더 초기화한다.
   function enterBrowse(cat, person) {
-    browsing = true;
     activeCat = cat || '전체';
     personFilter = person || null;
     if (showFavoritesOnly) {
@@ -1367,30 +1668,15 @@
       searchInput.value = '';
       searchBox.classList.remove('has-value');
     }
-    renderGrid();
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    renderList();
+    switchSection('recipe');   // 하단바 활성 표시까지 함께 바뀌고, 스크롤은 맨 위로 간다
   }
-  // 헤더 X(닫기) — 브라우즈의 유일한 탈출구. 탭·즐겨찾기·검색을 전부 리셋하고 홈으로.
-  function goHome() {
-    browsing = false;
-    activeCat = '전체';
-    personFilter = null;
-    if (showFavoritesOnly) {
-      showFavoritesOnly = false;
-      favToggleBtn.classList.remove('active');
-    }
-    if (query) {
-      query = '';
-      searchInput.value = '';
-      searchBox.classList.remove('has-value');
-    }
-    renderGrid();
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }
+  // 🔴 옛 goHome() 은 없앴다(2026-08-03) — 홈으로 가는 길은 하단바이고,
+  //    로고를 누르면 강제 새로고침(?_r=)이라 어차피 홈부터 다시 시작한다.
 
   function syncMonthlyFeature() {
-    // 홈에서만 노출 — 필터 중엔 결과에 집중
-    monthlyFeatureEl.hidden = !isHome();
+    // 이 배너는 #view-home 안에 있어 홈 탭에서만 보인다(2026-08-03). 데이터가 있을 때만 편다.
+    monthlyFeatureEl.hidden = false;
     // 보이게 된 직후 인디케이터 막대 재배치(숨김일 때 측정한 0값 교정)
     if (!monthlyFeatureEl.hidden && monthlyUpdatePill) monthlyUpdatePill();
   }
@@ -1403,18 +1689,38 @@
   const browseCatTabsEl = document.getElementById('browseCatTabs');
   const browseCatUnderlineEl = document.getElementById('browseCatUnderline');
   const browseCardCache = new Map(); // 브라우즈 그리드 카드(clean card) 캐시
-  const browseCloseEl = document.getElementById('browseClose');
+
+  // 🔴 고른 탭이 가로 스크롤 밖에 있으면 보이는 자리로 밀어준다(2026-08-04).
+  //    이 사이트는 스크롤바를 안 보여주므로(CLAUDE.md), 밀려 있는 탭은 스스로 나타나야 한다.
+  //    옆 탭이 살짝 걸치게 16px 을 남긴다 — "옆에 더 있다"는 유일한 신호다.
+  //    별도 IIFE 인 메뉴 코드도 써야 해서 window 에 건다(mnSyncUnderline 과 같은 방식).
+  function keepTabVisible(btn) {
+    // 🔴 스크롤되는 것은 `.tabs` 자신이다(styles.css @media all 의 overflow-x: auto).
+    //    감싼 .tabs-scroll 이 아니다 — 매장 탭에서도 실제로 미는 것은 `.tabs` 쪽이다(실측).
+    const box = btn && btn.closest('.tabs');
+    if (!box || box.scrollWidth <= box.clientWidth) return;   // 넘치지 않으면 할 일이 없다
+    const pad = 16;
+    const left = btn.offsetLeft;                              // .tabs 가 position:relative 라 이 값이 스크롤 좌표다
+    const right = left + btn.offsetWidth;
+    if (left - pad < box.scrollLeft) {
+      box.scrollTo({ left: Math.max(0, left - pad), behavior: 'smooth' });
+    } else if (right + pad > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: right + pad - box.clientWidth, behavior: 'smooth' });
+    }
+  }
+  window.keepTabVisible = keepTabVisible;
 
   function updateBrowseCatUnderline() {
     const active = browseCatTabsEl.querySelector('.tab-btn.active');
     if (active && active.offsetWidth) {
       browseCatUnderlineEl.style.width = active.offsetWidth + 'px';
       browseCatUnderlineEl.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      keepTabVisible(active);
     }
   }
-  // list-head가 홈에서는 통째로 숨겨지므로 브라우즈 중일 때만 다시 그리면 충분
+  // 뷰가 숨어 있어도 그려 둔다 — 탭을 눌러 레시피로 넘어오는 순간 이미 맞아 있어야 한다(2026-08-03).
+  // 숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡으므로 switchSection 에서 한 번 더 부른다.
   function renderBrowseCatTabs() {
-    if (!browsing) return;
     browseCatTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
     BROWSE_TABS.forEach((cat) => {
       const btn = document.createElement('button');
@@ -1422,9 +1728,12 @@
       btn.className = 'tab-btn' + (cat === activeCat ? ' active' : '');
       btn.textContent = cat;
       btn.addEventListener('click', () => {
+        // 같은 탭이면 아무 일도 하지 않는다(밑줄이 다시 그려지는 것을 막는다).
+        // 🔴 다른 탭이면 맨 위로 — 목록이 통째로 바뀌므로(2026-08-03 사용자 확정). 메뉴 탭도 같다.
         if (activeCat === cat) return;
         activeCat = cat;
-        renderGrid();
+        renderList();
+        window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
       });
       browseCatTabsEl.appendChild(btn);
     });
@@ -1433,11 +1742,26 @@
 
   // 즐겨찾기(북마크) — 브라우즈 카드 이미지 위 오버레이. 흰 아이콘+그림자(어떤 사진 위에서도 보이게, Q2 확정).
   const FAV_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
-  // span(버튼 아님) — hc-row-like와 같은 이유: 이 카드 자체가 <button>이라 그 안에 진짜 <button>을 중첩하면
-  // 브라우저가 파싱 중 바깥 버튼을 조기 종료시켜 DOM이 깨짐(실측 확인, 2026-07-24).
+  /* 🔴 진짜 <button> 이다 (2026-08-08, 전수조사 5-3).
+     예전에는 `<span role="button" tabindex="0">` 이었다. 카드 자체가 <button> 이라 그 안에 <button>을
+     중첩하면 브라우저가 파싱 중 바깥 버튼을 조기 종료시켜 DOM 이 깨졌기 때문이다(2026-07-24 실측).
+     이제 **카드가 <button> 이 아니다** — 카드는 <div> 이고, 상세 열기는 카드를 덮는 `.card-open`
+     버튼이 맡는다. 열기·즐겨찾기·좋아요가 서로 **형제**라 중첩이 사라졌다.
+     🔴 그래서 `role`·`tabindex`·`bindRoleButtonKeyboard` 가 전부 필요 없다 —
+        Tab 이동도 Enter·Space 도 브라우저가 알아서 한다. 되살리지 말 것. */
+  /* 🔴 카드 버튼 셋(열기·즐겨찾기·좋아요)의 **읽히는 이름**을 한 곳에서 만든다 (2026-08-08, 코덱스 지적).
+     예전에는 열기만 `r.name`, 나머지는 「즐겨찾기」·「좋아요」였다. 그러면
+     ① 버전만 다른 동명 레시피(`건희소스`가 여럿)가 전부 같은 이름으로 읽히고
+     ② 화면의 하트 33개가 죄다 「좋아요」라 **어느 레시피의 것인지 이름만으로 구분이 안 됐다.**
+     그래서 **레시피 이름 + 버전(있으면) + 동작**으로 통일한다 — 「건희소스 오리지널 · 2021 좋아요」.
+     ⚠️ `r.nameHtml` 은 태그가 섞여 있어 쓰지 않는다. 이름은 `r.name` 이 원본이다.
+     ⚠️ 눌림 여부는 `aria-pressed` 가 따로 전한다 — 이름에 「해제」 같은 말을 넣지 말 것. */
+  function cardLabel(r, 동작) {
+    return (r.name || '') + (r.ver ? ' ' + r.ver : '') + ' ' + 동작;
+  }
   function browseFavHtml(r) {
     const active = favorites.has(r.id);
-    return '<span class="browse-fav' + (active ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="즐겨찾기" aria-pressed="' + active + '">' + FAV_SVG + '</span>';
+    return '<button type="button" class="browse-fav' + (active ? ' active' : '') + '" data-id="' + r.id + '" aria-label="' + cardLabel(r, '즐겨찾기') + '" aria-pressed="' + active + '">' + FAV_SVG + '</button>';
   }
   function bindBrowseFav(container) {
     container.querySelectorAll('.browse-fav').forEach((btn) => {
@@ -1448,12 +1772,11 @@
         saveFavorites();
         setPressedState(btn, favorites.has(id));
       });
-      bindRoleButtonKeyboard(btn);
     });
   }
   function browseLikeHtml(r) {
     const active = likedByMe.has(r.id);
-    return '<span class="hc-row-like' + (active ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="좋아요" aria-pressed="' + active + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>';
+    return '<button type="button" class="hc-row-like' + (active ? ' active' : '') + '" data-id="' + r.id + '" aria-label="' + cardLabel(r, '좋아요') + '" aria-pressed="' + active + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></button>';
   }
   function bindBrowseLike(container) {
     container.querySelectorAll('.hc-row-like').forEach((el) => {
@@ -1464,8 +1787,13 @@
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         popHeart(el);
       });
-      bindRoleButtonKeyboard(el);
     });
+  }
+  /* 카드 전체를 덮는 「상세 열기」 버튼. 카드 안의 글이 이 버튼 밖에 있으므로 이름을 직접 준다.
+     ⚠️ `.card-open` 은 CSS 에서 `position:absolute; inset:0` 이다 — 카드에 `position:relative` 가
+        있어야 제자리에 덮인다(styles.css 에 함께 넣었다). */
+  function cardOpenHtml(r) {
+    return '<button type="button" class="card-open" aria-label="' + cardLabel(r, '상세 보기') + '"></button>';
   }
   // 그리드 카드(소스/히든메뉴/탕 공통) — 이미지 우상단 즐겨찾기. 아래는 이름(위)+부제(아래) 텍스트 칼럼과
   // 좋아요(오른쪽, 세로 가운데)를 감싸는 박스(.hc-card-foot)로 — 썸네일이 제각각이라 이름이 묻히는 문제 해결(2026-07-25).
@@ -1478,17 +1806,19 @@
   function buildBrowseGridCard(r, opts) {
     opts = opts || {};
     const interactive = opts.interactive !== false;
-    const el = document.createElement(interactive ? 'button' : 'div');
-    if (interactive) el.type = 'button';
+    // 🔴 카드는 이제 언제나 <div> 다(2026-08-08, 전수조사 5-3). 상세 열기는 `.card-open` 버튼이 맡는다.
+    //    예전엔 interactive 일 때 카드 자체가 <button> 이라 그 안의 하트가 중첩 버튼이 됐다.
+    const el = document.createElement('div');
     el.className = 'hc-card hc-card--browse' + (interactive ? '' : ' hc-card--static');
     el.dataset.id = r.id;
-    el.innerHTML = '<span class="hc-thumb"><span class="hc-badge-slot"></span>' + (opts.hideFav ? '' : browseFavHtml(r)) + homeCardBody(r, opts.eager) + '</span>'
+    el.innerHTML = (interactive ? cardOpenHtml(r) : '')
+      + '<span class="hc-thumb"><span class="hc-badge-slot"></span>' + (opts.hideFav ? '' : browseFavHtml(r)) + homeCardBody(r, opts.eager) + '</span>'
       + '<span class="hc-card-foot">'
       + '<span class="hc-card-txt"><span class="hc-row-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
       + (opts.hideLike ? '' : browseLikeHtml(r))
       + '</span>';
-    if (interactive) el.addEventListener('click', () => openModal(r));
+    if (interactive) el.querySelector('.card-open').addEventListener('click', () => openModal(r));
     if (!opts.hideFav) bindBrowseFav(el);
     if (!opts.hideLike) bindBrowseLike(el);
     return el;
@@ -1507,15 +1837,11 @@
     }
   }
 
-  function renderGrid() {
-    syncHome();
-    syncMonthlyFeature();
+  function renderList() {
     const filtered = getFiltered();
     listTitleEl.textContent = browseTitle();
     countEl.textContent = filtered.length;
     renderBrowseCatTabs();
-    // 즐겨찾기 켜져 있는 동안엔 닫기(X) 숨김 — 나가는 길은 즐겨찾기 버튼 하나로 통일(2026-07-25)
-    browseCloseEl.hidden = showFavoritesOnly;
     gridEl.innerHTML = '';
     if (filtered.length === 0) {
       const empty = document.createElement('p');
@@ -1559,18 +1885,24 @@
   //    — img onerror가 스스로 제거되는 방식이라, 나중에 사진만 넣으면 자동으로 얼굴로 바뀜.
   const celebRailEl = document.getElementById('celebRail');
   const popularRailEl = document.getElementById('popularRail');
-  const tangGridEl = document.getElementById('tangGrid');
+  const jeongolGridEl = document.getElementById('jeongolGrid');   // 홈 「전골」 — 레시피가 아니라 메뉴 육수다(2026-08-05)
   const hiddenGridEl = document.getElementById('hiddenGrid');
 
   // 가로 레일 마우스 드래그 스크롤(데스크탑용). 트랙패드·휠로만 되던 걸 손으로 끌 수 있게.
   //  - 컨테이너에 한 번만 붙임(레일은 innerHTML만 다시 그려도 컨테이너 자체는 유지됨).
   //  - 4px 넘게 끌면 dragMoved → 캡처 단계에서 자식 카드 클릭(이동)을 무효화.
+  //  - 🔴 끌 게 없으면 손 모양 커서를 안 준다(2026-08-04). 탭줄에도 쓰게 되면서 필요해졌다 —
+  //    레시피 카테고리는 넷이라 안 넘칠 때가 있는데, 그때 grab 커서만 뜨면 끌리는 줄 알고 헛손질한다.
+  //    레일(셀럽·인기소스)은 늘 넘치므로 지금까지와 똑같이 동작한다.
   function enableDragScroll(el) {
     if (!el) return;
-    el.classList.add('drag-scroll');
+    const 넘치나 = () => el.scrollWidth > el.clientWidth + 1;
+    const 커서맞추기 = () => el.classList.toggle('drag-scroll', 넘치나());
+    커서맞추기();
+    el.addEventListener('mouseenter', 커서맞추기);
     let down = false, startX = 0, startScroll = 0, moved = false;
     el.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
+      if (e.button !== 0 || !넘치나()) return;
       down = true; moved = false;
       startX = e.pageX;
       startScroll = el.scrollLeft;
@@ -1594,6 +1926,10 @@
   }
   enableDragScroll(celebRailEl);
   enableDragScroll(popularRailEl);
+  // 탭줄도 데스크탑에서 손으로 끌 수 있게(2026-08-04 사용자 요청) — 분류가 8개가 되면서 필요해졌다.
+  // 🔴 버튼이 아니라 **컨테이너**에 건다 — 탭 버튼은 다시 그려져도 `.tabs` 자체는 남는다.
+  enableDragScroll(browseCatTabsEl);
+  window.enableDragScroll = enableDragScroll;   // 매장 탭줄·메뉴 탭줄은 아래에서 붙인다(선언이 여기보다 뒤다)
   // 회색(#5F5E5A) 제외 — 'seen=회색 링'과 헷갈려서 안 본 셀럽이 꺼져 보이는 착시 방지(2026-07-22). 대신 베리로즈.
   const CELEB_COLORS = ['#D85A30', '#B98A44', '#7C9A5A', '#993556', '#534AB7', '#185FA5', '#0F6E56', '#B85575', '#A3612E', '#3E7C8A', '#8A5FB0'];
 
@@ -1667,6 +2003,15 @@
   // 자동 넘김용 — 지금 보고 있는 사람이 셀럽 순서(celebOrder)에서 몇 번째인지.
   let storyPersons = [];
   let storyPersonIdx = -1;
+  const storyCloseBtn = document.getElementById('storyClose');
+  const storyRecipeKbd = document.getElementById('storyRecipeKbd');
+  const storyAnnounceEl = document.getElementById('storyAnnounce');
+  /* 🔴 **처음 연 사람**을 따로 기억한다(2026-08-09, 스토리 접근성).
+     스토리는 마지막 칸에서 **다음 셀럽으로 이어지므로**, 「건희」로 열어도 닫을 때는 「마크」를
+     보고 있을 수 있다. 그때 **지금 사람**의 카드로 돌려보내면 **누른 적도 없는 카드**로 간다.
+     그래서 「처음 누른 그 카드」로 돌아가려고 이름을 따로 들고 있는다. */
+  let storyOpenPerson = null;
+  let storyReturnTicket = null;   // 연 순간의 키보드 번호를 담아 두는 복귀표(2026-08-10, 2차)
 
   // 한 사람의 스토리를 뷰어에 채운다(뷰어를 여닫지는 않는다).
   // atEnd=true면 마지막 칸부터 — 앞사람으로 되돌아갈 때 인스타처럼 그 사람의 끝에서 시작한다.
@@ -1679,6 +2024,8 @@
     storyIdx = atEnd ? storyList.length - 1 : 0;
     storyAvatarEl.innerHTML = '<img src="assets/people/' + personName + '.jpg" alt="" draggable="false" onerror="this.remove()">';
     storyNameEl.textContent = personName;
+    // 창 이름도 같이 갈아 끼운다 — 이름만으로는 창인지 모르므로 「스토리」를 붙인다
+    storyViewer.setAttribute('aria-label', personName + ' 스토리');
     // 각 세그먼트에 안쪽 채움 바(.story-seg-fill) — 현재 칸만 CSS 애니메이션으로 차오름
     storyProgress.innerHTML = storyList.map(() => '<span class="story-seg"><i class="story-seg-fill"></i></span>').join('');
     storyViewer.classList.remove('paused');
@@ -1690,9 +2037,38 @@
     storyPersons = celebOrder();
     storyPersonIdx = storyPersons.indexOf(personName);
     if (!loadStoryPerson(personName)) return;
+    storyOpenPerson = personName;   // 닫을 때 돌아갈 카드(위 주석 참고)
+    /* 🔴 **자리는 닫을 때 정하지만 번호는 지금 찍어 둔다**(2026-08-10, 2차).
+       카드는 매번 다시 그려져서 요소를 지금 붙들어 둘 수 없다. 그래도 「스토리를 연 순간의
+       키보드 번호」는 지금이 아니면 알 수 없으므로, 자리를 비운 표를 먼저 만들어 둔다. */
+    storyReturnTicket = makeReturnTicket(null);
+    /* 🔴 열 때도 끌어 닫기 뒤처리를 한 번 더 한다(2026-08-09) — 앞서 끌어 닫은 자리(`transform`)나
+       대기 처리가 남아 있으면 **새 스토리가 화면 아래에서 열리거나 저절로 닫힌다.** */
+    cancelDragClose();
     document.documentElement.style.overflow = 'hidden';
     storyViewer.classList.add('open');
     storyViewer.setAttribute('aria-hidden', 'false');
+    syncPageBackgroundA11y();   // 뒤 화면(본문·탭바·상단바)을 잠근다
+    /* 열면 초점을 X 로 보낸다. `focusDialogClose` 를 쓰는 이유는 「손가락으로 눌렀을 때 파란
+       테두리가 안 뜨게」다 — 🔴 그래서 `styles.css` 의 `focus-silent` 목록에 `.story-close` 도
+       넣어야 한다(안 넣으면 아이폰에서 파란 네모가 뜬다. 실제로 앱설치 X 에서 그런 적이 있다). */
+    requestAnimationFrame(() => focusDialogClose(storyCloseBtn));
+  }
+
+  /* 닫을 때 돌아갈 자리 — **처음 누른 카드** → 없으면 셀럽 줄 첫 카드 → 그것도 없으면 줄 제목.
+     ⚠️ 카드는 `renderCelebRail()` 이 매번 다시 그리므로 **눌렀던 그 요소는 이미 사라졌다.**
+        이름으로 **새로 찾아야** 한다. */
+  function storyReturnTarget() {
+    const 보이나 = (el) => !!el && el.isConnected && el.getClientRects().length > 0;
+    const rail = document.getElementById('celebRail');
+    if (storyOpenPerson && rail) {
+      const 카드 = rail.querySelector('.celeb[data-person="' + storyOpenPerson + '"]');
+      if (보이나(카드)) return 카드;
+    }
+    const 첫카드 = rail ? rail.querySelector('.celeb') : null;
+    if (보이나(첫카드)) return 첫카드;
+    const 제목 = document.querySelector('.celeb-sec-title');   // 「셀럽 레시피」 — 최후의 착지 자리
+    return 보이나(제목) ? 제목 : null;
   }
 
   // 옆 사람으로 이동(dir: +1 다음 / -1 이전). 갈 사람이 없으면 false.
@@ -1746,6 +2122,18 @@
       + '<div class="story-rname">' + (r.nameHtml || r.name) + '</div>'
       + (r.ver ? '<div class="story-rver">' + r.ver + '</div>' : '')
       + (r.desc ? '<div class="story-desc">' + r.desc + '</div>' : '');
+    /* 🔴 칸이 바뀌었다는 것을 화면낭독기에 **짧게 한 번** 알린다(2026-08-09).
+       그림과 글자가 바뀔 뿐이라 낭독기는 스스로 알아채지 못한다 — 처음 읽은 것만 읽고 끝난다.
+       ⚠️ **본문 전체를 다시 읽히지 않는다**(설명까지 매번 읽으면 길다). 진행바가 차오르는
+          동안에도 알리지 않는다 — **칸이 바뀔 때 이 한 줄뿐**이다. */
+    if (storyAnnounceEl) {
+      /* ⚠️ `r.ver` 를 빼면 안 된다 — 건희처럼 **같은 이름의 버전이 여러 칸**인 사람이 있어서,
+         이름만 읽으면 네 칸이 전부 「건희소스」로 똑같이 들린다. 화면에는 버전이 보인다. */
+      storyAnnounceEl.textContent = storyNameEl.textContent + ' 스토리, '
+        + (storyIdx + 1) + '/' + storyList.length + ', ' + r.name + (r.ver ? ' ' + r.ver : '');
+    }
+    // 키보드용 「레시피 보기」에 지금 칸의 이름을 달아 준다(버튼 글자는 그대로 「레시피 보기」)
+    if (storyRecipeKbd) storyRecipeKbd.setAttribute('aria-label', r.name + ' 레시피 보기');
     preloadNextStoryImages();
   }
 
@@ -1786,11 +2174,28 @@
     goToStoryPerson(-1);
   }
   function closeStory() {
+    /* 🔴 닫기는 **한 번만** 돈다(2026-08-09). 아래로 끌어 닫는 도중 `Esc`·X 가 겹치면
+       예전에는 두 번 돌아 초점 복귀까지 두 번 일어났다. 이미 닫혀 있으면 여기서 끝낸다. */
+    if (!storyViewer.classList.contains('open')) return;
+    cancelDragClose();   // 대기 중인 끌어 닫기 처리를 떼고 위치도 되돌린다
     storyViewer.classList.remove('open', 'paused');
     storyViewer.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
     const rt = document.getElementById('storyRecipeToggle');
     if (rt) rt.hidden = true; // 닫을 때 토글도 정리
+    if (storyAnnounceEl) storyAnnounceEl.textContent = '';  // 다시 열 때 옛 안내가 남지 않게
+    const 돌아갈곳 = storyReturnTarget();
+    storyOpenPerson = null;
+    syncPageBackgroundA11y();   // 뒤 화면 잠금을 푼다
+    /* 🔴 돌아갈 때는 **공용 복귀 함수**를 쓴다(2026-08-10, 2차).
+       그냥 `focus()` 하면 **손가락으로 닫아도 셀럽 카드에 파란 테두리가 남는다**(2026-08-09
+       사용자님 실기기 발견). 예전에는 `focusDialogClose` 로 막았는데, 그쪽은 **마지막 입력
+       하나**로 판정해서 「손가락으로 열고 → 중간에 Tab → 손가락으로 닫기」를 틀리게 봤다.
+       🔴 **자리는 위에서 이름으로 새로 찾은 그대로 쓴다** — 지금 보는 사람이 아니라
+          **처음 연 사람**의 카드다. 고르는 방식은 하나도 바꾸지 않았다. */
+    const 복귀표 = retargetReturnTicket(storyReturnTicket, 돌아갈곳);
+    storyReturnTicket = null;
+    if (돌아갈곳) restorePopupFocus(복귀표);
   }
 
   // 자동재생: 현재 진행바가 다 차면(animationend) 다음 칸으로
@@ -1807,7 +2212,18 @@
     if (Date.now() - storyPressT > 200) storyWasHold = true;
     storyViewer.classList.remove('paused');
   });
-  storyViewer.addEventListener('pointercancel', () => { storyViewer.classList.remove('paused'); });
+  /* 🔴 손가락이 **취소**됐을 때 멈춤을 풀지 말지 (2026-08-09 · 코덱스 지적).
+     「레시피 보기」 토글이 떠 있으면 그것은 **일부러 멈춰 둔 상태**다. 여기서 풀어 버리면
+     **토글은 그대로 떠 있는데 뒤에서 자동재생만 다시 흐른다.** 토글이 닫혔을 때만 푼다.
+     ⚠️ `pointerup`(정상적으로 손을 뗀 것)은 **건드리지 않는다** — 그쪽은 떼자마자 풀고,
+        이어서 오는 `click` 이 토글을 띄우며 다시 멈추는 것이 원래 순서다.
+     ⚠️ `pointercancel` 과 `touchcancel` 이 **같은 기준**을 쓰도록 함수 하나로 묶었다. */
+  function releasePauseIfNoToggle() {
+    const rt = document.getElementById('storyRecipeToggle');
+    if (rt && !rt.hidden) return;   // 토글이 떠 있으면 멈춤을 유지한다
+    storyViewer.classList.remove('paused');
+  }
+  storyViewer.addEventListener('pointercancel', releasePauseIfNoToggle);
 
   document.getElementById('storyClose').addEventListener('click', closeStory);
   // ── 탭 로직: 이미지 안 탭 = '레시피 보기' 토글 / 이미지 밖 탭 = 이전·다음 넘김 ──
@@ -1854,9 +2270,30 @@
   // 키보드: ← → 이동, Esc 닫기
   document.addEventListener('keydown', (e) => {
     if (!storyViewer.classList.contains('open')) return;
+    /* 🔴 레시피 상세가 **스토리 위에 겹쳐** 있으면 스토리는 손대지 않는다(2026-08-09).
+       예전엔 이 검사가 없어서 두 가지가 실제로 잘못 돌았다.
+       ① `Esc` 한 번에 **상세와 스토리가 같이 닫혔다** — 상세만 닫고 스토리로 돌아가려던 사람이
+          홈으로 튕겨 나갔다.
+       ② 상세가 떠 있는데 `←` `→` 가 **뒤 스토리를 몰래 넘겼다** — 닫고 나면 엉뚱한 칸이었고,
+          「레시피 보기」를 다시 누르면 화면에 보이던 것과 **다른 레시피**가 열렸다.
+       ⚠️ 여기서 막는 것은 **스토리의 중첩 경로뿐**이다. 키보드 처리 전체를 공통으로 묶지 않는다
+          — 5-5 에서 이미 끝낸 다른 창들을 다시 건드리게 되고 회귀 위험이 커진다. */
+    if (modalOverlay.classList.contains('open')) return;
     if (e.key === 'Escape') closeStory();
     else if (e.key === 'ArrowRight') storyNext();
     else if (e.key === 'ArrowLeft') storyPrev();
+  });
+  // Tab 을 스토리 안에 가둔다 — 안 그러면 안 보이는 뒤 화면 버튼들로 초점이 새어 나간다
+  storyViewer.addEventListener('keydown', (e) => trapFocusWithin(storyViewer, e));
+  /* 키보드용 「레시피 보기」 — 손가락용 토글과 **같은 일**을 한다(자동재생 정지 + 상세 열기).
+     ⚠️ 토글은 좌표로 뜨는 것이라 키보드로는 닿을 수 없었다. 그래서 길을 하나 더 낸 것이다. */
+  if (storyRecipeKbd) storyRecipeKbd.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideRecipeToggle();
+    if (!currentStoryRecipe) return;
+    storyViewer.classList.add('paused');
+    modalOverlay.classList.add('from-story');
+    openModal(currentStoryRecipe);
   });
   // 아래로 드래그 → 스토리 화면이 손 따라 내려가며 닫힘(인스타식). 조금만 내리면 스프링백.
   const storyPhoneEl = storyViewer.querySelector('.story-phone');
@@ -1867,11 +2304,37 @@
     storyViewer.style.transition = animate ? 'background-color .3s' : 'none';
     storyViewer.style.backgroundColor = '';
   }
+  /* 🔴 아래로 끌어 닫는 도중 **다른 길로 닫힐 때** 뒤처리 (2026-08-09 · 코덱스 지적으로 확인).
+     끌어 닫기는 0.26초 미끄러지는 연출이 **끝난 뒤**(`transitionend`) 닫는다. 그동안에
+     `Esc`·X 로 먼저 닫히면 예전에는 이런 일이 났다.
+       ① 대기하던 처리가 나중에 실행돼 **닫기가 두 번** 돈다
+       ② 내려간 위치(`transform`)가 **그대로 남아**, 다음 스토리가 화면 아래에서 열린다
+       ③ 남아 있던 처리가 **새로 연 스토리를 닫아 버린다**
+     그래서 대기 중인 처리를 **한 곳(`stPendingClose`)에서만 붙들고**, 어느 길로 닫히든
+     `cancelDragClose()` 로 **떼어내고 자리도 되돌린다.**
+     ⚠️ 스프링백(90px 미만)도 여기서 함께 정리된다 — 그쪽은 대기 처리가 없고 자리만 되돌리면 된다. */
+  let stPendingClose = null;
+  function cancelDragClose() {
+    if (stPendingClose) {
+      storyPhoneEl.removeEventListener('transitionend', stPendingClose);
+      stPendingClose = null;
+    }
+    stDragging = false;
+    stClearDrag(false);   // 연출 없이 즉시 제자리로 — 이미 닫힌 뒤라 눈에 안 보인다
+  }
+  /* 🔴 **닫히는 중(0.26초)에는 새 손가락을 아예 안 받는다** (2026-08-09 · 코덱스 지적).
+     받으면 아래 `touchstart` 의 `transition = 'none'` 이 **닫는 전환을 끊어 버린다.**
+     그러면 `transitionend` 가 **영영 안 오고**, 대기 처리(`stPendingClose`)가 남은 채
+     스토리는 **화면 밖으로 내려간 상태로 열려 있게** 된다.
+     ⚠️ 스프링백(0.34초)에는 걸지 않는다 — 그때는 대기 처리가 없고, 되돌아오는 도중
+        다시 잡아 끄는 것이 **자연스러운 동작**이다. */
   storyViewer.addEventListener('touchstart', (e) => {
+    if (stPendingClose) return;
     stDragY = e.touches[0].clientY; stDragX = e.touches[0].clientX; stDragging = false;
     storyPhoneEl.style.transition = 'none';
   }, { passive: true });
   storyViewer.addEventListener('touchmove', (e) => {
+    if (stPendingClose) return;
     const dy = e.touches[0].clientY - stDragY;
     const dx = e.touches[0].clientX - stDragX;
     if (!stDragging) {
@@ -1885,6 +2348,7 @@
     storyViewer.style.backgroundColor = 'rgba(20,20,22,' + Math.max(0, 1 - dy / 480) + ')'; // 뒤 배경 서서히 걷힘
   }, { passive: false });
   storyViewer.addEventListener('touchend', (e) => {
+    if (stPendingClose) return;
     if (!stDragging) return;
     stDragging = false;
     const dy = e.changedTouches[0].clientY - stDragY;
@@ -1893,9 +2357,29 @@
       storyViewer.style.transition = 'background-color .26s';
       storyPhoneEl.style.transform = 'translateY(100vh)';
       storyViewer.style.backgroundColor = 'rgba(20,20,22,0)';
-      const done = () => { storyPhoneEl.removeEventListener('transitionend', done); closeStory(); stClearDrag(false); };
+      /* 🔴 `transform` 이 끝났을 때만 받는다 — 배경색 등 **다른 전환에는 반응하지 않는다.**
+         이 검사가 없으면 취소된 뒤 일어난 엉뚱한 전환이 닫기를 부를 수 있다. */
+      const done = (e) => {
+        if (e.target !== storyPhoneEl || e.propertyName !== 'transform') return;
+        storyPhoneEl.removeEventListener('transitionend', done);
+        stPendingClose = null;
+        closeStory();       // 자리 되돌리기는 closeStory 안의 cancelDragClose 가 한다
+      };
+      stPendingClose = done;
       storyPhoneEl.addEventListener('transitionend', done);
     } else { stClearDrag(true); } // 스프링백
+  }, { passive: true });
+  /* 🔴 운영체제가 손가락을 가로챘을 때(전화가 오거나, 화면 가장자리 쓸기 등) 뒤처리 (2026-08-09).
+     `touchend` 가 **아예 안 온다.** 그대로 두면 스토리가 **끌려 내려간 자리에 멈춰** 있고
+     자동재생도 멈춘 채로 남는다.
+     ⚠️ 닫는 전환 중이면 손대지 않는다 — 건드리면 그 전환이 끊긴다.
+     ⚠️ 멈춤은 `pointercancel` 과 **같은 기준**으로 푼다(`releasePauseIfNoToggle`) —
+        「레시피 보기」 토글이 떠 있으면 **일부러 멈춰 둔 것**이라 풀지 않는다. */
+  storyViewer.addEventListener('touchcancel', () => {
+    if (stPendingClose) return;
+    stDragging = false;
+    stClearDrag(true);   // 제자리로 되돌린다(스프링백과 같은 연출)
+    releasePauseIfNoToggle();
   }, { passive: true });
 
   // 홈 카드(클린 스타일) 공통 마크업 — 캐러셀·그리드가 함께 씀. 클릭은 컨테이너에서 data-id로 위임.
@@ -1916,11 +2400,17 @@
     return homeCardName(r)
       + (r.source ? '<span class="hp-src">' + r.source + '</span>' : '');
   }
+  /* 직속 카드만 바인딩(:scope >) — 카드 안의 하트(같은 data-id)까지 모달이 열리는 것 방지.
+     🔴 두 모양을 모두 받는다(2026-08-08, 전수조사 5-3).
+        ① 카드가 <div> + 안에 `.card-open` 버튼 — 인기소스·목록형처럼 하트가 있는 카드
+        ② 카드 자체가 <button> — 홈 그리드·전골처럼 하트가 없어 중첩이 아예 없는 카드
+     ⚠️ ①에서 <div> 에 직접 걸면 하트를 눌러도 열린다(클릭이 위로 올라온다). 반드시 `.card-open` 에 건다. */
   function bindHomeCards(container) {
-    // 직속 카드만 바인딩(:scope >) — 인기소스 카드 안에 중첩된 하트(data-id)까지 모달 열리는 것 방지
-    container.querySelectorAll(':scope > [data-id]').forEach((btn) => {
-      const r = RECIPES.find((x) => x.id === btn.dataset.id);
-      if (r) btn.addEventListener('click', () => openModal(r));
+    container.querySelectorAll(':scope > [data-id]').forEach((card) => {
+      const r = RECIPES.find((x) => x.id === card.dataset.id);
+      if (!r) return;
+      const opener = card.matches('button') ? card : card.querySelector(':scope > .card-open');
+      if (opener) opener.addEventListener('click', () => openModal(r));
     });
   }
 
@@ -1945,13 +2435,14 @@
     popularRailEl.innerHTML = top.map((r, i) =>
       // 이름 앞 별(연예인 표시) 미노출(2026-07-25) — 이 레일은 "인기 소스" 랭킹이 목적이라
       // 별(셀럽) 여부와 섞이면 랭킹 카드에 배지가 두 종류(메달+별) 겹쳐 산만해짐. 브라우즈·모달 별은 유지.
-      '<button class="hp-card" type="button" data-id="' + r.id + '">'
+      // 🔴 카드가 <div> 이고 열기·좋아요가 형제 <button> 이다(2026-08-08, 전수조사 5-3).
+      '<div class="hp-card" data-id="' + r.id + '">' + cardOpenHtml(r)
       + '<span class="hp-thumb">' + homeRankBadge(i) + homeCardBody(r, true) + '</span>'
       + '<span class="hp-foot"><span class="hp-foot-txt"><span class="hp-name">' + (r.nameHtml || r.name) + '</span>'
       + (r.ver ? '<span class="hp-sub">' + r.ver + '</span>' : '') + '</span>'
-      + '<i class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="좋아요" aria-pressed="' + likedByMe.has(r.id) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></i>'
+      + '<button type="button" class="hp-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" aria-label="' + cardLabel(r, '좋아요') + '" aria-pressed="' + likedByMe.has(r.id) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">' + getLikeCount(r.id) + '</span></button>'
       + '</span>'
-      + '</button>'
+      + '</div>'
     ).join('');
     bindHomeCards(popularRailEl);
     // 하트 = 홈에서 바로 좋아요(카드 모달과 겹치지 않게 stopPropagation). 누르면 빨강 채움 + 팝 애니메이션
@@ -1963,7 +2454,6 @@
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         popHeart(el);
       });
-      bindRoleButtonKeyboard(el);
     });
     requestAnimationFrame(() => fitPopularTitles(popularRailEl));
   }
@@ -1994,12 +2484,13 @@
   function renderHomeCatList(cat, listElement) {
     const list = RECIPES.filter((r) => r.cat === cat).sort(byPopular);
     listElement.innerHTML = list.slice(0, 3).map((r) =>
-      '<button class="hc-row" type="button" data-id="' + r.id + '">'
+      // 🔴 행이 <div> 이고 열기·좋아요가 형제 <button> 이다(2026-08-08, 전수조사 5-3).
+      '<div class="hc-row" data-id="' + r.id + '">' + cardOpenHtml(r)
       + '<span class="hc-row-thumb">' + homeCardBody(r) + '</span>'
       + '<span class="hc-row-txt"><span class="hc-row-name' + starCls(r) + '">' + nameWithStar(r) + '</span>'
       + (r.ver ? '<span class="card-sub">' + r.ver + '</span>' : '') + '</span>'
-      + '<span class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" role="button" tabindex="0" aria-label="좋아요" aria-pressed="' + likedByMe.has(r.id) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></span>'
-      + '</button>'
+      + '<button type="button" class="hc-row-like' + (likedByMe.has(r.id) ? ' active' : '') + '" data-id="' + r.id + '" aria-label="' + cardLabel(r, '좋아요') + '" aria-pressed="' + likedByMe.has(r.id) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="hc-row-like-n like-count">' + getLikeCount(r.id) + '</span></button>'
+      + '</div>'
     ).join('');
     bindHomeCards(listElement);
     // 하트 = 홈 리스트에서 바로 좋아요(카드 모달과 안 겹치게 stopPropagation). 인기소스와 동일 동작
@@ -2011,14 +2502,58 @@
         syncLikeUI(id); // 누른 하트뿐 아니라 같은 레시피의 다른 하트도 함께
         popHeart(el);
       });
-      bindRoleButtonKeyboard(el);
     });
   }
+  /* 🔴 홈 「전골」 — 메뉴 탭의 육수 중 **넷만** 보여준다(2026-08-05 사용자 확정).
+     순서는 사용자가 정한 것이다(2열 그리드라 좌·우·좌·우로 놓인다). 인기순 같은 계산이 아니다.
+     ⚠️ 이름은 `MENU_DATA.broths` 의 것과 **글자까지 같아야** 한다 — 그림 파일 이름도 이것을 쓴다.
+        (`청유마라훠궈` 와 `우유마라훠궈` 는 다른 항목이다. 헷갈리기 쉬우니 고칠 때 확인할 것.)
+     🔴 카드 생김새는 옛 「탕」 그리드 그대로다(`.hc-card` + 그림 + 이름). 사용자 지시 —
+        「이미지만 따오고 아래에 전골 이름 표시」. 그래서 레시피 카드의 하트·출처는 안 붙인다. */
+  const HOME_BROTHS = ['토마토탕훠궈', '청유마라훠궈', '후추탕훠궈', '고수 듬뿍 훠궈'];
+  function renderHomeJeongol() {
+    if (!jeongolGridEl) return;
+    const D = window.MENU_DATA;
+    if (!D || !D.broths) { jeongolGridEl.innerHTML = ''; return; }  // 메뉴 데이터가 없으면 조용히 빈칸
+    jeongolGridEl.innerHTML = HOME_BROTHS.map((n) => {
+      const b = D.broths.find((x) => x.n === n);
+      if (!b) return '';   // 이름이 바뀌었으면 그 칸만 빠진다(화면이 깨지지 않게)
+      /* 🔴 부제 줄은 **넷 다 만든다**(2026-08-05 사용자 지시) — 하나만 있으면 2열 그리드에서
+         카드 높이가 어긋난다. 없는 카드는 빈 줄로 자리만 잡는다(`&nbsp;` 라야 높이가 생긴다). */
+      const 부제 = b.jeju
+        ? '<span class="jeongol-sub jeongol-sub--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정</span>'
+        : '<span class="jeongol-sub" aria-hidden="true">&nbsp;</span>';
+      /* 🔴 `data-broth` 를 쓰면 **안 된다** — 메뉴 탭이 문서 전체에서 `[data-broth]` 를 듣고 있어서
+         홈 카드를 눌러도 그 육수가 냄비에 담긴다(2026-08-05 사용자가 발견). 이름을 달리해 떼어 놓는다. */
+      return '<button class="hc-card" type="button" data-home-broth="' + n + '">'
+        + '<span class="hc-thumb">'
+        + (b.img ? '<img src="assets/menu/' + n + '.webp" alt="' + n + '" loading="lazy" draggable="false">' : '')
+        + '</span>'
+        + '<span class="hp-name">' + n + '</span>'
+        + 부제
+        + '</button>';
+    }).join('');
+    jeongolGridEl.querySelectorAll('[data-home-broth]').forEach((btn) => {
+      btn.addEventListener('click', () => 전골로가기(btn.dataset.homeBroth));
+    });
+  }
+  /* 메뉴 탭의 전골로 보낸다. 섹션을 먼저 바꾼 뒤 분류를 고른다 —
+     반대로 하면 메뉴 화면이 아직 안 보여서 폭이 0 이라 밑줄이 자리를 못 잡는다(mnSyncUnderline 주석 참고). */
+  /* 🔴 **담고** 메뉴 탭 전골로 간다(2026-08-05 사용자 확정). 처음엔 이동만 했는데 되짚어 바꿨다 —
+     홈 전골 카드는 메뉴 탭 육수 카드와 **같은 그림**이라, 한 곳에선 담기고 한 곳에선 안 담기면 더 헷갈린다.
+     「구경하다 담기면 놀란다」는 걱정은 **이동이 붙으면서 사라졌다** — 담긴 게 바로 눈앞에 보이고
+     그 자리에서 뺄 수 있다. ⚠️ 냄비가 차 있으면 안 담기고 토스트만 뜬다(메뉴 탭 안과 같은 규칙). */
+  function 전골로가기(이름) {
+    if (이름 && window.mnAddBroth) window.mnAddBroth(이름);
+    switchSection('menu');
+    if (window.mnGoTab) window.mnGoTab('전골');
+  }
+
   function renderHomeSections() {
     renderCelebRail();
     renderHomePopular();
-    renderHomeCatList('히든메뉴', hiddenGridEl); // 히든메뉴 = 리스트(위), 탕 = 그리드(아래)로 스왑(2026-07-24)
-    renderHomeCatGrid('탕', tangGridEl);
+    renderHomeCatList('히든메뉴', hiddenGridEl); // 히든메뉴 = 리스트(위), 전골 = 그리드(아래)
+    renderHomeJeongol();
   }
 
   function renderIngList(el, items) {
@@ -2040,6 +2575,14 @@
 
   let currentModalRecipe = null;
   let modalReturnFocus = null;
+  /* 🔴 다른 팝업이 「내 원래 입구」를 상세에 넘겨주는 자리다(2026-08-09, 5-5 · 코덱스 지적).
+     칼럼·가챠에서 레시피를 열면 그 팝업이 먼저 닫히는데, 그 순간 초점이 잡고 있던 버튼은
+     조상이 숨어 버려 **초점이 <body> 로 풀린다.** 그대로 두면 아래 openModal 이 그 <body> 를
+     복귀 대상으로 잡아, 상세를 닫아도 **원래 눌렀던 자리로 못 돌아간다.**
+     ⚠️ `finishCloseModal` 의 `isConnected && !hidden` 검사로는 못 거른다 — `hidden` 속성은
+        오버레이에 붙지 버튼에는 안 붙어서 **둘 다 통과**한다.
+     그래서 닫는 쪽이 원래 입구를 여기 놓아두고, openModal 이 그것을 우선 쓴다. 한 번 쓰면 비운다. */
+  let pendingModalReturnFocus = null;
   let modalClosingViaHistory = false;
   const MODAL_HISTORY_KEY = 'haidilgogoRecipeModal';
   function modalHistoryRecipeId() {
@@ -2048,14 +2591,18 @@
   }
 
   function openModal(r) {
-    // 카드는 레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
+    // 카드는 홈·레시피 섹션에만 있음 — iOS 클릭 지연 등으로 카드 클릭이 다른 섹션 전환 뒤 늦게 도착해
     // "메뉴/매장 위에 레시피 모달이 뜨는" desync(모달·섹션 어긋남)를 원천 차단(2026-07-21).
-    if (pageEl.dataset.section !== 'recipe') return;
+    // 🔴 홈이 탭으로 갈라지면서 'home' 을 넣어야 한다(2026-08-03) — 안 넣으면 홈의 인기소스·히든메뉴·
+    //    탕 카드, 스토리·가챠의 「레시피 보기」가 전부 눌러도 아무 일이 안 일어난다(실제로 그랬다).
+    if (pageEl.dataset.section !== 'recipe' && pageEl.dataset.section !== 'home') return;
     const wasOpen = modalOverlay.classList.contains('open');
     currentModalRecipe = r;
     if (!wasOpen) {
-      modalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      // 다른 팝업이 넘겨준 입구가 있으면 그것이 우선이다(위 pendingModalReturnFocus 주석 참고)
+      modalReturnFocus = pendingModalReturnFocus || popupOpener();
     }
+    pendingModalReturnFocus = null;   // 한 번 쓰면 반드시 비운다 — 다음 열기에 새면 엉뚱한 곳으로 돌아간다
     syncTopbarH(); // 모바일 전체화면 패널이 상단바 바로 아래에서 시작하도록 열 때마다 재측정
     // 배경 스크롤 잠금은 반드시 html(실제 스크롤 컨테이너)에 걸어야 한다. body에 걸면
     // body가 새 스크롤 컨테이너가 되어, sticky 상단바가 "스크롤 0인 body" 기준으로 붙어
@@ -2179,11 +2726,18 @@
       document.documentElement.style.overflow = '';
     }
     syncPageBackgroundA11y();
-    const target = modalReturnFocus && modalReturnFocus.isConnected && !modalReturnFocus.hidden
-      ? modalReturnFocus
-      : (storyViewer.classList.contains('open') ? document.getElementById('storyClose') : null);
+    /* 🔴 `modalReturnFocus` 는 **복귀표**다(2026-08-10, 2차 · 요소가 아니다).
+       칼럼·가챠가 넘겨준 표(`pendingModalReturnFocus`)일 수도 있는데, 그때는 **그 팝업을 연
+       순간의 번호**가 들어 있다. 상세를 여닫는 동안 키보드가 끼었는지까지 그 번호로 가려진다.
+       ⚠️ 스토리 위에서 열린 상세는 원래 자리가 못 쓸 때 **스토리 X 로 물러선다** —
+          번호는 물려받는다(`retargetReturnTicket`). */
+    const 복귀표 = modalReturnFocus;
     modalReturnFocus = null;
-    if (target) requestAnimationFrame(() => target.focus());
+    const el = 복귀표 && 복귀표.el;
+    if (el && el.isConnected && !el.hidden) restorePopupFocus(복귀표);
+    else if (storyViewer.classList.contains('open')) {
+      restorePopupFocus(retargetReturnTicket(복귀표, document.getElementById('storyClose')));
+    }
   }
 
   function closeModal(options) {
@@ -2239,7 +2793,7 @@
   syncTopbarH();
   window.addEventListener('resize', syncTopbarH);
 
-  // 데스크톱 우클릭으로 이미지 저장·복사 막기 — 사이트 모든 <img>(로고·카드/모달 썸네일·발도장 스티커 등)에
+  // 데스크톱 우클릭으로 이미지 저장·복사 막기 — 사이트 모든 <img>(로고·카드/모달 썸네일·스티커 등)에
   // 컨텍스트 메뉴 차단. 문서 위임이라 나중에 동적 생성되는 이미지도 자동 적용.
   // ⚠️ 완벽한 보호 아님(개발자도구·네트워크 탭으로 우회 가능) — 무심코 저장하는 것만 억제.
   document.addEventListener('contextmenu', (e) => {
@@ -2247,14 +2801,67 @@
   });
 
   // 상세/모달이 열린 채 상단바(탭·검색·즐겨찾기 등)를 누르면 닫고 그 동작을 그대로 실행
-  // (발도장 보기 모달도 지역 탭 누르면 닫히고 그 지역으로 필터 — 레시피 상세와 동일 규칙)
+  // (스티커 보기 모달도 지역 탭 누르면 닫히고 그 지역으로 필터 — 레시피 상세와 동일 규칙)
   // ⚠️ 공유 버튼(#topShareBtn)은 화면/섹션을 바꾸지 않으므로 예외 — 캡처 단계라 이 리스너가 버튼 자체의
   // 클릭 핸들러보다 먼저 실행돼, 예외 없이는 모달이 열린 채 공유를 눌러도 모달이 먼저 닫혀버렸다(2026-07-25 버그 수정).
   topbarEl.addEventListener('click', (e) => {
-    if (e.target.closest('#topShareBtn')) return;
-    if (modalOverlay.classList.contains('open')) closeModal();
-    if (stampViewOverlay.classList.contains('open')) closeStampView();
-    if (!columnOverlay.hidden) closeColumn(); // 기획 칼럼(아티클)도 같은 규칙
+    /* ⚠️ 공유 버튼은 화면·섹션을 안 바꾸므로 **레시피 상세·스티커 보기·칼럼**은 그대로 둔다
+       (2026-07-25 버그 수정 — 이 리스너가 캡처 단계라 버튼 제 손보다 먼저 돌아, 공유만 눌러도
+       상세가 닫혀 버렸다). 🔴 내 메뉴·내 코드는 **이 예외에 넣지 않는다**(2026-08-09 사용자 확정) —
+       「그 밖의 상단바 기능 버튼을 누르면 닫는다」가 규칙이고 공유도 그 하나다. */
+    const 공유 = !!e.target.closest('#topShareBtn');
+    if (!공유) {
+      if (modalOverlay.classList.contains('open')) closeModal();
+      if (stampViewOverlay.classList.contains('open')) closeStampView();
+      // 🔴 복귀 없이 닫는다(2026-08-09, 5-5) — 지금 누른 상단바 버튼이 초점을 가져가야 한다.
+      //    되돌리면 다음 프레임에 칼럼을 열었던 자리로 초점이 튄다.
+      if (!columnOverlay.hidden) closeColumn({ restoreFocus: false }); // 기획 칼럼(아티클)도 같은 규칙
+    }
+
+    /* ══ 내 메뉴 · 내 코드 (2026-08-09 사용자 확정) ══════════════════════════════
+       🔴 **자기 아이콘은 건드리지 않는다.** 이 리스너는 캡처 단계라 버튼 제 손보다 **먼저** 돈다 —
+          여기서 닫아 버리면 곧이어 도는 여닫이가 「닫혀 있네」 하고 **다시 연다.**
+          그래서 냄비는 냄비 여닫이가, 코드는 코드 여닫이가 각자 닫게 둔다.
+       🔴 **빈 공간이면 초점을 되돌리고**(누를 것이 없었으니 원래 자리로),
+          **버튼이면 안 되돌린다**(방금 누른 버튼이 초점과 동작을 가져가야 한다).
+       ⚠️ 닫을 때는 반드시 각자의 정상 닫기 함수를 쓴다 — 아이콘의 `is-open`(빨강)이 거기서 떨어진다.
+          담은 메뉴·코드 값은 그대로 남는다. 지우는 것은 「창이 떠 있다」는 표시뿐이다. */
+    const 자기아이콘 = e.target.closest('#potToggleBtn, #topCodeBtn');
+    const 누른것 = e.target.closest('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const 되돌릴까 = { restoreFocus: !누른것 };   // 빈 공간(누른 것이 없음) → 되돌린다
+
+    /* ══ 스티커 「기록하기」 작성 창 (2026-08-09, 5-5 추가 보완 · 사용자님 확정) ══════════
+       예전에는 여기 **스티커 보기(closeStampView)만** 있고 **작성 창은 빠져 있었다.**
+       그래서 작성 중에 지역 탭이나 빈 공간을 눌러도 창이 안 닫혔다 — 합의된 예외가 아니라 누락이다.
+       🔴 작성 중인 내용이 **바뀌었으면 바로 닫지 않는다.** 확인창을 띄우고 **지금 누른 동작을 붙든다.**
+          - 「계속 작성」 → 붙든 동작도 버린다(지역도 안 바뀐다)
+          - 「나가기」   → 창을 닫고 붙든 동작을 그때 실행한다(지역 이동이 이어진다)
+       ⚠️ 그래서 **여기서 원래 동작을 멈춰야 한다.** 이 리스너는 캡처 단계라
+          `stopPropagation()` 이면 지역 탭 제 손이 안 돈다. 나중에 되살릴 때는
+          `stampLeaveReplaying` 플래그로 이 가로채기를 한 번 건너뛴다. */
+    if (!stampLeaveReplaying && stampSheetOverlay.classList.contains('open') && !stampAnimating) {
+      const 지역탭 = e.target.closest('#stampTabs .tab-btn');
+      if (지역탭 || !누른것) {                       // 지역 탭 또는 빈 공간 (스티커 화면 상단바엔 이 둘뿐이다)
+        if (stampDirty()) {
+          e.preventDefault();
+          e.stopPropagation();                       // 지역 이동을 일단 막는다
+          requestCloseStampSheet(지역탭 ? () => {    // 「나가기」를 누르면 그때 이어서 실행
+            stampLeaveReplaying = true;              // 다시 눌러도 여기서 또 가로채지 않게
+            try { 지역탭.click(); } finally { stampLeaveReplaying = false; }
+          } : null);
+          return;
+        }
+        // 안 바뀌었으면 바로 닫고, 지역 이동은 원래대로 이어진다(막지 않는다)
+        requestCloseStampSheet();
+      }
+    }
+
+    if (!자기아이콘 || 자기아이콘.id !== 'potToggleBtn') {
+      if (window.mnCloseSheet) window.mnCloseSheet(되돌릴까);
+    }
+    if (!자기아이콘 || 자기아이콘.id !== 'topCodeBtn') {
+      if (syncOverlay && syncOverlay.classList.contains('open')) closeSyncSheet(되돌릴까);
+    }
   }, true);
   modalFavBtn.addEventListener('click', () => {
     if (!currentModalRecipe) return;
@@ -2266,7 +2873,7 @@
     }
     saveFavorites();
     setPressedState(modalFavBtn, favorites.has(id));
-    renderGrid();
+    renderList();
   });
 
   // 검색은 카테고리 탭과 겹치는 필터(AND, 2026-07-25 확정) — activeCat을 건드리지 않는다.
@@ -2274,31 +2881,134 @@
   searchInput.addEventListener('input', (e) => {
     query = e.target.value;
     searchBox.classList.toggle('has-value', query.length > 0);
-    renderGrid();
+    renderList();
   });
-  // 즐겨찾기도 카테고리 탭과 겹치는 필터 — 홈에서 켜면 브라우즈 진입, 브라우즈 중 켜면 현재 탭 유지.
-  // 끌 때는 "켰던 자리"로: 홈에서 켰으면 꺼질 때 홈으로, 브라우즈 중 켰으면 꺼져도 그 브라우즈에 남음(2026-07-25 수정).
-  let favEnteredFromHome = false;
+  // 즐겨찾기도 카테고리 탭과 겹치는 필터다. 🔴 버튼이 레시피 탭 상단바에만 있으므로(2026-08-03
+  // 상단바 규칙) 「켰던 자리로 돌아가기」 장치는 없앴다 — 켜고 끄는 곳이 언제나 레시피 탭이다.
   favToggleBtn.addEventListener('click', () => {
     showFavoritesOnly = !showFavoritesOnly;
     setPressedState(favToggleBtn, showFavoritesOnly);
-    if (showFavoritesOnly) {
-      favEnteredFromHome = !browsing;
-      browsing = true;
-    } else if (favEnteredFromHome) {
-      browsing = false;
-      favEnteredFromHome = false;
-    }
-    renderGrid();
-    // 화면이 통째로 바뀌므로 맨 위로. enterBrowse()·헤더 X에는 이미 있는데 여기만 빠져 있어서,
-    // 홈에서 스크롤한 뒤 즐겨찾기를 켜면 목록 중간부터 보였다(2026-07-25).
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    renderList();
+    scrollToTop();   // 목록이 통째로 바뀌므로 맨 위로
   });
 
   // ===== 오늘의 소스 가챠 =====
   const gachaOverlay = document.getElementById('gachaOverlay');
   const gachaModal = document.getElementById('gachaModal');
   const gachaClose = document.getElementById('gachaClose');
+  const gachaAnnounce = document.getElementById('gachaAnnounce');   // 결과 음성 안내 자리(2026-08-09)
+
+  /* ══ 가챠 효과음 (2026-08-09 사용자님 확정) ═══════════════════════════════════════
+     🔴 **소리 파일이 없다.** 브라우저가 직접 계산해서 낸다(Web Audio) — 아이콘을 그림 파일 대신
+        코드(SVG)로 그리는 것과 같은 방식이다. 그래서 저작권·출처 표기·용량 문제가 전부 없다.
+        ⚠️ 효과음 파일을 쓰려다 접은 이유: `app/` 은 공개 저장소라 무료 사이트 대부분의
+           「소스 파일과 함께 재배포 금지」 조항에 걸린다(자세한 것은 유저 메모리).
+     🔴 **iOS 무음 스위치는 일부러 안 뚫는다**(2026-08-09 사용자님 확정) — 무음은 「소리 내지 마」라는
+        명시적 의사다. `<video>` 로 우회하는 방법이 알려져 있지만 **쓰지 않는다.**
+        ⚠️ 그래서 아이폰 무음 상태에서는 안 들리는 것이 **정상**이다. 고장이 아니다.
+     🟢 화면낭독기 결과 안내(#gachaAnnounce)는 무음 스위치와 무관하게 나온다 — 별개다. */
+  const 가챠볼륨 = 0.35;   // 전체 크기 — 갑자기 크면 놀란다. 시험판에서 귀로 맞춘 값이다
+  let gachaAudio = null;
+  /* 소리 장치를 켜거나 깨운다. **깨어났는지는 보장하지 않는다** — 그건 `소리준비됨()` 이 본다.
+     🔴 `resume()` 은 Promise(나중에 성패가 정해지는 부탁)라 바깥 `try/catch` 로는 실패를 못 잡는다.
+        안 받아 주면 콘솔에 오류만 남으므로 여기서 받아서 조용히 넘긴다. */
+  const 소리켜기 = () => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;                       // 지원 안 하면 조용히 넘어간다
+      gachaAudio = gachaAudio || new AC();
+      if (gachaAudio.state !== 'running') {       // 'suspended' 와 아이폰의 'interrupted' 둘 다
+        const p = gachaAudio.resume && gachaAudio.resume();
+        if (p && p.catch) p.catch(() => {});
+      }
+      return gachaAudio;
+    } catch (e) { return null; }                  // 소리는 덤이다 — 실패해도 뽑기는 정상 동작
+  };
+  /* 🔴 **소리를 낼 수 있을 때만** 장치를 돌려준다(2026-08-09 코덱스 지적).
+     깨우기는 곧바로 끝나지 않는다. 깨어나기를 기다렸다가 예약하면 **그림은 이미 다 지나갔는데
+     소리만 뒤늦게 따라온다** — 그래서 아직 안 깨어났으면 **그 회차는 소리를 통째로 건너뛴다.**
+     ⚠️ 예약을 미뤄 두었다가 나중에 몰아 내는 방식은 쓰지 않는다. 늦은 소리는 없는 것만 못하다. */
+  const 소리준비됨 = () => {
+    const ctx = 소리켜기();
+    return ctx && ctx.state === 'running' ? ctx : null;
+  };
+  /* 🔴 지금 울리고 있거나 울리기로 예약된 소리를 **전부 적어 둔다**(2026-08-09 코덱스 지적).
+     예약만 해 놓고 손을 놓으면 **창을 닫아도 소리가 계속 난다** — 실제로 그랬다.
+     끝난 소리는 스스로 목록에서 빠지고 연결도 끊는다(안 끊으면 계속 쌓인다). */
+  const gachaOscs = new Set();
+  function 가챠소리등록(o, g) {
+    const 짝 = { o: o, g: g };
+    gachaOscs.add(짝);
+    o.onended = () => {
+      gachaOscs.delete(짝);
+      try { o.disconnect(); g.disconnect(); } catch (e) {}
+    };
+  }
+  /* 예약된 것까지 **지금 즉시** 끈다. 시작 시각보다 앞서 `stop()` 이 닿으면 그 소리는 아예 안 난다
+     (Web Audio 규칙 — 마지막 `stop()` 이 이긴다). */
+  function 가챠소리전부끄기() {
+    gachaOscs.forEach((짝) => {
+      try { 짝.o.onended = null; 짝.o.stop(); } catch (e) {}
+      try { 짝.o.disconnect(); 짝.g.disconnect(); } catch (e) {}
+    });
+    gachaOscs.clear();
+  }
+  /* 음 하나 = 「어떤 높이를, 얼마나 길게, 어떻게 사그라들게」.
+     `f2` 를 주면 그 높이로 미끄러진다. `gain` 은 0~1 (전체 크기의 비율). */
+  function 가챠음(t0, f, dur, gain, f2) {
+    const ctx = gachaAudio;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f, t0);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(gain, t0 + 0.008);   // 8ms 로 올린다 — 0에서 바로 켜면 「딱」 하고 튄다
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(ctx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+    가챠소리등록(o, g);   // 닫을 때 끌 수 있게 적어 둔다(위 주석 참고)
+  }
+  /* ══ 🔴 가챠 타이밍 — **그림과 소리가 같은 값을 본다** (2026-08-09 코덱스 지적) ══════════
+     예전엔 같은 숫자가 코드 여기저기에 흩어져 있어서 **한 곳만 바꾸면 소리와 그림이 어긋났다**
+     (실제로 130ms 어긋난 적이 있다). 이제 여기 한 곳만 고치면 된다.
+     ⚠️ `styles.css` 와 겹치는 값이 **둘** 있다 — 아직 코드로 연결하지 않았으므로 **같이 고칠 것.**
+        `dropMs` = `.gacha-ing` 의 `animation: gachaDrop .43s` / `firstContact` = `@keyframes gachaDrop` 의 `70%`
+        (CSS 와 직접 연결하는 것은 배포 후로 미뤘다 — `docs/review/가챠-효과음-코덱스답변.md`) */
+  const GACHA_TIMING = {
+    dropMs: 430,           // 재료 하나가 떨어지는 시간 (= CSS `.43s`)
+    firstContact: 0.70,    // 그릇에 **처음 닿는** 지점 (= CSS 키프레임 `70%`)
+    gapMs: 170,            // 재료와 재료 사이 간격
+    audioOffsetMs: -10,    // 실기기(아이폰)에서 귀로 맞춘 값(2026-08-09 사용자님)
+    sparkleMs: 130,        // 마지막 착지 뒤 완성 반짝임까지
+    resultSettleMs: 370,   // 마지막 착지 뒤 **결과를 공개하기까지의 여유** (연출이 가라앉는 시간)
+    imageFallbackMs: 1500, // 🔴 위와 성격이 다르다 — 「이미지가 아무리 느려도」의 한계일 뿐,
+                           //    그림 타이밍과 무관하므로 같이 묶어서 계산하지 말 것
+  };
+  // 마지막 재료가 착지하는 시각 · 결과를 공개하는 시각 — 재료 개수에서 **계산한다**(숫자를 적지 않는다)
+  const 가챠마지막착지 = () => (GACHA_DROPS.length - 1) * GACHA_TIMING.gapMs + GACHA_TIMING.dropMs;
+  const 가챠결과공개 = () => 가챠마지막착지() + GACHA_TIMING.resultSettleMs;
+  /* 🔴 재료가 떨어질 때 — **뽑기를 누르는 순간 다섯 개를 한꺼번에 예약**한다.
+     착지 순간에 소리를 내면 **그보다 일찍 낼 방법이 없다.** 그런데 그림상 재료가 그릇에
+     **처음 닿는 것은 낙하 애니메이션의 `firstContact` 지점**이고, 착지 콜백이 도는 자리는
+     100% 지점이라 **130ms 늦다**(실기기에서 어긋나게 들렸다).
+     미리 예약하면 시각을 정확히 맞출 수 있고 `setTimeout` 흔들림도 없어진다. */
+  function 가챠방울소리예약(total) {
+    const ctx = 소리준비됨(); if (!ctx) return;   // 안 깨어났으면 이 회차는 소리 없이 진행
+    const 기준 = ctx.currentTime + 0.02;
+    const 첫접촉초 = (GACHA_TIMING.dropMs * GACHA_TIMING.firstContact + GACHA_TIMING.audioOffsetMs) / 1000;
+    const 간격초 = GACHA_TIMING.gapMs / 1000;
+    for (let i = 0; i < total; i++) {
+      // 「톡」 — 소스가 차오를수록 음이 조금씩 올라가 결과의 「반짝」으로 이어진다
+      가챠음(기준 + i * 간격초 + 첫접촉초, 520 * Math.pow(1.12, i), 0.075, 0.35 * 가챠볼륨);
+    }
+  }
+  // 결과가 확정될 때 — 「반짝」이 올라갔다가 화음으로 퍼진다
+  function 가챠결과소리() {
+    const ctx = 소리준비됨(); if (!ctx) return;
+    const t = ctx.currentTime + 0.02;
+    [1318, 1760].forEach((f, i) => 가챠음(t + i * 0.05, f, 0.22, 0.5 * 가챠볼륨));
+    [1046, 1318, 1568].forEach((f, i) => 가챠음(t + 0.1 + i * 0.03, f, 0.5, 0.4 * 가챠볼륨));
+  }
   const gachaStage = document.getElementById('gachaStage');
   const gachaMat = document.getElementById('gachaMat');
   const gachaBowl = document.getElementById('gachaBowl');
@@ -2323,10 +3033,18 @@
   let gachaLast = -1;
   let gachaPicked = null;
 
+  /* 🔴 폭죽만 `gachaStage` 에 붙는다 — 재료·별은 `gachaIngs` 라 `gachaResetBowl()` 이 지워 주지만
+     **폭죽은 안 지워졌다**(2026-08-09 코덱스 지적). 결과 직후 닫고 곧바로 다시 열면
+     **옛 폭죽이 새 창에 남아 보인다.** 그래서 표시를 붙여 두고 아래에서 걷어낸다.
+     ⚠️ 이 이름은 `styles.css` 에 없다 — 걷어내려고 붙이는 표시일 뿐 모양과 무관하다. */
+  function 가챠폭죽정리() {
+    gachaStage.querySelectorAll('.gacha-confetti').forEach((el) => el.remove());
+  }
   function gachaConfetti() {
     for (let i = 0; i < 26; i++) {
       const s = document.createElement('span');
       const z = 7 + Math.random() * 7;
+      s.className = 'gacha-confetti';   // 걷어내기용 표시(위 주석 참고)
       s.style.cssText = 'position:absolute;left:104px;top:102px;width:' + z + 'px;height:' + (z * 0.6) + 'px;background:' + GACHA_CONFETTI[i % GACHA_CONFETTI.length] + ';border-radius:2px;pointer-events:none;z-index:9;';
       gachaStage.appendChild(s);
       const ang = Math.random() * 6.283;
@@ -2378,6 +3096,7 @@
   function gachaResetBowl() {
     // 그릇 복구는 전환 없이 즉시 — 다시 뽑기 때 잔상이 새 연출과 겹치지 않게
     gachaIngs.innerHTML = '';
+    가챠폭죽정리();   // 🔴 폭죽은 gachaIngs 밖(gachaStage)이라 위 한 줄로 안 지워진다
     gachaSauce.style.transition = 'none';
     gachaSauce.style.opacity = '0';
     gachaSauce.style.transform = 'scale(.5)';
@@ -2402,12 +3121,30 @@
   function gachaToStart() {
     gachaResetBowl();
     gachaActions.style.display = 'none';
-    gachaPull.style.display = 'inline-flex'; // CSS의 아이콘 정렬(inline-flex) 유지 — 'inline-block'이면 주사위·글자 baseline으로 어긋남(2026-07-24)
+    gachaPull.style.display = 'inline-flex'; // 글자 세로 가운데(2026-08-05 주사위 아이콘 제거 후에도 유지)
     gachaPull.style.pointerEvents = 'auto';
+    // 🔴 뽑기 전 상태 — 그릇을 1.3배로 키우고 버튼 아래를 띄워 **뽑은 뒤와 창 높이를 같게** 한다.
+    //    값과 이유는 styles.css 의 `.gacha-modal.is-start` 주석에 있다.
+    gachaModal.classList.add('is-start');
   }
 
   function gachaPullOnce() {
+    if (gachaRolling) return;   // 🔴 연출 중 재실행 차단 — 키보드 연타를 여기서 막는다(위 주석 참고)
+    // 🔴 이번 뽑기의 번호표를 발급한다(위 gachaRunId 주석 참고). `유효()` = 「아직 내 차례인가」
+    const 실행 = ++gachaRunId;
+    const 유효 = () => 실행 === gachaRunId;
+    gachaRolling = true;
+    가챠소리전부끄기();   // 앞 회차가 남긴 예약음이 있으면 먼저 끊는다
     gachaResetBowl();
+    /* 🔴 이번 회차에 **소리를 낼지 여기서 한 번만 정한다**(2026-08-09 코덱스 지적).
+       예전엔 「톡」과 「반짝」이 **각자** 장치가 깨어 있는지 물어봤다. 그래서 창을 열자마자
+       곧바로 뽑으면 — 깨우는 데 시간이 걸려 — **톡은 통째로 빠지고 반짝만 울리는**
+       반쪽짜리가 됐다. 이제 시작할 때 한 번 정하고 그 답을 끝까지 쓴다.
+       ⚠️ 늦게 깨어난 뒤 남은 톡을 다시 계산해 예약하지 않는다 — 중간 음부터 시작돼
+          더 어색하고, 타이밍을 실기기에서 다시 다 봐야 한다(코덱스 권고 → 2026-08-10 사용자님 확정). */
+    const 소리허용 = !!소리준비됨();
+    // 재료 다섯 개가 떨어질 때 날 소리를 **여기서 미리 예약**한다(위 가챠방울소리예약 주석 참고)
+    if (소리허용) 가챠방울소리예약(GACHA_DROPS.length);
     gachaPull.style.pointerEvents = 'none';
     // 결과를 미리 뽑아 이미지를 먼저 로드해둔다(카드가 흰 네모로 잠깐 보이는 현상 방지)
     let i;
@@ -2421,6 +3158,7 @@
     // 재료를 하나씩 그릇에 떨어뜨린다: 착지마다 그릇 출렁 + 소스 차오름/색 변화 + 스플래시
     GACHA_DROPS.forEach((d, idx) => {
       setTimeout(() => {
+        if (!유효()) return;   // 닫혔거나 새로 뽑았다 — 이 재료는 떨어뜨리지 않는다
         const s = document.createElement('span');
         s.className = 'gacha-ing';
         s.style.left = 'calc(50% + ' + d.x + 'px)';
@@ -2428,6 +3166,7 @@
         s.firstChild.style.transform = 'rotate(' + Math.round(Math.random() * 50 - 25) + 'deg)'; // 낙하마다 아이콘 각도 랜덤
         gachaIngs.appendChild(s);
         setTimeout(() => {
+          if (!유효()) return;   // 착지 처리 — 닫혔으면 그릇·소스를 건드리지 않는다
           gachaBowl.classList.remove('bump');
           void gachaBowl.offsetWidth;
           gachaBowl.classList.add('bump');
@@ -2437,11 +3176,13 @@
           gachaSauceBeige.style.opacity = String(1 - step); // 재료가 들어갈수록 베이지 → 빨강
           gachaSplash(d.x, GACHA_SPLASH_COLORS[idx]);
           s.classList.add('sink');
-          if (idx === GACHA_DROPS.length - 1) setTimeout(gachaSparkle, 130); // 완성 반짝임
-        }, 430); // gachaDrop 애니메이션(.43s) 착지 시점
-      }, idx * 170);
+          // 완성 반짝임
+          if (idx === GACHA_DROPS.length - 1) setTimeout(() => { if (유효()) gachaSparkle(); }, GACHA_TIMING.sparkleMs);
+        }, GACHA_TIMING.dropMs); // 낙하 애니메이션이 끝나는(착지) 시점
+      }, idx * GACHA_TIMING.gapMs);
     });
     setTimeout(() => {
+      if (!유효()) return;   // 결과 공개 — 닫혔으면 카드도 안 만들고 소리도 안 낸다
       // 브라우즈 그리드 카드와 완전히 동일한 마크업을 재사용(buildBrowseGridCard, 2026-07-25에 옛 TCG
       // 카드에서 교체. 그 옛 코드는 2026-07-30에 삭제됨). 좋아요는 숨기고 즐겨찾기·셀럽 별은 그대로 노출.
       // 카드는 opacity 0(리셋 상태)로 먼저 그려두고, 이미지가 실제로 로드된 뒤에만 공개한다.
@@ -2451,7 +3192,10 @@
       gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, hideFav: true, eager: true, interactive: false }));
       let revealed = false;
       const reveal = () => {
-        if (revealed) return;
+        /* 🔴 여기가 **가장 중요한 관문**이다 — 이 함수는 이미지 로드·실패·안전 타이머 셋 중
+           무엇으로도 불려 오고, 그 셋은 창을 닫아도 살아 있다. 옛 번호면 여기서 멈춰야
+           화면·초점·`gachaRolling`·안내·소리가 전부 안 바뀐다. */
+        if (!유효() || revealed) return;
         revealed = true;
         gachaResult.style.opacity = '1';
         gachaResult.style.transform = 'scale(1)';
@@ -2459,8 +3203,34 @@
         gachaMat.style.opacity = '0';
         gachaBowlShadow.style.opacity = '0';
         gachaConfetti();
+        /* 🔴 뽑기 버튼이 사라지기 **전에** 초점을 옮긴다(2026-08-09, 5-5 · 코덱스 지적).
+           키보드로 뽑으면 초점이 이 버튼에 있는데, 그냥 감추면 초점이 <body> 로 증발해
+           화면낭독기 사용자는 결과가 나온 것도 모른 채 자리를 잃는다.
+           ⚠️ `focusDialogClose` 를 쓰는 이유는 「손가락으로 눌렀을 때 파란 테두리가 안 뜨게」다 —
+              키보드로 눌렀을 때만 초점 표시가 남는다. */
+        const 뽑기에초점 = document.activeElement === gachaPull;
+        gachaRolling = false;
         gachaPull.style.display = 'none';
         gachaActions.style.display = 'flex';
+        if (뽑기에초점) focusDialogClose(gachaView);
+        /* 🔴 결과를 화면낭독기에 **한 번만** 알린다(2026-08-09 사용자 지시).
+           결과 카드가 떠도 낭독기는 스스로 말하지 않는다 — 그림과 글자가 바뀌었을 뿐이라
+           「방금 뭐가 뽑혔는지」를 알 길이 없다.
+           🔴 초점을 옮긴 **뒤에** 넣는다 — 초점 이동이 먼저 읽히고(「레시피 보기, 버튼」),
+              이 안내가 그 뒤에 이어 읽힌다(`polite`). 순서가 반대면 안내가 잘린다.
+           ⚠️ 중복으로 읽히지 않는다 — 「레시피 보기」 버튼 이름에는 소스 이름이 없고,
+              결과 카드는 live 영역이 아니라 저절로 읽히지 않는다.
+           ⚠️ 바로 아래에서 「반짝」 효과음도 낸다(2026-08-09 사용자님 확정으로 넣었다).
+              화면낭독기 발화와 **귀에서 겹치는지는 코드로 알 수 없다** — VoiceOver 실기기
+              청취 전까지 「미확인」이다. 겹쳐 들리면 그때 안내를 뒤로 미루는 안을 검토한다. */
+        if (gachaAnnounce) gachaAnnounce.textContent = '오늘의 소스는 ' + r.name + '입니다';
+        // 「반짝」 — 방울 소리의 올라가는 음에서 그대로 이어진다.
+        // 🔴 `소리허용` 은 이 회차가 **시작될 때** 정해진 값이다(위 주석) — 톡이 안 났으면 반짝도 안 낸다
+        if (소리허용) 가챠결과소리();
+        // 🔴 그릇 확대를 여기서 푼다 — 그릇이 사라지는 0.25초와 겹치게 부드럽게 줄어든다.
+        //    창 높이는 안 바뀐다(확대가 transform 이라 자리를 안 차지하고, 버튼 아래 66px 이
+        //    액션 영역으로 그대로 대체되기 때문).
+        gachaModal.classList.remove('is-start');
       };
       const cardImg = gachaResult.querySelector('.hc-thumb > img');
       if (cardImg && cardImg.complete && cardImg.naturalWidth > 0) {
@@ -2468,11 +3238,12 @@
       } else if (cardImg) {
         cardImg.addEventListener('load', reveal);
         cardImg.addEventListener('error', reveal); // 이미지 실패해도 그릇에 갇히지 않게
-        setTimeout(reveal, 1500); // 안전장치: 아무리 느려도 1.5초 뒤엔 공개
+        // 안전장치: 이미지가 아무리 느려도 여기서 공개한다(위 imageFallbackMs 주석 — 그림 타이밍과 무관)
+        setTimeout(reveal, GACHA_TIMING.imageFallbackMs);
       } else {
         reveal();
       }
-    }, 1480); // 마지막 재료 착지(~1110ms)와 잠김 연출이 끝난 뒤 카드 공개
+    }, 가챠결과공개()); // 마지막 재료 착지 + 가라앉는 여유 (숫자를 적지 않고 계산한다)
   }
 
   // ===== 하루 한 번 제한 (기기 localStorage, 로그인 없어 소프트 제한) =====
@@ -2491,6 +3262,7 @@
   // 오늘 이미 뽑았으면 뽑기 연출 없이 그 소스를 바로 결과 카드로(그릇/뽑기 버튼 숨김)
   function gachaShowSaved(r) {
     gachaResetBowl();
+    gachaModal.classList.remove('is-start');   // 이미 뽑은 상태로 바로 여는 길 — 확대·여백 없이 시작
     gachaPull.style.display = 'none';
     gachaResult.innerHTML = '';
     gachaResult.appendChild(buildBrowseGridCard(r, { hideLike: true, hideFav: true, eager: true, interactive: false }));
@@ -2506,7 +3278,23 @@
   }
 
   let gachaPreloaded = false;
+  let gachaReturnFocus = null;                                     // 열기 직전 초점(2026-08-09, 5-5)
+  /* 🔴 연출 중 재실행 잠금(2026-08-09, 5-5 · 코덱스 지적).
+     예전엔 `gachaPull.style.pointerEvents = 'none'` 하나로 막았는데, 그건 **손가락·마우스만** 막는다.
+     초점이 뽑기 버튼에 있으면 **Enter·Space 로 다시 눌린다** — 그러면 난수를 다시 뽑고
+     오늘 결과를 덮어쓰고 타이머가 겹친다. 그래서 실제 상태값으로 막는다. */
+  let gachaRolling = false;
+  /* 🔴 뽑기 한 번마다 붙는 **번호표**(2026-08-09 코덱스 지적).
+     연출은 「몇 초 뒤에 해라」고 **미리 걸어 둔 일**이 일곱 군데나 된다. 창을 닫아도 그 일들은
+     시간이 되면 그대로 깨어나서 **화면·초점·잠금·안내·소리를 건드렸다.**
+     이제 뽑기를 시작할 때 번호를 하나 발급하고, **창을 닫거나 열 때 번호를 올린다.**
+     깨어난 일은 자기 번호가 아직 유효한지 보고, 아니면 **아무것도 안 하고 사라진다.**
+     ⚠️ 「하루 한 번이라 두 번 뽑을 수 없으니 괜찮다」는 안전하지 않다 — 저장 실패·자정 넘김·
+        저장값 삭제로 재실행이 가능하다. 그래서 주석이 아니라 번호로 막는다. */
+  let gachaRunId = 0;
+  gachaModal.addEventListener('keydown', (e) => trapFocusWithin(gachaModal, e));
   function openGacha() {
+    gachaReturnFocus = popupOpener();
     document.documentElement.style.overflow = 'hidden'; // body 아닌 html에 — 상단바 sticky 유지 (openModal 주석 참고)
     // 첫 뽑기에서도 카드가 흰 네모로 안 뜨게, 소스 이미지를 미리 받아둔다(한 번만)
     if (!gachaPreloaded) {
@@ -2515,14 +3303,53 @@
     }
     const savedId = getGachaTodayId();
     const savedR = savedId ? GACHA_POOL.find((x) => x.id === savedId) : null;
+    /* 🔴 여는 순간에도 번호를 올린다(2026-08-09 코덱스 지적).
+       바로 아래에서 잠금을 푸는데, 만약 무효화되지 않은 옛 연출이 아직 살아 있다면
+       그 잠금 해제가 **옛 연출을 되살리는 셈**이 된다. 닫기를 거치지 않고 열리는 길이
+       생기더라도 안전하도록, 잠금을 풀기 **직전에** 여기서도 끊어 둔다.
+       🔴 네 줄의 **순서가 곧 뜻이다** — 옛 것을 다 끊고(번호·소리) → 잠금을 풀고 →
+          **그러고 나서** 새 회차용으로 소리를 깨운다. 깨우기가 앞에 오면 옛 소리를
+          정리하기도 전에 장치를 되살리는 셈이 된다. */
+    gachaRunId++;
+    가챠소리전부끄기();
+    gachaRolling = false;   // 연출 도중에 닫고 다시 연 경우를 위해 반드시 푼다
+    /* 🔴 소리 장치를 **여는 순간 미리 깨운다**(2026-08-09) — 처음 한 번은 깨우는 데 시간이 걸려
+       첫 「톡」만 늦게 들리는 일이 있다. 여는 것도 사람이 누른 동작이라 여기서 깨울 수 있다.
+       ⚠️ 실기기 타이밍(-10ms)을 이 상태에서 맞췄다. 이 줄을 빼면 첫 소리가 다시 어긋난다. */
+    소리켜기();
+    /* 🔴 열 때 안내를 비운다(2026-08-09) — 안 비우면 다시 열었을 때 **어제 뽑은 결과를 또 읽는다.**
+       이미 뽑은 날 다시 열면 결과 카드가 바로 떠 있는데, 그건 「지금 확정된 것」이 아니므로
+       알리지 않는다(사용자 지시: 확정되는 **순간**에 한 번). */
+    if (gachaAnnounce) gachaAnnounce.textContent = '';
     if (savedR) { gachaPicked = savedR; gachaShowSaved(savedR); } // 오늘 이미 뽑음 → 결과 바로
     else { gachaToStart(); }                                       // 아직 안 뽑음 → 뽑기 버튼
     gachaOverlay.classList.add('open');
+    syncPageBackgroundA11y();
+    // 결과가 이미 있으면 「레시피 보기」가, 아니면 닫기가 첫 초점이 된다 — 닫기로 통일한다(다른 팝업과 같게)
+    requestAnimationFrame(() => focusDialogClose(gachaClose));
   }
 
-  function closeGacha() {
+  // 닫기 두 갈래 — 이유는 closeColumn 주석 참고(2026-08-09, 5-5)
+  function closeGacha(options) {
     document.documentElement.style.overflow = '';
     gachaOverlay.classList.remove('open');
+    /* 🔴 닫는 순간 **번호를 올려 진행 중이던 연출을 통째로 무효화**한다(2026-08-09 코덱스 지적).
+       이 한 줄이 없으면 걸어 둔 일곱 가지가 닫힌 뒤에도 깨어나 화면·초점·소리를 건드렸다.
+       ⚠️ 순서가 중요하다 — 아래 `gachaRolling = false` **보다 먼저** 올려야, 뒤늦게 깨어난
+          옛 연출이 새 뽑기의 잠금을 푸는 일이 없다. */
+    gachaRunId++;
+    가챠소리전부끄기();   // 이미 예약된 「톡」·「반짝」을 지금 즉시 끊는다
+    가챠폭죽정리();       // 결과 직후 닫고 곧바로 다시 열 때 옛 폭죽이 남아 보이지 않게
+    gachaRolling = false;
+    if (gachaAnnounce) gachaAnnounce.textContent = '';   // 닫을 때도 비운다(위 openGacha 주석 참고)
+    syncPageBackgroundA11y();
+    /* 🔴 `target` 은 **복귀표**다(2026-08-10, 2차). `{restoreFocus:false}` 로 부른 쪽이
+       이것을 **쪼개지 말고 통째로** 레시피 상세에 넘긴다(아래 `pendingModalReturnFocus`). */
+    const target = gachaReturnFocus;
+    gachaReturnFocus = null;
+    if (options && options.restoreFocus === false) return target;
+    restorePopupFocus(target);
+    return target;
   }
 
   // 홈 맨 아래 '운명의 소스 뽑기'도 같은 가챠를 연다(헤더의 옛 '오늘의 소스' 버튼은 2026-07-24 삭제)
@@ -2536,6 +3363,9 @@
   // ── 기획 칼럼 패널 ──────────────────────────────────────────
   const columnOverlay = document.getElementById('columnOverlay');
   const columnSheet = document.getElementById('columnSheet');
+  const columnClose = document.getElementById('columnClose');
+  let columnReturnFocus = null;                                    // 열기 직전 초점(2026-08-09, 5-5)
+  columnSheet.addEventListener('keydown', (e) => trapFocusWithin(columnSheet, e));
   // ingFilter 재료가 ings에 든 레시피 자동 수집(고수 든 소스 등)
   // 칼럼에 붙는 소스 한 줄(썸네일 + 이름 + 버전 + 화살표). 누르면 칼럼을 닫고 그 레시피를 연다.
   // 아티클 맨 아래 자동 목록과 본문 중간 목록이 같은 모양을 쓰도록 여기 한 곳에서만 만든다.
@@ -2548,6 +3378,32 @@
       + thumb
       + '<span class="col-sauce-meta"><span class="col-sauce-name">' + r.name + '</span>'
       + ver + '</span>'
+      + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '</button>';
+  }
+  /* 칼럼에 붙는 **메뉴** 한 줄. 위 `buildColumnSauce` 와 같은 부품을 쓰되 셋이 다르다:
+     ① 그림이 `assets/menu/*.webp` 다 — 배경 없는 냄비 그림이라 `col-sauce-thumb--menu`(안에 맞춤 + 크림 배경)를 쓴다.
+        소스처럼 `cover` 로 두면 잘린다.
+     ② **누르면 메뉴 탭에서 그 항목이 보이는 자리로 간다**(2026-08-05 사용자 확정). 소스 줄처럼 화살표를 붙인다.
+        🔴 가는 방법이 둘이다 — 누르는 사람에겐 하나로 보이지만 속은 다르다:
+           · **육수(전골)** → `mnGoTab('전골')`. 검색으로는 **안 걸린다**(검색이 상위 7개 분류만 훑는다).
+             육수 목록이 12개뿐이라 탭만 열어도 바로 보인다.
+           · **그 밖의 메뉴** → `mnSearch(이름)`. 분류 탭으로만 보내면 60여 개에 파묻혀 못 찾는다.
+     ③ 부제는 **있는 것만**. 지금은 「제주 한정」뿐이고, 한라봉 아이콘을 반드시 같이 넣는다
+        (2026-08-05 사용자 지시 — 같은 말이 화면마다 다르게 보이면 안 된다). 색·크기는 메뉴 탭과 같은 값.
+     ⚠️ 복사본(`cilantro.html`)에서는 **소스도 메뉴도 안 눌린다** — 그 페이지엔 앱이 없어 갈 데가 없다.
+        글자와 모양은 같게 두되 **동작만 다른 것**이고, 원본↔복사본 규칙에 어긋나지 않는다. */
+  function buildColumnMenu(n) {
+    const D = window.MENU_DATA;
+    const 육수 = D && (D.broths || []).find((b) => b.n === n);
+    const it = 육수 || (D ? (D.tabs || []).flatMap((t) => t.items).find((i) => i.n === n) : null);
+    if (!it) return '';   // 이름이 바뀌었으면 그 줄만 빠진다(아티클이 깨지지 않게)
+    const 부제 = it.jeju
+      ? '<span class="col-sauce-ver col-sauce-ver--jeju"><img src="assets/icons/hallabong.svg" alt="">제주 한정</span>'
+      : '';
+    return '<button class="col-sauce" type="button" data-menu-n="' + n + '"' + (육수 ? ' data-menu-broth="1"' : '') + '>'
+      + '<img class="col-sauce-thumb col-sauce-thumb--menu" src="assets/menu/' + n + '.webp" alt="" draggable="false">'
+      + '<span class="col-sauce-meta"><span class="col-sauce-name">' + n + '</span>' + 부제 + '</span>'
       + '<svg class="col-sauce-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       + '</button>';
   }
@@ -2586,6 +3442,11 @@
     saucesSection.hidden = !sauces.length;
     const listEl = document.getElementById('columnSauceList');
     listEl.innerHTML = sauces.map(buildColumnSauce).join('');
+    // 하단: 관련 메뉴(손으로 적은 목록). 적어 둔 칼럼에만 뜬다 — 없으면 절째로 숨는다.
+    const menusSection = document.getElementById('columnMenus');
+    const menus = (col.menus || []).map(buildColumnMenu).filter(Boolean);
+    menusSection.hidden = !menus.length;
+    document.getElementById('columnMenuList').innerHTML = menus.join('');
     // 본문 중간에 직접 고른 소스를 놓는 자리. 본문 HTML에
     // <div class="column-sauce-list" data-sauce-ids="s1,s2"></div> 를 넣으면 그 자리에 채워진다.
     // 아래 자동 목록(.column-sauces)은 재료로 모으고 위치가 맨 끝 고정이라, 가이드처럼
@@ -2613,37 +3474,109 @@
       : '';
     // 자동 목록과 본문 중간 목록을 함께 잡는다(listEl만 보면 본문 것이 눌리지 않는다).
     // 열 때마다 버튼을 새로 만들므로 리스너가 겹치지 않는다.
-    [...columnOverlay.querySelectorAll('.col-sauce')].forEach((el) => {
+    [...columnOverlay.querySelectorAll('.col-sauce[data-rid]')].forEach((el) => {
       el.addEventListener('click', () => {
         const r = RECIPES.find((x) => x.id === el.dataset.rid);
-        if (r) { closeColumn(); openModal(r); }
+        // 🔴 복귀 없이 닫고, 칼럼의 원래 입구를 상세에 넘긴다(2026-08-09, 5-5). 안 그러면
+        //    상세를 닫았을 때 <body> 로 돌아가 자리를 잃는다(pendingModalReturnFocus 주석 참고).
+        if (r) { pendingModalReturnFocus = closeColumn({ restoreFocus: false }); openModal(r); }
+      });
+    });
+    /* 메뉴 줄 — **담고** 아티클을 닫고 메뉴 탭에서 그게 보이는 자리로 간다(2026-08-05 사용자 확정).
+       홈 전골 카드와 **같은 규칙**이다. 소스 줄이 「칼럼을 닫고 레시피를 연다」와 같은 흐름이기도 하다.
+       ⚠️ 가는 방법이 둘인 이유는 buildColumnMenu 주석 참고(육수는 검색에 안 걸린다).
+       ⚠️ 담기도 둘로 갈린다 — 육수는 냄비에(mnAddBroth), 그 밖의 메뉴는 담은 목록에(mnPick). */
+    [...columnOverlay.querySelectorAll('.col-sauce[data-menu-n]')].forEach((el) => {
+      el.addEventListener('click', () => {
+        const n = el.dataset.menuN;
+        const 육수 = !!el.dataset.menuBroth;
+        if (육수) { if (window.mnAddBroth) window.mnAddBroth(n); }
+        else if (window.mnPick) window.mnPick(n);
+        // 화면을 옮기는 길이라 초점을 되돌리지 않는다 — 되돌리면 다음 프레임에 튀어 새 화면을 방해한다
+        closeColumn({ restoreFocus: false });
+        switchSection('menu');
+        if (육수) { if (window.mnGoTab) window.mnGoTab('전골'); }
+        else if (window.mnSearch) window.mnSearch(n);
+        /* 🔴 초점을 **방금 담은 그 메뉴 항목**에 내려놓는다(2026-08-09 사용자 지시).
+           칼럼이 닫히면서 눌렀던 줄이 사라지므로 그냥 두면 초점이 <body> 로 빠진다.
+           ⚠️ 육수와 그 밖의 메뉴는 카드 표시가 다르다 — 육수는 `data-broth`, 나머지는 `data-menu`.
+           ⚠️ 못 찾으면 개수줄로 물러선다(분류가 달라 그 카드가 화면에 없을 수 있다). */
+        const 항목 = document.querySelector(
+          (육수 ? '#mnBody .mn-card[data-broth="' : '#mnBody .mn-card[data-menu="') + n + '"]');
+        if (!focusLanding(항목)) focusMenuLanding();
       });
     });
     // 본문 안 CTA 버튼. data-go 값으로 갈 곳을 정한다 — 소스 카드의 data-rid와 같은 방식이라
     // 나중에 다른 아티클에서 <button class="col-cta" data-go="browse">만 넣으면 그대로 동작한다.
     [...columnOverlay.querySelectorAll('.col-cta[data-go]')].forEach((el) => {
       el.addEventListener('click', () => {
-        if (el.dataset.go === 'browse') { closeColumn(); enterBrowse('전체'); }
+        /* 둘 다 화면을 옮기는 길이다 — 초점을 되돌리지 않고(위 메뉴 줄과 같은 이유),
+           **새 화면의 개수줄**에 내려놓는다(2026-08-09 사용자 지시).
+           🔴 개수줄을 고른 이유: 그 화면이 무엇이고 몇 개가 있는지를 한 줄로 말해 주는 자리라
+              「어디에 왔는지」가 바로 전달된다(레시피 = 「레시피 33개」 / 메뉴 = 「전골 12개」).
+           ⚠️ 검색창으로는 안 보낸다(사용자 지시). */
+        if (el.dataset.go === 'browse') {
+          closeColumn({ restoreFocus: false });
+          enterBrowse('전체');
+          focusLanding(document.getElementById('listCount'));
+        } else if (el.dataset.go === 'menu') {
+          closeColumn({ restoreFocus: false });
+          switchSection('menu');
+          if (window.mnGoTab) window.mnGoTab('전골');   // 메뉴 탭의 기본 자리
+          focusMenuLanding();   // 전골에서는 개수줄이 감춰져 있어 분류 탭으로 물러선다(위 주석 참고)
+        }
       });
     });
+    /* 🔴 이름을 그 글의 제목으로 갈아 끼운다(2026-08-09 사용자 확정) — 안 그러면 어느 아티클을
+       열어도 화면낭독기가 「칼럼」이라고만 읽어 가이드·훠궈·고수를 구분할 수 없다.
+       🔴 `col.title` 을 쓴다. `col.titleHtml`(화면용)이 아니다 — 그쪽은 띄어쓰기 자리에 장식
+          화살표 그림이 박혀 있어, 그림이 안 읽히면 「물어본사람~궁금한사람~」으로 맞붙는다.
+          `title` 은 애초에 **낭독·aria 용 순수 글자**로 마련해 둔 것이다(RECIPES 위 배너 정의의 주석). */
+    if (col.title) columnSheet.setAttribute('aria-label', col.title);
+    columnReturnFocus = popupOpener();
     columnOverlay.hidden = false;
     columnOverlay.scrollTop = 0;
+    syncPageBackgroundA11y();
+    requestAnimationFrame(() => focusDialogClose(columnClose));
   }
-  function closeColumn() {
+  /* 🔴 닫기는 두 갈래다(2026-08-09, 5-5).
+     ① 그냥 닫기(X·바깥클릭·Esc) → 열었던 버튼으로 초점을 되돌린다.
+     ② **복귀 없이 닫기**(`{restoreFocus:false}`) → 칼럼을 닫고 **곧바로 다른 화면·다른 팝업으로
+        가는 경우**다. 되돌리면 다음 프레임에 초점이 튀어 새 화면의 초점을 빼앗는다.
+     🔴 이때 원래 입구를 **돌려준다** — 부르는 쪽이 그것을 레시피 상세에 넘길 수 있게 하기 위해서다. */
+  function closeColumn(options) {
     document.documentElement.style.overflow = '';
     columnOverlay.hidden = true;
+    syncPageBackgroundA11y();
+    /* 🔴 `target` 은 **복귀표**다(2026-08-10, 2차) — 가챠와 같다. 통째로 넘긴다. */
+    const target = columnReturnFocus;
+    columnReturnFocus = null;
+    if (options && options.restoreFocus === false) return target;
+    restorePopupFocus(target);
+    return target;
   }
-  document.getElementById('columnClose').addEventListener('click', closeColumn);
-  document.getElementById('columnBottomClose').addEventListener('click', closeColumn);
+  // ⚠️ 화살표 함수로 감싼다 — 그냥 넘기면 click 이벤트가 options 로 들어가 `restoreFocus` 를 잘못 읽는다
+  columnClose.addEventListener('click', () => closeColumn());
+  document.getElementById('columnBottomClose').addEventListener('click', () => closeColumn());
   columnOverlay.addEventListener('click', (e) => { if (e.target === columnOverlay) closeColumn(); });
+  // Esc — 다른 팝업과 같게(2026-08-09, 5-5). 칼럼만 `hidden` 속성으로 여닫으므로 조건이 다르다
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !columnOverlay.hidden) closeColumn();
+  });
   gachaPull.addEventListener('click', gachaPullOnce);
-  gachaClose.addEventListener('click', closeGacha);
-  gachaOverlay.addEventListener('click', closeGacha);
+  // ⚠️ 화살표로 감싼다 — 그냥 넘기면 click 이벤트가 options 자리로 들어간다(closeColumn 과 같은 함정)
+  gachaClose.addEventListener('click', () => closeGacha());
+  gachaOverlay.addEventListener('click', () => closeGacha());
+  // Esc — 다른 팝업과 같게(2026-08-09, 5-5)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && gachaOverlay.classList.contains('open')) closeGacha();
+  });
   gachaModal.addEventListener('click', (e) => e.stopPropagation());
   gachaView.addEventListener('click', () => {
     if (!gachaPicked) return;
     const r = gachaPicked;
-    closeGacha();
+    // 칼럼 → 상세와 같다: 복귀 없이 닫고 가챠의 원래 입구를 상세에 넘긴다(2026-08-09, 5-5)
+    pendingModalReturnFocus = closeGacha({ restoreFocus: false });
     openModal(r);
   });
   homeBtn.addEventListener('click', () => {
@@ -2653,17 +3586,28 @@
     query = '';
     searchInput.value = '';
     searchBox.classList.remove('has-value');
-    renderGrid();
+    renderList();
     searchInput.focus();
   });
 
   // ===== 섹션(뷰) 전환: 레시피 · 메뉴 · 매장 · 스탬프 =====
   const pageEl = document.querySelector('.page');
-  const sectionTitleEl = document.getElementById('sectionTitle');
   const tabbarEl = document.getElementById('tabbar');
   const tabbarIndicator = document.getElementById('tabbarIndicator');
-  const SECTION_TITLES = { menu: '메뉴', store: '매장', stamp: '스티커' };
-  let activeSection = 'recipe';
+  const SECTIONS = ['home', 'recipe', 'menu', 'store', 'stamp'];
+  let activeSection = 'home';   // 시작은 홈 탭(2026-08-03 분리)
+  // 🔴 탭마다 스크롤 위치를 기억한다(2026-08-03 사용자 확정). 예전엔 「맨 위로」를 의도했는데
+  //    그 방식(scroll-behavior 를 잠깐 auto 로 바꿔치기)이 안 먹어 우연히 유지되고 있었다.
+  //    우연에 기대지 않고 여기서 직접 저장·복원한다.
+  const sectionScroll = Object.create(null);
+  const scrollTopNow = () => (document.scrollingElement || document.documentElement).scrollTop;
+  // 🔴 「맨 위로」 버튼과 탭 재탭은 **부드럽게** 올라간다(2026-08-03 사용자 확정) —
+  //    사람이 「올려달라」고 누른 것이라 올라가는 게 보여야 한다.
+  //    반대로 카테고리를 바꿀 때는 instant 다 — 목록이 통째로 바뀌는 자리라 훑고 지나갈 이유가 없다.
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    sectionScroll[activeSection] = 0;
+  }
 
   // 인디케이터 2상태(배민식): 정지=불투명 필(활성 버튼에 딱 맞음) / 이동=유리구슬(원형 76px).
   // 크기·위치는 여기서 인라인으로, 질감(필↔유리)은 CSS .tabbar-indicator(--glass)가 담당.
@@ -2776,15 +3720,15 @@
     requestAnimationFrame(() => { tabbarIndicator.style.transition = ''; });
   }
   function switchSection(name) {
-    if (!SECTION_TITLES[name] && name !== 'recipe') return;
+    if (!SECTIONS.includes(name) || name === activeSection) return;
+    sectionScroll[activeSection] = scrollTopNow();   // 떠나는 탭의 자리를 적어 둔다
     activeSection = name;
     // 뷰 보이기/숨기기
     document.querySelectorAll('.view').forEach((v) => {
       v.hidden = v.id !== 'view-' + name;
     });
-    // 상단바: 레시피만 탭·검색 노출, 그 외엔 섹션 제목으로 교체
+    // 상단바: 탭마다 전용 아이콘 하나만 보이게 하는 판정에 쓴다(2026-08-03 규칙)
     pageEl.dataset.section = name;
-    sectionTitleEl.textContent = SECTION_TITLES[name] || '';
     // 하단 탭바 활성 표시
     tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
       const on = btn.dataset.section === name;
@@ -2792,19 +3736,16 @@
       if (on) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
-    // 상세가 열려 있으면 닫기, 스크롤은 맨 위로
+    // 상세가 열려 있으면 닫기
     if (modalOverlay.classList.contains('open')) closeModal();
-    // 스크롤만 맨 위로 — 이 프로그램 스크롤이 축소/펼침 판정에 끼어들지 않게 다음 스크롤 이벤트 1회 무시.
-    // (iOS는 같은 점프에도 스크롤 이벤트가 여러 번 오지만, 아래에서 이미 펼친 뒤라 나머지는 무해한 no-op)
+    // 🔴 그 탭에서 보던 자리로 되돌린다(2026-08-03). 프로그램 스크롤이 축소/펼침 판정에 끼어들지
+    //    않게 다음 스크롤 이벤트 1회는 무시한다.
+    //    behavior:'instant' 를 쓴다 — 전역 scroll-behavior:smooth 를 확실히 우회하는 방법이고,
+    //    옛 방식(스타일을 잠깐 auto 로 바꿔치기)은 실제로 안 먹었다(2026-08-03 실측).
     ignoreScrollOnce = true;
-    // 전역 scroll-behavior:smooth를 우회해 즉시 맨 위로.
-    // 부드러운 스크롤이면 수백 ms 동안 iOS 주소창 변화 → resize → placeIndicator 스냅이
-    // 진행 중인 원 슬라이드를 죽여서 "어떨 땐 애니메이션 없는" 복불복이 생김.
-    const se = document.scrollingElement || document.documentElement;
-    se.style.scrollBehavior = 'auto';
-    window.scrollTo(0, 0);
-    se.style.scrollBehavior = '';
-    lastScrollY = 0;
+    const y = sectionScroll[name] || 0;
+    window.scrollTo({ top: y, behavior: 'instant' });
+    lastScrollY = y;
     requestAnimationFrame(() => { ignoreScrollOnce = false; });
     // 탭 전환은 항상 바를 펼침(상태 플래그 정리).
     // 과거엔 축소 상태 전환 시 스냅으로 우회했지만(iOS 합성기 레이스), 축소 시각효과(compact CSS)를
@@ -2813,17 +3754,26 @@
     slideIndicator(tabbarEl.querySelector('.tabbar-btn.active'));
     // 매장으로 오면 지역 탭 밑줄 위치 잡기 — 방금 display:flex로 바뀐 직후라 offsetWidth 읽으면
     // 강제 리플로우로 즉시 정확. rAF는 폰트 로드 등으로 폭이 미세하게 바뀔 때 보정용.
+    if (name === 'recipe') { updateBrowseCatUnderline(); requestAnimationFrame(updateBrowseCatUnderline); }
     if (name === 'store') { updateStoreUnderline(); requestAnimationFrame(updateStoreUnderline); }
+    // 메뉴도 같은 이유(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다, 2026-08-03)
+    if (name === 'menu' && window.mnSyncUnderline) { window.mnSyncUnderline(); requestAnimationFrame(window.mnSyncUnderline); }
+    // 🔴 스티커도 마찬가지다(2026-08-04 사용자 발견) — 이 줄이 없어서 새로고침 뒤 처음 스티커 탭에
+    //    들어가면 「전체」 밑에 밑줄이 없었고, 지역을 한 번 눌러야 그때 생겼다.
+    //    상단바는 늘 보이지만 .topbar-cat--stamp 는 스티커일 때만 display 되므로, 그 전엔 폭이 0이다.
+    if (name === 'stamp' && window.updateStampUnderline) { window.updateStampUnderline(); requestAnimationFrame(window.updateStampUnderline); }
     syncTopbarH();
   }
 
   tabbarEl.querySelectorAll('.tabbar-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (suppressClick) return; // 드래그로 끝난 제스처의 잔여 click 무시
+      // 지금 보고 있는 탭을 한 번 더 누르면 맨 위로(2026-08-03 사용자 확정) — 여러 앱의 관례다
+      if (btn.dataset.section === activeSection) return scrollToTop();
       switchSection(btn.dataset.section);
     });
   });
-  pageEl.dataset.section = 'recipe';
+  pageEl.dataset.section = 'home';   // 시작 탭(2026-08-03)
 
   // ── 탭바 드래그(배민식) ── 버블을 손가락으로 끌면 따라오고, 놓으면 가장 가까운 탭으로 전환.
   // 놓는 순간의 이동은 기존 switchSection→slideIndicator를 그대로 탐 — slideIndicator가
@@ -2968,8 +3918,10 @@
     if (active && active.offsetWidth) {
       storeUnderline.style.width = active.offsetWidth + 'px';
       storeUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      keepTabVisible(active);   // 320px 에서 「제주」가 44px 밀려 있다 — 고르면 따라 들어온다
     }
   }
+  enableDragScroll(storeTabsEl);   // 데스크탑에서 손으로 끌기(2026-08-04)
   function renderStoreTabs() {
     if (!storeTabsEl) return;
     storeTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
@@ -3076,7 +4028,15 @@
           book.rel = 'noopener';
           acts.appendChild(book);
         }
-        if (s.addr) {
+        if (s.addr && catchUrl === 'soon') {
+          // 오픈 예정 지점의 지도 — 전화와 같은 이유로 막는다(2026-08-04 사용자 지시).
+          // 아직 문을 안 연 자리라 지도에서 찾아도 나오지 않거나 엉뚱한 곳이 잡힌다.
+          // 전화(tel--soon)와 같은 크림 바랜 모양이고, 자리는 지켜서 카드 폭이 안 흔들린다.
+          const map = document.createElement('span');
+          map.className = 'store-btn tel--soon';
+          map.textContent = '지도';
+          acts.appendChild(map);
+        } else if (s.addr) {
           // '지도' 버튼 → 아래(위)로 펼쳐지는 드롭다운(네이버 지도/카카오맵)
           const dd = document.createElement('div');
           dd.className = 'map-dd';
@@ -3087,15 +4047,59 @@
           const menu = document.createElement('div');
           menu.className = 'map-dd-menu';
           const q = encodeURIComponent('하이디라오 ' + s.name);
+          // 🔴 네이버는 공백을 %20 이 아니라 + 로 받는다(2026-08-04 실기기 확인).
+          //    %20 으로 보내면 「명동점」이 통째로 잘려 나가고 「하이디라오」만 검색돼서
+          //    명동점·대학로점·홍대점이 다 나오거나, 지도만 뜨고 아무 데도 안 찍혔다.
+          const qPlus = q.replace(/%20/g, '+');
           [
-            { label: '네이버지도', img: 'assets/icons/navermap.png?v=1', href: 'https://map.naver.com/p/search/' + q },
-            { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1', href: 'https://map.kakao.com/?q=' + q },
+            // 🔴 map.naver.com/p/search/ 를 쓰면 안 된다 — 폰에서 열면 네이버가 앱 실행 페이지
+            //    (app.map.naver.com, appSchemeName=nmap&appmarket=N)로 넘겨서, 네이버지도 앱이
+            //    없으면 「앱 설치」 화면만 뜨고 지도를 못 본다(실기기 캡처로 확인).
+            //    m.map.naver.com/search + mapMode=0 은 앱으로 안 튀고 웹 지도에 핀을 찍는다.
+            //    🔴 핀은 pinId + pinType=site + menu=location 이 찍는다.
+            //    🔴🔴 그런데 그것만으로는 안 됐다 — **rel 에 noreferrer 가 있어야 한다**(아래 a.rel 참고).
+            //       네이버·카카오가 「어디서 왔는지」를 읽고 바깥에서 들어온 링크에는 핀을 안 내줬다.
+            //       주소를 직접 열면 핀이 나오고 우리 사이트에서 누르면 안 나오던 것이 이 차이였다.
+            //       ⚠️ 서버가 보내는 주소만 봐서는 안 보인다(curl 로는 referrer 있든 없든 같은 곳으로 간다).
+            //          페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
+            //          _map-test.html 로 여덟 가지를 눌러 보고 가려냈다(커밋 3f43f04 다음).
+            //    ⚠️ 여기까지 오는 데 다섯 번 틀렸다. 다음에 손댈 때 같은 길로 다시 가지 말 것:
+            //       · map.naver.com/p/search/…        폰에서 앱 설치 화면으로 튄다(appmarket=N 이라 아무 일도 안 남)
+            //       · …/search?query=…&mapMode=0#map/<번호>  이미 열린 화면 안에서만 통한다.
+            //                                        새 탭으로 열면 「알 수 없는 오류가 발생했습니다」
+            //       · m.map.naver.com/entry/place/<번호>     오류
+            //       · m.place.naver.com/restaurant/<번호>/home  열리긴 하나 지도가 아니라 매장정보 페이지
+            //       · map.naver.com/p/entry/place/<번호>     앱으로 튄다
+            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다 — 매장 하나만 잡히므로 쓸 만하다.
+            { label: '네이버지도', img: 'assets/icons/navermap.png?v=1',
+              href: STORE_NAVER_ID[s.name]
+                ? 'https://m.map.naver.com/map.naver?pinId=' + STORE_NAVER_ID[s.name] + '&pinType=site&menu=location'
+                : 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
+            // 🔴 카카오는 해시(#!/<번호>/map/place)가 핀을 찍는다. 네이버와 마찬가지로
+            //    rel 의 noreferrer 가 있어야 한다 — 없으면 해시가 무시되고 검색 결과만 나온다.
+            //    ⚠️ 카카오는 핀 지도 위에 「카카오맵 앱에서 더 편리하게」 안내창이 뜬다(네이버는 안 뜬다).
+            //       🔴 못 끈다. 같은 탭으로 열어도 뜬다(2026-08-04 실기기 확인) — 여는 방식과 무관하게
+            //          카카오 페이지가 스스로 띄우는 것이라 우리 쪽에서 손댈 수 없다.
+            //          받아 온 HTML 에도 끄는 값이 없다(배너 관련 낱말 자체가 안 나온다).
+            //          지도는 안내창 뒤에 이미 핀까지 찍혀 있어서, 닫으면 바로 보인다.
+            //    ⚠️ 옛 map.kakao.com/?q=… 는 쓰면 안 된다 — 폰에서 applink.map.kakao.com 으로 앱에 튄다.
+            //    ⚠️ place.map.kakao.com/<번호> 는 열리지만 지도가 아니라 매장정보 페이지다.
+            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다.
+            { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1',
+              href: 'https://m.map.kakao.com/actions/searchView?q=' + qPlus +
+                    (STORE_KAKAO_ID[s.name] ? '#!/' + STORE_KAKAO_ID[s.name] + '/map/place' : '') },
           ].forEach((o) => {
             const a = document.createElement('a');
             a.className = 'map-dd-item';
             a.href = o.href;
             a.target = '_blank';
-            a.rel = 'noopener';
+            // 🔴🔴 noreferrer 를 빼면 지도에 핀이 안 찍힌다(2026-08-04 실기기로 가려냄).
+            //    네이버·카카오가 「어디서 왔는지」(document.referrer)를 읽고, 바깥 사이트에서 들어온
+            //    링크에는 핀 대신 기본 지도나 검색 결과를 준다. noreferrer 가 그 값을 지워서
+            //    주소창에 직접 친 것과 같아진다. 주소를 아무리 정확히 만들어도 이것 없이는 소용없다.
+            //    ⚠️ 이건 서버 응답으로는 안 보인다 — curl 로는 referrer 유무에 상관없이 같은 곳으로 간다.
+            //       페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
+            a.rel = 'noopener noreferrer';
             a.innerHTML = '<img class="map-dd-ic" src="' + o.img + '" alt="" draggable="false">' + o.label;
             a.addEventListener('click', closeAllMapDd);
             menu.appendChild(a);
@@ -3169,7 +4173,7 @@
     document.body.removeChild(ta);
   }
 
-  // ===== 발도장 (방문 스티커 기록장) =====
+  // ===== 스티커 (방문 기록장) =====
   // 저장 = 이 기기 localStorage에만(즐겨찾기와 동일, 로그인 없음). 나중에 서버 이전이 쉽게
   // 버전 있는 JSON 한 덩어리로 보관: { version: 1, stamps: { 지점명: { date, memo } } }
   const STAMPS_KEY = 'haidilao_stamps';
@@ -3236,9 +4240,101 @@
     return card;
   }
 
-  // 발도장 지역 탭은 쓰지 않는다(2026-07-24 사용자 확정). 상단바에서 UI를 뺀 뒤 남아 있던
-  // 필터 코드(activeStampRegion·STAMP_REGION_OF·renderStampTabs·밑줄 계산)를 전부 제거했다.
-  // 기록은 지역 구분 없이 항상 전체가 최신순으로 보인다. 되살릴 일이 생기면 매장 탭 지역탭을 참고할 것.
+  // ── 스티커 지역 탭(2026-08-04 사용자 지시로 되살림) ──
+  // 🔴 2026-07-24 에 「스티커에 지역 탭 안 씀」으로 지웠던 기능이다. 그때 주석에 「되살릴 일이 생기면
+  //    매장 탭 지역탭을 참고할 것」이라 적어 뒀고, 실제로 그것을 본떠 다시 만들었다(같은 .tab-btn + 밑줄).
+  // 🔴 탭은 **매장과 똑같이 전부** 나온다(2026-08-04 사용자 확정).
+  //    한때 「다녀온 지역만」으로 만들었다가 되돌렸다 — 기록이 하나도 없으면 탭이 다 사라져서
+  //    상단바 왼쪽이 통째로 비었다. 빈 지역을 눌렀을 때는 아래 renderStamps 가 그 지역용 문구를 띄운다.
+  let activeStampRegion = '전체';
+  const STAMP_REGION_OF = (name) => (STORES.find((s) => s.name === name) || {}).region || '';
+  // ── 빈 화면의 감자 말풍선 ──────────────────────────────────────────────
+  // 지역 그림은 지역 수만큼 따로 있다 — 말풍선 문구가 「서울에는…」처럼 지역 이름을 부른다.
+  // 🔴 파일 이름은 로마자다. 한글 파일명은 자모 분리(NFD)로 저장된 것이 섞여 있어 탈이 난 적이 있다.
+  // ⚠️ 지역 목록은 STORES 에서 뽑으므로(storeRegions) 새 지역이 생기면 그림이 없을 수 있다.
+  //    그때는 예전처럼 글씨만 나온다 — renderStamps 에서 갈라 둔다. 화면이 비지 않는다.
+  const GAMJA_REGION = { 서울: 'seoul', 경기: 'gyeonggi', 부산: 'busan', 대구: 'daegu', 제주: 'jeju' };
+  // 🔴 그림을 새로 그려 넣으면 **이 숫자를 올린다.** 파일 이름이 그대로라 안 올리면 폰에
+  //    옛 그림이 캐시로 남는다(css·js 의 index.html `?v=` 와 같은 이유·같은 방식이다).
+  const GAMJA_V = 3;
+  const gamjaSrc = (name) => 'assets/mascot/' + name + '.webp?v=' + GAMJA_V;
+
+  /* 🔴 **여섯 장을 처음부터 다 겹쳐 놓고 보이는 것만 바꾼다.** 지역을 옮겨도 그림이 화면에서
+     떨어지지 않으므로 **깜빡일 수가 없다** — 네트워크도, 다시 그리기도, 붙였다 떼기도 없다.
+
+     ⚠️ 여기까지 온 이력을 적어 둔다. 같은 자리를 두 번 헛짚었다(둘 다 실기기에서만 보인다).
+       1차: 지역마다 빈 화면을 **새로 만들고** 있었다 → 지역별로 만들어 두고 다시 쓰게 했다. 그래도 깜빡였다.
+       2차: 처음 누르는 지역은 그때 **내려받는다** → 여섯 장을 미리 받아 뒀다. 그래도 깜빡였다.
+       3차(지금): 남은 원인은 **바꿔 끼우는 것 자체**였다. 만들어 둔 요소라도 `replaceChildren` 으로
+                  갈아 끼우면 그림이 화면에서 떨어졌다 붙으면서 다시 그려진다.
+     🔴 그러니 **다시 「갈아 끼우는」 구조로 되돌리지 말 것.** 미리 받기만으로는 안 잡힌다. */
+  const GAMJA_ALL = 'all';
+  let stampEmptyEl = null;      // 한 번 만들고 grid 에서 **절대 떼지 않는다**
+  function buildStampEmpty() {
+    const el = document.createElement('div');
+    el.className = 'stamp-empty';
+    const 장들 = [[GAMJA_ALL, 'gamja-bubble', '아직 스티커가 없어요. 기록하기로 첫 방문을 남겨보세요']]
+      .concat(Object.keys(GAMJA_REGION).map((ko) =>
+        [GAMJA_REGION[ko], 'gamja-bubble-' + GAMJA_REGION[ko], ko + '에는 아직 스티커가 없어요']));
+    // 🔴 alt 는 **그림에 그려진 문구를 그대로** 적는다. 문구가 그림 안에 있어 화면에 글씨로
+    //    안 나오기 때문이다. 그림을 다시 그려 문구가 달라지면 여기도 같이 고칠 것 — 자동이 아니다.
+    el.innerHTML = '<div class="stamp-slot stamp-empty-slot"><div class="stamp-slot-empty">'
+      + 장들.map((g) => '<img class="stamp-empty-gamja" data-g="' + g[0] + '" src="' + gamjaSrc(g[1])
+                        + '" width="660" height="800" alt="' + g[2] + '" aria-hidden="true">').join('')
+      + '</div></div>'
+      // 그림이 없는 지역(나중에 새 지점이 새 지역에 생기면)만 쓰는 자리 — 평소엔 숨어 있다
+      + '<p class="stamp-empty-text" hidden></p>';
+    return el;
+  }
+  // 보이는 한 장만 갈아 준다. 그림을 건드리지 않으므로 화면이 안 끊긴다.
+  function showGamja(region) {
+    if (!stampEmptyEl) return;
+    const key = (region === '전체') ? GAMJA_ALL : GAMJA_REGION[region];
+    stampEmptyEl.querySelectorAll('.stamp-empty-gamja').forEach((im) => {
+      const on = !!key && im.dataset.g === key;
+      im.classList.toggle('is-on', on);
+      im.setAttribute('aria-hidden', on ? 'false' : 'true');
+    });
+    const 글씨 = stampEmptyEl.querySelector('.stamp-empty-text');
+    글씨.hidden = !!key;                       // 그림이 있으면 글씨는 안 쓴다
+    if (!key) 글씨.textContent = region + '에는 아직 스티커가 없어요';
+  }
+
+  const stampTabsEl = document.getElementById('stampTabs');
+  const stampUnderline = document.getElementById('stampTabsUnderline');
+  function updateStampUnderline() {
+    if (!stampTabsEl || !stampUnderline) return;
+    const active = stampTabsEl.querySelector('.tab-btn.active');
+    if (active && active.offsetWidth) {
+      stampUnderline.style.width = active.offsetWidth + 'px';
+      stampUnderline.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      keepTabVisible(active);
+    }
+  }
+  // switchSection 에서도 부른다(숨어 있는 동안엔 폭이 0이라 밑줄 자리를 못 잡는다).
+  // 🔴 window 에 얹는 이유: switchSection 이 이 함수보다 위에 있어서, 스코프가 갈리면 직접 못 부른다.
+  //    메뉴 탭이 window.mnSyncUnderline 을 쓰는 것과 같은 방식이다.
+  window.updateStampUnderline = updateStampUnderline;
+  if (stampTabsEl) enableDragScroll(stampTabsEl);
+  function renderStampTabs() {
+    if (!stampTabsEl) return;
+    stampTabsEl.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    // 매장 탭과 같은 목록·같은 순서(storeRegions) — 기록이 없어도 탭은 그대로 서 있다
+    ['전체'].concat(storeRegions()).forEach((reg) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (reg === activeStampRegion ? ' active' : '');
+      btn.textContent = reg;
+      btn.addEventListener('click', () => {
+        if (activeStampRegion === reg) return;
+        activeStampRegion = reg;
+        renderStampTabs();
+        renderStamps();
+      });
+      stampTabsEl.appendChild(btn);
+    });
+    updateStampUnderline();
+  }
 
   // 기록 카드 노드 캐시(id→카드 DOM). 지역 탭 전환·삭제 때 카드를 새로 안 만들고 재사용해
   // 스티커 <img>가 매번 재생성돼 재디코딩·깜빡이던 것 방지(레시피 그리드 browseCardCache와 같은 원리).
@@ -3281,36 +4377,54 @@
   function renderStamps() {
     const grid = document.getElementById('stampGrid');
     if (!grid) return;
-    const list = stampData.records.slice(); // 지역 필터 없음 — 항상 전체(위 주석 참고)
-    // "다녀온 매장 N곳" = 고유 매장 수(같은 매장 여러 번 기록해도 1곳으로 셈 — 라벨과 의미 일치)
-    document.getElementById('stampCountNum').textContent = new Set(list.map((r) => r.name)).size;
+    renderStampTabs();   // 기록이 늘고 줄 때마다 「다녀온 지역」이 달라진다
+    const 전체 = stampData.records.slice();
+    const list = activeStampRegion === '전체'
+      ? 전체
+      : 전체.filter((r) => STAMP_REGION_OF(r.name) === activeStampRegion);
+    // 🔴 "다녀온 매장 N곳"은 **거른 결과가 아니라 늘 전체** 기준이다 — 이 줄은 「내가 다녀온 곳이 몇 곳인가」를
+    //    말하는 것이라 지역 탭을 눌렀다고 숫자가 줄면 다른 뜻이 되어 버린다.
+    //    (매장 탭의 개수는 반대로 「지금 보고 있는 목록의 개수」라 지역에 따라 바뀐다 — 뜻이 다르다.)
+    document.getElementById('stampCountNum').textContent = new Set(전체.map((r) => r.name)).size;
     // 일기라 최신이 먼저: 날짜 최근순, 같은 날짜면 나중에 기록한 것(addedAt)이 위.
     // addedAt 없는 옛 기록은 0 취급 → 같은 날짜 안에서 맨 아래(정렬 안 깨짐).
     list.sort((a, b) => {
       if ((a.date || '') !== (b.date || '')) return (a.date || '') < (b.date || '') ? 1 : -1;
       return (b.addedAt || 0) - (a.addedAt || 0);
     });
-    // 빈 상태 — 지역 필터가 없어졌으므로 "기록이 하나도 없음" 한 가지뿐이다(첫 기록 유도).
+    // 빈 상태 — 감자가 말풍선으로 말을 건다. **지금 보고 있는 탭 하나로만 갈린다**
+    // (2026-08-05 사용자 확정. 그전에는 「기록이 아예 없나」까지 따져 두 갈래였는데, 지역 그림이
+    //  다 생기면서 그 구분이 필요 없어졌다 — 「서울에는 아직 기록이 없어요」는 다른 지역에
+    //  기록이 있든 없든 참이라 거짓말이 되지 않는다).
+    //   전체 탭   → 「아직 스티커가 없어요 / 기록하기로 첫 방문을 남겨보세요」
+    //   지역 탭   → 「<지역>에는 아직 기록이 없어요」
+    // 🔴 감자 판은 **한 번 만들어 grid 에 넣고 다시는 떼지 않는다.** 떼었다 붙이면 그림이
+    //    다시 그려지면서 깜빡인다(위 buildStampEmpty 주석의 「1·2·3차」 참고).
+    //    그래서 아래는 `replaceChildren` 로 통째로 갈지 않고 **카드만** 넣고 뺀다.
+    if (!stampEmptyEl) { stampEmptyEl = buildStampEmpty(); grid.prepend(stampEmptyEl); }
+    Array.from(grid.children).forEach((c) => { if (c !== stampEmptyEl) c.remove(); });
     if (!list.length) {
-      const empty = document.createElement('div');
-      empty.className = 'stamp-empty';
-      empty.innerHTML = '<p class="stamp-empty-text">아직 스티커가 없어요<br><svg class="stamp-empty-pen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>기록하기로 첫 방문을 남겨보세요</p>';
-      grid.replaceChildren(empty);
+      stampEmptyEl.hidden = false;
+      showGamja(activeStampRegion);      // 보이는 한 장만 바뀐다
     } else {
-      // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → replaceChildren로 순서만 재배치(재생성 X)
-      const cards = list.map((rec) => {
+      stampEmptyEl.hidden = true;
+      // 캐시된 카드는 재사용, 없으면 새로 만들어 캐시 → 순서만 재배치(재생성 X)
+      grid.append(...list.map((rec) => {
         let card = stampCardCache.get(rec.id);
         if (!card) { card = buildStampRecCard(rec); stampCardCache.set(rec.id, card); }
         return card;
-      });
-      grid.replaceChildren(...cards);
+      }));
     }
+    // 🔴 「맨 위로」는 보여줄 목록이 있을 때만 — 빈 화면에 있으면 내릴 게 없는데 올라가라는 말이 된다.
+    //    기준은 `list`(지금 보이는 목록)다. 전체 기록이 있어도 이 지역이 비었으면 화면은 비어 있다.
+    const 맨위로 = document.getElementById('stampToTop');
+    if (맨위로) 맨위로.hidden = !list.length;
     // 삭제된 기록의 캐시 정리(메모리 누수·오래된 카드 재사용 방지)
     const liveIds = new Set(stampData.records.map((r) => r.id));
     stampCardCache.forEach((_, id) => { if (!liveIds.has(id)) stampCardCache.delete(id); });
   }
 
-  // ── 발도장 입력 시트: 점선 슬롯 → 지점 선택 → "발도장 찍기" → 스티커 탁!(stampPop) ──
+  // ── 스티커 입력 시트: 점선 슬롯 → 지점 선택 → "기록하기" → 스티커 탁!(stampPop) ──
   const stampSheetOverlay = document.getElementById('stampSheetOverlay');
   const stampSheetEl = stampSheetOverlay.querySelector('.stamp-sheet'); // 시트 안쪽 스크롤 컨테이너
   const stampSheetClose = document.getElementById('stampSheetClose');
@@ -3333,7 +4447,7 @@
     const n = new Date();
     return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
   }
-  // 발도장 = 방문 기록이라 미래 날짜는 무의미 → 오늘 이후 선택 금지. max로 달력에서 미래를 비활성화하고,
+  // 스티커 = 방문 기록이라 미래 날짜는 무의미 → 오늘 이후 선택 금지. max로 달력에서 미래를 비활성화하고,
   // 혹시 미래 값이 들어오면(직접 입력·기존 데이터) 오늘로 되돌린다.
   function clampStampDate() {
     const max = todayIso();
@@ -3346,6 +4460,9 @@
   const stampSubmitEl = document.getElementById('stampSubmit');
   let stampSelected = null;   // 고른 매장 이름
   let stampEditId = null;     // 수정 중인 기록 id (add면 null)
+  /* 「나가기」를 누른 뒤 원래 누르려던 상단바 지역 탭을 다시 누를 때 켠다.
+     상단바 공통 처리가 그 클릭을 **또 가로채지 않게** 하는 표시다(2026-08-09). */
+  let stampLeaveReplaying = false;
   let stampAnimating = false; // 찍기 연출 중 중복 제출·닫기 방지
   let stampMode = 'add';      // 'add'(새로 찍기) | 'edit'(기록 수정)
   // 삭제는 보기 모달로 이동함(입력 시트엔 없음) — 아래 stampViewDelete 참고
@@ -3370,7 +4487,7 @@
 
   // editId 있으면 = 그 기록 수정 모드(매장·날짜·메모·동행 수정 + 삭제), 없으면 새로 찍기
   function openStampSheet(editId) {
-    stampSheetReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    stampSheetReturnFocus = popupOpener();
     const rec = editId ? stampData.records.find((r) => r.id === editId) : null;
     stampMode = rec ? 'edit' : 'add';
     stampEditId = rec ? rec.id : null;
@@ -3406,14 +4523,40 @@
     // 오버레이가 opacity로만 여닫혀 시트가 늘 레이아웃에 남는다 → 지난번 스크롤 위치가 그대로 유지됨.
     // 다시 열 땐 항상 맨 위(날짜부터)에서 시작하도록 되돌린다(2026-07-24 버그 수정).
     if (stampSheetEl) stampSheetEl.scrollTop = 0;
-    requestAnimationFrame(() => focusDialogClose(stampSheetClose));
+    // 🔴 비교 기준은 **여기서** 찍는다 — 위에서 새 기록/수정 값을 전부 채운 **뒤**다.
+    //    한 줄이라도 위로 올리면 「열자마자 바뀌었다」가 되어 경고가 뜬다.
+    stampBaseline = stampSnapshot();
+    // 지난번에 기억한 「작성창 안 마지막 초점」은 버린다 — 새로 연 창의 자리가 아니다(2026-08-09)
+    stampLastFocusInside = null;
+    focusDialogCloseWhenReady(stampSheetClose);
   }
   function closeStampSheet() {
     if (stampAnimating) return; // 찍히는 중엔 닫기 무시(연출 보장)
     stampSheetOverlay.classList.remove('open');
-    const target = stampSheetReturnFocus;
+    stampBaseline = null;       // 닫혔으니 비교 기준도 버린다
+    const target = stampSheetReturnFocus;   // 복귀표(2026-08-10, 2차)
     stampSheetReturnFocus = null;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
+  }
+
+  /* ══ 작성 중 나가기 확인 (2026-08-09, 5-5 추가 보완 · 사용자님 확정) ══════════════════
+     🔴 **완전히 준비된 직후의 값**을 기준으로 삼는다. `openStampSheet` 맨 끝에서 찍는다 —
+        새 기록의 기본 날짜(오늘)나 수정 모드로 불러온 기존 값은 **사용자가 바꾼 것이 아니므로**
+        기준에 들어가야 한다. 안 그러면 창을 열자마자 「바뀌었다」가 되어 경고가 뜬다.
+     ⚠️ 저장 경로는 `closeStampSheet` 를 안 거치고 `classList.remove('open')` 을 직접 부른다.
+        그래서 저장하고 닫힐 때는 이 확인이 **애초에 안 걸린다**(사용자님 지시: 저장엔 경고 없음). */
+  let stampBaseline = null;
+  function stampSnapshot() {
+    return JSON.stringify({
+      date: stampDateEl.value,
+      store: stampSelected,
+      withSel: stampWithSelected,
+      withText: stampWithEl ? stampWithEl.value.trim() : '',
+      memo: stampMemoEl.value.trim(),
+    });
+  }
+  function stampDirty() {
+    return stampBaseline !== null && stampSnapshot() !== stampBaseline;
   }
   // 매장 드롭다운 열기/닫기 — 정렬 dd와 같은 동작(버튼 토글, 바깥 클릭 시 닫힘)
   function closeStampDd() {
@@ -3539,10 +4682,116 @@
     }
     stampDdMenu.appendChild(item);
   });
-  stampSheetClose.addEventListener('click', closeStampSheet);
-  stampSheetOverlay.addEventListener('click', (e) => { if (e.target === stampSheetOverlay) closeStampSheet(); });
+  /* ══ 확인창 ══════════════════════════════════════════════════════════════════
+     🔴 브라우저 기본 `confirm()` 을 안 쓴다(사용자님 지시) — 기기마다 모양이 다르고 문구를 못 정한다.
+     흐름: 닫으려 함 → 안 바뀌었으면 바로 닫음 / 바뀌었으면 이 창을 띄우고 **원래 동작을 붙들어 둔다.**
+       · 「계속 작성」 → 아무 일도 안 일어난다. 붙들어 둔 동작도 버린다.
+       · 「나가기」  → 기록 창을 닫고, 붙들어 둔 동작(예: 누른 지역 탭)을 그때 실행한다. */
+  const leaveConfirmOverlay = document.getElementById('leaveConfirmOverlay');
+  const leaveConfirmBox = leaveConfirmOverlay && leaveConfirmOverlay.querySelector('.leave-confirm');
+  const leaveConfirmStay = document.getElementById('leaveConfirmStay');
+  const leaveConfirmGo = document.getElementById('leaveConfirmGo');
+  let leaveConfirmReturnFocus = null;   // 기록 창 안에서 초점이 있던 자리
+  let leaveConfirmPending = null;       // 「나가기」를 누르면 이어서 할 일
+
+  /* 🔴 **기록 창 안에서** 마지막으로 초점을 받은 자리를 따로 기억한다
+     (2026-08-09 추가 보완 · 코덱스가 실기 브라우저에서 잡은 문제).
+     ⚠️ 왜 필요한가: 확인창을 띄우는 순간의 `document.activeElement` 를 그대로 쓰면 **틀린다.**
+        마우스로 상단바 지역 탭을 누르면 **누르는 순간 그 버튼이 이미 초점을 가진다** —
+        그래서 「계속 작성」을 눌렀을 때 초점이 작성창 밖(지역 탭)으로 돌아갔다.
+        `stamp-sheet` 는 `aria-modal="true"` 인 대화상자라 계속 작성하는 동안
+        초점이 그 밖에 있으면 안 된다.
+     그래서 **작성창 안에서 일어난 `focusin` 만** 기억해 둔다. */
+  let stampLastFocusInside = null;
+  if (stampSheetEl) {
+    stampSheetEl.addEventListener('focusin', (e) => {
+      if (e.target instanceof HTMLElement) stampLastFocusInside = e.target;
+    });
+  }
+
+  function leaveConfirmIsOpen() {
+    return !!leaveConfirmOverlay && leaveConfirmOverlay.classList.contains('open');
+  }
+  function openLeaveConfirm(onLeave) {
+    if (!leaveConfirmOverlay) { onLeave && onLeave(); return; }   // 마크업이 없으면 옛 동작대로
+    /* 🔴 지금 초점이 **작성창 안일 때만** 그것을 쓴다. 밖이면(예: 마우스로 누른 지역 탭)
+       위에서 기억해 둔 「작성창 안 마지막 자리」를 쓴다. 둘 다 없으면 아래 복귀에서 X 로 물러선다. */
+    const 지금 = document.activeElement;
+    const 안쪽 = (지금 instanceof HTMLElement && stampSheetEl && stampSheetEl.contains(지금)) ? 지금 : null;
+    /* 🔴 고르는 방식은 그대로다(2026-08-10, 2차) — `popupOpener()` 로 바꾸지 않는다.
+       이 창은 **기록 창 안쪽**으로 돌아가야 해서 다른 팝업과 기준이 다르다.
+       바뀐 것은 고른 자리를 **복귀표로 감싸는 것**뿐이다. */
+    leaveConfirmReturnFocus = makeReturnTicket(안쪽 || stampLastFocusInside || null);
+    leaveConfirmPending = onLeave || null;
+    leaveConfirmOverlay.inert = false;
+    leaveConfirmOverlay.classList.add('open');
+    leaveConfirmOverlay.setAttribute('aria-hidden', 'false');
+    syncScrollLock();          // 뒤의 기록 창을 잠근다(아래 syncScrollLock 참고)
+    syncPageBackgroundA11y();  // 상단바까지 잠근다
+    // 🔴 안전한 쪽(「계속 작성」)에 초점을 준다 — 실수로 Enter 를 눌러도 잃는 것이 없어야 한다
+    requestAnimationFrame(() => focusDialogClose(leaveConfirmStay));
+  }
+  function closeLeaveConfirm(실행할것) {
+    if (!leaveConfirmOverlay) return;
+    const 할일 = 실행할것 ? leaveConfirmPending : null;
+    leaveConfirmPending = null;
+    /* 🔴 복귀 대상은 **여기서 한 번에 꺼내고 비운다**(2026-08-09 보완).
+       예전엔 「나가기」 갈래에서 `return` 하느라 이 값이 **안 비워진 채 남았다** —
+       다음에 확인창을 띄우면 옛 자리가 섞일 수 있다. */
+    const 복귀후보 = leaveConfirmReturnFocus;
+    leaveConfirmReturnFocus = null;
+    leaveConfirmOverlay.classList.remove('open');
+    leaveConfirmOverlay.setAttribute('aria-hidden', 'true');
+    leaveConfirmOverlay.inert = true;
+    syncScrollLock();
+    syncPageBackgroundA11y();
+    if (할일) { 할일(); return; }                 // 나가기 — 초점은 그 동작이 정한다(복귀값은 위에서 비웠다)
+    /* 계속 작성 — **반드시 기록 창 안으로** 초점을 되돌린다.
+       기억한 자리가 사라졌거나(다시 그려짐) 숨었거나 창 밖이면 **X 버튼으로 물러선다** —
+       작성창 안에 확실히 있는 요소라 초점이 밖으로 새지 않는다. */
+    const 자리 = 복귀후보 && 복귀후보.el;   // 복귀후보는 **복귀표**다(2026-08-10, 2차)
+    const 쓸만한가 = 자리 && 자리.isConnected && !자리.hidden
+      && stampSheetEl && stampSheetEl.contains(자리)
+      && 자리.getClientRects().length > 0;
+    /* 🔴 물러설 때도 **번호를 물려받는다** — 새로 찍으면 확인창이 떠 있는 동안 쓴 키보드가
+       통째로 지워져 테두리가 잘못 숨는다. */
+    if (쓸만한가) restorePopupFocus(복귀후보);
+    else if (stampSheetClose) restorePopupFocus(retargetReturnTicket(복귀후보, stampSheetClose));
+  }
+  if (leaveConfirmBox) leaveConfirmBox.addEventListener('keydown', (e) => trapFocusWithin(leaveConfirmBox, e));
+  if (leaveConfirmStay) leaveConfirmStay.addEventListener('click', () => closeLeaveConfirm(false));
+  if (leaveConfirmGo) leaveConfirmGo.addEventListener('click', () => closeLeaveConfirm(true));
+  // 배경 클릭 = 「계속 작성」(취소). 실수로 바깥을 눌러 글을 잃으면 안 된다
+  if (leaveConfirmOverlay) {
+    leaveConfirmOverlay.addEventListener('click', (e) => {
+      if (e.target === leaveConfirmOverlay) closeLeaveConfirm(false);
+    });
+  }
+  /* 🔴 Esc 도 「계속 작성」이다. **캡처 단계**로 잡아 기록 창의 Esc 보다 먼저 처리한다 —
+     안 그러면 확인창을 Esc 로 닫는 순간 그 Esc 가 기록 창까지 닫아 버린다. */
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && stampSheetOverlay.classList.contains('open')) closeStampSheet();
+    if (e.key === 'Escape' && leaveConfirmIsOpen()) {
+      e.stopPropagation();
+      closeLeaveConfirm(false);
+    }
+  }, true);
+
+  /* 🔴 기록 창을 닫으려는 모든 길이 여기를 지난다(2026-08-09).
+     `onLeave` 는 「닫은 다음에 이어서 할 일」이다 — 상단바 지역 탭처럼 원래 하려던 동작이 있을 때 쓴다. */
+  function requestCloseStampSheet(onLeave) {
+    if (stampAnimating) return false;                                   // 찍히는 중엔 무시(기존 규칙)
+    if (!stampSheetOverlay.classList.contains('open')) return false;
+    if (leaveConfirmIsOpen()) return true;                              // 이미 묻는 중이면 두 번 안 띄운다
+    const 마무리 = () => { closeStampSheet(); if (onLeave) onLeave(); };
+    if (!stampDirty()) { 마무리(); return true; }
+    openLeaveConfirm(마무리);
+    return true;
+  }
+
+  stampSheetClose.addEventListener('click', () => requestCloseStampSheet());
+  stampSheetOverlay.addEventListener('click', (e) => { if (e.target === stampSheetOverlay) requestCloseStampSheet(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && stampSheetOverlay.classList.contains('open')) requestCloseStampSheet();
   });
 
   stampSubmitEl.addEventListener('click', () => {
@@ -3624,7 +4873,7 @@
     }
   });
 
-  // ── 발도장 보기 모달 (카드 탭 시, 읽기 전용 + 수정/삭제) ──
+  // ── 스티커 보기 모달 (카드 탭 시, 읽기 전용 + 수정/삭제) ──
   const stampViewOverlay = document.getElementById('stampViewOverlay');
   const stampViewSticker = document.getElementById('stampViewSticker');
   const stampViewInfo = document.getElementById('stampViewInfo');
@@ -3641,16 +4890,59 @@
   // 닫는 지점이 6곳으로 흩어져 있어(X·바깥클릭·Esc·저장 후·연출 종료 등) 호출부마다 넣는 대신
   // .open 클래스 변화를 관찰해 자동 동기화한다 — 나중에 닫는 경로가 늘어도 빠뜨릴 일이 없다.
   const SCROLL_LOCK_OVERLAYS = [stampSheetOverlay, stampViewOverlay];
+  /* 🔴 배경 비활성화 대상에 나머지 팝업도 넣는다(2026-08-09, 전수조사 5-5).
+     예전에는 레시피 상세와 스티커 둘만 셌다 — 그래서 내 메뉴·내 코드·칼럼·가챠·앱설치가
+     떠 있는 동안 **Tab 이 뒤 화면으로 새어 나갔다.**
+     ⚠️ 칼럼만 `.open` 클래스가 아니라 `hidden` 속성으로 여닫는다(openColumn 참고). 따로 본다.
+     ⚠️ 상단바(.topbar)는 **일부러 안 잠근다** — 이 사이트는 팝업이 떠 있어도 상단바를 눌러
+        옮겨 가는 것이 제품 규칙이고(2404 주석), 내 메뉴·내 코드는 상단 아이콘을 다시 눌러
+        닫는 길이기도 하다. 잠그면 그 길이 막힌다. */
+  const A11Y_DIALOG_IDS = ['mnSheetOverlay', 'syncSheetOverlay', 'gachaOverlay', 'a2hsOverlay'];
+  function otherDialogOpen() {
+    if (columnOverlay && !columnOverlay.hidden) return true;
+    return A11Y_DIALOG_IDS.some((id) => {
+      const el = document.getElementById(id);
+      return !!el && el.classList.contains('open');
+    });
+  }
   function syncPageBackgroundA11y() {
     const recipeOpen = modalOverlay.classList.contains('open');
     const stampOpen = SCROLL_LOCK_OVERLAYS.some((el) => el.classList.contains('open'));
-    const anyOpen = recipeOpen || stampOpen;
+    /* 🔴 스토리도 뒤 화면을 잠근다(2026-08-09, 스토리 접근성).
+       🔴 **`storyOpen` 은 「뒤 화면(본문·탭바·상단바)을 잠글까」에만 쓴다.**
+          스토리 **자신**의 잠금(맨 아래 `storyViewer.inert`)에는 **절대 넣지 않는다** —
+          넣으면 스토리가 **자기 자신을 잠가** 통째로 안 눌리는 사고가 난다.
+       ⚠️ 그래서 `SCROLL_LOCK_OVERLAYS` 에 스토리를 그냥 집어넣는 방식도 쓰지 않는다.
+          그 목록은 스크롤 잠금용이고, 스토리는 이미 `overflow:hidden` 으로 스스로 잠근다. */
+    const storyOpen = storyViewer.classList.contains('open');
+    const anyOpen = recipeOpen || stampOpen || storyOpen || otherDialogOpen();
     [document.querySelector('.main'), document.getElementById('tabbar')].forEach((el) => {
       if (!el) return;
       el.inert = anyOpen;
       if (anyOpen) el.setAttribute('aria-hidden', 'true');
       else el.removeAttribute('aria-hidden');
     });
+    /* 🔴 가챠가 열린 동안에는 **상단바까지** 잠근다(2026-08-09 사용자 확정).
+       가챠는 화면 전체를 덮어 상단바가 **눈에 안 보이는데**, 그냥 두면 Tab 으로는 갈 수 있고
+       화면낭독기도 읽는다 — 「안 보이는 것을 조작하는」 상태가 된다.
+       🔴 그래서 가챠는 「상단바를 눌러 닫는」 대상에 **넣지 않는다.** 닫는 길은 X·Esc·어두운 배경이다.
+       ⚠️ 다른 팝업(내 메뉴·내 코드·칼럼·앱설치)에는 이걸 걸면 안 된다 — 그쪽은 상단바가 보이고,
+          상단 아이콘을 다시 눌러 닫는 길이기도 하다. 그래서 **가챠일 때만** 이다. */
+    /* 🔴 「나갈까요?」 확인창이 떠 있는 동안에도 상단바를 잠근다(2026-08-09, 5-5 추가 보완).
+       그 창은 **답을 해야 넘어가는 물음**이라, 뒤의 상단바를 눌러 빠져나갈 수 있으면 안 된다. */
+    const 확인창 = (() => { const el = document.getElementById('leaveConfirmOverlay');
+                            return !!el && el.classList.contains('open'); })();
+    const gachaOpen = gachaOverlay.classList.contains('open');
+    if (topbarEl) {
+      /* 🔴 스토리도 상단바를 잠근다(2026-08-09) — 가챠와 **같은 성격**이다. 스토리는 화면을 꽉
+         덮어 **상단바가 눈에 안 보이는데**, 그냥 두면 Tab 으로 갈 수 있고 낭독기도 읽는다.
+         ⚠️ 다른 팝업(내 메뉴·내 코드·칼럼·앱설치)에는 이걸 걸면 안 된다 — 그쪽은 상단바가
+            보이고, 상단 아이콘을 다시 눌러 닫는 길이기도 하다. */
+      const 잠글까 = gachaOpen || 확인창 || storyOpen;
+      topbarEl.inert = 잠글까;
+      if (잠글까) topbarEl.setAttribute('aria-hidden', 'true');
+      else topbarEl.removeAttribute('aria-hidden');
+    }
     // 스토리 위에 레시피 상세를 띄울 수 있으므로, 상세가 열려 있을 때만 스토리를 배경 처리한다.
     storyViewer.inert = recipeOpen;
     storyViewer.setAttribute(
@@ -3661,10 +4953,14 @@
   function syncScrollLock() {
     const anyOpen = SCROLL_LOCK_OVERLAYS.some((el) => el.classList.contains('open'));
     document.documentElement.classList.toggle('is-locked', anyOpen);
+    /* 🔴 확인창이 떠 있으면 **그 아래 기록 창도 잠근다**(2026-08-09, 5-5 추가 보완).
+       확인창은 기록 창 위에 뜨는데, 잠그지 않으면 Tab 이 뒤 입력칸으로 새어 나간다. */
+    const 확인창 = (() => { const el = document.getElementById('leaveConfirmOverlay');
+                            return !!el && el.classList.contains('open'); })();
     SCROLL_LOCK_OVERLAYS.forEach((el) => {
       const open = el.classList.contains('open');
       el.setAttribute('aria-hidden', String(!open));
-      el.inert = !open;
+      el.inert = !open || 확인창;
     });
     syncPageBackgroundA11y();
   }
@@ -3681,11 +4977,11 @@
   function openStampView(id) {
     const rec = stampData.records.find((r) => r.id === id);
     if (!rec) return;
-    stampViewReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    stampViewReturnFocus = popupOpener();
     stampViewId = id;
     renderStampView(rec);
     stampViewOverlay.classList.add('open');
-    requestAnimationFrame(() => focusDialogClose(stampViewClose));
+    focusDialogCloseWhenReady(stampViewClose);
   }
   // 🔴 그리기만 하는 부분을 따로 뒀다(2026-07-31 5차 교차검증 2번). 열려 있는 상세를 새
   //   내용으로 다시 그려야 하는데, `openStampView`를 그대로 다시 부르면 **포커스 복귀 대상**
@@ -3721,9 +5017,9 @@
   function closeStampView() {
     stampViewOverlay.classList.remove('open');
     resetStampViewDelete();
-    const target = stampViewReturnFocus;
+    const target = stampViewReturnFocus;   // 복귀표(2026-08-10, 2차)
     stampViewReturnFocus = null;
-    if (target && target.isConnected && !target.hidden) requestAnimationFrame(() => target.focus());
+    restorePopupFocus(target);
   }
   stampViewClose.addEventListener('click', closeStampView);
   stampViewOverlay.addEventListener('click', (e) => { if (e.target === stampViewOverlay) closeStampView(); });
@@ -3757,7 +5053,7 @@
     renderStamps();
   });
 
-  // 상단바 ✏️ 기록하기(발도장 섹션 전용) → 새로 찍기 시트
+  // 상단바 ✏️ 기록하기(스티커 섹션 전용) → 새로 찍기 시트
   const stampWriteBtn = document.getElementById('stampWriteBtn');
   if (stampWriteBtn) stampWriteBtn.addEventListener('click', () => {
     if (stampSheetOverlay.classList.contains('open')) return; // 이미 작성 중이면 무시 — 다시 누르면 입력 리셋되던 것 방지
@@ -3765,9 +5061,14 @@
   });
 
   // 그리드 뷰 헤더 ‹(뒤로) + 인기소스 '전체 ›' → 홈/전체보기 전환
-  browseCloseEl.addEventListener('click', goHome);
-  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderGrid에서 자동 적용됨)
-  document.getElementById('tangMore').addEventListener('click', () => enterBrowse('탕'));
+  // 「맨 위로」 — 레시피·메뉴 탭 목록 끝의 버튼(2026-08-03). 하단바 재탭과 같은 일을 한다.
+  document.querySelectorAll('.to-top-btn').forEach((btn) => btn.addEventListener('click', scrollToTop));
+  // 탕·히든·소스 섹션 '전체보기' → 해당 카테고리 브라우즈(소스는 1~5위 랭킹+6위 이하 그리드가 renderList에서 자동 적용됨)
+  // 🔴 홈 「전골」의 「메뉴 보기」는 **레시피가 아니라 메뉴 탭**으로 간다(2026-08-05 사용자 확정).
+  //    카드도 같은 곳으로 간다 — 육수는 상세 화면이 없어서 갈 데가 여기뿐이고, 홈 카드가 눌러도
+  //    반응이 없으면 고장으로 보인다. ⚠️ 눌렀다고 냄비에 담지는 않는다(구경하다 담기면 놀란다).
+  //    ⚠️ 「메뉴 보기」 버튼은 **담지 않는다** — 이름 없이 부른다. 「보러 간다」는 뜻이라 담을 대상이 없다.
+  document.getElementById('jeongolMore').addEventListener('click', () => 전골로가기());
   document.getElementById('hiddenMore').addEventListener('click', () => enterBrowse('히든메뉴'));
   document.getElementById('popularMore').addEventListener('click', () => enterBrowse('소스'));
 
@@ -3790,7 +5091,7 @@
 
   // 같은 사이트를 여러 창에서 열었거나 iOS가 bfcache 화면을 복원했을 때, 메모리에 남은
   // 옛 상태가 localStorage의 최신값을 덮지 않도록 저장값을 다시 읽고 필요한 부분만 갱신한다.
-  // 전체 renderGrid()는 즐겨찾기 필터에서 항목이 빠져야 할 때만 호출해 스크롤 위치를 보존한다.
+  // 전체 renderList()는 즐겨찾기 필터에서 항목이 빠져야 할 때만 호출해 스크롤 위치를 보존한다.
   function syncExternalState(key) {
     const syncAll = !key;
 
@@ -3802,7 +5103,7 @@
       if (currentModalRecipe) {
         setPressedState(modalFavBtn, favorites.has(currentModalRecipe.id));
       }
-      if (showFavoritesOnly) renderGrid();
+      if (showFavoritesOnly) renderList();
     }
 
     if (syncAll || key === LIKED_KEY) {
@@ -3858,7 +5159,7 @@
 
   renderHomeSections();
   initMonthlyFeature();
-  renderGrid();
+  renderList();
   renderStoreTabs();
   renderStores();
   renderStamps();
@@ -3921,24 +5222,51 @@
   const topInstallBtn = document.getElementById('topInstallBtn');
   const tabsInstallBtns = [...document.querySelectorAll('.tabs-install-btn')];
   const installBtns = [topInstallBtn].concat(tabsInstallBtns);
+  // 🔴 인라인 display 로 켜지 않는다(2026-08-04) — 「레시피·메뉴에서는 설치를 감춘다」는
+  //    CSS 규칙을 인라인이 이겨서 두 탭에도 나왔다(사용자가 실기기에서 발견).
+  //    켜고 끄는 것은 클래스로만 하고, 어디에 보일지는 CSS 가 정한다.
   function showInstallBtns() {
-    topInstallBtn.style.display = 'flex';
+    document.querySelector('.page').classList.add('can-install');
     // 탭줄 아이콘은 인라인만 걷어내면 CSS가 표시를 결정(모바일 flex / 데스크탑 none — 공유 버튼과 동일 규칙)
     tabsInstallBtns.forEach((b) => { b.style.display = ''; });
   }
   function hideInstallBtns() {
-    installBtns.forEach((b) => { b.style.display = 'none'; });
+    document.querySelector('.page').classList.remove('can-install');
+    tabsInstallBtns.forEach((b) => { b.style.display = 'none'; });
   }
 
   // ADD TO HOME SCREEN (iOS Safari — no install API exists, so we guide manually)
+  /* 🔴 앱 설치 안내도 다른 팝업과 같게 만든다(2026-08-09, 5-5 · 사용자 승인으로 범위에 추가).
+     전수조사가 센 대화상자 7개에 이것이 안 들어 있어 목록에서 빠져 있었다.
+     닫혔을 때는 `display:none`(styles.css .a2hs-overlay)이라 `inert` 는 필요 없다 —
+     내 메뉴·내 코드와 달리 `visibility` 전환이 없다. */
+  let a2hsReturnFocus = null;
+  const a2hsCard = a2hsOverlay && a2hsOverlay.querySelector('.a2hs-card');
+  if (a2hsCard) a2hsCard.addEventListener('keydown', (e) => trapFocusWithin(a2hsCard, e));
+  function closeA2hs() {
+    a2hsOverlay.classList.remove('open');
+    syncPageBackgroundA11y();
+    const target = a2hsReturnFocus;   // 복귀표(2026-08-10, 2차)
+    a2hsReturnFocus = null;
+    restorePopupFocus(target);
+  }
   if (isIosSafariNotInstalled()) {
     showInstallBtns();
-    const openA2hsOverlay = () => a2hsOverlay.classList.add('open');
+    const openA2hsOverlay = () => {
+      a2hsReturnFocus = popupOpener();
+      a2hsOverlay.classList.add('open');
+      syncPageBackgroundA11y();
+      requestAnimationFrame(() => focusDialogClose(a2hsClose));
+    };
     installBtns.forEach((b) => b.addEventListener('click', openA2hsOverlay));
     a2hsOverlay.addEventListener('click', (e) => {
-      if (e.target === a2hsOverlay) a2hsOverlay.classList.remove('open');
+      if (e.target === a2hsOverlay) closeA2hs();
     });
-    a2hsClose.addEventListener('click', () => a2hsOverlay.classList.remove('open'));
+    a2hsClose.addEventListener('click', closeA2hs);
+    // Esc — 다른 팝업과 같게(2026-08-09, 5-5)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && a2hsOverlay.classList.contains('open')) closeA2hs();
+    });
   }
 
   // INSTALL APP (Android Chrome/삼성 인터넷 — 표준 설치 프롬프트 이용)
@@ -3978,9 +5306,14 @@
     inappBanner.style.display = 'flex';
     const bannerHeight = inappBanner.offsetHeight;
     document.body.style.paddingTop = bannerHeight + 'px';
+    // 🔴 화면에 고정된 것들은 body 여백을 안 따라간다 — 배너 높이를 CSS 에 건네준다.
+    //    지금 쓰는 곳은 토스트(.share-toast) 하나다. 안 넣으면 배너(z-index 300)가 토스트(250)를 덮는다.
+    //    ⚠️ 앞으로 position:fixed 로 화면 위쪽에 두는 것을 새로 만들면 여기에 같이 엮을 것.
+    document.documentElement.style.setProperty('--inapp-h', bannerHeight + 'px');
     inappBannerClose.addEventListener('click', () => {
       inappBanner.style.display = 'none';
       document.body.style.paddingTop = '';
+      document.documentElement.style.removeProperty('--inapp-h');
       sessionStorage.setItem(INAPP_DISMISS_KEY, '1');
     });
   }
@@ -3992,12 +5325,30 @@
   const shareToast = document.getElementById('shareToast');
   let shareToastTimer = null;
 
+  // 화면 아래(탭바 위 20px)에 뜨는 검은 알약. 2초 뒤 저절로 사라진다.
+  // 🔴 이름은 share- 로 시작하지만 공유 전용이 아니다 — 처음 쓴 곳이 공유였을 뿐이고,
+  //    지금은 메뉴 탭(냄비가 가득 찼을 때)도 쓴다. 알려만 주고 사라지는 모든 자리에 쓴다.
   function showShareToast(text) {
     shareToast.textContent = text;
     shareToast.classList.add('show');
     clearTimeout(shareToastTimer);
     shareToastTimer = setTimeout(() => shareToast.classList.remove('show'), 2000);
   }
+  window.showToast = showShareToast;   // 메뉴 탭 IIFE 는 따로 감싸여 있어 이걸로 건넨다
+  /* 🔴 대화상자 접근성 공용 함수(2026-08-09, 5-5). 메뉴 탭 IIFE 의 「내 메뉴」 시트가 쓴다.
+     ⚠️ 전역 이름을 셋 늘리는 대신 **객체 하나**에 담는다(코덱스 제안) — 남의 전역과 부딪힐 일이 적다.
+     ⚠️ 위 `window.showToast` 같은 옛 전역은 건드리지 않는다. 고치면 메뉴 탭 쪽도 같이 고쳐야 하는데
+        이번 작업 범위가 아니다. */
+  /* 🔴 **여기 안 넣고 메뉴 탭에서 직접 부르면 그 탭이 통째로 죽는다**(2026-08-09 실제로 그랬다).
+     `popupOpener` 를 본체에서만 만들고 메뉴 탭 IIFE 에서 그냥 불렀더니
+     `ReferenceError: popupOpener is not defined` 로 **「내 메뉴」가 아예 안 열렸다.**
+     이 파일은 IIFE 가 둘로 갈려 있다 — **경계를 넘는 것은 반드시 이 객체에 담아 건넨다.** */
+  /* 🔴 2026-08-10 (1차) — 초점 복귀 공용 함수 넷을 여기 같이 싣는다.
+     「내 메뉴」(두 번째 IIFE)도 2차에서 이 문으로 건너와 쓴다. 직접 부르면 그 탭이 죽는다. */
+  window.haidilDialogA11y = {
+    trapFocusWithin, focusDialogClose, focusDialogCloseWhenReady, syncPageBackgroundA11y, popupOpener,
+    makeReturnTicket, retargetReturnTicket, restorePopupFocus, normalizeReturnTicket, returnTicketUsedKeyboard
+  };
 
   async function shareSite() {
     const isLocalPreview = /^(localhost|127\.0\.0\.1|\d{1,3}(?:\.\d{1,3}){3})$/.test(location.hostname);
@@ -4022,7 +5373,7 @@
   favShareBtn.addEventListener('click', shareSite);
   topShareBtn.addEventListener('click', shareSite);
   if (storeShareBtn) storeShareBtn.addEventListener('click', shareSite);
-  const stampShareBtn = document.getElementById('stampShareBtn'); // 발도장 섹션(모바일) 공유 버튼
+  const stampShareBtn = document.getElementById('stampShareBtn'); // 스티커 섹션(모바일) 공유 버튼
   if (stampShareBtn) stampShareBtn.addEventListener('click', shareSite);
 
   // ════════════════════════════════════════════════════════════════════════
@@ -4051,7 +5402,18 @@
 
   const SYNC_CODE_KEY = 'haidilao_sync_code';
   // 헷갈리는 글자(I·O·0·1) 제외 — 사용자가 눈으로 읽고 손으로 입력하는 코드다.
-  const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  /* 🔴 코드를 **만들 때** 쓰는 글자다(2026-08-05 개편). 모음 A·E·U 와 반모음 Y 를 뺐다 —
+     안 빼면 읽히는 영어 단어가 만들어진다. 실제로 욕설이 그대로 들어간 코드가 나왔다(사용자 발견).
+     I·O·0·1 은 원래부터 헷갈려서 빼 두었다.
+     🔴 **입력 검사(아래 CODE_CHAR)는 절대 같이 좁히지 말 것.** 이미 나가 있는 옛 코드에는 모음이
+        들어 있어서, 좁히면 그 사람들이 자기 코드를 못 넣게 된다. **만들 때만** 좁힌다.
+     가짓수는 28^6 ≈ 4억 8천만이다(전 32^6 ≈ 10억 7천만). 줄지만 이 규모엔 넘친다 —
+     더 늘려야 하면 알파벳을 넓히지 말고 **자릿수를 7로** 올릴 것(28^7 ≈ 135억). */
+  const CODE_ALPHABET = 'BCDFGHJKLMNPQRSTVWXZ23456789';
+  /* 🔴 모음을 빼도 자음만으로 읽히는 말이 남는다(FCK 처럼). 그런 조각이 들어간 코드는 다시 뽑는다.
+     ⚠️ 이 목록이 전부일 수 없다 — 거슬리는 코드가 나오면 여기 한 줄 추가하면 된다.
+     ⚠️ 소문자로 적고 대문자 코드와 맞출 땐 대소문자를 무시한다. */
+  const CODE_BANNED = ['fck', 'fuk', 'sht', 'nggr', 'ngr', 'cnt', 'kkk', 'dck', 'phk', 'wtf', 'jjk'];
 
   // 🔴 저장소가 가득 차거나 막혀도 **이 세션에선 코드가 살아 있어야 한다**(2026-07-31 교차검증).
   //    예전엔 setSyncCode의 실패를 삼켰는데, pushSync가 저장소에서 코드를 다시 읽는 구조라
@@ -4070,7 +5432,7 @@
     syncCodeMem = code;
     try { localStorage.setItem(SYNC_CODE_KEY, code); } catch (e) { /* 저장 실패해도 위 사본으로 버틴다 */ }
   }
-  function makeSyncCode() {
+  function 여섯자리() {
     let s = '';
     const buf = new Uint32Array(6);
     if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
@@ -4078,15 +5440,30 @@
       const n = buf[i] || Math.floor(Math.random() * 0xffffffff);
       s += CODE_ALPHABET[n % CODE_ALPHABET.length];
     }
+    return s;
+  }
+  function makeSyncCode() {
+    // 🔴 걸리는 조각이 들어 있으면 다시 뽑는다. 20번은 넉넉한 상한이다 —
+    //    걸릴 확률이 아주 낮아 실제로는 첫 판에 끝난다. 상한을 두는 이유는 목록이 잘못 커져
+    //    (예: 한 글자를 넣어 버림) 영원히 도는 일을 막기 위해서다. 그땐 마지막 것을 그냥 쓴다.
+    let s = '';
+    for (let i = 0; i < 20; i++) {
+      s = 여섯자리();
+      const 소문자 = s.toLowerCase();
+      if (!CODE_BANNED.some((w) => 소문자.includes(w))) break;
+    }
     return 'HG-' + s;
   }
   // 사용자가 어떻게 적어와도 받아준다 — 소문자, 공백, 하이픈 유무, 'HG' 생략까지.
   // 🔴 'HG'를 무조건 떼면 안 된다. 코드 알파벳에 H와 G가 있어서 뒤 6자리가 'HGXY12'처럼
   //    HG로 시작할 수 있는데, 그때 접두어로 착각해 떼면 4글자만 남아 멀쩡한 코드가 거부된다.
   //    → **길이가 8일 때만** 앞의 HG를 접두어로 본다(6자리면 그대로가 본체다).
-  // 🔴 실제 코드에 쓰는 글자만 통과시킨다(CODE_ALPHABET과 같은 집합 = I·O·0·1 제외).
-  //    예전엔 [A-Z0-9]를 다 받아서, 0이나 1이 섞인 코드가 화면에선 멀쩡히 통과한 뒤
-  //    서버 규칙에 막혀 "저장된 데이터가 없어요"로 나왔다 — 형식 문제인데 없는 코드처럼 보였다.
+  // 🔴 헷갈리는 글자(I·O·0·1)만 막는다. 예전엔 [A-Z0-9]를 다 받아서, 0이나 1이 섞인 코드가
+  //    화면에선 멀쩡히 통과한 뒤 서버 규칙에 막혀 "저장된 데이터가 없어요"로 나왔다 —
+  //    형식 문제인데 없는 코드처럼 보였다.
+  // 🔴 **이 집합은 CODE_ALPHABET(만들 때)보다 넓다. 좁히지 말 것**(2026-08-05).
+  //    만들 때는 모음을 빼지만, **이미 나가 있는 옛 코드에는 모음이 들어 있다.** 여기를 같이 좁히면
+  //    그 사람들이 자기 코드를 못 넣게 된다 — 되살릴 방법이 없는 데이터라 치명적이다.
   const CODE_CHAR = /^[A-HJ-NP-Z2-9]{6}$/;
   function normalizeCode(raw) {
     let s = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -4125,8 +5502,20 @@
       //    흔들린다(3차 교차검증 R1). 항목 자체는 통째로 교체되므로 얕은 사본이면 충분하다.
       favMarks: Object.assign({}, favMarks),
       likedMarks: Object.assign({}, likedMarks),
+      // 🔴 담은 목록(메뉴 탭)도 함께 보낸다(2026-08-04 사용자 확정) —
+      //    「초기화하기 전까지 유지되니 다음 주문 때도 써먹는다」는 것이 이유다.
+      //    메뉴 탭은 다른 IIFE 라 값을 직접 못 읽는다 → 저장된 것을 그대로 읽어 싣는다.
+      menu: readMenuPicked(),
       updatedAt: Date.now(),
     };
+  }
+  // 담은 목록 저장값 그대로. { picked:[], broths:[], cells:n, at:ms } — at 은 마지막으로 손댄 시각이다.
+  const MENU_PICKED_KEY = 'haidilao_menu_picked';
+  function readMenuPicked() {
+    try {
+      const v = JSON.parse(localStorage.getItem(MENU_PICKED_KEY));
+      return (v && typeof v === 'object') ? v : null;
+    } catch (e) { return null; }
   }
 
   // 서버 것 + 이 기기 것을 합쳐서 로컬에 적용. 합친 결과를 돌려준다(개수 안내용).
@@ -4190,6 +5579,13 @@
       // 목록도 이력과 같이 채워 둔다 — 이력이 진실이지만, 사람이 서버 값을 열어볼 때 읽기 쉽다.
       favorites: setsFromMarks(favMarksM),
       liked: setsFromMarks(likedMarksM),
+      // 🔴 담은 목록은 **합치지 않고 최신 것이 통째로 이긴다**(2026-08-04).
+      //    스티커·즐겨찾기는 항목마다 켠/끈 이력이 있어 합칠 수 있지만, 담은 목록은
+      //    「지금 이 한 벌」이다 — 합치면 냄비 칸 수(1·2·4)와 육수가 서로 안 맞게 뒤엉킨다.
+      //    예: 한쪽이 2칸에 육수 둘, 다른 쪽이 4칸에 육수 넷이면 합친 결과가 성립하지 않는다.
+      //    at 이 없는 옛 자료는 0 으로 봐서 새 쪽이 이긴다.
+      menu: ((a.menu && a.menu.at) || 0) >= ((b.menu && b.menu.at) || 0) ? (a.menu || b.menu || null)
+                                                                        : (b.menu || null),
       updatedAt: Date.now(),
     };
   }
@@ -4225,6 +5621,15 @@
       localStorage.setItem(FAV_MARKS_KEY, JSON.stringify(favMarks));
       localStorage.setItem(LIKED_MARKS_KEY, JSON.stringify(likedMarks));
     } catch (e) { /* 무시 */ }
+    // 🔴 담은 목록은 **더 새로울 때만** 덮어쓴다(2026-08-04). 지금 이 기기 것이 더 최신인데
+    //    덮으면 방금 담은 게 사라진다. mergePayloads 가 이미 최신 쪽을 골라 주지만,
+    //    여기서 한 번 더 보는 이유는 이 함수가 합치기를 거치지 않고 불릴 수도 있기 때문이다.
+    const 지금 = readMenuPicked();
+    if (p.menu && ((p.menu.at || 0) > ((지금 && 지금.at) || 0))) {
+      try { localStorage.setItem(MENU_PICKED_KEY, JSON.stringify(p.menu)); } catch (e) { /* 무시 */ }
+      // 메뉴 탭이 이미 그려져 있으면 화면까지 새로 그린다(다른 IIFE 라 window 를 거친다)
+      if (window.mnReloadPicked) window.mnReloadPicked();
+    }
   }
   function mergeIntoLocal(remote) {
     if (!remote) return;
@@ -4233,6 +5638,9 @@
 
   // 서버에 올리기 — 저장이 연달아 일어나도 한 번만 보내게 묶는다
   let pushTimer = null;
+  // 🔴 메뉴 탭은 다른 IIFE 라 직접 못 부른다 — 담은 목록이 바뀔 때도 코드에 올려야 해서 window 에 얹는다.
+  //    (메뉴 탭의 saveMenu 가 window.schedulePush() 를 부른다)
+  window.schedulePush = () => schedulePush();
   function schedulePush() {
     if (!syncRoot) return;
     // 🔴 **저장할 게 생기는 순간** 코드를 만든다 — 스티커든 즐겨찾기든 좋아요든(2026-07-31).
@@ -4323,9 +5731,8 @@
       //   메모를 그대로 들고 있어 **같은 화면 안에서 두 값이 어긋났다.** 지워진 기록이면 닫는다
       //   (그대로 두면 `수정`을 눌렀을 때 빈 새 기록 화면이 뜬다).
       if (typeof refreshStampView === 'function') refreshStampView();
-      if (typeof renderGrid === 'function') renderGrid();
+      if (typeof renderList === 'function') renderList();
       if (typeof renderHomePopular === 'function') renderHomePopular();
-      if (typeof syncHome === 'function') syncHome();
     } catch (e) { /* 그리기 실패해도 데이터는 이미 저장됐다 */ }
   }
 
@@ -4364,6 +5771,9 @@
 
   // ── 화면 ──────────────────────────────────────────────────────────────
   const syncOverlay = document.getElementById('syncSheetOverlay');
+  let syncReturnFocus = null;                                      // 열기 직전 초점(2026-08-09, 5-5)
+  const syncSheetEl = syncOverlay && syncOverlay.querySelector('.stamp-sheet');
+  if (syncSheetEl) syncSheetEl.addEventListener('keydown', (e) => trapFocusWithin(syncSheetEl, e));
   const syncCodeText = document.getElementById('syncCodeText');
   const syncInput = document.getElementById('syncInput');
   const syncMsg = document.getElementById('syncMsg');
@@ -4406,73 +5816,93 @@
     setSyncMsg('');
     setCodeMsg(''); // 지난번에 뜬 '복사했어요'가 남아 있지 않게
     if (syncInput) syncInput.value = '';
+    syncReturnFocus = popupOpener();
     syncOverlay.classList.add('open');
     syncOverlay.setAttribute('aria-hidden', 'false');
+    syncOverlay.inert = false;   // 🔴 닫을 때 건 잠금을 푼다(2026-08-09, 5-5)
+    // 🔴 뒷화면 스크롤을 막는다(2026-08-04 사용자 발견) — 시트를 열고 손가락을 움직이면
+    //    뒤의 홈이 그대로 스크롤됐다. 내 메뉴 시트가 쓰는 것과 같은 방법이다.
+    //    ⚠️ body 가 아니라 **documentElement** 다 — body 를 스크롤 컨테이너로 만들면 sticky 상단바가 깨진다
+    //       (CLAUDE.md 스크롤바 규칙에 적혀 있는 함정).
+    document.documentElement.style.overflow = 'hidden';
+    // 🔴 열려 있는 동안 상단바 아이콘을 빨갛게(2026-08-04 사용자 확정) — 즐겨찾기·내 메뉴와 같은 규칙.
+    //    ⚠️ 어디서 열든(홈 박스로 열어도) 붙인다. 아이콘만 입구가 아니기 때문이다.
+    const cb = document.getElementById('topCodeBtn');
+    if (cb) cb.classList.add('is-open');
+    syncPageBackgroundA11y();
+    // 열면 닫기 버튼으로 초점을 옮긴다(2026-08-09, 5-5) — 다른 팝업과 같은 규칙
+    const 닫기 = document.getElementById('syncSheetClose');
+    if (닫기) focusDialogCloseWhenReady(닫기);
   }
-  function closeSyncSheet() {
+  /* 🔴 닫기는 한 곳뿐이다(2026-08-09) — 상단바로 닫을 때도 **반드시 이 함수를 거친다.**
+     여기서 `topCodeBtn` 의 `is-open`(아이콘 빨강)을 떼기 때문이다. 다른 데서 클래스만
+     지우는 식으로 닫으면 **아이콘이 빨간 채로 남는다.**
+     `options.restoreFocus === false` 면 초점을 되돌리지 않는다 — 방금 누른 상단바 버튼이
+     초점을 가져가야 하는 경우다(빈 공간을 눌러 닫을 때는 되돌린다). */
+  function closeSyncSheet(options) {
+    document.documentElement.style.overflow = '';   // 열 때 막아 둔 뒷화면 스크롤을 푼다
+    const cb = document.getElementById('topCodeBtn');
+    if (cb) cb.classList.remove('is-open');
     if (!syncOverlay) return;
     syncOverlay.classList.remove('open');
     syncOverlay.setAttribute('aria-hidden', 'true');
+    /* 🔴 `inert` 를 **즉시** 건다(2026-08-09, 5-5 · 코덱스 지적).
+       이 시트는 `visibility` 가 0.22초에 걸쳐 꺼지므로(styles.css .stamp-sheet-overlay),
+       그동안은 아직 `visible` 이라 Tab 이 안쪽 버튼에 닿는다. `aria-hidden` 은 초점을 못 막는다.
+       ⚠️ CSS 는 손대지 않는다 — `display:none` 으로 바꾸면 여는 애니메이션과
+          2026-08-05 에 고친 사파리 주소창 버그가 되살아난다. */
+    syncOverlay.inert = true;
+    syncPageBackgroundA11y();
+    const target = syncReturnFocus;   // 복귀표(2026-08-10, 2차)
+    syncReturnFocus = null;
+    if (options && options.restoreFocus === false) return;
+    restorePopupFocus(target);
   }
 
   // 첫 기록을 남기면 코드를 만들고, 스티커 탭에 **띠 안내**를 띄운다.
   // 🔴 팝업으로 한 번 띄우는 방식은 버렸다(2026-07-31) — 스티커 붙는 연출 뒤에 겹쳐 뜨는 데다
   //    한 번 지나가면 다시 못 보고, "코드를 저장해두라"는 말은 놓치면 의미가 없다.
   //    띠는 사용자가 **직접 닫을 때까지 남는다**. 타이밍에 기대지 않아 훨씬 튼튼하다.
-  // 🔴 띠는 **없어지지 않는다**(2026-07-31 사용자 확정) — "이 기기에만 저장된다"를 계속 보이게 하는 게
-  //    목적이라 닫기가 아니라 **접기**다. 접힌 상태에서도 제목 한 줄은 남는다.
-  //    저장하는 건 '닫았다'가 아니라 '접어뒀다'뿐이고, 기록이 하나라도 있으면 띠 자체는 늘 뜬다.
-  const CODE_FOLD_KEY = 'haidilao_code_notice_folded';
+  // 🔴 접기는 없앴다(2026-08-04) — 스티커 탭의 띠(.code-notice)를 홈의 박스(.home-code)로 옮기면서,
+  //    통째로 누르는 박스에는 접을 자리가 없어졌다. CODE_FOLD_KEY·toggleCodeNotice 도 함께 지웠다.
+  //    옛 띠를 되살릴 일이 있으면 커밋 74a6893 을 볼 것.
   // (여기 있던 maybeIntroCode는 지웠다 — 코드 만들기와 띠 갱신을 schedulePush가 맡는다.
   //  스티커에만 걸려 있던 게 즐겨찾기·좋아요를 빠뜨린 원인이었다.)
   function renderCodeNotice() {
-    const el = document.getElementById('codeNotice');
+    const el = document.getElementById('homeCode');
     if (!el) return;
     // 🔴 기록이 없어도 **항상** 보인다(2026-07-31 사용자 확정: "기록이 없을 때도 띄우자").
     //    기록이 없을 때가 오히려 중요하다 — 새 기기·홈 화면에서 처음 열었을 때가 그 상태이고,
-    //    그 사람에게 필요한 건 '내 코드'가 아니라 **불러오기**다. 그래서 문구·버튼이 상황에 따라 바뀐다.
-    el.hidden = false;
+    //    그 사람에게 필요한 건 '내 코드'가 아니라 **불러오기**다. 그래서 문구가 상황에 따라 바뀐다.
     const hasCode = !!getSyncCode();
     // 🔴 제목은 **한 가지로 고정**한다(2026-07-31 사용자 확정).
     //    잠깐 상태에 따라 바꿔봤는데("이 기기에만" ↔ "내 코드에"), 제목이 뒤집히는 게 더 이상했다.
     //    코드가 없는 상태 = 아직 아무것도 저장 안 한 새 방문자뿐인데, 그 사람이 뭐라도 저장하는
     //    순간 코드가 생기면서 "이 기기에만"이 곧바로 거짓이 된다.
     //    「데이터는 내 코드에 저장돼요」는 지금도 앞으로도 맞는 말이라 뒤집힐 일이 없다.
-    const text = document.getElementById('codeNoticeText');
-    const btn = document.getElementById('codeNoticeBtn');
-    if (text) {
-      // 🔴 '기록'이 아니라 '데이터'다(2026-07-31 사용자 확정) — '기록'이라고 하면 스티커 얘기로만
-      //    읽히는데 실제로는 즐겨찾기·좋아요까지 따라온다. 그래서 괄호로 셋을 그대로 적는다.
-      // 괄호 순서는 **스티커가 먼저**다 — 셋 중 유일하게 다시 만들 수 없는 데이터라
-      // 이 기능을 만든 이유이기도 하고, 화면에서 먼저 읽히는 게 맞다.
-      text.innerHTML = hasCode
-        ? '내 코드를 저장해두면 폰을 바꾸거나 홈 화면에 추가해도 데이터(스티커, 즐겨찾기, 좋아요)를 그대로 불러올 수 있어요'
-        : '다른 기기에서 남긴 데이터(스티커, 즐겨찾기, 좋아요)가 있다면 코드로 불러올 수 있어요';
-    }
-    if (btn) btn.textContent = hasCode ? '내 코드 보기 · 불러오기' : '코드로 불러오기';
-    let folded = '';
-    try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
-    el.classList.toggle('is-folded', !!folded);
-    const toggle = document.getElementById('codeNoticeToggle');
-    if (toggle) toggle.setAttribute('aria-expanded', folded ? 'false' : 'true');
-  }
-  function toggleCodeNotice() {
-    let folded = '';
-    try { folded = localStorage.getItem(CODE_FOLD_KEY) || ''; } catch (e) { /* 무시 */ }
-    try {
-      if (folded) localStorage.removeItem(CODE_FOLD_KEY);
-      else localStorage.setItem(CODE_FOLD_KEY, '1');
-    } catch (e) { /* 무시 */ }
-    renderCodeNotice();
+    // 🔴 제목만 상태에 따라 바뀐다(2026-08-04 사용자 확정). 부제는 마크업에 고정으로 둔다.
+    //    코드는 **뭔가를 처음 저장할 때 생긴다** — 새로 들어온 사람에게는 볼 코드가 없어서
+    //    「내 코드 보기」가 거짓말이 된다. 그 사람에게 필요한 건 「불러오기」다.
+    //    ⚠️ 이 박스가 가장 필요한 사람이 바로 그 「코드 없는 사람」이라, 분기를 없애면 안 된다.
+    const title = document.getElementById('homeCodeTitle');
+    if (title) title.textContent = hasCode ? '내 코드 보기 · 불러오기' : '코드로 불러오기';
   }
 
-  // 🔴 입구는 띠의 버튼 **하나뿐**이다(2026-07-31). 목록 아래 있던 별도 링크는 지웠다 —
+  // 🔴 입구는 이 박스 **하나뿐**이다(2026-07-31). 목록 아래 있던 별도 링크는 지웠다 —
   //    시트 안에 '내 코드'와 '불러오기'가 둘 다 있어서 입구가 둘일 이유가 없었다.
   //    안내 문단은 **코드가 있을 때만** 띄운다("기록이 저장됐어요"가 빈 기기에선 거짓말이 된다).
-  const codeNoticeBtn = document.getElementById('codeNoticeBtn');
-  if (codeNoticeBtn) codeNoticeBtn.addEventListener('click', () => openSyncSheet());
-  const codeNoticeToggle = document.getElementById('codeNoticeToggle');
-  if (codeNoticeToggle) codeNoticeToggle.addEventListener('click', toggleCodeNotice);
+  //    2026-08-04: 옛 띠의 버튼 대신 홈 박스 전체가 입구다.
+  const homeCodeBox = document.getElementById('homeCode');
+  if (homeCodeBox) homeCodeBox.addEventListener('click', () => openSyncSheet());
+  // 상단바 아이콘(홈 전용, 공유 왼쪽) — 같은 시트를 연다. 홈 박스와 입구가 둘이지만 역할이 다르다:
+  // 아이콘은 「상시 손 닿는 곳」, 박스는 「무엇인지 설명이 있는 곳」.
+  // 🔴 다시 누르면 닫힌다(2026-08-04 사용자 지시) — 메뉴 탭의 냄비 버튼과 같은 규칙이다.
+  //    아이콘이 제자리에 그대로 보이는데 다시 눌러도 안 닫히면 갇힌 느낌이 든다.
+  const topCodeBtn = document.getElementById('topCodeBtn');
+  if (topCodeBtn) topCodeBtn.addEventListener('click', () => {
+    if (syncOverlay && syncOverlay.classList.contains('open')) closeSyncSheet();
+    else openSyncSheet();
+  });
   renderCodeNotice(); // 새로 열었을 때도 아직 안 닫았으면 계속 보이게
   const syncCloseBtn = document.getElementById('syncSheetClose');
   if (syncCloseBtn) syncCloseBtn.addEventListener('click', closeSyncSheet);
@@ -4499,9 +5929,37 @@
   if (syncShareBtn) syncShareBtn.addEventListener('click', async () => {
     const code = getSyncCode();
     if (!code) return;
-    const text = '하딜고고 내 데이터 코드: ' + code;
+    /* 🔴 이 글은 **카톡이나 메모에 남아 몇 달 뒤에 읽힌다** — 그때는 앱 화면이 옆에 없다.
+       그래서 네 가지가 다 들어간다(2026-08-05 사용자 확정):
+         ① 무슨 앱인지(「하딜고고」 = 나중에 검색해 찾는 말) ② 코드 ③ 무엇에 쓰는지 ④ 남에게 주지 말 것
+       ③④ 는 앱의 「내 코드」 절 문구를 **그대로** 가져왔다 — 앱과 메시지가 다른 말을 하면 안 된다.
+       🔴 순서도 그 절과 같다: 불러올 수 있다 → 공유하지 마라 → 무엇이 들어 있나(2026-08-05 사용자 확정).
+          경고를 목록 뒤로 미루면 목록을 읽다 끝나서 경고를 안 읽고 넘어간다.
+       ⚠️ 「내 코드」 절 문구를 고치면 여기도 같이 고칠 것(index.html 의 .sync-note--strong).
+       🔴 ④를 빼지 말 것 — 「나에게 보내기」를 누르면 공유창에 **친구 목록이 먼저 뜬다.** 잘못 눌러
+          남에게 갈 수 있는 자리이고, 메모에 남은 글은 나중에 그대로 전달되기도 한다.
+       ⚠️ 문구를 길게 써도 된다 — 붙여넣기는 extractCode 가 `HG-` 뒤 6자만 뽑아낸다(확인함).
+       🔴 주소는 **글 안에 넣는다 — `url:` 로 따로 넘기지 말 것**(2026-08-05 사용자 요청으로 추가).
+          `url` 은 받는 앱에 따라 **주소만 가져가고 본문을 버린다.** 그러면 코드가 통째로 사라진다.
+          글 안에 있으면 카톡이 알아서 링크로 만들어 준다. 주소가 코드 인식을 방해하지도 않는다
+          (`haidilgogo.com` 에는 `HG` 다음에 여섯 글자가 오는 자리가 없다 — 확인함).
+       🔴 **주소는 둘째 줄이다 — 맨 위로 올리지 말 것**(2026-08-05 사용자 확정).
+          **첫 줄이 카톡 목록·검색 결과에 보이는 줄**이라, 주소를 맨 위에 두면 몇 달 뒤 「하딜고고」로
+          검색했을 때 결과에 주소만 보이고 코드는 열어야 알 수 있다. 첫 줄은 코드 몫이다.
+          위 두 줄이 「무엇」과 「어디」다 — 급할 땐 그 둘만 보면 되고 아래 셋은 설명이다. */
+    const text = '하딜고고 내 코드 ' + code + '\n'
+      + 'https://haidilgogo.com\n'
+      + '이 코드가 있으면 어디서든 데이터를 불러올 수 있어요.\n'
+      + '코드를 아는 사람은 내 데이터를 볼 수 있으니 절대 공유하지 마세요.\n'
+      + '데이터에는 내 메뉴, 스티커, 즐겨찾기, 좋아요가 포함되어 있어요.';
+    /* 🔴 **본문(text)만 넘긴다 — 제목(title)을 같이 넘기지 말 것**(2026-08-05).
+       제목을 같이 넘겼더니 카톡에 온 글 **맨 아래에 빈 줄이 하나 생겼다**(사용자가 화면으로 발견).
+       우리 글에는 마지막 줄바꿈이 없다(확인함) — 아이폰이 제목과 본문을 **따로** 넘기고,
+       받는 앱이 그 둘을 이어 붙이면서 생긴 자리다. 카톡은 제목을 화면에 쓰지도 않으므로 뺀다.
+       ⚠️ 제목을 되살릴 일이 있으면 실기기 카톡으로 **다시 보내 보고** 빈 줄이 없는지 확인할 것 —
+          공유창은 폰 것이라 맥에서는 재현이 안 된다. */
     if (navigator.share) {
-      try { await navigator.share({ title: '하딜고고 내 데이터 코드', text: text }); return; } catch (e) { return; }
+      try { await navigator.share({ text: text }); return; } catch (e) { return; }
     }
     try {
       await navigator.clipboard.writeText(text);
@@ -4581,4 +6039,827 @@
   });
 
   syncOnStart();
+})();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ── 메뉴 탭 ──  목업(_mockup-menu.html)에서 옮겨온 것이다(그 목업은 앱에 다 옮긴 뒤 지웠다 —
+   커밋 이력에 있다). 앱의 다른 코드와 섞이지 않게
+   따로 감쌌다 — 이 안의 render/count 는 위쪽의 같은 이름과 아무 상관이 없다.
+   데이터는 menu-data.js(`node .claude/make_menu_data.mjs`가 메뉴.md 에서 만든다).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  const D = window.MENU_DATA;
+  if (!D || !document.getElementById('mnTabs')) return; // 데이터·화면이 없으면 조용히 빠진다
+
+  // 🔴 화면 분류는 공식 2단이다(메뉴.md 「화면 분류」). 상위 = 전골·육류·야채류·디저트.
+  //    D.tabs 의 7개 묶음은 자료 정리용이라 화면에 쓰지 않는다 — items 만 꺼내 쓴다.
+  const ALL = D.tabs.flatMap((t) => t.items);
+  // 🔴 탭은 성격이 다른 셋이 한 줄에 있다(2026-08-04 사용자 확정):
+  //    전골(냄비 고르기) │ 전체메뉴(130개 훑기) · 상위 분류 7개.
+  //    전골과 나머지 사이에만 세로 구분선을 넣는다 — 전골만 「목록」이 아니라서다(renderTabs 참고).
+  const TABS = [{ name: '전골', pot: true }, { name: '전체메뉴', all: true }].concat(
+    D.cats.map((g) => ({ name: g.up, subs: g.subs }))
+  );
+  const 분류탭 = () => TABS.filter((t) => t.subs);   // 전골·전체메뉴를 뺀 상위 7개
+  const 하위메뉴 = (up, sub) => ALL.filter((it) => it.up === up && it.sub === sub);
+  // 상위 하나에 딸린 항목 전부. 🔴 순서는 하위 분류가 정한다 — 하위는 화면에 안 나오지만
+  //    「소양돈고기 다음 닭고기」 같은 줄 세우기는 그대로 살아 있다(2026-08-03 확정 참고).
+  const 상위메뉴 = (t) => t.subs.flatMap((sub) => 하위메뉴(t.name, sub));
+  const IMG = (n) => 'assets/menu/' + n + '.webp';
+  /* 🔴 목록 그림이 **칸을 꽉 채우는** 메뉴(2026-08-06 사용자 확정). 여기 적힌 것만 예외다.
+     나머지 129장은 「접시에 담긴 음식 · 배경 투명」이 규칙이고, 크림 칸 가운데에 그림자와 함께 놓인다.
+
+     쿵푸면은 참고 사진부터가 **접시 사진이 아니라 면을 뽑는 공연 장면**이라(SIGNATURE 메뉴),
+     접시로 그리면 다른 넓적면과 구분이 안 됐다. 공연 그림을 그대로 쓰되 80px 목록에서
+     **「이건 다른 메뉴다」가 눈에 띄게** 하려고 칸을 꽉 채운다.
+     🔴 그래서 이 그림만 **배경이 검고 불투명**하다. 규격 위반이 아니라 의도다 —
+        `make_menu_images.py` 가 「여백 0px」로 경고하는 것도 이 한 장뿐이고 무시해도 된다.
+     ⚠️ 예외를 늘릴 때는 **왜 접시로는 안 되는지**부터 적을 것. 하나씩 늘면 규칙이 사라진다. */
+  const MENU_FILL = new Set(['쿵푸면']);
+  // 🔴 담긴 표시 ✓ 는 SVG 다(2026-08-04 사용자 확정). 옛 글자 `✓`(U+2713)는 폰트가 그려주는 것이라
+  //    굵기·모양이 앱의 다른 아이콘(전부 SVG, 「18px 통일」 규격)과 따로 놀았다.
+  //    18px + stroke 2.2 = 화면에서 획 약 1.65px — 상단바 아이콘들과 같은 굵기다.
+  const 체크아이콘 =
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"' +
+    ' stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+  // 냄비 칸은 타일(-타일)을 쓴다. 아직 안 들어온 육수는 카드용 그림을 임시로 쓴다(냄비 속 냄비로 보인다)
+  const TILE = new Set(D.broths.filter((b) => b.tile).map((b) => b.n));
+  const CELL_IMG = (n) => IMG(TILE.has(n) ? n + '-타일' : n);
+  // 🔴 냄비 칸 그림(`-타일`)은 **카드 그림과 다른 파일**이라, 담는 순간에야 처음 받는다.
+  //    그래서 첫 담기가 살짝 늦어 보였다(2026-08-04 사용자 지적 — 실제로 확인:
+  //    전골 화면에 들어가면 카드용 12장만 받고 타일은 0장이었다).
+  //    🔴 **하나를 담고 나서** 나머지를 뒤에서 받아 둔다(B안, 사용자 확정). 전골 탭에 들어가자마자
+  //    12장(584KB)을 다 받으면 냄비를 안 쓰는 사람까지 치르게 된다 — 첫 한 번만 겪게 하는 쪽으로 정했다.
+  let 타일미리받음 = false;
+  function 타일미리받기() {
+    if (타일미리받음) return;
+    타일미리받음 = true;
+    D.broths.forEach((b) => { const im = new Image(); im.src = CELL_IMG(b.n); });
+  }
+
+  let cur = 0;                    // 지금 탭
+  let cells = 2;                  // 냄비 칸 수(1·2·4)
+  let broths = [];                // 고른 육수(칸 수만큼, 중복 허용)
+  let query = '';                 // 검색어 (아래 「검색」 절)
+  const picked = new Map();       // 담은 메뉴
+
+  const $ = (s) => document.querySelector(s);
+  const sheetOverlay = $('#mnSheetOverlay');
+
+  /* ── 내 메뉴 저장 ──────────────────────────────────────────────────────────
+     🔴 이 기기에 저장한다(2026-08-04 사용자 확정). 켰다 꺼도 남아야 화면의
+        「여기에 담아두고 매장에서 편하게 주문해보세요」가 참이 된다 — 그 전엔 새로고침하면 사라졌다.
+     🔴🔴 **기기 간 동기화도 이미 된다** (2026-08-11 정정). 아래 `saveMenu()` 가
+        `window.schedulePush()` 를 부른다. 저장은 **로컬(`localStorage`)에 하고**, 그와 함께
+        **Firebase 가 연결돼 있으면 서버 동기화 쓰기가 예약된다**(`schedulePush` 는 `syncRoot` 가
+        없으면 그냥 돌아가고, 있으면 0.8초 뒤 `pushSync` 로 올린다).
+        ⚠️ 예전 주석은 「동기화는 아직 아니다」로 남아 있었다 — 낡은 내용이었고, 전수조사에서
+           그 문구를 믿고 메뉴 탭을 「보기만 하는 화면」으로 오판해 **실제로 서버에 쓴 사고**가 났다.
+        🔴 **즐겨찾기·좋아요·스티커·메뉴 담기 넷 다 같은 길을 탄다.** 연결이 없으면 로컬에만 남지만,
+           **시험할 때는 「연결돼 있으면 나간다」를 전제로** 차단부터 걸고 시작할 것.
+     🔴 되살릴 때 **지금 있는 메뉴만** 되살린다. 메뉴가 바뀌어 이름이 없어졌는데 그대로 넣으면
+        담긴 표시는 있는데 목록엔 없는 유령이 된다(칸 수도 1·2·4 가 아니면 버린다).
+     키 이름은 앱의 다른 것과 같은 꼴이다(haidilao_favorites · haidilao_stamps).
+     ────────────────────────────────────────────────────────────────────────── */
+  const MENU_KEY = 'haidilao_menu_picked';
+  // 🔴 되살리는 동안에는 저장하지 않는다(2026-08-04). refreshCards·refreshPot 이 끝에서 saveMenu 를
+  //    부르는데, 불러오기로 받은 값을 그리는 중에 그게 돌면 두 가지가 한꺼번에 잘못된다:
+  //      ① at 이 지금 시각으로 덮여 **방금 받아온 것이 「더 새것」으로 둔갑**한다
+  //      ② schedulePush 가 다시 돌아 올리기 → 받기 → 그리기로 되돌아 나간다
+  let 되살리는중 = false;
+  function saveMenu() {
+    if (되살리는중) return;
+    try {
+      // 🔴 at = 마지막으로 손댄 시각. 내 코드로 기기 간에 옮길 때 **어느 쪽이 최신인지** 가리는 데 쓴다.
+      //    스티커·즐겨찾기는 켠/끈 이력을 합치지만, 담은 목록은 「지금 이 한 벌」이라
+      //    합치면 냄비 칸 수와 육수가 뒤엉킨다 — 그래서 통째로 최신 것이 이긴다.
+      localStorage.setItem(MENU_KEY, JSON.stringify({ picked: [...picked.keys()], broths, cells, at: Date.now() }));
+    } catch (err) {
+      // 시크릿 모드 등 저장이 막힌 경우는 무시한다(즐겨찾기와 같은 방식)
+    }
+    if (window.schedulePush) window.schedulePush(); // 담은 목록도 내 코드에 실린다
+  }
+  // 다른 기기에서 온 담은 목록을 반영할 때 쓴다(내 코드 불러오기) — 저장값을 다시 읽어 화면까지 새로 그린다.
+  window.mnReloadPicked = function () {
+    되살리는중 = true;
+    try {
+      picked.clear(); broths = []; cells = 2;   // 2 = 이 파일 위쪽 `let cells = 2` 와 같은 기본값
+      loadMenu();
+      refreshCards(); refreshPot();
+    } finally {
+      되살리는중 = false;
+    }
+  };
+  function loadMenu() {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(MENU_KEY)); } catch (err) { return; }
+    if (!saved || typeof saved !== 'object') return;
+    const 있는메뉴 = new Set(ALL.map((it) => it.n));
+    const 있는육수 = new Set(D.broths.map((b) => b.n));
+    if (POTS.includes(saved.cells)) cells = saved.cells;
+    if (Array.isArray(saved.broths)) broths = saved.broths.filter((n) => 있는육수.has(n)).slice(0, cells);
+    if (Array.isArray(saved.picked)) saved.picked.forEach((n) => { if (있는메뉴.has(n)) picked.set(n, 1); });
+    // 되살린 육수가 있으면 냄비 칸 그림도 곧 필요하다 — 미리 받아 둔다(위 타일미리받기 참고)
+    if (broths.length) 타일미리받기();
+  }
+
+  function count() { return picked.size + (broths.length ? 1 : 0); }
+
+  // 상위 탭 하나의 항목 수. 🔴 화면에 실제로 뜨는 것만 센다 — 하위 분류(subs)에 안 걸린 항목은
+  //    화면에 나오지 않으므로 데이터 총계가 아니라 하위 분류를 훑어 더한다.
+  //    하위 분류를 눌러도 숫자는 안 바뀐다(상위 카테고리 개수다).
+  const 탭개수 = (t) => t.pot ? D.broths.length
+    : t.all ? 분류탭().reduce((a, x) => a + 상위메뉴(x).length, 0)
+    : 상위메뉴(t).length;
+
+  function renderHead() {
+    // 검색 중에는 분류가 아니라 「검색 결과 N개」다 — 레시피 탭의 목록 제목과 같은 문구를 쓴다
+    if (검색중()) {
+      $('#mnCountLabel').textContent = '검색 결과';
+      $('#mnCountNum').textContent = 검색결과().reduce((a, g) => a + g.items.length, 0);
+      return;
+    }
+    const t = TABS[cur];
+    $('#mnCountLabel').textContent = t.name;
+    $('#mnCountNum').textContent = 탭개수(t);
+  }
+
+  // 🔴 서식은 레시피 카테고리 탭과 똑같이 쓴다(.tabs/.tab-btn/.tabs-underline, 2026-08-03 사용자 확정).
+  //    밑줄이 미끄러지는 것까지 매장 지역 탭(updateStoreUnderline)과 같은 방식이다.
+  function updateMenuUnderline() {
+    const wrap = $('#mnTabs');
+    if (!wrap) return;
+    const line = wrap.querySelector('.tabs-underline');
+    if (!line) return;
+    // 🔴 전골은 탭줄 **밖**(#mnPotTab)에 있다 — 그래서 고른 탭을 두 곳에서 찾아야 한다.
+    //    전골이 골라져 있으면 공용 밑줄은 숨기고 자기 밑줄(CSS .tab-btn.is-pot.active::before)에 맡긴다.
+    //    공용 밑줄은 탭줄 안 요소라 밖으로 못 나간다.
+    const pot = $('#mnPotTab .tab-btn.active');
+    if (pot) { line.hidden = true; return; }
+    line.hidden = false;
+    const active = wrap.querySelector('.tab-btn.active');
+    // 메뉴 섹션이 숨겨져 있으면 offsetWidth=0 → 위치를 못 잡는다. 보일 때 다시 불린다(switchSection)
+    if (active && active.offsetWidth) {
+      line.style.width = active.offsetWidth + 'px';
+      line.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+      if (window.keepTabVisible) window.keepTabVisible(active);
+    }
+  }
+  window.mnSyncUnderline = updateMenuUnderline;   // 섹션 전환 때 switchSection 이 부른다
+  /* 🔴 밖에서 특정 분류로 열어 주는 통로(2026-08-05) — 홈의 「전골」 섹션이 쓴다.
+     탭 누름 처리와 **같은 일**을 한다(cur 바꾸고 검색 끄고 다시 그리기). 한 곳에 몰아넣지 않고
+     따로 둔 이유는, 탭 누름 쪽에는 「같은 탭이면 아무 일도 안 한다」가 있어서다 — 밖에서 부를 땐
+     이미 그 탭이어도 목록을 맨 위로 올려 줘야 「눌렀더니 왔다」가 된다.
+     ⚠️ 분류 순서(TABS)가 바뀌면 부르는 쪽 번호도 같이 봐야 한다. 그래서 번호가 아니라 **이름**으로 받는다. */
+  window.mnGoTab = function (이름) {
+    const i = TABS.findIndex((t) => t.name === 이름);
+    if (i < 0) return false;
+    cur = i;
+    clearSearch();
+    render(true);
+    return true;
+  };
+  /* 🔴 밖에서 **검색된 상태로** 열어 주는 통로(2026-08-05) — 고수 아티클의 「고수가 들어간 메뉴」가 쓴다.
+     ⚠️ **육수(전골)는 검색으로 안 걸린다** — 검색은 상위 7개 분류만 훑는다(검색결과() 참고).
+        그래서 부르는 쪽이 육수면 이걸 쓰지 말고 `mnGoTab('전골')` 로 보내야 한다.
+     검색을 켜면 「전체메뉴」 탭으로 옮긴다 — 사람이 직접 칠 때와 같은 규칙이다(그쪽 주석 참고). */
+  /* 🔴 밖에서 **담아 주는** 통로(2026-08-05 사용자 확정) — 홈 전골 카드와 고수 아티클의 메뉴 줄이 쓴다.
+     같은 그림의 카드가 메뉴 탭 안에서는 담기는데 밖에서는 안 담기면 그게 더 헷갈린다는 판단이다.
+     🔴 **담고 나서 부르는 쪽이 그 화면으로 데려간다** — 담긴 게 눈앞에 보여야 하고, 잘못 눌렀으면
+        그 자리에서 뺄 수 있어야 한다. 이동 없이 담기만 하면 「모르는 새 담긴다」가 되어 안 된다.
+     ⚠️ 담기 규칙은 메뉴 탭 안에서 누를 때와 **똑같이** 간다 — 냄비가 차면 토스트만 뜨고 안 담긴다. */
+  window.mnAddBroth = function (이름) {
+    if (!(D.broths || []).some((b) => b.n === 이름)) return false;
+    if (broths.length >= cells) {          // 메뉴 탭 안 누름과 같은 규칙
+      if (window.showToast) window.showToast(냄비참);
+      return false;
+    }
+    broths.push(이름);
+    refreshPot();
+    return true;
+  };
+  /* 🔴 육수가 아닌 메뉴를 담는다. **담기만 하고 빼지는 않는다** — 메뉴 탭 안에서는 다시 누르면 빠지지만,
+     밖에서 부를 땐 「담아 달라」는 뜻이라 이미 담긴 것을 빼 버리면 놀란다. 이미 있으면 그냥 둔다. */
+  window.mnPick = function (이름) {
+    if (picked.has(이름)) return true;
+    picked.set(이름, 1);
+    refreshCards();
+    return true;
+  };
+  window.mnSearch = function (말) {
+    const s = String(말 || '').trim();
+    if (!s) return false;
+    query = s;
+    if (searchInput) searchInput.value = s;
+    if (searchBox) searchBox.classList.add('has-value');
+    if (전체메뉴자리 >= 0) cur = 전체메뉴자리;
+    render(true);
+    return true;
+  };
+  if (window.enableDragScroll) window.enableDragScroll($('#mnTabs'));   // 데스크탑에서 손으로 끌기(2026-08-04)
+
+  function renderTabs() {
+    // 🔴 탭에 숫자를 넣지 않는다 — 고른 카드에 이미 ✓가 있어 같은 정보가 두 번 나온다
+    // 🔴 밑줄(.tabs-underline)은 지우지 않는다 — 버튼만 갈아 끼운다(레시피 renderBrowseCatTabs 와 같은 방식).
+    //    통째로 새로 그리면 밑줄이 옛 위치를 잃어 0 에서 다시 미끄러진다.
+    const wrap = $('#mnTabs');
+    const pin = $('#mnPotTab');
+    wrap.querySelectorAll('.tab-btn').forEach((b) => b.remove());
+    pin.replaceChildren();
+    TABS.forEach((t, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (t.pot ? ' is-pot' : '') + (i === cur ? ' active' : '');
+      btn.dataset.i = i;
+      btn.textContent = t.name;
+      // 🔴 전골만 **스크롤 영역 밖**(#mnPotTab)에 담는다(2026-08-05 사용자 확정) — 탭줄 안에
+      //    position:sticky 로 붙여 뒀더니 왼쪽 끝에서 튕길 때 같이 딸려갔다. 자세한 경위는 styles.css
+      //    `.tab-btn.is-pot` 주석. 구분선·전용 밑줄도 거기서 맡는다(따로 있던 `.mn-tab-div` 는 없앴다).
+      (t.pot ? pin : wrap).appendChild(btn);
+    });
+    updateMenuUnderline();
+  }
+
+  const POTS = [1, 2, 4];
+  // 「1 맛 / 2가지 맛」 → 「1칸 / 2칸 / 4칸」(2026-08-02) → 「한 칸 / 두 칸 / 네 칸」(2026-08-04 사용자 확정).
+  // 🔴 한글로 쓰는 이유는 **숫자가 두 뜻으로 섞여서**다 — 「2칸」의 2는 개수인데, 바로 아래 냄비 안
+  //    배지와 고른 육수 목록의 1·2·3·4 는 순번이다. 한국어는 개수(두 칸)와 순번(2번)을 다르게 말한다.
+  // 🔴 띄어쓴다(「한 칸」) — 단위 명사는 띄어 쓰는 게 어법이고, 이 프로젝트에 이미 같은 규칙이 있다
+  //    (CLAUDE.md 「관형형+명사는 어법대로 띄어 씀」 — 다진 마늘·다진 파).
+  const POT_LABEL = { 1: '한 칸', 2: '두 칸', 4: '네 칸' };
+  const potLabel = (n) => POT_LABEL[n] || n + ' 칸';
+  // 🔴 「더는 못 담는다」를 말하는 곳이 둘이다 — 확대 모달의 잠긴 버튼과 카드 누름 토스트.
+  //    한 곳에 적어 두 곳이 저절로 같은 말을 하게 한다(2026-08-04 사용자 확정).
+  //    「찼어요」만 쓰면 「(물이) 찼어요」로도 읽혀서 「가득」을 넣었다.
+  const 냄비참 = '냄비가 가득 찼어요';
+
+  // 🔴 냄비 영역과 육수 목록을 따로 그린다(2026-08-04) — 육수를 담을 때마다 통째로 다시 그렸더니
+  //    아래 육수 카드 12장의 <img> 가 매번 새로 만들어져 그림이 깜빡였다. 바뀌는 것은 냄비뿐이다.
+  function renderPotTop() {
+    return `
+      <div class="mn-pot-seg">
+        ${POTS.map((n) => `<button data-pot="${n}" class="${n === cells ? 'is-on' : ''}">${potLabel(n)}</button>`).join('')}
+      </div>
+
+      <div class="mn-pot-wrap">
+        <div class="mn-pot">
+          <div class="mn-pot-inner" data-cells="${cells}">
+            ${Array.from({ length: cells }, (_, i) => {
+              const b = broths[i];
+              return b
+                ? `<div class="mn-cell is-filled" data-cell="${i}"><img src="${CELL_IMG(b)}" alt=""></div>`
+                : `<div class="mn-cell"></div>`;
+            }).join('')}
+            ${cells > 1 ? `<div class="mn-pot-nums" data-cells="${cells}">
+              ${Array.from({ length: cells }, (_, i) => `<span class="mn-pot-num">${i + 1}</span>`).join('')}
+            </div>` : ''}
+          </div>
+        </div>
+        <div class="mn-pot-list ${cells === 1 ? 'is-one' : ''}">${renderPotRows()}</div>
+      </div>`;
+  }
+  // 고른 육수 목록의 줄들 — 그림이 없어서 통째로 다시 써도 깜빡이지 않는다(아래 refreshPot 참고)
+  function renderPotRows() {
+    return Array.from({ length: cells }, (_, i) => {
+      const b = broths[i];
+      return `<div class="mn-pot-row ${b ? '' : 'is-empty'}"><b>${i + 1}</b><span>${b || '비어 있음'}</span>` +
+             (b ? `<button class="mn-pot-row-x" data-cell="${i}" aria-label="빼기">✕</button>` : '') + `</div>`;
+    }).join('');
+  }
+  // 🔴 육수 카드에 「몇 번 칸에 담겼는지」를 붙인다(2026-08-04 사용자 제안).
+  //    체크(✓)를 안 쓰는 이유가 「이미 골라서 또 못 담는다」로 읽혀서였는데(2026-08-02),
+  //    번호는 **여러 개가 붙을 수 있어** 중복해 담는 이 화면의 동작을 그대로 보여준다.
+  //    규격은 냄비 옆 목록의 번호(.mn-pot-row b)와 같은 것을 쓴다 — 값을 새로 정하지 않았다.
+  function 칸번호HTML(n) {
+    const 칸 = [];
+    broths.forEach((x, i) => { if (x === n) 칸.push(i + 1); });
+    return 칸.map((i) => `<span class="mn-card-num">${i}</span>`).join('');
+  }
+  // 번호가 셋 이상이면 두 줄로 접는다(아래 CSS) — 그래야 이름 자리를 안 뺏는다
+  function 칸번호칸수(n) {
+    return broths.filter((x) => x === n).length;
+  }
+  /* 🔴 「제주 한정」 줄 — **메뉴 카드와 육수 카드가 이 한 곳을 같이 쓴다**(2026-08-04 사용자 확정).
+     예전엔 육수만 아이콘 없는 맨 글자였다. 같은 뜻인데 화면마다 달라 보였다.
+     자리·크기·색을 왜 이렇게 정했는지는 카드HTML() 위 주석에 있다. */
+  const 제주한정 = '제주 한정';
+  function 제주줄(부제) {
+    return `<span class="mn-card-sub mn-card-sub--jeju">` +
+           `<img src="assets/icons/hallabong.svg" alt="">${제주한정}${부제 ? ` · ${부제}` : ''}</span>`;
+  }
+
+  // 육수를 담고 뺄 때 카드의 번호만 갈아 끼운다 — 카드를 다시 그리면 그림이 깜빡인다
+  function refreshBrothNums() {
+    document.querySelectorAll('#mnBody .mn-card--broth').forEach((el) => {
+      const box = el.querySelector('.mn-card-nums');
+      if (!box) return;
+      box.innerHTML = 칸번호HTML(el.dataset.broth);
+      box.dataset.n = 칸번호칸수(el.dataset.broth);
+    });
+  }
+
+  function renderPot() {
+    return `<div id="mnPotTop">${renderPotTop()}</div>
+      <div class="mn-list">
+        ${D.broths.map((b) => {
+          // 🔴 체크(✓)는 여전히 안 붙인다(2026-08-02 사용자 지시) —
+          //    「이미 골랐으니 또 못 담는다」로 읽히기 때문이다. 중복해서 담을 수 있는 화면이다.
+          //    대신 **몇 번 칸에 담겼는지 번호**를 붙인다(2026-08-04 사용자 제안).
+          //    번호는 여러 개가 붙을 수 있어 중복 담기를 그대로 보여준다 — 체크로는 못 하던 것이다.
+          // 🔴 썸네일은 **냄비째 그린 카드용**이다 — 타일(국물만)로 바꿔봤더니 「냄비를 고르는
+          //    화면」이라는 게 안 읽혔다. 타일은 냄비 칸 안에서만 쓴다.
+          return `<button class="mn-card mn-card--broth ${b.img ? '' : 'mn-card--text'}" data-broth="${b.n}">
+            <div class="mn-card-thumb ${b.img ? '' : 'is-text'}">${
+              b.img ? `<img src="${IMG(b.n)}" alt="">` : b.n}</div>
+            <span class="mn-card-body">
+              <span class="mn-card-name">${b.n}</span>
+              ${b.jeju ? 제주줄() : ''}
+            </span>
+            <span class="mn-card-nums" data-n="${칸번호칸수(b.n)}">${칸번호HTML(b.n)}</span>
+          </button>`;
+        }).join('')}
+      </div>`;
+  }
+
+  // 🔴 이름 규칙(2026-08-02 사용자 확정) — 화면에서만 나눈다. 데이터(메뉴.md)는 공식 이름 그대로 둔다.
+  //    ① 끝 괄호는 부제로 내린다        차돌박이(지방 적음) → 차돌박이 / 지방 적음
+  //    ② 앞의 「하이디라오」도 부제로     하이디라오 특제소고기 → 특제소고기 / 하이디라오
+  //    이렇게 해야 320px 에서 이름이 안 잘린다(그림 80px 기준으로 재서 정함).
+  function 이름나누기(n) {
+    let 이름 = n, 부제 = '';
+    const m = /^(.*?)\((.+)\)$/.exec(n);
+    if (m) { 이름 = m[1].trim(); 부제 = m[2]; }
+    if (/^하이디라오\s+/.test(이름)) {
+      부제 = '하이디라오' + (부제 ? ' · ' + 부제 : '');
+      이름 = 이름.replace(/^하이디라오\s+/, '');
+    }
+    return { 이름, 부제 };
+  }
+
+  function toggle(n) { picked.has(n) ? picked.delete(n) : picked.set(n, 1); }
+
+  /* ── 그림 확대 모달은 없앴다 (2026-08-04 사용자 확정) ───────────────────────────
+     🔴 되살리지 말 것. 이유 셋이 전부 같은 방향이었다.
+     ① **담으려고 그림을 눌렀는데 창이 떴다.** 카드에서 가장 눈에 띄는 자리(그림, 카드 폭의
+        24% · 320px 에선 29%)만 다른 일을 했다. 레시피 카드는 「다른 일」이 구석의 작은
+        아이콘 둘(즐겨찾기 5.5% · 좋아요 6.3%)뿐이라 안 헷갈리는 것과 대비된다.
+        담기는 이 탭에서 수십 번 하는 동작이고 확대는 어쩌다 한 번이다.
+     ② 🔴 **저작권** — 메뉴 일러스트는 하이디라오 사전주문 페이지 사진을 보고 생성한 것이라
+        크게 보여주지 않는 편이 하딜고고에 유리하다(CLAUDE.md 「공식 사진·로고는 못 쓴다」).
+     ③ 모달 생김새가 마음에 안 든다는 이야기도 있었다 — 고치는 대신 없애는 쪽으로 갔다.
+     이제 카드는 **어디를 눌러도 담기** 하나다. 「냄비가 가득 찼어요」는 토스트가 맡는다.
+     ⚠️ 80px 썸네일이 130장을 보여주는 유일한 자리가 됐다 — 그래서 그릇 그림자를 넣었다
+        (styles.css `.mn-card-thumb img`).
+     ────────────────────────────────────────────────────────────────────────── */
+
+  // 🔴 하위 분류를 화면에서 걷어냈다(2026-08-03 사용자 확정) — 상위 하나를 누르면 그 안의 것이 전부 나온다.
+  //    하위 줄 하나 때문에 붙박이·구분선·방향 감지까지 세 겹을 쌓게 돼서 접었다.
+  //    데이터의 하위 분류는 그대로 살아 있고(정렬 순서를 그게 정한다), 화면에만 안 나온다.
+  // 🔴 이름에 Menu 를 붙인다 — 레시피 탭에도 `renderList()` 가 따로 있다(script.js 위쪽 IIFE).
+  //    별개 IIFE 라 충돌은 안 나지만, 같은 이름이 둘이면 찾을 때 헷갈린다(2026-08-04 정리).
+  function 카드HTML(it) {
+    const on = picked.has(it.n);
+    const { 이름, 부제 } = 이름나누기(it.n);
+    /* 🔴 「일부 매장」 꼬리표를 뗐다(2026-08-04 사용자 확정). 되살리지 말 것.
+       판정이 「13곳이 아니면 일부 매장」이라 **한 시점의 조회값**일 뿐인데, 화면에서는
+       「이 매장에서만 판다」는 단정으로 읽혔다. 실제로는 실시간 판매 상태(품절 등)가 섞인다.
+       근거 — 2026-08-04 재조사에서 이틀 만에 이만큼 움직였다:
+         공심채 9곳 → 3곳 · 비타민채 6곳 → 5곳 · 소부채살 2곳 → 3곳 · 우아롱사태 1곳 → 2곳
+         (그전에도 차돌박이가 하루 만에 1곳 → 13곳, 부천점 응답이 146 → 140 → 143)
+       대신 내 메뉴 안내와 메뉴 탭 푸터가 「매장 사정에 따라 판매하지 않는 메뉴가 있을 수
+       있어요」로 **한 번만, 맞는 말로** 알린다. 47개에 개별 딱지를 붙이는 것보다 정직하다.
+       ⚠️ 「제주 한정」은 남긴다 — 그건 조회값이 아니라 진짜 지역 한정이고, 공식 분류에
+          「제주한정」이 실제로 있다(제주도점에만). 메뉴 6개 + 육수 `고수 듬뿍 훠궈` 1개.
+       ⚠️ 데이터의 `part`·판매 지점 기록은 그대로 둔다 — 조사 자료로는 쓸모가 있고
+          `메뉴.md` 가 원본이다. 화면에만 안 쓴다. */
+    /* 🔴 「제주 한정」은 **부제 자리(이름 아래)에 한라봉 아이콘 + 주황 글씨**다(2026-08-04 사용자 확정).
+       거쳐 온 안들과 왜 이걸로 정했는지 —
+       · 이름 **위** 배지로 올려 봤더니 **이름이 12.5px 내려갔다.** 부제 있는 카드(위로 8px)와
+         반대로 움직여서 목록을 내리면 이름 줄이 20.7px 폭으로 튀었다(재서 확인)
+       · 썸네일 **위**에 아이콘만 얹는 안도 봤다. 이름은 안 움직이지만 아이콘과 「제주 한정」
+         글자가 왼쪽 위·오른쪽 아래로 떨어져 서로 안 묶인다. `.mn-card-thumb img` 규칙이
+         썸네일 안 모든 그림을 100%로 늘리는 함정도 있다
+       · 지금 방식은 이름 이동이 **부제 있는 카드와 똑같아서**(위로 8px) 새 어긋남이 없다
+       ⚠️ 아이콘 13px 이다 — 부제 글자 12px 과 키를 맞춘 값이다. 16px 은 아이콘만 도드라진다.
+       ⚠️ 「제주 한정」은 **띄어 쓴다.** 「한정」이 명사라 명사구는 띄어 쓰는 게 원칙이고,
+          CLAUDE.md 에 「관형형+명사는 어법대로 띄어 씀」이 이미 있다.
+          (메뉴.md 의 `🍊제주한정` 은 문서 안 표식이라 붙여 쓴 것이고 화면 문구가 아니다)
+       아이콘은 코덱스가 하딜고고용으로 새로 그렸다 — 원본은 저장소 밖
+       `data/brand/icon/svg/jeju/hallabong-16px-color.svg`, 앱에는 복사본을 쓴다. */
+    const 제주 = !!it.jeju;
+    const 아랫줄 = 제주 ? 제주줄(부제)
+      : (부제 ? `<span class="mn-card-sub">${부제}</span>` : '');
+    return `<button class="mn-card ${on ? 'is-on' : ''} ${it.img ? '' : 'mn-card--text'}" data-menu="${it.n}">
+      <div class="mn-card-thumb ${it.img ? '' : 'is-text'} ${MENU_FILL.has(it.n) ? 'is-fill' : ''}">${it.img ? `<img src="${IMG(it.n)}" alt="">` : 이름}</div>
+      <span class="mn-card-body">
+        <span class="mn-card-name">${이름}</span>
+        ${아랫줄}
+      </span>
+      <span class="mn-card-check">${체크아이콘}</span>
+    </button>`;
+  }
+
+  function renderMenuList(t) {
+    return `<div class="mn-list">${상위메뉴(t).map(카드HTML).join('')}</div>`;
+  }
+
+  // 묶음 소제목이 붙은 목록. 🔴 「전체메뉴」와 「검색 결과」가 같은 것을 쓴다 — 둘 다
+  //    여러 분류가 한 화면에 섞이는 목록이라, 값을 두 벌로 두면 저절로 어긋난다.
+  function 묶음목록HTML(groups) {
+    return `<div class="mn-list">${groups.map((g) =>
+      `<p class="mn-group">${g.up}</p>${g.items.map(카드HTML).join('')}`
+    ).join('')}</div>`;
+  }
+
+  // 전체메뉴 — 육수를 뺀 130개를 상위 일곱 덩이로 끊어 보여준다(2026-08-04 사용자 확정).
+  // 소제목 없이 이으면 한 덩이가 대략 17,000px 이라 지금 어디를 보는지 알 수 없다.
+  function renderAllMenus() {
+    return 묶음목록HTML(분류탭().map((t) => ({ up: t.name, items: 상위메뉴(t) })));
+  }
+
+  /* ── 검색 ──────────────────────────────────────────────────────────────────
+     🔴 대상은 **화면에 보이는 이름 + 부제**다(2026-08-03 확정). 즉 이름나누기()를 거친 값이라
+        `하이디라오 특제소고기` 는 `특제소고기` 로도, `하이디라오` 로도 걸린다.
+     🔴 **「제주 한정」도 대상에 넣는다**(2026-08-04 사용자 확정). 처음엔 뺐는데 그때는 꼬리표가
+        「일부 매장」 47개 + 「제주 한정」 0개라, 넣으면 `일부 매장` 한 번에 47개가 쏟아져 쓸모가
+        없었다. 그 47개를 뗀 지금은 남은 꼬리표가 「제주 한정」 6개뿐이라 넣는 편이 쓸모 있다
+        (「제주도 가는데 거기만 있는 게 뭐지」가 실제로 있을 법한 검색이다).
+        ⚠️ 붙여 써도 걸린다 — 검색꼴()이 공백을 떼므로 `제주한정`·`제주 한정` 둘 다 맞는다.
+     🔴 범위는 **분류를 가로지른다**(2026-08-04 사용자 확정). 어느 탭에서 치든 130개 전부에서
+        찾는다 — 레시피 탭처럼 분류와 겹치는 AND 가 **아니다**.
+        ⚠️ 나중에 「전체메뉴」 탭이 생겼지만 이 규칙은 그대로 두기로 했다(같은 날 재확인) —
+        AND 로 바꾸면 「전체메뉴로 먼저 가야 한다」를 모르는 사람이 막힌다.
+        대신 결과에 상위 분류 소제목을 붙여 어디 것인지 보인다.
+     🔴 전골(육수 12개)은 대상에서 뺀다(2026-08-04 사용자 확정) — 전골은 목록이 아니라 냄비를
+        고르는 화면이고, 담는 규칙(칸 번호·중복 담기)이 달라 결과 안에서 따로 논다.
+     🔴 묶음 소제목은 **상위 한 단만** 쓴다(2026-08-04 사용자 지적). 화면에서 하위 분류는
+        2026-08-03에 걷어내기로 확정된 것이라, 검색 결과에만 되살리면 화면마다 단 수가 달라진다.
+     ────────────────────────────────────────────────────────────────────────── */
+  const searchBox = $('#mnSearchBox');
+  const searchInput = $('#mnSearchInput');
+
+  // 괄호·공백을 뺀 형태로도 맞춘다 — 레시피 탭의 검색꼴()과 같은 규칙이다(script.js 위쪽 IIFE).
+  // 🔴 괄호·공백만 친 경우 빈 문자열이 되는데, 빈 문자열은 아무 이름에나 들어 있어 그대로 쓰면
+  //    전부가 걸린다. 쓰는 쪽에서 반드시 비었는지 본다(레시피 탭이 실제로 당했던 함정이다).
+  const 검색꼴 = (s) => (s || '').replace(/[()\s]/g, '');
+  // 🔴 전골 탭은 검색창 자체가 없다(CSS 가 감춘다). 그 탭에서 검색 상태가 살아 있으면 「보이지 않는
+  //    검색창에 걸려 목록이 이상하다」가 되므로, 여기 한 곳에서 함께 막는다.
+  const 검색중 = () => !!query.trim() && !TABS[cur].pot;
+
+  // 상위별 묶음 배열을 돌려준다. 화면 순서는 탭 순서 그대로다(전골·전체메뉴는 분류가 아니라 건너뛴다).
+  function 검색결과() {
+    const q = query.trim();
+    const nq = 검색꼴(q);
+    const 걸린다 = (it) => {
+      const { 이름, 부제 } = 이름나누기(it.n);
+      // 화면에 보이는 글자를 그대로 이어 붙인다 — 이름 + 부제 + (제주 한정)
+      const 대상 = 이름 + ' ' + 부제 + (it.jeju ? ' ' + 제주한정 : '');
+      return 대상.includes(q) || (nq && 검색꼴(대상).includes(nq));
+    };
+    const out = [];
+    분류탭().forEach((t) => {
+      const items = 상위메뉴(t).filter(걸린다);
+      if (items.length) out.push({ up: t.name, items });
+    });
+    return out;
+  }
+
+  function renderSearch() {
+    const groups = 검색결과();
+    if (!groups.length) return `<p class="empty-state">검색 결과가 없어요</p>`;
+    return 묶음목록HTML(groups);
+  }
+
+  // 🔴 스크롤은 「사람이 탭을 눌렀을 때」만 위로 보낸다. 첫 렌더는 페이지가 뜨는 중이라
+  //    다른 탭(레시피)을 보고 있을 수 있고, 거기서 스크롤을 건드리면 남의 화면을 움직인다.
+  function render(scrollTop) {
+    renderTabs();
+    renderHead();
+    const t = TABS[cur];
+    // 🔴 전골은 목록이 아니라 냄비를 고르는 화면이다 — 검색창·개수를 감춘다(2026-08-03 사용자 확정).
+    //    🔴 pageEl 은 이 모듈 밖(위쪽 IIFE)의 변수라 여기서 쓰면 안 된다 — 쓰면 렌더가 통째로 멈춘다.
+    //    🔴 이름을 'mn-pot' 으로 쓰면 안 된다 — 그건 냄비 그림(.mn-pot)의 클래스라
+    //       .page 가 그 규칙(폭·모양)을 통째로 뒤집어써서 화면이 194px 로 쪼그라든다(실제로 그랬다).
+    document.querySelector('.page').classList.toggle('mn-pot-tab', !!t.pot);
+    $('#mnBody').innerHTML = t.pot ? renderPot()
+      : 검색중() ? renderSearch()
+      : t.all ? renderAllMenus()
+      : renderMenuList(t);
+    $('#potIcon').classList.toggle('has-item', !!count());
+    if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });   // smooth 를 확실히 우회
+  }
+
+  // 🔴 담기·빼기는 **다시 그리지 않는다**(2026-08-04 사용자 지적) — `#mnBody` 를 통째로 새로 쓰면
+  //    그 안의 <img> 가 전부 새로 만들어져 그림 64장이 한꺼번에 깜빡였다.
+  //    바뀌는 것은 카드의 테두리(is-on)와 냄비 아이콘뿐이라 클래스만 갈아 끼운다.
+  //    (레시피 탭이 browseCardCache 로 푼 것과 같은 문제다)
+  function refreshCards() {
+    document.querySelectorAll('#mnBody .mn-card[data-menu]').forEach((el) => {
+      el.classList.toggle('is-on', picked.has(el.dataset.menu));
+    });
+    $('#potIcon').classList.toggle('has-item', !!count());
+    // 🔴 저장은 여기와 refreshPot 두 곳에서만 부른다 — 담고 빼는 자리 일곱 곳이 전부 둘 중 하나를
+    //    거치기 때문이다(담기·빼기·칸 수·칸 빼기·목록 ✕·전체 지우기). 자리마다 넣으면 하나를 빠뜨린다.
+    saveMenu();
+  }
+  // 전골 화면 — 냄비만 다시 그린다. 아래 육수 카드 12장은 손대지 않는다.
+  // 🔴 냄비 **안쪽까지** 통째로 다시 쓰면 안 된다(2026-08-04 사용자 지적) — `innerHTML` 을 새로 쓰면
+  //    이미 떠 있던 칸 그림의 <img> 가 버려지고 새로 만들어져서, 육수를 담을 때마다 **먼저 담긴 칸이
+  //    다시 받아지며 깜빡였다.** 아래 육수 카드 12장에서 고쳤던 것과 같은 문제인데 냄비 안쪽엔
+  //    안 고쳐져 있었다. 그래서 여기서는 **칸 수가 바뀔 때만** 통째로 그리고, 그 밖에는 갈아 끼운다.
+  function refreshPot() {
+    const inner = $('.mn-pot-inner');
+    if (!inner || +inner.dataset.cells !== cells) {
+      // 칸 수(한 칸·두 칸·네 칸)가 바뀌면 칸 자체가 늘고 줄어 구조가 달라진다 — 이때만 다시 그린다
+      const top = $('#mnPotTop');
+      if (top) top.innerHTML = renderPotTop();
+    } else {
+      updateCells(inner);
+      const list = $('.mn-pot-list');
+      if (list) list.innerHTML = renderPotRows();   // 그림이 없는 줄이라 다시 써도 안 깜빡인다
+    }
+    refreshBrothNums();          // 아래 육수 카드의 번호도 같이 맞춘다(카드는 다시 안 그린다)
+    $('#potIcon').classList.toggle('has-item', !!count());
+    saveMenu();                  // 저장하는 두 자리 중 하나(refreshCards 주석 참고)
+  }
+  // 칸 하나하나를 견줘 바뀐 것만 손댄다. 🔴 그림이 그대로면 <img> 를 건드리지 않는다 —
+  //    src 를 같은 값으로 다시 넣기만 해도 브라우저가 다시 받아 깜빡인다.
+  function updateCells(inner) {
+    inner.querySelectorAll('.mn-cell').forEach((cell, i) => {
+      const b = broths[i];
+      const img = cell.querySelector('img');
+      if (b) {
+        const src = CELL_IMG(b);
+        if (!img) cell.innerHTML = `<img src="${src}" alt="">`;
+        else if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+        cell.classList.add('is-filled');
+        cell.dataset.cell = i;
+      } else {
+        if (img) cell.innerHTML = '';
+        cell.classList.remove('is-filled');
+        delete cell.dataset.cell;   // 빈 칸은 눌러도 뺄 게 없다
+      }
+    });
+  }
+
+  // 담은 줄의 그림 24px. 🔴 카드용 그림(IMG)을 쓴다 — 목록 카드가 이미 받아 둔 파일이라 새로 안 받는다.
+  //    전골도 카드용이다(냄비 칸의 `-타일`이 아니다 — 그건 담는 순간 따로 받는 파일이다).
+  //    그림이 없는 항목은 자리만 비운다(지금은 130장 다 있지만 데이터에 없음 표시가 남아 있을 수 있다).
+  const 줄그림 = (n, 있나) => (있나 ? `<img src="${IMG(n)}" alt="">` : '');
+
+  function renderSheet() {
+    const rows = [];
+    if (broths.length) {
+      rows.push(`<p class="mn-sheet-group">전골 ${potLabel(cells)}</p>`);
+      // 🔴 몇 번 칸에 담은 건지 번호를 붙인다(2026-08-04 사용자 확정). 같은 육수를 두 칸에 담으면
+      //    똑같은 줄이 두 개 나란히 보여서 「왜 두 번 있지」가 됐다 — 번호가 그 답이다.
+      //    규격은 냄비 아래 목록·육수 카드 배지와 **같은 한 곳**을 쓴다(styles.css 「칸 번호 규격」).
+      broths.forEach((b, i) => rows.push(
+        `<div class="mn-sheet-item"><b class="mn-sheet-num">${i + 1}</b>` +
+        `${줄그림(b, (D.broths.find((x) => x.n === b) || {}).img)}${b}` +
+        `<button class="mn-sheet-x" data-rm-broth="${i}">✕</button></div>`));
+    }
+    // 담은 목록도 화면 분류대로 묶는다 — 어느 탭에서 담았는지 그대로 보이게.
+    // 🔴 소제목은 상위 한 단이다(2026-08-04 사용자 지적). 옛 코드는 「육류 › 내장류」처럼 하위까지
+    //    적었는데, 그건 상위가 `육류`이던 4분류 시절 것이다. 오늘 8분류로 다시 묶으면서
+    //    「내장 › 내장류」처럼 같은 말이 두 번 나오는 자리가 됐고, 하위는 애초에 화면에서
+    //    걷어낸 단이다(2026-08-03 확정). 검색 결과 소제목과 같은 규칙을 쓴다.
+    분류탭().forEach((t) => {
+      const on = 상위메뉴(t).filter((it) => picked.has(it.n));
+      if (!on.length) return;
+      rows.push(`<p class="mn-sheet-group">${t.name}</p>`);
+      on.forEach((it) => rows.push(
+        `<div class="mn-sheet-item">${줄그림(it.n, it.img)}${it.n}` +
+        `<button class="mn-sheet-x" data-rm="${it.n}">✕</button></div>`));
+    });
+    // 🔴 안내(2026-08-04 사용자 확정) — 경고가 아니라 **쓰는 법**을 말한다.
+    //    「매장에서 주문」이라는 말 자체가 「여기서 주문되는 게 아니다」를 전한다.
+    //    분명한 고지(「하이디라오 주문과는 연동되지 않아요」)는 메뉴 탭 푸터가 맡는다 — 역할을 나눴다.
+    //    ⚠️ 「담아두고」가 성립하려면 저장이 있어야 한다 — 그래서 같은 날 이 기기 저장을 붙였다(위 saveMenu).
+    //    🔴 **담은 게 없을 때도 보여준다**(2026-08-10 사용자 지시). 예전에는 숨겼는데,
+    //       처음 열어 본 사람은 **이 창이 무엇에 쓰는 것인지** 알 길이 없었다.
+    //       빈 상태에서는 「아직 담은 것이 없어요」 **아래**에 붙는다.
+    //       ⚠️ 문구·색·글자 크기·간격은 그대로다 — **보이는 조건만** 바꿨다.
+    //    🔴 마침표를 안 쓴다 — 앱의 다른 문구도 안 쓴다(「아직 담은 것이 없어요」·푸터 안내).
+    //    🔴 둘째 줄이 「일부 매장」 꼬리표를 대신한다(2026-08-04 사용자 확정).
+    //       메뉴 카드의 꼬리표를 여기로 옮기지 **않는다** — 그 꼬리표의 근거는 2026-08-02 한 시점의
+    //       조회값이고(13곳이 아니면 「일부 매장」), 하루 만에 차돌박이가 1곳 → 13곳이 된 적이 있다.
+    //       47개에 개별 딱지를 붙이면 틀릴 수 있는 단정을 47번 하는 것이고, 이 한 줄이면 아는 만큼만 말한다.
+    //       「판매하지 않는」은 품절이든 원래 안 팔든 둘 다 덮는다 — 우리 데이터가 그 둘을 못 가린다.
+    //       「매장 사정에 따라」는 앱이 이미 쓰는 말이다(매장 탭 푸터).
+    const 안내 =
+      `<p class="mn-sheet-note">여기에 담아두고 매장에서 편하게 주문해보세요<br>매장 사정에 따라 판매하지 않는 메뉴가 있을 수 있어요</p>`;
+    $('#mnSheetBody').innerHTML =
+      (rows.length ? rows.join('') : `<p class="mn-sheet-empty">아직 담은 것이 없어요</p>`) + 안내;
+  }
+
+  // 🔴 창이 떠 있는 동안 상단바 냄비를 눌린 모습(빨강)으로 둔다(2026-08-04 사용자 확정) —
+  //    「이 창이 이 아이콘에서 나왔다」가 보여야 한다. 표시는 CSS 가 하고 여기선 클래스만 붙인다.
+  /* 🔴 대화상자 접근성(2026-08-09, 5-5). 공용 함수는 본체 IIFE 에 있어 `window.haidilDialogA11y`
+     로 건네받는다 — 이 파일은 IIFE 가 둘로 갈려 있다(`window.showToast` 와 같은 사정). */
+  const A11Y = (window.haidilDialogA11y) || {};
+  let sheetReturnFocus = null;
+  const mnSheetEl = sheetOverlay.querySelector('.stamp-sheet');
+  if (mnSheetEl && A11Y.trapFocusWithin) {
+    mnSheetEl.addEventListener('keydown', (e) => A11Y.trapFocusWithin(mnSheetEl, e));
+  }
+  function openSheet() {
+    /* 🔴 `A11Y.` 를 반드시 붙인다 — 이 함수들은 **본체 IIFE 에** 있다(위 A11Y 주석 참고).
+       그냥 `popupOpener()` 라고 썼다가 `ReferenceError` 로 「내 메뉴」가 안 열린 적이 있다. */
+    /* 🔴 돌려받는 것은 **복귀표**다(2026-08-10, 2차) — 요소가 아니다.
+       ⚠️ 다리가 끊겼을 때의 물러설 값도 **같은 모양**으로 만든다. 요소를 그냥 넣으면
+          닫을 때 자료 모양을 잘못 읽는다. 번호를 모르므로 「애매함」 → 테두리 보임이 된다. */
+    sheetReturnFocus = A11Y.popupOpener
+      ? A11Y.popupOpener()
+      : { el: document.activeElement instanceof HTMLElement ? document.activeElement : null, openSeq: null, openedByKeyboard: null };
+    renderSheet();
+    sheetOverlay.classList.add('open');
+    sheetOverlay.setAttribute('aria-hidden', 'false');
+    sheetOverlay.inert = false;   // 🔴 닫을 때 건 잠금을 푼다(2026-08-09, 5-5)
+    $('#potToggleBtn').classList.add('is-open');
+    if (A11Y.syncPageBackgroundA11y) A11Y.syncPageBackgroundA11y();
+    const 닫기 = $('#mnSheetClose');
+    // `visibility` 로 여닫는 시트라 초점이 닿을 때까지 다시 시도하는 쪽을 쓴다(본체의 그 주석 참고)
+    if (닫기 && A11Y.focusDialogCloseWhenReady) A11Y.focusDialogCloseWhenReady(닫기);
+    else if (닫기 && A11Y.focusDialogClose) requestAnimationFrame(() => A11Y.focusDialogClose(닫기));
+    // 🔴 뒤 화면이 밀리지 않게 잠근다(2026-08-04 사용자 지적) — 예전엔 시트를 열고 밀면
+    //    뒤 목록이 400px 그대로 움직였다. body 가 아니라 html 에 건다 — body 를 스크롤
+    //    컨테이너로 만들면 상단바 sticky 가 깨진다(레시피 상세·가챠와 같은 방식).
+    document.documentElement.style.overflow = 'hidden';
+  }
+  /* 🔴 닫기는 한 곳뿐이다(2026-08-09) — 상단바로 닫을 때도 **반드시 이 함수를 거친다.**
+     여기서 냄비 아이콘의 `is-open`(빨강)을 떼기 때문이다. 클래스만 따로 지우는 식으로 닫으면
+     **아이콘이 빨간 채로 남는다.**
+     ⚠️ 담은 메뉴(`picked`·`broths`)는 **건드리지 않는다** — 창을 닫는 것과 담은 것을 비우는 것은
+        다른 일이다. 여기서 지우는 것은 「창이 떠 있다」는 표시뿐이다.
+     `options.restoreFocus === false` 면 초점을 안 되돌린다(상단바 버튼이 초점을 가져갈 때). */
+  function closeSheet(options) {
+    sheetOverlay.classList.remove('open');
+    sheetOverlay.setAttribute('aria-hidden', 'true');
+    /* 🔴 `inert` 를 **즉시** 건다(2026-08-09, 5-5 · 코덱스 지적).
+       이 시트는 `visibility` 가 0.22초에 걸쳐 꺼져서(styles.css .stamp-sheet-overlay),
+       그 사이에는 아직 `visible` 이라 Tab 이 안쪽 버튼에 닿는다. `aria-hidden` 은 초점을 못 막는다.
+       ⚠️ CSS 는 손대지 않는다 — `display:none` 으로 바꾸면 여는 애니메이션과 사파리 주소창 버그가 되살아난다. */
+    sheetOverlay.inert = true;
+    $('#potToggleBtn').classList.remove('is-open');
+    document.documentElement.style.overflow = '';
+    if (A11Y.syncPageBackgroundA11y) A11Y.syncPageBackgroundA11y();
+    const target = sheetReturnFocus;   // 복귀표(2026-08-10, 2차)
+    sheetReturnFocus = null;
+    if (options && options.restoreFocus === false) return;
+    /* 🔴 `A11Y.` 를 반드시 붙인다 — 공용 복귀 함수는 **본체 IIFE 에** 있다(위 A11Y 주석 참고).
+       그냥 부르면 `ReferenceError` 로 「내 메뉴」가 통째로 안 열린다(2026-08-09 실제 사고). */
+    if (A11Y.restorePopupFocus) A11Y.restorePopupFocus(target);
+  }
+  /* 🔴 본체 IIFE(상단바 처리)가 이 시트를 닫을 수 있게 건넨다(2026-08-09).
+     ⚠️ 반드시 `closeSheet` 를 건넨다 — 바깥에서 `classList.remove('open')` 만 하면
+        냄비 아이콘의 `is-open` 이 안 떨어져 **빨간 채로 남는다.** */
+  window.mnCloseSheet = (options) => {
+    if (!sheetOverlay.classList.contains('open')) return false;
+    closeSheet(options);
+    return true;
+  };
+
+  document.addEventListener('click', (e) => {
+    // 🔴 반드시 메뉴 탭줄 안으로 좁힌다 — .tab-btn 은 레시피·매장 탭도 쓰는 이름이다.
+    //    🔴 두 곳을 다 적는다 — 전골은 탭줄 밖(#mnPotTab)에 있다(2026-08-05). 여기를 빠뜨리면
+    //       전골을 눌러도 아무 일도 안 일어난다.
+    const tab = e.target.closest('#mnTabs .tab-btn, #mnPotTab .tab-btn');
+    if (tab) {
+      // 🔴 레시피 탭과 같다(2026-08-03 사용자 확정):
+      //    같은 탭을 누르면 아무 일도 하지 않고(밑줄이 다시 그려지는 것을 막는다),
+      //    다른 탭이면 목록이 통째로 바뀌므로 맨 위로 간다.
+      const i = +tab.dataset.i;
+      if (i === cur) return;
+      cur = i;
+      // 🔴 분류를 누르면 검색을 지운다 — 검색은 8개 분류를 가로지르므로(위 「검색」 절), 검색을 켠 채
+      //    분류를 눌러도 결과가 안 바뀐다. 그러면 밑줄만 움직이고 목록은 그대로여서 고장으로 보인다.
+      //    「이 분류를 보겠다」는 뜻으로 받아 검색을 끄고 그 분류를 보여준다.
+      clearSearch();
+      render(true);
+      /* 🔴 초점을 **새로 만들어진 같은 분류 버튼**으로 옮긴다(2026-08-09, 5-5 · 코덱스 2차 검토).
+         `renderTabs()` 가 분류 버튼을 전부 지우고 새로 만들기 때문에 **방금 누른 버튼이 사라지고**
+         초점이 <body> 로 빠진다. 그러면 키보드·화면낭독기 사용자는 어디에 있는지 알 수 없다.
+         🔴 특히 이번 5-5 에서 「내 메뉴를 열어 둔 채 분류 버튼을 누르면 닫고 그 분류로 간다」가
+            승인된 경로라, 그 길 끝에서 초점이 사라지면 반쪽짜리가 된다.
+         ⚠️ `preventScroll: true` — `render(true)` 가 이미 맨 위로 보냈다. 여기서 또 스크롤하면 화면이 튄다.
+         ⚠️ 같은 분류를 다시 누르는 경우는 위에서 `return` 하므로 여기 안 온다(버튼도 안 새로 만든다). */
+      const 새버튼 = $('#mnTabs .tab-btn.active') || $('#mnPotTab .tab-btn.active');
+      if (새버튼) 새버튼.focus({ preventScroll: true });
+      return;
+    }
+
+    // 🔴 아래 넷은 render() 를 부르지 않는다(2026-08-04) — 통째로 다시 그리면 그림이 깜빡인다.
+    const seg = e.target.closest('[data-pot]');
+    if (seg) {
+      cells = +seg.dataset.pot;
+      if (broths.length > cells) broths = broths.slice(0, cells);   // 칸이 줄면 뒤에서 덜어낸다
+      return refreshPot();
+    }
+
+    // 냄비 칸을 누르거나 오른쪽 목록의 ✕ 를 눌러 뺀다
+    const cell = e.target.closest('[data-cell]');
+    if (cell) {
+      const i = +cell.dataset.cell;
+      if (i < broths.length) { broths.splice(i, 1); return refreshPot(); }
+      return;
+    }
+
+    // 🔴 육수는 중복해서 담을 수 있다 — 다시 눌러도 빠지지 않고 다음 칸에 또 들어간다.
+    //    빼는 것은 냄비 칸을 눌러서 한다(위). 안 그러면 「2칸에 같은 육수」를 만들 방법이 없다.
+    const bc = e.target.closest('[data-broth]');
+    if (bc) {
+      // 🔴 냄비가 찼으면 냄비를 다시 그리지 않는다(2026-08-04 사용자 지적) — 예전엔 담기지 않는데도
+      //    refreshPot() 을 불러서, 연타하면 바뀐 게 없는데 냄비가 깜빡였다.
+      //    대신 토스트로 알린다(2026-08-04 사용자 확정) — 아무 반응이 없으면 고장으로 보인다.
+      //    확대 모달이 없어진 지금은 **이 토스트가 「더는 못 담는다」를 알리는 유일한 자리**다.
+      if (broths.length >= cells) {
+        if (window.showToast) window.showToast(냄비참);
+        return;
+      }
+      broths.push(bc.dataset.broth);
+      타일미리받기();      // 첫 담기 뒤 나머지 타일을 뒤에서 받아 둔다(위 주석 참고)
+      return refreshPot();
+    }
+
+    // 🔴 반드시 `.mn-card` 안으로 좁힌다 — 위 #mnTabs .tab-btn 과 같은 이유다.
+    //    범위 없이 `[data-menu]` 만 찾으면 목록 밖에 있는 것까지 담기 처리로 빨려 들어간다.
+    const mc = e.target.closest('.mn-card[data-menu]');
+    if (mc) { toggle(mc.dataset.menu); return refreshCards(); }
+
+    // 🔴 냄비 아이콘은 여닫이다(2026-08-04 사용자 요청) — 열려 있을 때 다시 누르면 닫힌다.
+    //    창이 떠 있는 동안 이 아이콘은 빨갛게(is-open) 눌린 모습이라, 다시 누르면 풀리는 게 맞다.
+    if (e.target.closest('#potToggleBtn')) {
+      return sheetOverlay.classList.contains('open') ? closeSheet() : openSheet();
+    }
+    // 어두운 배경이나 X 를 누르면 닫는다(시트 안쪽을 눌렀을 때는 안 닫힌다)
+    if (e.target.closest('#mnSheetClose') || e.target === sheetOverlay) return closeSheet();
+    if (e.target.closest('#mnSheetClear')) {
+      picked.clear(); broths = []; renderSheet(); refreshCards(); return refreshPot();
+    }
+    /* 🔴 지우면 그 ✕ 버튼이 사라진다 — 초점을 넘겨줘야 한다(2026-08-09, 5-5 · 코덱스 지적).
+       `renderSheet()` 가 `#mnSheetBody` 의 innerHTML 을 통째로 새로 만들기 때문에,
+       방금 누른 버튼이 DOM 에서 없어지고 **초점이 <body> 로 빠진다.** 그러면 시트의
+       초점 가두기(keydown)까지 우회돼 키보드 사용자가 뒤 화면으로 새어 나간다.
+       ⚠️ 「전체 지우기」(#mnSheetClear)는 `#mnSheetBody` 밖이라 사라지지 않는다 — 그래서 여기 없다. */
+    const 지운뒤초점 = (자리) => {
+      const 남은 = [...$('#mnSheetBody').querySelectorAll('.mn-sheet-x')];
+      const 다음 = 남은[자리] || 남은[남은.length - 1] || $('#mnSheetClose');
+      if (다음) 다음.focus();
+    };
+    const 지우기버튼들 = () => [...$('#mnSheetBody').querySelectorAll('.mn-sheet-x')];
+    const rm = e.target.closest('[data-rm]');
+    if (rm) {
+      const 자리 = 지우기버튼들().indexOf(rm);
+      picked.delete(rm.dataset.rm); renderSheet(); 지운뒤초점(자리);
+      return refreshCards();
+    }
+    const rmb = e.target.closest('[data-rm-broth]');
+    if (rmb) {
+      const 자리 = 지우기버튼들().indexOf(rmb);
+      broths.splice(+rmb.dataset.rmBroth, 1); renderSheet(); 지운뒤초점(자리);
+      return refreshPot();
+    }
+  });
+
+  // ── 검색창 배선 ── 레시피 탭(searchInput/searchClear)과 같은 방식이다.
+  //    ✕ 는 CSS 가 `.search-box.has-value` 일 때만 보여준다 — 클래스를 반드시 같이 갈아 끼운다.
+  function clearSearch() {
+    query = '';
+    if (searchInput) searchInput.value = '';
+    if (searchBox) searchBox.classList.remove('has-value');
+  }
+  const 전체메뉴자리 = TABS.findIndex((t) => t.all);
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      query = e.target.value;
+      searchBox.classList.toggle('has-value', query.length > 0);
+      // 🔴 치기 시작하면 「전체메뉴」 탭으로 옮긴다(2026-08-04 사용자 확정).
+      //    검색은 분류를 가로지르는데 밑줄이 「고기」에 남아 있으면 결과에 해산물·완자가 섞여 나와
+      //    규칙이 어긋나 보인다. 이 앱엔 「활성 탭 없음」 상태가 없어서(레시피 탭도 검색 중 「전체」가
+      //    활성이다) 밑줄만 떼는 대신, 실제로 전부에 해당하는 탭으로 보낸다.
+      //    ⚠️ 그래서 검색을 지우면 원래 보던 분류가 아니라 전체메뉴에 남는다 — 아는 값이다.
+      if (query.trim() && cur !== 전체메뉴자리) cur = 전체메뉴자리;
+      // 🔴 render() 를 쓴다(refreshCards 가 아니다) — 목록에 뜨는 카드가 통째로 바뀌는 일이다.
+      render();
+    });
+  }
+  const searchClearBtn = $('#mnSearchClear');
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', () => {
+      clearSearch();
+      render();
+      searchInput.focus();
+    });
+  }
+
+  // Esc — 앱의 다른 시트·모달과 같게. 이제 이 탭에 떠 있는 것은 담은 목록 하나뿐이다.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (sheetOverlay.classList.contains('open')) closeSheet();
+  });
+
+  loadMenu();   // 🔴 render() 보다 먼저 — 되살린 담은 것·육수·칸 수가 첫 화면에 그대로 나와야 한다
+  render();
 })();
