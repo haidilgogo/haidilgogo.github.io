@@ -1139,7 +1139,7 @@ window.MENU_DATA = {
    "tile": true
   },
   {
-   "n": "맑은 탕",
+   "n": "맑은 탕(맹물)",
    "img": true,
    "jeju": false,
    "tile": true
