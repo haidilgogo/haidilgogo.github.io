@@ -894,6 +894,14 @@ window.MENU_DATA = {
      "sub": "근경류"
     },
     {
+     "n": "시금치",
+     "img": true,
+     "part": true,
+     "jeju": false,
+     "up": "채소·버섯",
+     "sub": "잎채류"
+    },
+    {
      "n": "새송이버섯",
      "img": true,
      "part": true,
