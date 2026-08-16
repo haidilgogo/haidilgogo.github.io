@@ -2994,7 +2994,7 @@
      (실제로 130ms 어긋난 적이 있다). 이제 여기 한 곳만 고치면 된다.
      ⚠️ `styles.css` 와 겹치는 값이 **둘** 있다 — 아직 코드로 연결하지 않았으므로 **같이 고칠 것.**
         `dropMs` = `.gacha-ing` 의 `animation: gachaDrop .43s` / `firstContact` = `@keyframes gachaDrop` 의 `70%`
-        (CSS 와 직접 연결하는 것은 배포 후로 미뤘다 — `docs/review/가챠-효과음-코덱스답변.md`) */
+        (CSS 와 직접 연결하는 것은 배포 후로 미뤘다 — `docs/99_archive/review/가챠-효과음-코덱스답변.md`) */
   const GACHA_TIMING = {
     dropMs: 430,           // 재료 하나가 떨어지는 시간 (= CSS `.43s`)
     firstContact: 0.70,    // 그릇에 **처음 닿는** 지점 (= CSS 키프레임 `70%`)
