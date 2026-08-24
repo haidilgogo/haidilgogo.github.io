@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=779">
+<link rel="stylesheet" href="styles.css?v=781">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -402,6 +402,44 @@
         </div>
         <div class="hp-rail" id="popularRail"></div>
       </section>
+      <!-- 나만의 소스 만들기 — 소스바 재료를 골라 담아 내 소스를 만드는 화면으로 가는 입구.
+           🔴 자리 = 인기 소스 다음, **옛 가이드 박스 자리**다(2026-08-23 사용자 확정).
+              셀럽 소스 → 인기 소스 → 「그럼 내가 만들어 볼까」로 맥락이 이어진다.
+              배너 바로 아래에 두는 안도 봤지만, 홈의 「큰배너 → 둥근 얼굴 → 세로 카드」 리듬을 끊어서 뺐다.
+           얼개는 가이드 박스(.home-guide)를 그대로 쓰고 색·여백·아이콘만 .home-sauce 로 덮는다.
+           🔴 아이콘 칸은 가이드와 **규격이 다르다**(46×58 vs 46×46) — 그림이 세로로 길어서다.
+              그래서 위아래 여백도 18 → 12px 로 줄여 박스 높이를 82px 로 맞췄다.
+              둘은 짝이라 한쪽만 바꾸면 가이드 박스와 높이가 어긋난다(styles.css .home-sauce 주석 참고).
+           🔴 **아직 누르면 아무 일도 안 한다.** 소스바 화면이 없어서 자리만 잡아 둔 것이다.
+              화면이 생기면 script.js 에 클릭 배선을 붙여야 한다(가이드 박스가 칼럼을 여는 방식 참고). -->
+      <button class="home-guide home-sauce home-sec" id="homeSauce" type="button">
+        <i class="home-sauce-ic" aria-hidden="true"></i>
+        <span class="home-guide-txt">
+          <!-- 🔴 문구는 320px 에서 재고 정한다(2026-08-23). 부제 칸이 162px 이고
+               **넘치면 줄바꿈이 아니라 뒤가 …로 잘린다** — 화면에서 티가 잘 안 나니 주의.
+               한글만이면 17자, 띄어쓰기가 섞이면 19자쯤이 한계다.
+               ⚠️ 「공유해요」는 일부러 뺐다 — 공유 기능이 이번 범위에 없어서 거짓말이 된다.
+                  공유가 생기면 그때 부제에 넣는다. -->
+          <span class="home-guide-title">소스 만들기</span>
+          <span class="home-guide-sub">나만의 소스를 만들어요</span>
+        </span>
+        <svg class="home-guide-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <section class="home-sec" id="homeHidden">
+        <div class="home-sec-head">
+          <h2 class="home-sec-title">히든메뉴</h2>
+          <button class="home-sec-more" id="hiddenMore" type="button">레시피 보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="home-list" id="hiddenGrid"></div>
+      </section>
+      <!-- 가이드 박스 — 🔴 히든메뉴 **다음**으로 내렸다(2026-08-23 사용자 확정).
+           옛 자리(인기 소스 다음)는 나만의 소스 만들기 박스가 받았다.
+           🔴 내려도 입구가 사라지지 않는다 — 홈 배너에도 가이드가 있고, 같은 날 그 배너를
+              **2번째**로 올려 보완했다(script.js pickMonthlyFeatures).
+              배너 순서: 이달의 소스 → 가이드 → 고수 칼럼 → 알쓸신잡.
+           ⚠️ 원래 이 박스가 위에 있던 이유가 「홈 아래쪽 가이드를 놓치는 사람이 많아서」였다
+              (script.js GUIDE_BANNER 주석). 그래서 배너를 올리는 보완이 짝으로 붙어 있다 —
+              한쪽만 되돌리지 말 것. -->
       <button class="home-guide home-sec" id="homeGuide" type="button">
         <img class="home-guide-ic" src="assets/icons/hi-logo-white.png?v=1" alt="" draggable="false">
         <span class="home-guide-txt">
@@ -414,13 +452,6 @@
         </span>
         <svg class="home-guide-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <section class="home-sec" id="homeHidden">
-        <div class="home-sec-head">
-          <h2 class="home-sec-title">히든메뉴</h2>
-          <button class="home-sec-more" id="hiddenMore" type="button">레시피 보기<svg class="home-sec-more-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
-        <div class="home-list" id="hiddenGrid"></div>
-      </section>
       <!-- 🔴 「탕」이던 자리를 「전골」로 바꿨다(2026-08-05 사용자 확정). 성격이 달라졌다 —
            예전엔 **레시피**(cat==='탕')를 보여주고 누르면 레시피 상세가 열렸는데,
            지금은 **메뉴 탭의 육수**를 보여주고 누르면 메뉴 탭 전골로 간다.
@@ -434,24 +465,30 @@
         </div>
         <div class="home-grid" id="jeongolGrid"></div>
       </section>
+      <section class="home-sec home-random" id="homeRandom">
+        <span class="home-random-dice"><img src="assets/icons/dice.png?v=1" alt="주사위" width="76" height="76" loading="lazy" draggable="false"></span>
+        <p class="home-random-title">아, 소스 뭐 먹지?</p>
+        <p class="home-random-sub">오늘 먹을 소스를 가챠로 뽑아보세요</p>
+        <button class="home-random-btn" id="homeRandomBtn" type="button">오늘의 소스</button>
+      </section>
+
       <!-- 내 코드 — 스티커 탭 안에 있던 띠를 홈으로 옮겼다(2026-08-04 사용자 확정).
            🔴 홈이 맞는 자리다: 이 안내가 가장 필요한 사람은 **아무것도 없는 새 기기에서 처음 연 사람**인데,
               스티커 탭까지 들어가야 보이면 늦는다. 홈은 그 사람이 반드시 보는 화면이다.
            얼개는 가이드 박스(.home-guide)와 같다 — 통째로 누르면 열리는 박스 + 오른쪽 화살표.
-           🔴 색은 따라가지 않는다. 가이드는 빨강 그라데이션이라 홈 아래쪽에 빨간 덩어리가 둘이 되고,
-              매일 쓰는 기능도 아닌데 너무 커진다. 옛 띠의 연분홍을 그대로 잇는다.
            🔴 접기는 없앴다 — 통째로 누르는 박스에는 접을 자리가 없다.
 
-           🔴 자리 = 탕 다음, 가챠 **앞**이다(2026-08-04 사용자 확정). 이유 둘:
-              ① 가이드 박스와 **떨어뜨린다** — 얼개가 같아서 나란히 두면 「같은 것 두 개」로 읽히고
-                 가이드도 특별해 보이지 않는다(사용자 지적).
-              ② **가챠가 홈의 마무리**다 — 「아, 소스 뭐 먹지?」로 끝나는 게 자연스러운데,
-                 그 뒤에 안내 박스가 붙으면 마무리를 끊는다.
+           🔴 자리 = **가챠 다음, 홈의 맨 마지막**이다(2026-08-23 사용자 확정).
+              ⚠️ 2026-08-04 에는 「탕 다음, 가챠 **앞**」이었고 근거가 둘이었다 —
+                 ① 가이드 박스와 떨어뜨린다 ② 가챠가 홈의 마무리다.
+                 ①은 지금도 지켜진다(가이드는 히든메뉴 다음이라 사이에 전골·가챠가 낀다).
+                 ②는 사용자가 바꾼 것이다. 「가챠가 마무리」라는 옛 판단을 근거로 되돌리지 말 것.
            부제는 코드 유무에 따라 바뀐다(script.js renderCodeNotice). -->
       <button class="home-code home-sec" id="homeCode" type="button">
-        <!-- 아이콘 HG-*** — 사용자가 Solar Icons 「Password」(CC Attribution)를 고쳐 만든 것.
+        <!-- 아이콘 HG-*** — 사용자가 만든 카드 그림(2026-08-23 교체).
              코드 형식이 실제로 'HG-' + 네 글자라(script.js getSyncCode) 코드 모양을 그대로 보여 준다.
-             🔴 <img> 가 아니라 CSS 마스크다 — 색을 CSS 가 정해야 어두운 면 위에서 흰색으로 나온다. -->
+             🔴 옛 CSS 마스크(hg-code-plain.svg)에서 **PNG 그림**으로 바뀌었다 —
+                색이 흰색으로 구워져 있어 CSS 로 색을 못 바꾼다. 크기·주의점은 styles.css 의 .home-code-ic 주석 참고. -->
         <i class="home-code-ic" aria-hidden="true"></i>
         <span class="home-code-txt">
           <!-- 제목은 코드 유무에 따라 바뀐다(script.js renderCodeNotice) — 코드가 없는 사람에게는
@@ -461,13 +498,6 @@
         </span>
         <svg class="home-code-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-
-      <section class="home-sec home-random" id="homeRandom">
-        <span class="home-random-dice"><img src="assets/icons/dice.png?v=1" alt="주사위" width="76" height="76" loading="lazy" draggable="false"></span>
-        <p class="home-random-title">아, 소스 뭐 먹지?</p>
-        <p class="home-random-sub">오늘 먹을 소스를 가챠로 뽑아보세요</p>
-        <button class="home-random-btn" id="homeRandomBtn" type="button">오늘의 소스</button>
-      </section>
 
       <!-- 홈 푸터 — 문구 + 링크. 「맨 위로」 버튼은 두지 않는다(2026-08-03 사용자 확정) -->
       <footer class="footer">
