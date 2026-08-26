@@ -5138,6 +5138,50 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 
 /* 탭 제거 후 레시피용 탭줄 그룹은 항상 숨김(내용물은 script 참조용으로만 DOM 유지) */
 .tabs-group--recipe { display: none !important; }
+/* ── 카테고리 탭줄의 세로 구분선 + 「내 소스」(2026-08-26 사용자님 확정) ──────────
+   🔴 **구분선이 핵심이다.** 카테고리 넷(전체·소스·히든메뉴·탕)은 「레시피가 무엇인가(종류)」인데
+      내 소스는 「누가 만들었나」다. 구분선이 없으면 **카테고리 다섯 번째로 읽힌다** — 그래서 예전에
+      탭줄 안을 물렸던 것이고, 구분선이 그 지적에 대한 답이다. **빼지 말 것.**
+   ⚠️ 상단바 아이콘으로 먼저 만들었다가 물렸다 — 44px 을 먹어서 **320px 에서 「탕」이 밀려 안 보였다.**
+   🔴 높이 14px 은 탭 글자(15px)보다 **한 단 낮다.** 글자와 같은 높이로 세우면 선이 글자만큼 굵게 읽혀
+      「나누는 표시」가 아니라 「또 하나의 항목」이 된다.
+   ⚠️ 색은 상단바 구분선(`--card-border` 계열)과 같은 집안이다. 탭 글자색을 쓰면 너무 진하다. */
+.tab-div {
+  flex: none;
+  align-self: center;
+  width: 1px;
+  height: 14px;
+  background: #D9CEC2;
+}
+/* 내 소스 탭 — 켜짐 표시는 **다른 탭과 똑같다**(굵게 + 밑줄). 필터의 성격이 같아서다.
+   ⚠️ 밑줄(`.tabs-underline`)은 `.tab-btn.active` 를 따라가므로 여기서 따로 그리지 않는다.
+   ⚠️ 즐겨찾기와 동시에 켜질 일은 없다 — script.js 의 `목록필터켜기()` 가 하나만 켠다. */
+.tab-btn--mine { flex: none; }
+
+/* ── 목록 머리 한 줄 — 「레시피 43개」 / 「소스 만들기」(2026-08-26 사용자님 지시) ──────────
+   스티커 탭의 `.stamps-head`(개수 + 기록하기)와 **같은 얼개**다. 왼쪽 개수, 오른쪽 빨강 버튼.
+   ⚠️ `margin` 은 `.list-count` 에서 이 줄로 옮겼다 — 「위 18px 과 짝인 아래 6px」 규칙은 그대로다. */
+.list-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+/* 🔴 글자만 줄 맨 위로 — **스티커 탭과 같은 보정이다**(2026-08-26 사용자님 지적으로 추가).
+   36px 짜리 버튼이 줄 높이를 정하는데 가운데 맞춤이면 13px 글자가 (36-15.5)/2 = 10.3px 내려앉아
+   스티커 탭의 개수 줄보다 낮아 보였다(두 줄 다 본문 77px 에서 시작한다 — 실측).
+   ⚠️ `.list-count-row` 를 통째로 flex-start 로 바꾸지 말 것 — 버튼까지 올라가는데 버튼은 이미
+      맨 위라 달라지는 게 없고, 나중에 줄에 다른 것이 붙으면 같이 딸려 올라간다(스티커 쪽 주석과 같은 이유).
+   ⚠️ 버튼이 없을 때(내 소스가 아닌 탭)는 줄 높이가 글자 높이라 이 규칙이 아무 일도 안 한다. */
+.list-count-row .list-count { margin: 0; align-self: flex-start; }
+.my-sauce-make { flex: none; gap: 5px; }   /* 그릇 SVG ↔ 글자 간격. 스티커 기록하기와 같은 값 */
+
+/* 🔴 **내 소스에서는 검색창을 감춘다**(2026-08-26 사용자님 지시).
+   ⚠️ 감추는 것으로 끝내면 안 된다 — 검색어가 남아 있으면 **화면에 안 보이는 필터가 뒤에서 걸린다.**
+      그래서 `목록필터켜기('mine')` 가 검색어를 함께 비운다(script.js). 카테고리를 건너뛰는 것과 같은 이유다. */
+.page.is-my-sauce .list-head { display: none; }
+
 /* 즐겨찾기 버튼(topbar-right로 이사)은 레시피 섹션에서만 표시 */
 /* 상단바 규칙(2026-08-03): 그 탭 전용 아이콘 하나 + 공유·설치.
    즐겨찾기는 레시피 목록을 거르는 버튼이라 레시피 탭에서만 뜻이 있다(홈에는 거를 목록이 없다). */
@@ -5833,7 +5877,14 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   position: absolute;
   left: 0;
   right: 17px;
-  bottom: 0;
+  /* 🔴 `-9px` 은 **재서 정한 값이다**(2026-08-26 사용자님이 「전골만 밑줄 위치가 다르다」고 발견).
+     둘이 서로 **다른 것에 붙어 있어서** 생긴 어긋남이다 —
+       · 이 밑줄은 `.tab-btn`(버튼)의 바닥에 붙는다 … 실측 45px
+       · 공용 밑줄(`.tabs-underline`)은 `.tabs`(탭줄)의 바닥에 붙는다 … 실측 54px
+     전골만 탭줄 **밖**에 나와 있어 기준이 갈렸고, 그래서 전골을 고를 때만 밑줄이 9px 떠 보였다.
+     ⚠️ 탭 버튼의 세로 여백이나 탭줄 높이를 바꾸면 이 값도 **다시 재야 한다.**
+        (재는 법: 전골 버튼의 `getBoundingClientRect().bottom` 과 `.tabs-underline` 의 `bottom` 차이) */
+  bottom: -9px;
   height: 2px;
   border-radius: 1px;
   background: var(--brand-red);
@@ -5971,8 +6022,12 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    ⚠️ 11.5 가 아니라 12 를 쓴다 — 남는 0.5px 은 눈에 안 보이고(재서 확인: 3px → 0.5px),
    반픽셀 위치는 1배율 화면에서 X 획을 흐리게 만든다. 정수로 두는 편이 낫다.
    ⚠️ 이 시트에서만 바꾼다 — `.stamp-sheet-close` 는 스티커 시트도 쓰는 공용 클래스다.
-   ⚠️ transform 으로 가운데 맞추면 안 된다 — `:active` 의 `scale(.9)` 가 그걸 덮어써서 누를 때 튄다. */
-#mnSheetOverlay .stamp-sheet-close { top:12px; }
+   ⚠️ transform 으로 가운데 맞추면 안 된다 — `:active` 의 `scale(.9)` 가 그걸 덮어써서 누를 때 튄다.
+   🔴 소스 만들기 시트도 여기 함께 넣는다(2026-08-26 사용자님 지적) — 제목줄 규격이 같아졌으므로
+      계산도 같다(위 여백 24 + 제목 19/2 = 중심 33.5 → 44px 버튼의 top = 11.5 → 12).
+      그전에는 공용 기본값 `top:9px` 을 써서 내 메뉴보다 3px 위에 있었다. */
+#mnSheetOverlay .stamp-sheet-close,
+#sauceSheetOverlay .stamp-sheet-close { top:12px; }
 /* 🔴 내 메뉴 시트 배경 = 레시피 모달과 같은 --bg-card (2026-08-04 사용자 지시).
    원래=--bg-cream(#F5EFEC). 이 시트는 하단바를 덮고 화면 맨 아래까지 내려오는데,
    페이지 크림(#FCF9F5)과 「비슷하지만 다른」 크림이라 열고 닫을 때마다 하단바 아래 띠의
@@ -6001,3 +6056,317 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 @media (hover:hover) { .mn-sheet-x:hover, .mn-pot-row-x:hover { color:var(--brand-red); } }
 .mn-sheet-x:active, .mn-pot-row-x:active { color:var(--brand-red); transform:scale(.9); }
 .mn-sheet-empty { padding:26px 0; text-align:center; font-size:14px; color:var(--text-muted); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   나만의 소스 만들기 시트 (2026-08-25)
+   홈 「소스 만들기」 박스에서 열린다. 껍데기는 스티커 기록 시트(.stamp-sheet)를 그대로 쓰고
+   안쪽만 세로 3단으로 나눈다 — 위(제목·검색) 고정 · 가운데(재료) 스크롤 · 아래(저장) 고정.
+   🔴 스크롤바를 따로 숨기지 않는다. 맨 위 `*` 규칙이 이미 전역으로 덮는다(CLAUDE.md 스크롤바 규칙).
+   ══════════════════════════════════════════════════════════════════════════ */
+.sauce-sheet {
+  /* 🔴 시트 자체 스크롤을 끈다 — 안쪽 목록만 굴러야 검색창과 저장 줄이 제자리에 남는다.
+     (.stamp-sheet 는 `overflow-y:auto` 라 그대로 두면 통째로 굴러 둘 다 밀려 나간다) */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;              /* 안쪽 3단이 각자 여백을 갖는다 */
+  /* 🔴 배경 = `--bg-card`. **「내 메뉴」 시트와 같은 규칙이다**(2026-08-25 사용자님 확인).
+     화면을 통째로 덮는 창은 페이지 배경과 같은 색으로 간다 — 근거는 아래쪽
+     `#mnSheetOverlay .stamp-sheet` 주석에 있다(2026-08-04): 「비슷하지만 다른」 크림이면
+     열고 닫을 때마다 하단바 아래 띠 색이 어긋나 보인다. 레시피 상세 모달도 같은 이유로 이 색이다.
+     ⚠️ 크림(`.stamp-sheet` 기본값)으로 되돌리지 말 것 — 그러면 위 문제가 되살아나고,
+        **검색창(`.search-box`)까지 통째로 묻힌다**(그 배경이 `--bg-cream` 이라 시트와 같은 색이 된다).
+     ⚠️ 검색창 자체는 **손대지 않았다.** 앱의 검색창 셋(레시피·메뉴·소스 만들기)은 같은 모습이어야 한다.
+     🔴 **테두리를 넣지 않는다**(2026-08-25 사용자님 확정). 오버레이 배경도 같은 색이라 경계가
+        안 보이는데 **그게 의도다** — 상단바 아래를 채우는 화면이라 「카드가 얹힌」 모습일 필요가 없고,
+        내 메뉴 시트도 테두리가 없다. 한 번 넣어 봤다가 물렀으니 다시 넣지 말 것. */
+  background: var(--bg-card);
+}
+/* 🔴 위 여백 24px 는 `.stamp-sheet` 기본값과 같은 값이다(2026-08-26 사용자님 지적).
+   이 시트는 `.sauce-sheet { padding:0 }` 이라 안쪽 3단이 각자 여백을 갖는데, 여기만 22px 이라
+   제목줄이 내 메뉴보다 2px 위에 떠 있었다. 닫기 X 자리 계산(아래 `#sauceSheetOverlay`)이
+   이 값에 걸려 있다 — 바꾸면 그쪽도 같이 다시 재야 한다. */
+.sauce-top {
+  flex: none;
+  padding: 24px 20px 12px;
+  border-bottom: 1px solid var(--card-border);
+}
+/* 🔴 크기·굵기는 `.mn-sheet-title`(내 메뉴 시트 제목)과 같은 값이다(2026-08-26 사용자님).
+   시트 제목은 이 한 벌로 통일한다 — 원래 18px/700 이라 혼자 크고 얇았다. */
+.sauce-title {
+  margin: 0 0 12px;
+  padding-right: 34px;     /* 닫기 X 자리 — 겹치지 않게 */
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -.02em;
+}
+.sauce-top .search-box { width: 100%; box-sizing: border-box; }
+
+/* ── 재료 목록 ── */
+.sauce-list {
+  flex: 1;
+  min-height: 0;           /* flex 자식이 넘칠 때 줄어들 수 있게 — 없으면 스크롤이 안 생긴다 */
+  overflow-y: auto;
+  overscroll-behavior-y: contain;  /* 끝에서 당겨도 뒤 화면·새로고침으로 안 번지게(시트와 같은 규칙) */
+  padding: 4px 0 8px;
+}
+/* 재료 한 줄 — 왼쪽 이름, 오른쪽 담기(+) 또는 양 조절(− 1 스푼 +).
+   🔴 그림 자리(.si-thumb)는 **일러스트가 나오면** 켠다. 지금은 만들지 않는다 —
+      비어 있는 네모가 36줄 보이는 것보다 없는 편이 낫다(2026-08-25). */
+/* 🔴 **그림 옆을 세로로 나눠 쓴다**(2026-08-25). 그림이 왼쪽에 통째로 서고,
+   그 오른쪽 칸 안에서 이름(위)과 담기·조절부(아래)가 층을 이룬다.
+   ⚠️ 이렇게 해야 **그림을 키워도 줄이 안 길어진다** — 아랫단이 그림 밑으로 내려가는 구조였을 때는
+      그림 높이 + 아랫단 높이가 통째로 더해져, 그림을 키우면 줄이 그만큼 길어졌다. */
+.si-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px;
+  border-bottom: 1px solid #F4EDE4;
+}
+.si-body { flex: 1; min-width: 0; }
+/* 담긴 줄의 아랫단 — 양 조절이 여기로 내려온다(2026-08-25).
+   🔴 왼쪽 여백 74px = 그림(62) + 사이(12). 이름 글자와 세로로 줄이 맞아 딸린 것으로 읽힌다.
+   ⚠️ 그림 크기를 바꾸면 이 값도 같이 바꿔야 한다. */
+/* 🔴 **오른쪽 정렬**이다(2026-08-25 사용자님). 담기(+)든 조절부든 늘 오른쪽 끝에 있어서
+   눈이 그 자리를 한 번만 익히면 된다. 왼쪽 74px 은 그림(62)+사이(12) 만큼 비운 것이다. */
+/* 🔴 **높이를 42px 로 고정한다**(2026-08-25 사용자님 「담으면 글씨가 살짝 올라간다」).
+   담기 전에는 `+` 버튼(34px), 담은 뒤에는 알약(42px)이라 아랫단이 8px 커지는데,
+   줄이 세로 가운데 정렬이라 그 **절반인 4px 만큼 이름이 올라간다**(실측: top 21 → 17px).
+   빈 칸에 미리 자리를 잡아 두면 담아도 이름이 제자리에 있다. */
+.si-below {
+  margin-top: 7px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+/* 재료 그림 자리 (2026-08-25) — 62px. 메뉴 탭이 131개를 80px 줄로 보여주는 것과 같은 갈래다.
+   🔴 **지금은 비어 있다.** 일러스트가 나오면 이 안에 `<img>` 를 넣으면 되고 줄 높이는 그대로다.
+   ⚠️ 62px 는 그냥 정한 값이 아니다 — 찍어 온 사진을 이 크기로 줄여 보니 **통이 전부 똑같아 보여서**,
+      일러스트는 「통을 빼고 내용물이 칸을 채우는」 그림이어야 한다는 조건이 여기서 나왔다. */
+.si-thumb {
+  flex: none;
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  background: #F4EDE4;
+  border: 1px dashed #DFCEBA;   /* 🔴 점선은 「아직 비었다」는 표시다. 그림이 들어오면 지운다 */
+  overflow: hidden;
+}
+.si-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.si-row:last-child { border-bottom: 0; }
+.si-row.is-on { background: #FFF9F7; }
+/* 🔴 이름은 **두 줄까지** 간다(2026-08-25 실측). 그림 자리(62px)가 들어오면서 이름 칸이 99px 로
+   좁아져 긴 이름 셋이 잘렸다 — `마라시즈닝/고춧가루`(122px 필요) · `오향우육/다진 고기`(113px) ·
+   `산고추/고추장아찌`(109px). 줄 높이가 85px 라 두 줄이 들어갈 자리가 남으므로 폰트를 줄이는 대신 풀었다.
+   ⚠️ `-webkit-line-clamp` 로 두 줄에서 끊는다. 세 줄짜리 이름이 생기면 줄 높이가 밀린다. */
+.si-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.32;
+  color: var(--text-dark);
+  text-align: left;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: keep-all;   /* 낱말 가운데서 끊지 않는다 — 「마라시즈닝 / 고춧가루」 처럼 갈리게 */
+}
+.si-row.is-on .si-name { font-weight: 700; }
+/* 담기 버튼(+) — 안 담긴 줄에만 있다 */
+/* 🔴 크기(30px)와 오른쪽 여백(4px)을 **알약 안의 `+` 와 똑같이** 맞췄다(2026-08-25 사용자님).
+   담는 순간 버튼이 움직이면 이어서 양을 올릴 때 손가락이 헛나간다.
+   맞추기 전에는 34px·20px 이라 2px 어긋났다. 알약의 안쪽 여백이 4px 이라 이쪽도 4px 이다.
+   ⚠️ 34 → 30px 로 작아진 만큼 아래 `::after` 의 확장값을 키워 **닿는 자리는 44px 그대로** 뒀다. */
+.si-add {
+  position: relative;      /* 아래 ::after(터치 영역 확장)의 기준 */
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-right: 4px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: #fff;
+  color: var(--text-muted);
+  font-size: 17px;
+  line-height: 1;
+  /* 🔴 `inline-flex` 다 — 그냥 `flex` 면 블록이 되어 `.si-below` 의 오른쪽 정렬이 안 먹고
+     버튼이 왼쪽 끝에 붙는다(2026-08-25에 겪음. 조절부 알약도 같은 함정이었다). */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover:hover) { .si-add:hover { border-color: var(--card-hover-border); color: var(--brand-red); } }
+.si-add:active { transform: scale(.9); border-color: var(--brand-red); color: var(--brand-red); }
+/* 담기 버튼도 닿는 자리를 44px 로 넓힌다 — 이쪽은 줄 오른쪽 끝이라 사방으로 넓혀도 겹칠 것이 없다 */
+.si-add::after { content: ''; position: absolute; inset: -7px; }
+/* 양 조절 — 담긴 줄에만 있다. 「− 1 스푼 +」 한 덩어리 */
+.si-step {
+  flex: none;
+  /* 🔴 `inline-flex` 다. 그냥 `flex` 면 **블록이 되어 남는 폭을 통째로 먹는다** —
+     조절부가 아랫줄로 내려가면서 실제로 그렇게 됐다(2026-08-25 실기기에서 발견).
+     알약은 「− 1 스푼 +」 만큼만 있으면 된다. */
+  display: inline-flex;
+  align-items: center;
+  background: #FBE9E4;
+  /* 🔴 알약(999px)이다 — 「D안」(2026-08-25 사용자님이 보고 고르심).
+     둥근 네모 12px 도 만들어 봤다. 앱의 다른 칸들과는 그쪽이 맞지만, 안쪽 흰 동그라미와 나란히 놓으니
+     모양이 섞여 보였다. 안팎을 **둘 다 동그란 쪽**으로 맞춘 것이다. */
+  border-radius: 999px;
+  padding: 4px;
+}
+/* 🔴 `[data-step]` 으로 콕 집는다. `.si-step button` 같은 뭉뚱그린 선택자를 쓰지 말 것 —
+   2026-08-25 에 그렇게 뒀다가 **단위 글자까지 잡혀** 「스푼」이 17px·폭 28px 에 갇혔다.
+   그 선택자(0,1,1)가 홑클래스(0,1,0)보다 명시도가 높아 뒤에 뭘 써도 안 이겨서 원인을 찾기 어렵다. */
+.si-step [data-step] {
+  position: relative;      /* 아래 ::after(터치 영역 확장)의 기준 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  /* 🔴 **흰 동그라미로 띄운다**(2026-08-25 사용자님). 누르는 자리가 눈에 보여야 손이 정확히 간다 —
+     한 알약 안에 −·숫자·+ 가 뭉쳐 있으면 어디를 눌러야 하는지 모양으로는 안 보인다.
+     ⚠️ 그림자는 앱에서 드문 표현이다. 여기만 쓰는 이유는 **떠 있어 보여야** 눌러 보게 되기 때문이고,
+        1px 2px 로 아주 옅게만 준다(짙게 주면 이 칸만 튄다). */
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(160, 90, 70, .18);
+  color: var(--brand-red);
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.si-step [data-step]:active { transform: scale(.88); }
+/* 🔴 **손끝이 닿는 자리를 위아래로 넓힌다**(2026-08-25 사용자님 「터치가 잘 안 된다」).
+   보이는 동그라미는 34px 그대로 두고 **닿는 자리만** 44px 로 만든다 — 애플이 권하는 최소 크기다.
+   ⚠️ 좌우로는 조금만 넓힌다. 사이에 숫자 입력칸이 있어서 크게 넓히면 그 칸을 덮어 못 누르게 된다. */
+.si-step [data-step]::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: -5px;
+  bottom: -5px;
+}
+/* 가운데 숫자 — **진짜 입력칸**이다. 눌러서 0.3·2~3 같은 값을 직접 칠 수 있다.
+   🔴 −/+ 로 덮이는 것은 0.5 단위뿐이고, 실제 레시피의 4%(0.25·0.33·범위)는 이 칸으로만 적힌다. */
+.si-amt {
+  /* 🔴 **흰 칸이 「여기는 고칠 수 있다」는 신호다**(2026-08-25 사용자님 확정).
+     그냥 숫자로 두면 옆의 「스푼」(못 누르는 글자)과 같은 급으로 보인다.
+     `−`·`+` 가 이미 흰 바탕이라 셋이 같은 옷을 입으면 「손댈 수 있는 것」으로 한 번에 읽힌다.
+     🔴 다만 **동그라미보다 한 단계 작고**(26px 대 30px) **좌우를 6px 씩 띄운다.**
+        같은 크기로 붙여 놓으면 셋 다 버튼처럼 보이는데, 실제로 `−`·`+` 는 누르면 값이 바로 바뀌고
+        숫자는 키보드가 뜬다 — 하는 일이 다르니 조금 다르게 생기는 편이 맞다.
+     ⚠️ 밑줄로 표시하는 안도 만들어 봤다가 물렀다(사용자님이 이쪽을 고르심). */
+  width: 30px;
+  height: 26px;
+  margin: 0 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-red);
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 단위 글자 — **누를 수 없다.** 단위가 「스푼」 하나뿐이라 고를 것이 없다(2026-08-25 확정).
+   🔴 숫자보다 작고 덜 굵다. 주인공은 양(숫자)이고 단위는 딸린 말이라,
+      같은 굵기로 두면 「스푼」이 한글 두 글자라 폭까지 넓어 숫자를 눌러 버린다. */
+.si-unit-txt {
+  padding: 0 6px 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brand-red);
+  white-space: nowrap;
+}
+/* 검색 결과 없음 */
+.sauce-empty { padding: 40px 20px; text-align: center; font-size: 14px; color: var(--text-muted); }
+
+/* ── 아래 저장 줄 ── */
+.sauce-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--card-border);
+  background: var(--bg-card);
+}
+/* 🔴 `inline-flex` + 가운데 정렬이다(2026-08-25 사용자님 「세로 정렬이 안 맞아 보인다」).
+   안에 그림(`+` 동그라미)과 글자가 섞여 있는데, `vertical-align` 로 눈대중해 맞추면
+   글꼴이나 글자 크기가 바뀔 때마다 다시 어긋난다. 가운데 정렬은 스스로 맞는다.
+   ⚠️ flex 는 아이템 사이 공백을 지우므로 `gap` 으로 대신 띄운다. */
+.sauce-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+/* 안내문 속 담기 버튼 그림 — 목록의 `.si-add` 와 **같은 모양**이라야 「저걸 누르라」는 뜻이 통한다.
+   🔴 글자(`+`)를 그대로 담고 있다. 화면낭독기가 「더하기」로 읽어야 문장이 성립하기 때문이다. */
+.sauce-count-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--card-border);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1;
+}
+.sauce-count.is-on { color: var(--text-dark); font-weight: 700; }
+.sauce-save {
+  flex: none;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 20px;
+  background: var(--brand-red);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover:hover) { .sauce-save:not(:disabled):hover { background: var(--brand-red-hover); } }
+.sauce-save:not(:disabled):active { background: var(--brand-red-active); transform: scale(.97); }
+/* 🔴 재료를 하나도 안 담으면 저장할 수 없다 — 이름만 있는 빈 소스가 생기면 목록에서 아무 뜻이 없다 */
+.sauce-save:disabled { background: #E3D8CE; color: #fff; cursor: default; }
+
+
+/* ── 소스 만들기 화면의 초점 표시 ──────────────────────────────────────────
+   🔴 **손가락으로 누를 때는 테두리를 안 보인다.** 기본값 그대로 두면 숫자 칸을 누를 때마다
+      네모 테두리가 떴다(2026-08-25 사용자님 실기기).
+   🔴 조건이 `:focus-visible` 이 아니라 **`.kbd-nav` + `:focus`** 인 것은 앱의 규칙이다
+      (2026-08-19 확정. 아이폰 사파리는 손가락으로 눌러도 `:focus-visible` 로 치는 경우가 있어
+      그쪽만으로는 안 막힌다 — 위 `.kbd-nav .stamp-field` 주석에 경위가 있다).
+      `.kbd-nav` 는 `script.js` 가 **Tab 을 눌렀을 때만** 붙이고 손가락·마우스를 대면 뗀다.
+   ⚠️ 그러니 **키보드 사용자에게는 그대로 보인다** — 끄기만 하면 안 된다. 아래 두 벌이 짝이다. */
+.si-amt:focus,
+.si-add:focus,
+.si-step [data-step]:focus { outline: none; }
+.kbd-nav .si-amt:focus {
+  outline: 2px solid var(--brand-red);
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+.kbd-nav .si-add:focus,
+.kbd-nav .si-step [data-step]:focus {
+  outline: 2px solid var(--brand-red);
+  outline-offset: 2px;
+}
