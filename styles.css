@@ -2350,6 +2350,14 @@ a[href] {
 /* 팁에 줄바꿈(\n)을 쓰면 여러 줄로 — 조건별 팁을 나열할 때 사용.
    한 줄짜리 기존 팁은 \n이 없어 영향 없음. */
 .tip-box { white-space: pre-line; }
+/* 🔴 **띄어쓰기 없는 긴 팁이 상자를 넘던 것**을 막는다(2026-08-27 사용자님이 실기기에서 잡으심).
+   ■ 왜 — `.tip-box` 는 아이콘과 글을 나란히 놓는 flex 라, 글 칸이 기본 `min-width: auto` 다.
+     띄어쓰기가 없으면 통째로 한 덩어리여서 칸이 줄어들지 못하고 **오른쪽으로 넘쳐 잘렸다.**
+   🔴 `overflow-wrap: anywhere` 는 **다른 데서 끊을 수 없을 때만** 글자 사이를 끊으므로,
+      위의 `word-break: keep-all`(어절 가운데서 안 끊기)은 그대로 산다.
+   ⚠️ 재료 이름(`.ing-name`)도 같은 이유로 같은 처방을 썼다. 사용자가 직접 치는 글이 들어가는
+      자리를 새로 만들면 **이 짝을 함께 볼 것.** */
+#modalTip { min-width: 0; overflow-wrap: anywhere; }
 
 /* 만드는 법도 다른 섹션과 같은 흰 박스로 — 본체 위 요소는 전부 박스 문법 통일.
    번호마다 재료 행과 같은 은은한 구분선 */
@@ -5699,20 +5707,20 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 .column-bottom-close:active,
 .to-top-btn:active,
 .modal-bottom-close:active { background: #F0EAE4; }
-/* ── 내 소스 지우기 (2026-08-27) ────────────────────────────────────────────────
-   🔴 색·확인 방식은 **스티커 기록 삭제(`.stamp-view-delete`)와 같은 값**이다 — 한 번 누르면
-      빨강으로 바뀌며 「한 번 더 누르면 지워져요」가 되고, 3초 안에 안 누르면 저절로 돌아간다.
+/* ── 내 소스: 수정하기 · 지우기 (2026-08-27) ──────────────────────────────────
+   🔴 **스티커 기록 보기(`.stamp-view-btns`)와 같은 얼개**다(사용자님 지시) — 한 줄에 나란히 놓는다.
+   🔴 지우기의 색·확인 방식도 스티커(`.stamp-view-delete`)와 같은 값이다 — 한 번 누르면 빨강으로
+      바뀌며 「한 번 더 누르면 지워져요」가 되고, 3초 안에 안 누르면 저절로 돌아간다.
       같은 성격의 일에는 같은 모습을 쓴다(앱 규칙).
-   ⚠️ 「닫기」 위에 놓이고 그 사이 여백은 이 버튼이 갖는다 — 「닫기」는 다른 화면과 공용이라
+   ⚠️ 「닫기」 위에 놓이고 그 사이 여백은 이 줄이 갖는다 — 「닫기」는 다른 화면과 공용이라
       거기에 여백을 더하면 칼럼·목록의 「맨 위로」까지 같이 밀린다. */
-.modal-mine-delete {
-  width: 100%;
+.modal-mine-btns { display: flex; gap: 10px; margin-bottom: 10px; }
+.modal-mine-btns[hidden] { display: none; }   /* `display:flex` 가 `hidden` 을 이기지 않게 */
+.modal-mine-btn {
+  flex: 1;
+  min-width: 0;
   height: 48px;
-  margin-bottom: 10px;
-  border: none;
   border-radius: 12px;
-  background: #F3EDE7;
-  color: #B0554A;
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -5721,10 +5729,16 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   -webkit-tap-highlight-color: transparent;
   transition: background .12s, color .12s;
 }
-.modal-mine-delete[hidden] { display: none; }   /* `width` 때문에 밀리지 않게 — 위 `.modal-thumb[hidden]` 과 같은 처방 */
+.modal-mine-edit { border: 1px solid var(--card-border); background: #fff; color: var(--text-dark); }
+.modal-mine-edit:active { background: #F3EDE7; }
+.modal-mine-delete { border: none; background: #F3EDE7; color: #B0554A; }
 .modal-mine-delete:active { background: #E7DCD3; }
 .modal-mine-delete.armed { background: var(--brand-red); color: #fff; }
 .modal-mine-delete.armed:active { background: var(--brand-red-active); }
+/* 🔴 확인 상태가 되면 **「수정하기」가 줄고 「지우기」가 넓어진다** — 스티커가 쓰는 그 처방이다.
+   안 그러면 「한 번 더 누르면 지워져요」가 절반 폭에서 두 줄로 감긴다.
+   `0 1` 이라 더 좁은 기기에서는 수정 쪽이 먼저 양보한다. */
+.modal-mine-btns:has(.modal-mine-delete.armed) .modal-mine-edit { flex: 0 1 100px; }
 /* 🔴 푸터는 탭마다 다르다(2026-08-03 사용자 확정).
    홈 = 문구 + 링크 / 레시피 = 「맨 위로」 + 링크 / 메뉴 = 안내문 + 「맨 위로」 + 링크 /
    매장 = 안내문 + 링크 / 스티커 = 링크. 제보·문의와 이미지 출처는 어디에나 있다.

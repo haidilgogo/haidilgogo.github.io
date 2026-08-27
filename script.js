@@ -3000,7 +3000,8 @@
        한 번 더 눌러 확인한다 — 이미 앱에 있는 방식이라 새로 배울 것이 없다.
        ⚠️ 상세를 열 때마다 확인 상태를 **반드시 푼다.** 안 풀면 다른 소스를 열었는데 「한 번 더 누르면
           삭제돼요」가 떠 있어, 무심코 누르면 **엉뚱한 소스가 지워진다.** */
-    modalMineDelete.hidden = !r.mine;
+    /* 🔴 **줄 전체**를 여닫는다(2026-08-27) — 버튼을 하나씩 숨기면 남은 하나가 줄 전체로 늘어난다. */
+    if (modalMineBtns) modalMineBtns.hidden = !r.mine;
     resetModalMineDelete();
 
     const orderWrap = document.getElementById('modalOrderWrap');
@@ -3147,12 +3148,24 @@
      🔴 지운 id 는 `deleted` 에 남긴다 — 안 남기면 다른 기기와 합칠 때 **지운 소스가 되살아난다.**
      ⚠️ 카드 무늬 저장분(`browseCardCache`)도 함께 버린다. 남겨 두면 같은 id 로 다시 만들 일은
         없지만 쓸모없는 카드가 계속 쌓인다. */
+  const modalMineBtns = document.getElementById('modalMineBtns');
+  const modalMineEdit = document.getElementById('modalMineEdit');
+  /* 「수정하기」 — 이 소스를 담은 채로 만들기 시트를 연다(2026-08-27 사용자님 요청).
+     🔴 **상세를 먼저 닫는다.** 안 닫으면 시트 뒤에 상세가 그대로 남아, 시트를 X 로 닫았을 때
+        상세가 다시 드러나면서 「방금 고친 것이 왜 그대로지」로 보인다(저장은 목록으로 나간다).
+     ⚠️ 시트 쪽이 초점을 가져가므로 상세는 **되돌리지 않고** 닫는다. */
+  if (modalMineEdit) modalMineEdit.addEventListener('click', () => {
+    const r = currentModalRecipe;
+    if (!r || !r.mine || !window.openSauceSheet) return;
+    closeModal();
+    window.openSauceSheet({ 고칠것: r });
+  });
   const modalMineDelete = document.getElementById('modalMineDelete');
   let modalMineDeleteArmed = false;
   function resetModalMineDelete() {
     if (!modalMineDelete) return;
     modalMineDeleteArmed = false;
-    modalMineDelete.textContent = '지우기';
+    modalMineDelete.textContent = '삭제';
     modalMineDelete.classList.remove('armed');
     clearTimeout(modalMineDelete._t);
   }
@@ -3160,7 +3173,7 @@
     if (!currentModalRecipe || !currentModalRecipe.mine) return;
     if (!modalMineDeleteArmed) {
       modalMineDeleteArmed = true;
-      modalMineDelete.textContent = '한 번 더 누르면 지워져요';
+      modalMineDelete.textContent = '한 번 더 누르면 삭제돼요';
       modalMineDelete.classList.add('armed');
       clearTimeout(modalMineDelete._t);
       modalMineDelete._t = setTimeout(resetModalMineDelete, 3000);
@@ -6651,6 +6664,22 @@
       + ' stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
 
+    /* 저장해 둔 소스를 시트에 **되담는다**(2026-08-27 「수정하기」).
+       🔴 소스바에 있는 이름은 `picked` 로, **없는 이름은 「기타」로** 되돌린다 — 저장할 때
+          「기타」를 그냥 이름으로 적어 두기 때문에, 되돌릴 때도 그 갈래로만 나눌 수 있다.
+       ⚠️ 양은 문자열로 되돌린다(`picked`·`기타` 둘 다 `q` 가 문자열이다). 저장된 값이 숫자 꼴이
+          아닐 일은 없지만(만들기 화면이 숫자만 받는다), 옛 자료를 대비해 `1` 로 물러선다.
+       ⚠️ 이름·팁은 여기서 안 채운다 — 2단계로 넘어갈 때(`다음단계`) 채운다. */
+    function 고칠것담기(r) {
+      고치는중 = r.id;
+      (r.ings || []).forEach((i) => {
+        const 이름 = i[0];
+        const 양 = String(parseFloat(i[1]) > 0 ? parseFloat(i[1]) : 1);
+        const 단위 = i[2] || 기본단위;
+        if (SAUCE_BAR.indexOf(이름) >= 0) picked.set(이름, { q: 양, u: 단위 });
+        else 기타.push({ id: 'e' + (++기타번호), n: 이름, q: 양, u: 단위 });
+      });
+    }
     /* 🔴 이 화면에서는 **매장 이름표 그대로** 부른다(2026-08-25 사용자님 확정).
        레시피 데이터의 이름에는 낯선 말을 풀어 주는 병기(`/…`)가 붙어 있는데
        (표기 규칙: 「정식명이 낯설 때 슬래시로 붙이는 고정 부연」), 소스바 앞에서는
@@ -6681,6 +6710,10 @@
        **같은 값에서 나온다** — 한쪽만 고쳐 둘이 어긋나는 일을 막는다.
        ⚠️ 칸에 한 번에 **보이는** 글자 수와는 다르다. 보이는 수는 기기 폭에 따라 달라진다. */
     const 이름최대 = 20;
+    /* 🔴 **고치는 중인 소스의 id**(2026-08-27 사용자님 요청으로 「수정하기」를 붙이면서 생겼다).
+       `null` 이면 새로 만드는 중이다. 저장할 때 이 값으로 **새로 넣을지 고칠지**를 가른다.
+       ⚠️ 열 때마다 반드시 정해 준다 — 안 그러면 지난번에 고치던 소스를 또 덮어쓴다. */
+    let 고치는중 = null;
     let query = '';
     let 돌아갈자리 = null;
 
@@ -7008,9 +7041,13 @@
          닫는 쪽에서 비우지 않는 이유: 오버레이가 0.22초에 걸쳐 사라지는 동안 아직 보이는데,
          그때 목록을 지우면 **담은 것이 눈앞에서 하나씩 풀리는 게 보인다.**
          열 때 비우면 결과는 같으면서 그 장면이 없다.
-         ⚠️ 저장을 만들고 나면 여기가 「이어서 고치기」의 진입점이 된다 — 그때 조건을 나눠야 한다. */
+         🔴 **비운 뒤에, 고칠 것이 있으면 그것을 담는다**(2026-08-27 「수정하기」). 늘 비우고 시작하므로
+            지난번에 담았던 것이 새 소스에 섞일 일이 없다 — 순서를 바꾸지 말 것. */
       picked.clear();
       기타.length = 0;   // 🔴 기타도 함께 비운다 — 안 비우면 다음에 열었을 때 지난번 것이 남는다
+      고치는중 = null;
+      const 고칠것 = 옵션 && 옵션.고칠것;
+      if (고칠것) 고칠것담기(고칠것);
       query = '';
       searchInput.value = '';
       searchBox.classList.remove('has-value');
@@ -7115,7 +7152,10 @@
     //    여기저기서 따로 바꾸면 한 곳만 고쳤을 때 화면이 반쪽으로 어긋난다.
     function 단계그리기() {
       const 둘째 = 단계 === 2;
-      titleEl.textContent = 둘째 ? '소스 저장하기' : '소스 만들기';
+      /* 🔴 고치는 중이면 제목이 다르다(2026-08-27) — 새로 만드는 것과 헷갈리면
+         「내가 지금 뭘 하고 있나」를 화면이 안 알려 주는 셈이 된다. */
+      titleEl.textContent = 둘째 ? (고치는중 ? '소스 고치기' : '소스 저장하기')
+                                 : (고치는중 ? '소스 고치기' : '소스 만들기');
       listEl.hidden = 둘째;
       formEl.hidden = !둘째;
       // 🔴 2단계에서는 검색창을 감춘다 — 재료 목록이 없는 화면에서 검색은 뜻이 없다.
@@ -7156,8 +7196,11 @@
         기타.splice(i, 1);
       }
       단계 = 2;
-      nameInput.value = '';
-      tipInput.value = '';
+      /* 🔴 고치는 중이면 **적어 둔 이름·팁을 채워 준다**(2026-08-27). 비워 두면 고치러 왔는데
+         이름을 다시 쳐야 한다. ⚠️ 새로 만드는 중이면 반드시 비운다 — 지난번 값이 남으면 안 된다. */
+      const 원본 = 고치는중 ? (mySauceData.records || []).find((x) => x.id === 고치는중) : null;
+      nameInput.value = 원본 ? (원본.name || '') : '';
+      tipInput.value = 원본 ? (원본.tip || '') : '';
       단계그리기();
       /* 🔴 **담은 것을 여기서 한 번 보여 준다**(2026-08-27 사용자님 제안). 2단계에서는 개수 줄이
          「뒤로」에 자리를 내줘서 **뭘 담았는지 아예 안 보였다** — 확인하려면 뒤로 갔다 와야 했다.
@@ -7199,20 +7242,35 @@
          ⚠️ 양은 마지막으로 한 번 더 정리한다. 숫자 칸을 비운 채 「다음」으로 넘어오면 `''` 가
             그대로 저장돼 상세에서 양이 안 보인다. */
       const 재료 = 담은재료();
-      mySauceData.records.push({
-        id: newMySauceId(),
-        name: 이름,
-        ings: 재료,
-        tip: tipInput.value.trim(),
-        addedAt: 지금,
-        // 🔴 처음 만들 때도 `editedAt` 을 넣는다 — 합치기가 「마지막으로 손댄 시각」으로 견주는데,
-        //    비워 두면 나중에 고치는 길이 생겼을 때 옛 기록만 기준이 달라진다.
-        editedAt: 지금,
-      });
+      const 팁 = tipInput.value.trim();
+      /* 🔴 **고치는 중이면 새로 넣지 않고 그 기록을 고친다**(2026-08-27 「수정하기」).
+         `id` 와 `addedAt` 은 그대로 두고 `editedAt` 만 새로 찍는다 —
+         합치기가 「마지막으로 손댄 시각」으로 견주므로, 다른 기기의 옛 내용이 이걸 덮지 않는다.
+         ⚠️ 고치던 소스가 그새 사라졌으면(다른 기기에서 지웠다) **새로 넣는다.** 없는 것을 고치려다
+            사용자님이 방금 한 일이 통째로 사라지는 편보다 낫다. */
+      const 자리 = 고치는중 ? (mySauceData.records || []).findIndex((x) => x.id === 고치는중) : -1;
+      if (자리 >= 0) {
+        const 옛것 = mySauceData.records[자리];
+        mySauceData.records[자리] = Object.assign({}, 옛것, {
+          name: 이름, ings: 재료, tip: 팁, editedAt: 지금,
+        });
+      } else {
+        mySauceData.records.push({
+          id: newMySauceId(),
+          name: 이름,
+          ings: 재료,
+          tip: 팁,
+          addedAt: 지금,
+          // 🔴 처음 만들 때도 `editedAt` 을 넣는다 — 합치기가 「마지막으로 손댄 시각」으로 견주는데,
+          //    비워 두면 옛 기록만 기준이 달라진다.
+          editedAt: 지금,
+        });
+      }
+      const 고쳤나 = 자리 >= 0;
       saveMySauces();
       close({ 초점복귀: false });
       내소스로가기();
-      if (window.showToast) window.showToast('소스를 저장했어요');
+      if (window.showToast) window.showToast(고쳤나 ? '소스를 고쳤어요' : '소스를 저장했어요');
     }
 
     nameInput.addEventListener('input', 버튼갱신);
