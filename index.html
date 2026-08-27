@@ -849,13 +849,31 @@
             붙일 자리는 이름 칸 **위**다. -->
     <div class="sauce-form" id="sauceForm" hidden>
       <p class="stamp-req-note"><span class="stamp-req-star">*</span> 필수 입력</p>
-      <p class="stamp-q">어떤 이름으로 저장할까요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
+      <p class="stamp-q">어떤 이름이 좋을까요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
+      <!-- 🔴 **최대 10자**다(2026-08-27 사용자님 확정. 20자에서 줄였다).
+           근거 = 레시피 이름 59개 중 10자를 넘는 것은 **하나뿐**이고(「라젤(이 아는 동생)소스」 13자)
+           58개가 8자 이하다. 그리고 10자면 320px 칸(14자 들어감)에 **치는 글자가 늘 다 보인다.**
+           ⚠️ 이름표를 「이름」에서 「소스 이름」으로 늘리면서 칸이 28px 좁아졌는데(200→172px),
+              글자 수를 줄여 그만큼 상쇄했다. 둘은 짝이다 — 한쪽만 되돌리지 말 것.
+           ⚠️ **직접 입력 재료는 20자 그대로**다(같은 날 사용자님 확정). 두 칸의 제한이 다른 것은
+              일부러 그런 것이다 — 소스 이름은 목록 카드에 나오고 재료는 목록 안에 나온다. -->
       <div class="stamp-fields">
-        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">이름</span><input type="text" id="sauceSaveName" maxlength="20" placeholder="예: 우리집소스 (최대 20자)" autocomplete="off" enterkeyhint="next" aria-label="소스 이름"></label>
+        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">소스 이름</span><input type="text" id="sauceSaveName" maxlength="10" placeholder="홍길동소스(최대 10자)" autocomplete="off" enterkeyhint="next" aria-label="소스 이름"></label>
       </div>
-      <p class="stamp-q">기억하고 싶은 팁이 있나요?</p>
+      <!-- 🔴 「기억하고 싶은 팁이 있나요?」에서 바꿨다(2026-08-27 사용자님). 그 말은 스티커 기록에서
+           그대로 가져온 것이었는데, **스티커는 일기라 「기억」이 맞지만 여기 팁은 다음에 만들 때
+           쓰거나 친구에게 알려 줄 요령**이다. 「나만의 소스」와 말이 이어지고, 만드는 요령이든
+           먹는 법이든 다 담긴다.
+           ⚠️ 옆 질문이 「어떤 이름이 **좋을까요**?」라 묻는 말이 겹치지 않는다. 한쪽만 바꾸지 말 것.
+           🔴 **최대 60자**다(2026-08-27 사용자님. 40자로 줄였다가 되돌렸다).
+             근거 = 기존 레시피의 팁 17개를 재 보니 **40자면 3개가 잘리고 60자면 2개만 잘린다**
+             (가운데값 29자 · 가장 김 68자). 스티커 메모(40자)보다 긴 이유는 **여기가 할 말이 더
+             많은 자리**라서다 — 스티커는 「누구와 갔다」는 한마디지만 팁은 만드는 요령이라 문장이 길다.
+             ⚠️ 60자면 상세 화면에서 320px 기준 **세 줄**까지 간다. 넘치지는 않는다.
+           ⚠️ 괄호 앞을 띄우지 않는다. 스티커의 두 칸이 전부 붙여 쓴다(「메모해보세요(최대 40자)」). -->
+      <p class="stamp-q">나만의 팁이 있나요?</p>
       <div class="stamp-fields">
-        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">팁</span><input type="text" id="sauceSaveTip" maxlength="60" placeholder="간단하게 적어보세요 (최대 60자)" autocomplete="off" enterkeyhint="done" aria-label="나만의 팁"></label>
+        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">팁</span><input type="text" id="sauceSaveTip" maxlength="60" placeholder="간단하게 적어보세요(최대 60자)" autocomplete="off" enterkeyhint="done" aria-label="나만의 팁"></label>
       </div>
       <!-- 담은 재료 — 저장하기 전에 한 번 보여 준다 (2026-08-27 사용자님 제안).
            🔴 안쪽 줄은 JS 가 `renderIngList` 로 그린다. **상세 모달과 같은 부품**이라
@@ -1369,7 +1387,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=724"></script>
+<script src="script.js?v=728"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
