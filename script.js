@@ -21,7 +21,7 @@
     // 1) 베이스 소스 (참기름은 베이스로 취급 — 사용자 지정)
     '땅콩참깨소스', '스위트칠리소스', '고추귀리소스', '칠리갈릭소스', '라조장', '부추소스', '버섯소스', '사차장', '발효콩장', '발효두부소스', '청유훠궈소스', '참기름',
     // 2) 액체 양념
-    '굴소스', '간장소스', '중국식초',
+    '굴소스', '완자간장소스', '중국식초',
     // 3) 고기·건더기
     '매운소고기소스', '오향우육/다진 고기', '튀긴대두',
     // 4) 채소·향신
@@ -45,6 +45,14 @@
   // 재료 한 줄의 **화면에 보이는 이름**. 네 번째 칸이 있으면 괄호로 붙인다.
   // 🔴 이름을 그리는 곳은 전부 이것을 거친다(상세·검색·앞으로 만들 소스바 화면). 직접 `i[0]` 을 쓰지 말 것.
   const ingLabel = (i) => (i && i[3]) ? i[0] + '(' + i[3] + ')' : (i ? i[0] : '');
+  /* 🔴 **사람이 쓴 글자를 화면 코드(HTML)에 얹기 전에 반드시 거친다**(2026-08-27).
+     레시피 데이터는 전부 우리가 적은 것이라 이런 장치가 필요 없었는데, 「나만의 소스」부터는
+     **사용자님이 직접 이름과 팁을 친다.** 그대로 얹으면 `<b>` 같은 글자가 글자가 아니라
+     **명령으로 읽힌다** — 이름에 그런 글자를 넣으면 카드가 깨진다.
+     ⚠️ `"` 까지 바꾸는 이유는 `aria-label="…"` 처럼 **따옴표 안에** 들어가는 자리가 있어서다.
+     ⚠️ 글자를 그대로 넣는 자리(`textContent`)에는 쓰지 않는다 — 거기서는 브라우저가 이미 안전하다. */
+  const escHtml = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   /* 정식 단위 (국자=탕 국물 뜰 때, 그릇=소스바 종지)
      🔴 **`티스푼`은 2026-08-25 에 없앴다. 되살리지 말 것** — 옛 규칙(「티스푼은 스푼과 다른 크기이므로
         원본대로 유지」, 2026-07-11)을 사용자님이 현장 확인으로 뒤집으셨다.
@@ -186,15 +194,15 @@
       steps: [],
       tip: '' },
     { id: 's5', date: '2025-04-11', cat: '소스', emoji: '🥣', img: 'assets/cards/영지소스_2025.jpg?v=4', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5E6D3,#E8C9A0)', name: '영지소스', ver: '2025', source: 'YouTube 채널십오야', star: true, person: '이영지', desc: '<b>나영석의 보글보글</b> 촬영 중 <b>이영지</b>가 공개한 소스로, <b>나영석</b>이 <u>그룹 활동을 하고 있음에도 불구하고 솔로 가수가 되기 위해 노력하고 있는 느낌의 소스다</u>라고 했다.',
-      ings: [['땅콩참깨소스', '2', '스푼'], ['스위트칠리소스', '1.5', '스푼'], ['태국고추', '2', '스푼'], ['마라시즈닝/고춧가루', '1.5', '스푼'], ['다진 파', '1.5', '스푼'], ['다진 마늘', '1', '스푼'], ['참기름', '2', '바퀴'], ['간장소스', '1', '바퀴'], ['오향우육/다진 고기', '1.5', '스푼'], ['참깨', '', '적당히'], ['설탕', '', '한 꼬집'], ['땅콩가루', '', '한 꼬집']],
+      ings: [['땅콩참깨소스', '2', '스푼'], ['스위트칠리소스', '1.5', '스푼'], ['태국고추', '2', '스푼'], ['마라시즈닝/고춧가루', '1.5', '스푼'], ['다진 파', '1.5', '스푼'], ['다진 마늘', '1', '스푼'], ['참기름', '2', '바퀴'], ['완자간장소스', '1', '바퀴'], ['오향우육/다진 고기', '1.5', '스푼'], ['참깨', '', '적당히'], ['설탕', '', '한 꼬집'], ['땅콩가루', '', '한 꼬집']],
       steps: [],
       tip: '' },
     { id: 's7', date: '2025-04-11', cat: '소스', emoji: '🥣', img: 'assets/cards/마크소스.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#FDEBD0,#F5C99B)', name: '마크소스', source: 'YouTube 채널십오야', star: true, person: '마크', desc: '<b>나영석의 보글보글</b> 촬영 중 <b>마크</b>가 최초로 공개한 소스로, <b>나영석</b>이 <u>그룹 활동에 최적화된 소스다</u>라고 했다.',
-      ings: [['땅콩참깨소스', '2', '스푼'], ['다진 마늘', '1.5', '스푼'], ['양파', '1.5', '스푼'], ['굴소스', '1', '스푼'], ['태국고추', '1', '스푼'], ['간장소스', '2', '스푼'], ['오향우육/다진 고기', '', '적당히'], ['다진 파', '', '적당히'], ['땅콩가루', '', '적당히'], ['마라시즈닝/고춧가루', '', '적당히']],
+      ings: [['땅콩참깨소스', '2', '스푼'], ['다진 마늘', '1.5', '스푼'], ['양파', '1.5', '스푼'], ['굴소스', '1', '스푼'], ['태국고추', '1', '스푼'], ['완자간장소스', '2', '스푼'], ['오향우육/다진 고기', '', '적당히'], ['다진 파', '', '적당히'], ['땅콩가루', '', '적당히'], ['마라시즈닝/고춧가루', '', '적당히']],
       steps: [],
       tip: '' },
     { id: 's14', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#EAF3D8,#C9DFA0)', name: '라젤소스', source: 'YouTube 라젤Razel', person: '라젤', desc: '유튜버 <b>라젤</b>이 본인의 이름을 붙인 간장 베이스 소스로, 건희소스와 번갈아 먹으면 질리지 않게 먹을 수 있다고 한다.',
-      ings: [['양파', '', '넉넉하게'], ['간장소스', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고추기름', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['중국식초', '1', '스푼'], ['참기름', '0.5', '스푼'], ['태국고추', '', '넉넉하게']],
+      ings: [['양파', '', '넉넉하게'], ['완자간장소스', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고추기름', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['중국식초', '1', '스푼'], ['참기름', '0.5', '스푼'], ['태국고추', '', '넉넉하게']],
       steps: [],
       tip: '' },
     { id: 's15', date: '2026-05-18', cat: '소스', emoji: '🥣', img: 'assets/cards/라젤(이 아는 동생)소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E8D6,#DCC39E)', name: '라젤(이 아는 동생)소스', nameHtml: '라젤<span class="name-sub">(이 아는 동생)</span>소스', source: 'YouTube 라젤Razel', person: '라젤', desc: '유튜버 <b>라젤</b>이 <u>아는 동생이 진짜 건강하게 츠묵고 산다</u>며 소개한 소스이다.',
@@ -203,7 +211,7 @@
       tip: '' },
     { id: 's17', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/세훈소스(간장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#EFE3CE,#DBC5A0)', name: '세훈소스', ver: '간장', source: 'YouTube 밥은영', star: true, person: '세훈', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>엑소</b>의 <b>세훈</b>이 공개한 소스이다.',
       order: [['우유/청유 마라훠궈', '1', '스푼']],
-      ings: [['간장소스', '3', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '3', '스푼'], ['양파', '3', '스푼'], ['고수', '2', '스푼'], ['태국고추', '', '적당히']],
+      ings: [['완자간장소스', '3', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '3', '스푼'], ['양파', '3', '스푼'], ['고수', '2', '스푼'], ['태국고추', '', '적당히']],
       steps: [],
       tip: '홍탕 1T는 취향에 맞게 넣기' },
     { id: 's18', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/세훈소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6EEDD,#E7D6BA)', name: '세훈소스', ver: '마장', source: 'YouTube 밥은영', star: true, person: '세훈', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>엑소</b>의 <b>세훈</b>이 공개한 소스로, <u>정통파들은 소스바 대신 홍탕에 있는 고추기름을 넣는다</u>라고 했다.',
@@ -221,7 +229,7 @@
       steps: [],
       tip: '부추 소스, 홍두부 소스가 소스바에 없는 경우에는 하이디라오 직원분께 요청하기' },
     { id: 's21', date: '2025-04-26', cat: '소스', emoji: '🥣', img: 'assets/cards/장하오소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2EEE6,#E2DACB)', name: '장하오소스', source: 'MBC 전지적 참견 시점', star: true, person: '장하오', desc: '<b>전지적 참견 시점</b> 촬영 중 <b>제로베이스원</b>의 <b>장하오</b>가 멤버들과 함께 하이디라오에 방문했을 때 공개한 소스이다.',
-      ings: [['다진 파', '1', '스푼'], ['양파', '0.5', '스푼'], ['다진 마늘', '0.5', '스푼'], ['발효콩장', '1', '스푼'], ['참기름', '2', '스푼'], ['굴소스', '1', '스푼'], ['간장소스', '0.5', '스푼'], ['오향우육/다진 고기', '1', '스푼'], ['발효두부소스', '2', '스푼'], ['버섯소스', '1', '스푼'], ['매운소고기소스', '1', '스푼'], ['태국고추', '', '적당히'], ['고수', '', '적당히'], ['참깨', '', '적당히'], ['중국식초', '', '적당히']],
+      ings: [['다진 파', '1', '스푼'], ['양파', '0.5', '스푼'], ['다진 마늘', '0.5', '스푼'], ['발효콩장', '1', '스푼'], ['참기름', '2', '스푼'], ['굴소스', '1', '스푼'], ['완자간장소스', '0.5', '스푼'], ['오향우육/다진 고기', '1', '스푼'], ['발효두부소스', '2', '스푼'], ['버섯소스', '1', '스푼'], ['매운소고기소스', '1', '스푼'], ['태국고추', '', '적당히'], ['고수', '', '적당히'], ['참깨', '', '적당히'], ['중국식초', '', '적당히']],
       steps: [],
       tip: '태국고추, 고수, 참깨, 중국식초는 취향에 맞게 넣기' },
     { id: 's22', date: '2026-05-25', cat: '소스', emoji: '🥣', img: 'assets/cards/수코소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#EAF3E0,#CFE3BC)', name: '수코소스', source: 'YouTube sookoh 수코', person: '수코', desc: '유튜버 <b>수코</b>가 혼자 상하이에 있는 하이디라오 와이탄점에 방문해서 공개한 소스이다.',
@@ -233,7 +241,7 @@
       steps: [],
       tip: '' },
     { id: 's24', date: '2025-10-07', cat: '소스', emoji: '🥣', img: 'assets/cards/김풍소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F4E7D6,#E4CBA6)', name: '김풍소스', source: 'YouTube 라꼰즈', star: true, person: '김풍', desc: '<b>김풍</b> 작가가 <b>파김치갱</b> 멤버들과 함께 하이디라오에서 회식을 하며 공개한 소스로, <u>이 소스 천만 소스 간다</u>라며 소개했다.',
-      ings: [['땅콩참깨소스', '2', '스푼'], ['발효콩장', '1', '스푼'], ['중국식초', '1', '스푼'], ['굴소스', '1', '스푼'], ['칠리갈릭소스', '1', '스푼'], ['간장소스', '1', '스푼'], ['다진 파', '', '적당히'], ['양파', '', '적당히']],
+      ings: [['땅콩참깨소스', '2', '스푼'], ['발효콩장', '1', '스푼'], ['중국식초', '1', '스푼'], ['굴소스', '1', '스푼'], ['칠리갈릭소스', '1', '스푼'], ['완자간장소스', '1', '스푼'], ['다진 파', '', '적당히'], ['양파', '', '적당히']],
       steps: [],
       tip: '' },
     { id: 's25', date: '2025-02-28', cat: '소스', emoji: '🥣', img: 'assets/cards/우기소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F0EFD9,#D6D4A2)', name: '우기소스', source: 'YouTube 미연zip MIYEON', star: true, person: '우기', desc: '<b>(여자)아이들</b> <b>미연</b>의 유튜브 촬영 중 같은 멤버 <b>우기</b>가 공개한 소스로, 자막으로 안내된 레시피와 실제 제조 과정이 달라 영상을 직접 판독해 만든 그대로 옮겨 적었다.',
@@ -241,7 +249,7 @@
       steps: [],
       tip: '' },
     { id: 's26', date: '2024-10-01', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스_2024.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '2024', source: 'Instagram @in2yourblue', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 인스타그램 스토리를 통해서 공개한 소스로, <u>님들 나 대단한 소스를 하나 더 만들어냄</u>이라며 소개했다.',
-      ings: [['양파', '3', '스푼'], ['다진 파', '1', '스푼'], ['태국고추', '', '적당히'], ['간장소스', '2', '스푼'], ['중국식초', '0.7~1', '스푼'], ['다진 마늘', '0.5', '스푼'], ['굴소스', '0.3', '스푼'], ['고추기름', '0.3', '스푼'], ['참깨', '', '적당히']],
+      ings: [['양파', '3', '스푼'], ['다진 파', '1', '스푼'], ['태국고추', '', '적당히'], ['완자간장소스', '2', '스푼'], ['중국식초', '0.7~1', '스푼'], ['다진 마늘', '0.5', '스푼'], ['굴소스', '0.3', '스푼'], ['고추기름', '0.3', '스푼'], ['참깨', '', '적당히']],
       steps: [],
       tip: '태국고추는 취향에 맞게 넣고, 홍탕에서 건진 고기, 푸주, 새우 완자를 소스에 절여진 양파와 함께 먹는게 포인트' },
     { id: 's27', date: '2025-03-27', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스_2025.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '리뉴얼 · 2025', source: 'YouTube 다비드 봉', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 단맛 버전을 리뉴얼해 공개한 소스로, <u>입맛이 바뀌어서 조금 달라졌다</u>라며 설탕을 빼는 등 기존 레시피에서 단맛을 많이 낮췄다.',
@@ -273,20 +281,20 @@
       steps: [],
       tip: '' },
     { id: 's34', date: '2025-07-29', cat: '소스', emoji: '🥣', img: 'assets/cards/사인클소스_2025.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#6B7799,#4A5470)', name: '사인클소스', ver: '리뉴얼 · 2025', source: 'X @gimsyabeu', person: '사회인 게임클럽', desc: '유튜버 <b>사회인 게임클럽</b>의 횐이인 <b>김샤브</b>가 추천한 <b>사인클소스</b>의 리뉴얼 버전이다.',
-      ings: [['간장소스', '1.5', '스푼'], ['스위트칠리소스', '1', '스푼'], ['굴소스', '1', '스푼'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히']],
+      ings: [['완자간장소스', '1.5', '스푼'], ['스위트칠리소스', '1', '스푼'], ['굴소스', '1', '스푼'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히']],
       steps: [],
       tip: '너무 짜면 간장소스를 0.5스푼만 넣거나 취향에 맞게 조절하기' },
     { id: 's35', date: '2025-07-29', cat: '소스', emoji: '🥣', img: 'assets/cards/사인클양파소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#3A3A3A,#111111)', name: '사인클양파소스', source: 'X @gimsyabeu', person: '사회인 게임클럽', desc: '유튜버 <b>사회인 게임클럽</b>의 횐이인 <b>김샤브</b>가 추천한 <b>사인클소스</b>에 양파가 가득 들어간 버전이다.',
-      ings: [['간장소스', '2', '스푼'], ['스위트칠리소스', '1', '스푼'], ['양파', '', '넉넉하게'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['굴소스', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히']],
+      ings: [['완자간장소스', '2', '스푼'], ['스위트칠리소스', '1', '스푼'], ['양파', '', '넉넉하게'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['굴소스', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히']],
       steps: [],
       tip: '너무 짜면 간장소스를 0.5스푼만 넣거나 취향에 맞게 조절하기' },
     { id: 's36', date: '2024-02-13', cat: '소스', emoji: '🥣', img: 'assets/cards/사인클소스(오리지널)_2024.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#6B7799,#4A5470)', name: '사인클소스', ver: '오리지널 · 2024', source: 'X @gimsyabeu', person: '사회인 게임클럽', desc: '유튜버 <b>사회인 게임클럽</b>의 횐이인 <b>김샤브</b>가 추천하는 소스로, <b>건희소스</b>와 궁합이 좋다고 한다.',
-      ings: [['간장소스', '1.5', '스푼'], ['스위트칠리소스', '2', '스푼'], ['굴소스', '0.5', '스푼'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히'], ['땅콩가루', '', '적당히']],
+      ings: [['완자간장소스', '1.5', '스푼'], ['스위트칠리소스', '2', '스푼'], ['굴소스', '0.5', '스푼'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히'], ['땅콩가루', '', '적당히']],
       steps: [],
       tip: '' },
     { id: 'b3', cat: '탕', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
       order: [['맑은 탕/맹물', '', '']],
-      ings: [['굴소스', '3', '스푼'], ['간장소스', '1', '그릇'], ['오향우육/다진 고기', '2', '스푼'], ['다진 마늘', '0.5', '스푼'], ['다진 파', '0.5', '그릇'], ['설탕', '2', '스푼'], ['소금', '3', '스푼']],
+      ings: [['굴소스', '3', '스푼'], ['완자간장소스', '1', '그릇'], ['오향우육/다진 고기', '2', '스푼'], ['다진 마늘', '0.5', '스푼'], ['다진 파', '0.5', '그릇'], ['설탕', '2', '스푼'], ['소금', '3', '스푼']],
       steps: [
         '국자를 이용해 맑은 탕의 물을 소스 그릇에 덜어둔다',
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
@@ -306,7 +314,7 @@
       tip: '굴소스는 취향에 맞게 조절해서 넣기' },
     { id: 'b5', cat: '탕', emoji: '🍲', img: 'assets/cards/마라훠궈탕.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '마라훠궈탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라훠궈탕이다.',
       order: [['맑은 탕/맹물', '', '']],
-      ings: [['청유훠궈소스', '6', '스푼'], ['산초기름', '6', '스푼'], ['굴소스', '5', '스푼'], ['고추기름', '6', '스푼'], ['땅콩참깨소스', '5', '스푼'], ['다진 마늘', '5', '스푼'], ['간장소스', '4', '스푼'], ['참기름', '4', '스푼'], ['소금', '', '한 꼬집'], ['매운소고기소스', '2', '스푼']],
+      ings: [['청유훠궈소스', '6', '스푼'], ['산초기름', '6', '스푼'], ['굴소스', '5', '스푼'], ['고추기름', '6', '스푼'], ['땅콩참깨소스', '5', '스푼'], ['다진 마늘', '5', '스푼'], ['완자간장소스', '4', '스푼'], ['참기름', '4', '스푼'], ['소금', '', '한 꼬집'], ['매운소고기소스', '2', '스푼']],
       steps: [
         '직원분께 맑은 탕 물의 절반을 빼 달라고 요청한다',
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
@@ -314,14 +322,14 @@
       tip: '' },
     { id: 'b6', date: '2025-02-05', cat: '탕', emoji: '🍲', img: 'assets/cards/혼자햐탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '혼자햐탕', source: 'YouTube 혼자햐', desc: '유튜버 <b>혼자햐</b>가 혼자 하이디라오에 가서 맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라탕이다.',
       order: [['맑은 탕/맹물', '', '']],
-      ings: [['땅콩참깨소스', '6', '스푼'], ['참기름', '3', '스푼'], ['산초기름', '3', '스푼'], ['고추기름', '3', '스푼'], ['청유훠궈소스', '3', '스푼'], ['다진 마늘', '3', '스푼'], ['굴소스', '3', '스푼'], ['간장소스', '3', '스푼'], ['참깨', '', '적당히'], ['소금', '', '적당히']],
+      ings: [['땅콩참깨소스', '6', '스푼'], ['참기름', '3', '스푼'], ['산초기름', '3', '스푼'], ['고추기름', '3', '스푼'], ['청유훠궈소스', '3', '스푼'], ['다진 마늘', '3', '스푼'], ['굴소스', '3', '스푼'], ['완자간장소스', '3', '스푼'], ['참깨', '', '적당히'], ['소금', '', '적당히']],
       steps: [
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
       ],
       tip: '화한 맛이 부족하면 산초기름 더 넣기\n매운맛이 부족하면 청유훠궈소스 더 넣기\n국물에 깊이가 없으면 땅콩참깨소스 더 넣기' },
     { id: 'b7', date: '2026-06-10', cat: '탕', emoji: '🍲', img: 'assets/cards/지새기탕.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBEBD0,#EFCB94)', name: '지새기탕', source: 'YouTube 지새기의 인간극장', desc: '유튜버 <b>지새기</b>가 마라탕을 셀프로 만들기 위해 레시피를 미리 공부까지 해갔으나, 정작 소스바 앞에서 본인 마음대로 조합하다가 맛이 애매해졌다. 이를 가엽게 여긴 <s>천사가</s> 직원이 나타나 만들어준 비법 레시피이다.',
       order: [['맑은 탕/맹물', '', '']],
-      ings: [['땅콩참깨소스', '1', '그릇'], ['땅콩참깨소스', '1', '스푼'], ['산초기름', '6', '스푼'], ['소금', '2', '스푼'], ['설탕', '6', '스푼'], ['굴소스', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['간장소스', '1', '스푼'], ['참기름', '1', '스푼'], ['태국고추', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['매운소고기소스', '1', '스푼'], ['청유훠궈소스', '1', '스푼']],
+      ings: [['땅콩참깨소스', '1', '그릇'], ['땅콩참깨소스', '1', '스푼'], ['산초기름', '6', '스푼'], ['소금', '2', '스푼'], ['설탕', '6', '스푼'], ['굴소스', '1', '스푼'], ['마라시즈닝/고춧가루', '1', '스푼'], ['완자간장소스', '1', '스푼'], ['참기름', '1', '스푼'], ['태국고추', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['매운소고기소스', '1', '스푼'], ['청유훠궈소스', '1', '스푼']],
       steps: [
         '직원분께 맑은 탕 물의 절반을 빼 달라고 요청한다',
         '소스바에서 가져온 재료를 물이 끓으면 넣고 계속 끓여준다',
@@ -329,7 +337,7 @@
       tip: '' },
     { id: 'r1', date: '2025-01-16', cat: '히든메뉴', emoji: '🍚', img: 'assets/cards/메기살덮밥.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFF6DC,#FCE4AE)', name: '메기살덮밥', source: 'X @dduuuu__', desc: '홍탕에 익힌 메기살을 특제소스에 비빈 밥에 얹어 먹는 히든 메뉴이다.',
       order: [['우유/청유 마라훠궈', '', ''], ['팡가시우메기', '1', '인분'], ['공깃밥', '1', '공기']],
-      ings: [['참기름', '1', '스푼'], ['간장소스', '1', '스푼'], ['굴소스', '0.5', '스푼'], ['중국식초', '0.5', '스푼'], ['다진 파', '1', '스푼']],
+      ings: [['참기름', '1', '스푼'], ['완자간장소스', '1', '스푼'], ['굴소스', '0.5', '스푼'], ['중국식초', '0.5', '스푼'], ['다진 파', '1', '스푼']],
       steps: [
         '소스바에서 소스를 만든다',
         '메기살은 마라훠궈 국물에 넣어 익히고, 공깃밥에는 소스를 부어 비빈다',
@@ -448,6 +456,95 @@
     }
   })();
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     나만의 소스 — 저장 (2026-08-27)
+
+     🔴 **고치기 전에 `docs/나만의소스-얼개.md` 5절을 읽을 것.** 결정은 전부 거기에 근거와 함께 있다.
+
+     ■ 무엇: 소스 만들기 시트(파일 아래쪽 `소스만들기` IIFE)에서 담은 재료에 **이름과 팁**을 붙여
+        이 기기에 저장하고, 「내 코드」로 다른 기기에도 나른다.
+
+     🔴 **`RECIPES` 에 섞지 않는다**(2026-08-27 사용자님 확정). 저장한 소스는 이 목록에만 있고
+        **「내 소스」 탭에서만** 보인다 — 전체·소스 탭, 검색, 홈 인기소스, 가챠, 순위 배지
+        어디에도 안 들어간다.
+        ■ 왜 — 인기순 정렬과 순위 배지는 **공개 레시피를 좋아요로 줄 세운 자리**다.
+          좋아요가 아예 없는 내 소스가 그 줄에 끼면 뜻이 어긋난다(얼개 3절이 내 소스 카드에서
+          좋아요·즐겨찾기를 뺀 것과 같은 판단이다).
+
+     🔴 **저장 키는 화면 위치와 분리돼 있다**(얼개 5절, 코덱스 지적). 지금은 레시피 탭 안의
+        탭 하나지만 나중에 하단 탭으로 올려도 이 자료는 안 흔들린다.
+
+     🔴 **합치기는 항목별이다 — 스티커 기록과 같은 방식**(얼개 5절). 그래서 `deleted` 를 함께
+        나른다. ⚠️ 메뉴 탭 방식(「최신 것이 통째로 이긴다」)을 쓰면 **한쪽 기기에서 만든 소스가
+        통째로 사라진다.** 담은 목록은 「지금 이 한 벌」이라 그 방식이 맞지만, 내 소스는
+        여러 개를 각각 저장하므로 다르다. 합치기 코드는 맨 아래 「내 데이터 코드」 절에 있다.
+     ══════════════════════════════════════════════════════════════════════════ */
+  const MY_SAUCES_KEY = 'haidilao_my_sauces';
+  /* 저장 모양 — `{ version, records, deleted }`
+     기록 하나 = `{ id, name, ings: [[재료, 양, 단위]], tip, addedAt, editedAt }`
+     🔴 `deleted` 는 **지운 id 목록**이다. 안 남기면 다른 기기와 합칠 때 지운 소스가 되살아난다. */
+  let mySauceData = { version: 1, records: [], deleted: [] };
+  try {
+    const 저장된내소스 = JSON.parse(localStorage.getItem(MY_SAUCES_KEY));
+    if (저장된내소스 && Array.isArray(저장된내소스.records)) {
+      mySauceData = {
+        version: 1,
+        records: 저장된내소스.records,
+        // 옛 저장값에 `deleted` 가 없을 수 있다 — 없으면 빈 목록으로 시작한다
+        deleted: Array.isArray(저장된내소스.deleted) ? 저장된내소스.deleted : [],
+      };
+    }
+  } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
+  function saveMySauces() {
+    try { localStorage.setItem(MY_SAUCES_KEY, JSON.stringify(mySauceData)); } catch (e) { /* 시크릿 모드 등 저장 실패 무시 */ }
+    schedulePush(); // 서버 사본 갱신 + 코드 생성(맨 아래 「내 데이터 코드」 절)
+  }
+  /* 🔴 접두어 `ms` 는 **레시피 id(`s1`·`h1`·`t1`)와도, 스티커 기록 id(`r…`)와도** 겹치지 않게 고른 것이다.
+     셋이 같은 코드에 실려 한 덩어리로 오가므로 겹치면 서로 덮어쓴다. */
+  function newMySauceId() {
+    return 'ms' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+  /* 저장 기록 → **레시피 모양**으로 바꾼다. 카드와 상세 모달을 새로 만들지 않고 그대로 쓰기 위한 것이다
+     (얼개 1절: 「보는 화면은 새로 만들 것이 없다 — 상세 모달이 이미 그 일을 한다」).
+     🔴 `steps` 는 **반드시 배열**이어야 한다 — `openModal` 이 `r.steps.length` 를 그냥 읽는다(방어 없음).
+     🔴 `emoji`·`tint` 는 **일부러 안 넣는다**(얼개 3절 사용자님 확정). 썸네일 자리는
+        `homeCardBody` 의 `r.mine` 갈래가 **담긴 재료 이름**으로 채운다.
+     🔴 `nameHtml` 에 **글자를 안전하게 바꾼 이름**을 넣어 둔다 — 이름을 화면 코드로 얹는 자리
+        (`nameWithStar`)가 이 값을 먼저 쓴다. 위 `escHtml` 주석 참고.
+     ⚠️ `mine: true` 가 카드·모달·걸러내기의 **갈림길**이다. 빼면 남의 레시피처럼 그려진다. */
+  function mySauceToRecipe(rec) {
+    return {
+      id: rec.id,
+      cat: '소스',
+      mine: true,
+      name: rec.name || '',
+      nameHtml: escHtml(rec.name || ''),
+      ings: rec.ings || [],
+      steps: [],
+      tip: rec.tip || '',
+    };
+  }
+  /* 🔴 **최신순**이다 — `byPopular`(인기순)를 쓰지 않는다. 내 소스에는 좋아요가 아예 없어서
+     인기순으로 세우면 전부 동점이 되고 동점 규칙만 남는데, **왜 그 순서인지가 코드에서 안 보인다.**
+     방금 만든 것이 맨 앞에 오는 것이 이 화면의 규칙이다(저장하면 그 자리로 데려간다). */
+  function mySauceRecipes() {
+    return mySauceData.records
+      .slice()
+      .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0))
+      .map(mySauceToRecipe);
+  }
+  function findMySauce(id) {
+    return mySauceData.records.find((r) => r.id === id) || null;
+  }
+  /* id 하나로 **공개 레시피와 내 소스를 함께** 찾는다.
+     ⚠️ 뒤로·앞으로 가기가 상세를 되살릴 때 쓴다 — `RECIPES` 만 뒤지면 내 소스 상세가 안 살아난다. */
+  function 아이디로레시피찾기(id) {
+    const 공개 = RECIPES.find((r) => r.id === id);
+    if (공개) return 공개;
+    const 내것 = findMySauce(id);
+    return 내것 ? mySauceToRecipe(내것) : null;
+  }
+
   // 2026-07-25 확정: 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 필터(AND).
   // 🔴 옛 `browsing` 플래그는 없앴다(2026-08-03) — 홈이 탭으로 갈라져서 「지금 어느 화면인가」는
   //    하단바 탭(activeSection)이 곧 답이다. 한 탭 안에서 두 화면을 오가던 시절의 장치였다.
@@ -456,7 +553,7 @@
   let query = '';
   let showFavoritesOnly = false;
   /* 🔴 내 소스 보기(2026-08-26 사용자님 확정). 즐겨찾기와 **둘 중 하나만 켜진다** — 아래 배타 처리 참고.
-     ⚠️ 아직 **저장이 없어서 걸리는 레시피가 0개**다. 켜면 늘 빈 목록이 나오는 것이 지금은 정상이다. */
+     ⚠️ 목록은 `RECIPES` 가 아니라 **`mySauceRecipes()`** 에서 온다(위 「나만의 소스 — 저장」 절). */
   let showMySauceOnly = false;
   const FAVORITES_KEY = 'haidilao_favorites';
   let favorites;
@@ -1033,25 +1130,25 @@
     const q = query.trim();
     // 카테고리 탭·즐겨찾기·검색·인물은 전부 서로 겹치는 이중 필터(AND)다(2026-07-25 확정) —
     // 예: 즐겨찾기 켠 채 '탕' 탭 → 즐겨찾기한 것 중 탕만. 검색 중 '소스' 탭 → 검색 결과 중 소스만.
-    /* 🔴 **내 소스가 켜지면 카테고리는 건너뛴다**(2026-08-26). 카테고리 넷은 「레시피가 무엇인가(종류)」인데
-       내 소스를 켜면 그 물음이 뜻을 잃는다 — 그래서 탭줄에서도 켜진 카테고리의 불을 끈다
-       (`renderBrowseCatTabs`). **화면에 안 켜진 필터가 뒤에서 걸리면 안 된다** —
-       「탕을 보다가 내 소스를 켰더니 내가 만든 것 중 탕만 나오는」 숨은 상태가 생긴다.
-       ⚠️ 즐겨찾기는 다르다 — 카테고리와 **겹쳐서** 걸린다(「소스」 탭 + 즐겨찾기 = 즐겨찾기한 소스만).
-          그쪽은 탭의 불도 그대로 켜져 있어서 화면과 어긋나지 않는다. */
-    let filtered = showMySauceOnly
-      ? RECIPES.slice()
-      : RECIPES.filter((r) => activeCat === '전체' || r.cat === activeCat);
+    /* 🔴 **내 소스는 여기서 곧장 돌려준다**(2026-08-27). 저장한 소스는 `RECIPES` 에 아예 없다 —
+       내가 만든 것은 「내 소스」 탭에서만 보이기 때문이다(위 「나만의 소스 — 저장」 절).
+       ■ 아래 걸러내기를 **하나도 안 거치는 이유** —
+         · **카테고리** — 내 소스를 켜면 「레시피가 무엇인가(종류)」라는 물음이 뜻을 잃는다.
+           그래서 탭줄에서도 켜진 카테고리의 불을 끈다(`renderBrowseCatTabs`).
+           **화면에 안 켜진 필터가 뒤에서 걸리면 안 된다** — 「탕을 보다가 내 소스를 켰더니
+           내가 만든 것 중 탕만 나오는」 숨은 상태가 생긴다.
+         · **검색** — 이 화면은 검색창을 감추고, 켤 때 검색어도 함께 비운다(`목록필터켜기`).
+         · **즐겨찾기** — 배타라 같이 켜지지 않고, 내 소스 카드에는 즐겨찾기가 아예 없다.
+         · **인물** — 저장한 소스에는 `person` 이 없다. 걸면 언제나 0개가 된다.
+       ⚠️ 즐겨찾기는 이 모두와 다르다 — 카테고리와 **겹쳐서** 걸리고(「소스」 탭 + 즐겨찾기 =
+          즐겨찾기한 소스만) 탭의 불도 그대로 켜져 있어서 화면과 어긋나지 않는다. */
+    if (showMySauceOnly) return mySauceRecipes();
+    let filtered = RECIPES.filter((r) => activeCat === '전체' || r.cat === activeCat);
     if (personFilter) {
       filtered = filtered.filter((r) => r.person === personFilter);
     }
     if (showFavoritesOnly) {
       filtered = filtered.filter((r) => favorites.has(r.id));
-    }
-    /* 🔴 내 소스 = **내가 만든 것**만. `mine` 이 붙은 레시피는 아직 하나도 없다(저장을 안 만들었다).
-       ⚠️ 즐겨찾기와 겹칠 일은 없다 — 배타 처리로 둘 다 켜지지 않는다. */
-    if (showMySauceOnly) {
-      filtered = filtered.filter((r) => r.mine);
     }
     if (q) {
       const nq = 검색꼴(q);          // 비면 아래 보정을 건너뛴다 — 안 그러면 전부가 걸린다
@@ -1853,6 +1950,22 @@
     scrollToTop();   // 목록이 통째로 바뀌므로 맨 위로
   }
 
+  /* 🔴 **「내 소스」 목록으로 데려간다**(2026-08-27 사용자님 확정). 소스를 저장하면 여기로 온다 —
+     저장이 실제로 됐다는 것이 **방금 만든 카드로 눈에 보인다.**
+     ⚠️ 소스 만들기는 **홈에서도** 열리므로 탭 전환까지 해야 한다. 그때 레시피 탭에 있지 않으면
+        목록을 아무리 다시 그려도 화면에는 안 보인다.
+     ⚠️ 카테고리·인물 필터를 먼저 비운다 — 내 소스를 **끄고 나왔을 때** 돌아갈 자리이고,
+        인물 필터가 남아 있으면 화면에 안 보이는 필터가 뒤에 남는다.
+     ⚠️ 초점은 **켜진 「내 소스」 탭**에 내려앉힌다(메뉴 화면 착지와 같은 규칙 — `focusMenuLanding`).
+        탭줄은 `renderBrowseCatTabs()` 가 매번 새로 그리므로 **다시 그린 뒤에** 찾아야 한다. */
+  function 내소스로가기() {
+    activeCat = '전체';
+    personFilter = null;
+    if (pageEl.dataset.section !== 'recipe') switchSection('recipe');
+    목록필터켜기('mine');
+    focusLanding(browseCatTabsEl.querySelector('.tab-btn--mine'));
+  }
+
   function renderBrowseCatTabs() {
     browseCatTabsEl.querySelectorAll('.tab-btn, .tab-div').forEach((b) => b.remove());
     BROWSE_TABS.forEach((cat) => {
@@ -1919,9 +2032,12 @@
      ② 화면의 하트 33개가 죄다 「좋아요」라 **어느 레시피의 것인지 이름만으로 구분이 안 됐다.**
      그래서 **레시피 이름 + 버전(있으면) + 동작**으로 통일한다 — 「건희소스 오리지널 · 2021 좋아요」.
      ⚠️ `r.nameHtml` 은 태그가 섞여 있어 쓰지 않는다. 이름은 `r.name` 이 원본이다.
-     ⚠️ 눌림 여부는 `aria-pressed` 가 따로 전한다 — 이름에 「해제」 같은 말을 넣지 말 것. */
+     ⚠️ 눌림 여부는 `aria-pressed` 가 따로 전한다 — 이름에 「해제」 같은 말을 넣지 말 것.
+     🔴 **글자를 안전하게 바꿔서 내보낸다**(2026-08-27). 이 값은 부르는 곳 셋이 전부
+        `aria-label="…"` 처럼 **따옴표 안**에 넣는데, 「나만의 소스」부터는 이름을 사용자님이
+        직접 치신다 — 따옴표가 섞이면 그 자리에서 코드가 끊긴다. 위 `escHtml` 주석 참고. */
   function cardLabel(r, 동작) {
-    return (r.name || '') + (r.ver ? ' ' + r.ver : '') + ' ' + 동작;
+    return escHtml((r.name || '') + (r.ver ? ' ' + r.ver : '') + ' ' + 동작);
   }
   function browseFavHtml(r) {
     const active = favorites.has(r.id);
@@ -2021,7 +2137,7 @@
         empty.textContent = '즐겨찾기한 레시피가 없어요';
       } else if (showMySauceOnly) {
         // 🔴 즐겨찾기 문구와 **같은 꼴**로 맞췄다 — 같은 자리에는 같은 말을 쓴다.
-        // ⚠️ 얼개 3절은 여기에 **「만들기」 버튼**도 두기로 적어 뒀다. 아직 안 붙였다(문안·모양 미정).
+        // ⚠️ 여기에 만들기 버튼을 또 두지 않는다 — 바로 위 개수 줄에 「소스 만들기」가 있다(얼개 3절).
         empty.textContent = '아직 만든 소스가 없어요';
       } else {
         empty.textContent = '아직 등록된 레시피가 없어요';
@@ -2045,7 +2161,13 @@
     filtered.forEach((r) => {
       let el = browseCardCache.get(r.id);
       if (!el) {
-        el = buildBrowseGridCard(r);
+        /* 🔴 내 소스 카드에는 **좋아요도 즐겨찾기도 없다**(얼개 3절 사용자님 확정).
+           ■ 좋아요를 빼는 이유 — 좋아요는 Firebase 에 저장돼 **모든 방문자가 함께 보는 숫자**다.
+             나만 보는 소스에는 붙을 자리가 없다.
+           ■ 즐겨찾기를 빼는 이유 — 내 소스는 몇 개 안 돼서 추릴 이유가 없다(지금 즐겨찾기가
+             쓸모 있는 건 레시피가 40개가 넘어서다). 나중에 스무 개쯤 쌓이면 그때 붙인다.
+           ⚠️ 가챠 결과 카드가 이미 쓰는 옵션이라 새로 만든 것이 아니다. */
+        el = buildBrowseGridCard(r, r.mine ? { hideLike: true, hideFav: true } : undefined);
         browseCardCache.set(r.id, el);
       }
       const rank = (showRankBadges && r.cat === '소스') ? rankMap.get(r.id) : undefined;
@@ -2560,9 +2682,30 @@
 
   // 홈 카드(클린 스타일) 공통 마크업 — 캐러셀·그리드가 함께 씀. 클릭은 컨테이너에서 data-id로 위임.
   // eager=true면 즉시 로드(인기소스=첫 화면에 바로 보임). 탕·히든은 스크롤해야 보여 lazy 유지.
+  /* 🔴 내 소스 카드의 썸네일 자리는 **담긴 재료 이름**이다(얼개 3절, 2026-08-25 사용자님 확정).
+     ■ 왜 — 카드 아래에 이름이 이미 나온다. 썸네일에 이름을 또 넣으면 위아래로 두 번 보이는데,
+       내가 만든 소스는 「우리집소스」처럼 이름이 붙기 쉬워서 목록에서 값이 큰 것은
+       **뭐가 들어갔는지**다.
+     🔴 **이모지도 색(`tint`)도 쓰지 않는다** — 사용자님이 명시적으로 물리셨다.
+     🔴 **재료 타일을 겹쳐 그리는 안은 버렸다**(얼개 6절) — 재료가 2개에서 15개까지 오가서
+        부채꼴·덩어리·격자·띠 어느 방식이든 **어떤 개수에서는 어색해진다.**
+     ⚠️ 5줄까지만 적고 나머지는 「외 N가지」로 접는다. 사진을 넣는 길이 생기면(얼개 3절 「사진」)
+        `r.img` 갈래가 먼저 걸리므로 여기는 안 고쳐도 된다. */
+  const MINE_THUMB_LINES = 5;
+  function mineThumbHtml(r) {
+    const 이름들 = sortIngs(r.ings || []).map(ingLabel);
+    const 보일것 = 이름들.slice(0, MINE_THUMB_LINES);
+    const 남은수 = 이름들.length - 보일것.length;
+    return '<span class="hc-mine-thumb">'
+      + 보일것.map((n) => '<span class="hc-mine-ing">' + escHtml(n) + '</span>').join('')
+      + (남은수 > 0 ? '<span class="hc-mine-more">외 ' + 남은수 + '가지</span>' : '')
+      + '</span>';
+  }
   function homeCardBody(r, eager) {
+    // 🔴 내 소스는 사진이 없으면 재료 이름이 그 자리를 채운다(바로 위 주석). 이모지·색으로 안 내려간다.
+    if (r.mine && !r.img) return mineThumbHtml(r);
     const thumb = r.img
-      ? '<img src="' + r.img + '" alt="' + r.name + '"' + (eager ? '' : ' loading="lazy"') + ' draggable="false">'
+      ? '<img src="' + r.img + '" alt="' + escHtml(r.name) + '"' + (eager ? '' : ' loading="lazy"') + ' draggable="false">'
       : '<span class="hc-emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
     return thumb;
   }
@@ -2791,9 +2934,19 @@
 
     // 원본 썸네일(모바일 전용 표시) — 카드와 동일한 이미지·출처 오버레이 재사용
     const thumbEl = document.getElementById('modalThumb');
-    if (r.img) {
+    /* 🔴 **사진 없는 내 소스는 썸네일 칸 자체를 접는다**(2026-08-27).
+       ■ 왜 목록 카드와 다른가 — 카드에서는 썸네일 자리를 재료 이름으로 채운다(얼개 3절). 거기는
+         그 자리 말고 뭘 보여 줄 데가 없어서다. **상세는 다르다** — 바로 아래 「소스바」 칸에
+         같은 재료가 양까지 붙어 그대로 나온다. 위에 이름만 5줄 또 깔면 **같은 것이 두 번** 보인다.
+       ⚠️ 이모지·색으로 내려가면 안 된다 — 내 소스에는 둘 다 없어서(사용자님이 물리셨다)
+          빈 네모와 `undefined` 배경이 그려진다.
+       ⚠️ 사진을 넣는 길이 생기면(얼개 3절 「사진」) 아래 `r.img` 갈래가 먼저 걸려 사진이 나온다. */
+    thumbEl.hidden = !!(r.mine && !r.img);
+    if (thumbEl.hidden) {
+      thumbEl.innerHTML = '';
+    } else if (r.img) {
       thumbEl.style.background = r.imgBg || '#fff';
-      thumbEl.innerHTML = '<img class="modal-thumb-img" src="' + r.img + '" alt="' + r.name + '" draggable="false">' +
+      thumbEl.innerHTML = '<img class="modal-thumb-img" src="' + r.img + '" alt="' + escHtml(r.name) + '" draggable="false">' +
         '<div class="recipe-thumb-overlay">' + (r.source ? '<div class="recipe-thumb-source">' + sourceHtml(r.source) + '</div>' : '') + '</div>';
     } else {
       thumbEl.style.background = r.tint;
@@ -2802,8 +2955,12 @@
     // 순위·이달의 소스 배지(2026-07-25) — 소스 카테고리에서 절대 순위(sauceRankMap) top5면 순위 배지
     // (homeRankBadge, 홈 인기소스와 동일 마크업/클래스 재사용), 이번 달 소스(pickMonthlySauce)면 '이달의
     // 소스' 배지. 둘 다 해당하면(예: s19) 좌상단에 가로로 나란히 — 순위 배지 → 이달의 소스 배지 순서.
-    const modalRank = r.cat === '소스' ? sauceRankMap().get(r.id) : undefined;
-    const modalIsMonthly = pickMonthlySauce(new Date())?.id === r.id;
+    /* 🔴 내 소스에는 둘 다 안 붙는다(2026-08-27) — 순위와 「이달의 소스」는 **공개 레시피를
+       좋아요로 줄 세운 자리**라 좋아요가 없는 내 소스에는 붙을 자리가 없다(얼개 3절).
+       ⚠️ 지금은 `sauceRankMap()`·`pickMonthlySauce()` 가 `RECIPES` 만 보므로 어차피 안 걸리지만,
+          **왜 안 걸리는지가 코드에 보여야** 나중에 그 두 함수를 고칠 때 실수가 안 난다. */
+    const modalRank = (!r.mine && r.cat === '소스') ? sauceRankMap().get(r.id) : undefined;
+    const modalIsMonthly = !r.mine && pickMonthlySauce(new Date())?.id === r.id;
     if ((modalRank != null && modalRank < 5) || modalIsMonthly) {
       thumbEl.insertAdjacentHTML('beforeend',
         '<span class="modal-badge-row">'
@@ -2816,7 +2973,11 @@
     modalNameEl.classList.toggle('has-star', !!r.star); // 연예인 별 — 카드와 동일
     modalNameEl.innerHTML = (r.star ? STAR_SVG : '') + (r.nameHtml || r.name);
     modalScroll.dataset.cat = r.cat; // 모바일 TCG 프레임·배지 색 스위치 (CSS 변수 세트)
-    document.getElementById('modalCat').textContent = r.cat;
+    /* 🔴 내 소스는 **왼쪽 위 이름표만** 「내 소스」로 바꾼다(2026-08-27). 「소스」라고 적으면
+       공개 소스와 구분이 안 되는데, 이 모달에는 출처도 좋아요도 없어서 더 헷갈린다.
+       ⚠️ `dataset.cat` 은 **`소스` 그대로 둔다** — 그것은 글자가 아니라 **프레임·배지 색을 고르는
+          스위치**다(CSS 변수 세트). 여기까지 바꾸면 색 규칙이 통째로 빠져 틀이 흰색이 된다. */
+    document.getElementById('modalCat').textContent = r.mine ? '내 소스' : r.cat;
     document.getElementById('modalVer').textContent = r.ver || '';
     // desc는 고유명사 <b> 강조 등 제한적 HTML 허용(작성자 데이터). 없으면 빈 박스가 남으므로 숨김.
     const descEl = document.getElementById('modalDesc');
@@ -2826,9 +2987,21 @@
     } else {
       descEl.style.display = 'none';
     }
+    /* 🔴 내 소스에서는 **즐겨찾기·좋아요를 감춘다**(2026-08-27) — 목록 카드에서 뺀 것과 같은 이유다
+       (얼개 3절: 좋아요는 모든 방문자가 함께 보는 숫자이고, 즐겨찾기는 몇 개 안 되는 목록에서
+       추릴 이유가 없다). **목록에는 없는데 상세에만 있으면** 눌러 놓고도 어디서도 안 보인다.
+       ⚠️ `hidden` 이라 화면낭독기와 Tab 순서에서도 함께 빠진다. */
+    modalFavBtn.hidden = !!r.mine;
+    modalLikeBtn.hidden = !!r.mine;
     setPressedState(modalFavBtn, favorites.has(r.id));
     setPressedState(modalLikeBtn, likedByMe.has(r.id));
     modalLikeCount.textContent = getLikeCount(r.id);
+    /* 🔴 지우는 길은 **여기 하나뿐**이다(2026-08-27 사용자님 확정). 스티커 기록 상세와 **같은 방식**으로
+       한 번 더 눌러 확인한다 — 이미 앱에 있는 방식이라 새로 배울 것이 없다.
+       ⚠️ 상세를 열 때마다 확인 상태를 **반드시 푼다.** 안 풀면 다른 소스를 열었는데 「한 번 더 누르면
+          삭제돼요」가 떠 있어, 무심코 누르면 **엉뚱한 소스가 지워진다.** */
+    modalMineDelete.hidden = !r.mine;
+    resetModalMineDelete();
 
     const orderWrap = document.getElementById('modalOrderWrap');
     if (r.order && r.order.length > 0) {
@@ -2946,7 +3119,9 @@
     // X로 닫은 뒤 오른쪽 가장자리 앞으로가기: Safari가 보여준 상세 미리보기가 다시
     // 사라지지 않도록, 기록에 들어 있는 같은 레시피를 실제 상세창으로 복원한다.
     if (historyRecipeId) {
-      const historyRecipe = RECIPES.find((r) => r.id === historyRecipeId);
+      // 🔴 내 소스도 되살아나야 한다(2026-08-27) — `RECIPES` 만 뒤지면 내가 만든 소스의 상세는
+      //    앞으로 가기로 돌아와도 **빈 화면**이 된다. 둘을 함께 찾는 함수를 쓴다.
+      const historyRecipe = 아이디로레시피찾기(historyRecipeId);
       if (historyRecipe) openModal(historyRecipe);
     }
   });
@@ -2962,6 +3137,53 @@
     modalLikeCount.textContent = getLikeCount(id);
     syncLikeUI(id); // 뒤에 깔린 카드 하트(숫자+빨강 채움)도 같이 맞춤
     popHeart(modalLikeBtn); // 홈 하트와 같은 통통 팝 — 알약을 벗기며 사라진 "눌림" 신호를 대신한다
+  });
+
+  /* ── 내 소스 지우기 (2026-08-27 사용자님 확정) ──────────────────────────────────
+     🔴 **스티커 기록 삭제와 같은 방식**이다 — 한 번 누르면 「한 번 더 누르면 삭제돼요」로 바뀌고,
+        3초 안에 다시 누르지 않으면 저절로 돌아간다. 앱에 이미 있는 방식이라 새로 배울 것이 없다.
+        ⚠️ 앱은 되돌릴 수 없는 지우기를 **세 가지 방식**으로 처리하고 있고, 사용자님이 그것을
+           **알고도 그대로 두기로** 정하셨다(얼개 4절). 통일을 다시 제안하지 말 것.
+     🔴 지운 id 는 `deleted` 에 남긴다 — 안 남기면 다른 기기와 합칠 때 **지운 소스가 되살아난다.**
+     ⚠️ 카드 무늬 저장분(`browseCardCache`)도 함께 버린다. 남겨 두면 같은 id 로 다시 만들 일은
+        없지만 쓸모없는 카드가 계속 쌓인다. */
+  const modalMineDelete = document.getElementById('modalMineDelete');
+  let modalMineDeleteArmed = false;
+  function resetModalMineDelete() {
+    if (!modalMineDelete) return;
+    modalMineDeleteArmed = false;
+    modalMineDelete.textContent = '지우기';
+    modalMineDelete.classList.remove('armed');
+    clearTimeout(modalMineDelete._t);
+  }
+  if (modalMineDelete) modalMineDelete.addEventListener('click', () => {
+    if (!currentModalRecipe || !currentModalRecipe.mine) return;
+    if (!modalMineDeleteArmed) {
+      modalMineDeleteArmed = true;
+      modalMineDelete.textContent = '한 번 더 누르면 지워져요';
+      modalMineDelete.classList.add('armed');
+      clearTimeout(modalMineDelete._t);
+      modalMineDelete._t = setTimeout(resetModalMineDelete, 3000);
+      return;
+    }
+    const 지울id = currentModalRecipe.id;
+    mySauceData.records = mySauceData.records.filter((r) => r.id !== 지울id);
+    if (mySauceData.deleted.indexOf(지울id) === -1) mySauceData.deleted.push(지울id);
+    saveMySauces();
+    browseCardCache.delete(지울id);
+    resetModalMineDelete();
+    closeModal();
+    renderList();
+    /* 🔴 **초점이 갈 자리를 준다**(2026-08-27). 상세를 닫으면 원래 눌렀던 **카드로 돌아가는데,
+       지운 소스의 카드는 방금 사라졌다** — 그대로 두면 초점이 `<body>` 로 풀려 화면낭독기
+       사용자는 무슨 일이 일어났는지 모른 채 목록 맨 처음으로 튕긴다(실측으로 잡았다).
+       🔴 **켜진 「내 소스」 탭**으로 보낸다 — 저장했을 때와 같은 자리다(`내소스로가기`).
+          지우고 나면 목록이 비어 있을 수도 있어서 목록 안의 무언가는 노릴 수 없다.
+       ⚠️ 개수 줄의 「소스 만들기」 버튼은 **여기서 못 쓴다.** 이 시점에는 상세가 아직 닫히는
+          중이라 본문(`.main`)이 `inert` 이고, `inert` 안에는 초점이 안 내려앉는다(실측).
+          탭줄은 `.main` 밖이라 걸리지 않는다. */
+    focusLanding(browseCatTabsEl.querySelector('.tab-btn--mine'));
+    showShareToast('소스를 지웠어요');
   });
 
   // 모바일 전체화면 상세: 오버레이가 상단바 아래에서 시작하도록 실제 높이를 CSS 변수로 전달
@@ -2983,6 +3205,13 @@
   // (스티커 보기 모달도 지역 탭 누르면 닫히고 그 지역으로 필터 — 레시피 상세와 동일 규칙)
   // ⚠️ 공유 버튼(#topShareBtn)은 화면/섹션을 바꾸지 않으므로 예외 — 캡처 단계라 이 리스너가 버튼 자체의
   // 클릭 핸들러보다 먼저 실행돼, 예외 없이는 모달이 열린 채 공유를 눌러도 모달이 먼저 닫혀버렸다(2026-07-25 버그 수정).
+  /* ══ 소스 만들기 시트가 상단바 처리에 자기를 알리는 자리 (2026-08-27) ══════════════
+     🔴 시트 IIFE 는 이 아래(파일 끝쪽)에 있어서 여기서 직접 부를 수 없다 —
+        시트 쪽이 자기 함수를 여기에 넣어 준다. 스티커 기록 창처럼 같은 IIFE 였다면 필요 없었다.
+     ⚠️ `sauceLeaveReplaying` 은 「나가기」 뒤에 원래 동작을 되살릴 때 **이 가로채기를 한 번
+        건너뛰려고** 쓴다(스티커의 `stampLeaveReplaying` 과 같은 장치). */
+  let 소스시트상단바처리 = null;   // (되살릴것) => true 면 「가로챘다」
+  let sauceLeaveReplaying = false;
   topbarEl.addEventListener('click', (e) => {
     /* ⚠️ 공유 버튼은 화면·섹션을 안 바꾸므로 **레시피 상세·스티커 보기·칼럼**은 그대로 둔다
        (2026-07-25 버그 수정 — 이 리스너가 캡처 단계라 버튼 제 손보다 먼저 돌아, 공유만 눌러도
@@ -3033,6 +3262,26 @@
         // 안 바뀌었으면 바로 닫고, 지역 이동은 원래대로 이어진다(막지 않는다)
         requestCloseStampSheet();
       }
+    }
+
+    /* ══ 소스 만들기 시트 (2026-08-27 사용자님이 잡으심) ══════════════════════════
+       상단바는 시트 위에 그대로 보이고 눌린다(일부러 안 잠근다 — 위 `syncPageBackgroundA11y` 주석).
+       그래서 **누르면 창을 닫고 그 동작을 잇는다**가 앱 규칙인데, **소스 만들기만 빠져 있었다** —
+       시트가 열린 채 뒤 목록만 「소스」로 바뀌었다(실측). 스티커 기록 창이 2026-08-09에 같은 이유로
+       합류한 것과 **똑같은 누락**이다.
+       🔴 담은 재료가 있으면 **바로 닫지 않고** 확인창을 띄우며 **지금 누른 동작을 붙든다.**
+          - 「계속 작성」 → 붙든 동작도 버린다(카테고리도 안 바뀐다)
+          - 「나가기」   → 시트를 닫고 붙든 동작을 그때 실행한다(탭 이동이 이어진다)
+       ⚠️ 이 리스너는 캡처 단계라 `stopPropagation()` 이면 탭 제 손이 안 돈다. 그래서 되살릴 때는
+          `sauceLeaveReplaying` 으로 이 가로채기를 한 번 건너뛴다.
+       ⚠️ 상단바의 **무엇을 눌러도** 같다 — 이 시트를 여는 상단바 아이콘이 없어서
+          「자기 아이콘은 건드리지 않는다」(내 메뉴·내 코드) 같은 예외가 필요 없다. */
+    if (!sauceLeaveReplaying && 소스시트상단바처리) {
+      const 가로챘나 = 소스시트상단바처리(누른것 ? () => {
+        sauceLeaveReplaying = true;
+        try { 누른것.click(); } finally { sauceLeaveReplaying = false; }
+      } : null);
+      if (가로챘나) { e.preventDefault(); e.stopPropagation(); return; }
     }
 
     if (!자기아이콘 || 자기아이콘.id !== 'potToggleBtn') {
@@ -5101,6 +5350,21 @@
         옮겨 가는 것이 제품 규칙이고(2404 주석), 내 메뉴·내 코드는 상단 아이콘을 다시 눌러
         닫는 길이기도 하다. 잠그면 그 길이 막힌다. */
   const A11Y_DIALOG_IDS = ['mnSheetOverlay', 'syncSheetOverlay', 'gachaOverlay', 'a2hsOverlay'];
+  /* 🔴 **시트 위에 겹쳐 뜨는 창** — 지금은 「작성 중인데 나갈까요?」 확인창 하나뿐이다.
+     **답을 해야 넘어가는 창**이라, 떠 있는 동안 아래 시트와 상단바를 잠근다 —
+     안 잠그면 Tab 이 뒤 입력칸으로 새고, 상단바를 눌러 창을 띄워 둔 채 다른 탭으로 빠져나간다.
+     ⚠️ 이런 창은 `SCROLL_LOCK_OVERLAYS` 에 **넣지 않는다.** 그 목록은 「뒤 화면 스크롤을 잠그는 시트」
+        들이고, 이것은 그 시트 **위**에 뜬다. 여닫는 쪽이 `syncScrollLock()` 을 직접 부른다.
+     🔴 둘째가 생기면 **여기에만 더한다** — 아래 두 함수에 조건을 따로 적지 말 것.
+     ⚠️ 2026-08-27에 「나만의 소스」 저장 창이 잠깐 여기 있었다. 그 창은 **없어졌다** —
+        작은 창이 아니라 소스 만들기 시트의 두 번째 화면이 됐다(그쪽 주석에 경위가 있다). */
+  const OVER_SHEET_DIALOG_IDS = ['leaveConfirmOverlay'];
+  function overSheetDialogOpen() {
+    return OVER_SHEET_DIALOG_IDS.some((id) => {
+      const el = document.getElementById(id);
+      return !!el && el.classList.contains('open');
+    });
+  }
   function otherDialogOpen() {
     if (columnOverlay && !columnOverlay.hidden) return true;
     return A11Y_DIALOG_IDS.some((id) => {
@@ -5132,9 +5396,9 @@
        ⚠️ 다른 팝업(내 메뉴·내 코드·칼럼·앱설치)에는 이걸 걸면 안 된다 — 그쪽은 상단바가 보이고,
           상단 아이콘을 다시 눌러 닫는 길이기도 하다. 그래서 **가챠일 때만** 이다. */
     /* 🔴 「나갈까요?」 확인창이 떠 있는 동안에도 상단바를 잠근다(2026-08-09, 5-5 추가 보완).
-       그 창은 **답을 해야 넘어가는 물음**이라, 뒤의 상단바를 눌러 빠져나갈 수 있으면 안 된다. */
-    const 확인창 = (() => { const el = document.getElementById('leaveConfirmOverlay');
-                            return !!el && el.classList.contains('open'); })();
+       그 창은 **답을 해야 넘어가는 물음**이라, 뒤의 상단바를 눌러 빠져나갈 수 있으면 안 된다.
+       ⚠️ 겹쳐 뜨는 창 목록은 위 `OVER_SHEET_DIALOG_IDS` 한 곳에 있다. */
+    const 확인창 = overSheetDialogOpen();
     const gachaOpen = gachaOverlay.classList.contains('open');
     if (topbarEl) {
       /* 🔴 스토리도 상단바를 잠근다(2026-08-09) — 가챠와 **같은 성격**이다. 스토리는 화면을 꽉
@@ -5157,9 +5421,9 @@
     const anyOpen = SCROLL_LOCK_OVERLAYS.some((el) => el.classList.contains('open'));
     document.documentElement.classList.toggle('is-locked', anyOpen);
     /* 🔴 확인창이 떠 있으면 **그 아래 기록 창도 잠근다**(2026-08-09, 5-5 추가 보완).
-       확인창은 기록 창 위에 뜨는데, 잠그지 않으면 Tab 이 뒤 입력칸으로 새어 나간다. */
-    const 확인창 = (() => { const el = document.getElementById('leaveConfirmOverlay');
-                            return !!el && el.classList.contains('open'); })();
+       확인창은 기록 창 위에 뜨는데, 잠그지 않으면 Tab 이 뒤 입력칸으로 새어 나간다.
+       ⚠️ 겹쳐 뜨는 창 목록은 위 `OVER_SHEET_DIALOG_IDS` 한 곳에 있다. */
+    const 확인창 = overSheetDialogOpen();
     SCROLL_LOCK_OVERLAYS.forEach((el) => {
       const open = el.classList.contains('open');
       el.setAttribute('aria-hidden', String(!open));
@@ -5331,6 +5595,24 @@
         // 열린 상세도 맞춘다 — 예전엔 **지워졌을 때 닫기만** 하고 내용이 바뀐 경우는 그대로 둬서
         // 목록과 상세가 어긋났다(동기화 경로에서 발견된 것과 같은 결함, 5차 교차검증 2번).
         refreshStampView();
+      }
+    }
+
+    /* 🔴 「나만의 소스」도 창 사이를 맞춘다(2026-08-27). 안 맞추면 창 두 개를 띄웠을 때
+       한쪽에서 저장한 소스를 다른 쪽이 모른 채 **옛 목록으로 덮어써** 그 소스가 사라진다
+       (즐겨찾기·스티커가 이 함수를 두고 있는 이유와 같다).
+       ⚠️ 여기서는 `saveMySauces()` 를 부르지 않는다 — 그것은 서버로 올리는 함수이고,
+          여기는 **이미 저장소에 있는 값을 읽어 오는 자리**다. */
+    if (syncAll || key === MY_SAUCES_KEY) {
+      const 저장된것 = readStoredObject(MY_SAUCES_KEY);
+      if (Array.isArray(저장된것.records) || localStorage.getItem(MY_SAUCES_KEY) === null) {
+        mySauceData = Array.isArray(저장된것.records)
+          ? { version: 1, records: 저장된것.records, deleted: Array.isArray(저장된것.deleted) ? 저장된것.deleted : [] }
+          : { version: 1, records: [], deleted: [] };
+        // 내용이 어떻게 달라졌는지 견줄 방법이 없는 자리다 — 카드 저장분은 통째로 비운다(내 소스 것만).
+        mySauceData.records.forEach((r) => browseCardCache.delete(r.id));
+        (mySauceData.deleted || []).forEach((id) => browseCardCache.delete(id));
+        if (showMySauceOnly) renderList();
       }
     }
 
@@ -5709,6 +5991,17 @@
       //    「초기화하기 전까지 유지되니 다음 주문 때도 써먹는다」는 것이 이유다.
       //    메뉴 탭은 다른 IIFE 라 값을 직접 못 읽는다 → 저장된 것을 그대로 읽어 싣는다.
       menu: readMenuPicked(),
+      /* 🔴 「나만의 소스」도 함께 보낸다(2026-08-27). **스티커와 같은 모양**이다 —
+         만든 것(`records`)과 지운 것(`deleted`)을 같이 나른다.
+         🔴 **사본**이어야 한다. 이 값은 트랜잭션이 도는 동안 스냅샷으로 붙들려 있는데,
+            원본을 그대로 넘기면 그 사이 사용자가 소스를 저장·삭제할 때 스냅샷도 같이 흔들린다
+            (즐겨찾기 이력에서 겪은 것과 같은 함정 — 위 `favMarks` 주석 참고).
+         ⚠️ `clean` 을 거치는 이유 — `undefined` 가 하나라도 섞이면 Firebase 가 **말없이 통째로
+            거절한다**(아래 `clean` 주석). 새 칸을 더할 때도 반드시 이 함수를 거칠 것. */
+      mySauces: {
+        records: (mySauceData.records || []).map(clean),
+        deleted: (mySauceData.deleted || []).slice(),
+      },
       updatedAt: Date.now(),
     };
   }
@@ -5746,21 +6039,21 @@
     }));
     return out;
   }
-  function mergePayloads(a, b) {
-    // 🔴 한쪽이 없어도 **그냥 돌려주면 안 된다.** 아래 applyPayload는 이력(marks)만 보고
-    //    집합을 다시 만드는데, 이력이 없던 시절 자료는 marksOf를 거쳐야 살아난다.
-    //    그대로 넘기면 옛 즐겨찾기가 그 순간 사라진다(1차 교차검증에서 겪은 그 버그).
-    a = a || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
-    b = b || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
-    const deleted = new Set([].concat(
-      (a.stamps && a.stamps.deleted) || [], (b.stamps && b.stamps.deleted) || []
-    ));
-    // 같은 id끼리는 **내용을 마지막으로 손댄 쪽**이 이긴다.
-    // 🔴 addedAt만 보면 안 된다 — 수정해도 addedAt은 그대로라 늘 동점이 되고, 나중에 처리되는
-    //    쪽이 무조건 이겨 수정한 메모가 되돌아간다(1차 교차검증).
-    // 🔴 시각까지 같으면 **내용 문자열이 큰 쪽**으로 정한다. 크고 작음에 뜻은 없고, 두 기기가
-    //    같은 답에 도달하는 것이 목적이다. 예전엔 '동점이면 로컬'이라 기기마다 답이 달라
-    //    영영 수렴하지 않았다(2차 교차검증).
+  /* ── 항목별 합치기 ─────────────────────────────────────────────────────────
+     🔴 **스티커 기록과 「나만의 소스」가 같은 함수를 쓴다**(2026-08-27에 함수로 뺐다. 얼개 5절이
+        「스티커 기록과 같은 방식」이라고 정한 것을 코드에서도 같게 만든 것이다 — 한쪽만 고쳐
+        조용히 갈라지는 일을 막는다).
+     ■ 무엇을 하나 — 기기 두 벌의 기록을 **항목마다** 견줘 한 벌로 만든다. 기기마다 만든 것이
+       **둘 다 남고**, 지운 것은 되살아나지 않는다(`deleted` 를 함께 나른다).
+     ⚠️ 메뉴 탭 방식(「최신 것이 통째로 이긴다」)을 여기 쓰면 **한쪽 기기에서 만든 것이 통째로 사라진다.**
+     🔴 같은 id 끼리는 **내용을 마지막으로 손댄 쪽**이 이긴다.
+        · `addedAt` 만 보면 안 된다 — 고쳐도 `addedAt` 은 그대로라 늘 동점이 되고, 나중에 처리되는
+          쪽이 무조건 이겨 **고친 내용이 되돌아간다**(1차 교차검증).
+        · 시각까지 같으면 **내용 문자열이 큰 쪽**으로 정한다. 크고 작음에 뜻은 없고 **두 기기가
+          같은 답에 도달하는 것**이 목적이다. 예전엔 「동점이면 로컬」이라 기기마다 답이 달라
+          영영 수렴하지 않았다(2차 교차검증). */
+  function 기록합치기(기록가, 기록나, 지운가, 지운나) {
+    const deleted = new Set([].concat(지운가 || [], 지운나 || []));
     const touchedAt = (r) => Math.max(r.editedAt || 0, r.addedAt || 0);
     const byId = new Map();
     const put = (r) => {
@@ -5771,12 +6064,30 @@
       if (rt > ot) { byId.set(r.id, r); return; }
       if (rt === ot && JSON.stringify(r) > JSON.stringify(old)) byId.set(r.id, r);
     };
-    ((a.stamps && a.stamps.records) || []).forEach(put);
-    ((b.stamps && b.stamps.records) || []).forEach(put);
+    (기록가 || []).forEach(put);
+    (기록나 || []).forEach(put);
+    return { records: [...byId.values()], deleted: [...deleted] };
+  }
+  function mergePayloads(a, b) {
+    // 🔴 한쪽이 없어도 **그냥 돌려주면 안 된다.** 아래 applyPayload는 이력(marks)만 보고
+    //    집합을 다시 만드는데, 이력이 없던 시절 자료는 marksOf를 거쳐야 살아난다.
+    //    그대로 넘기면 옛 즐겨찾기가 그 순간 사라진다(1차 교차검증에서 겪은 그 버그).
+    a = a || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
+    b = b || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
+    const stampsM = 기록합치기(
+      (a.stamps && a.stamps.records), (b.stamps && b.stamps.records),
+      (a.stamps && a.stamps.deleted), (b.stamps && b.stamps.deleted)
+    );
+    // 🔴 내 소스도 **똑같이** 합친다(2026-08-27. 얼개 5절) — 위 `기록합치기` 주석 참고.
+    const mySaucesM = 기록합치기(
+      (a.mySauces && a.mySauces.records), (b.mySauces && b.mySauces.records),
+      (a.mySauces && a.mySauces.deleted), (b.mySauces && b.mySauces.deleted)
+    );
     const favMarksM = mergeMarkMaps(marksOf(a.favMarks, a.favorites), marksOf(b.favMarks, b.favorites));
     const likedMarksM = mergeMarkMaps(marksOf(a.likedMarks, a.liked), marksOf(b.likedMarks, b.liked));
     return {
-      stamps: { records: [...byId.values()], deleted: [...deleted] },
+      stamps: stampsM,
+      mySauces: mySaucesM,
       favMarks: favMarksM,
       likedMarks: likedMarksM,
       // 목록도 이력과 같이 채워 둔다 — 이력이 진실이지만, 사람이 서버 값을 열어볼 때 읽기 쉽다.
@@ -5816,6 +6127,35 @@
       const nw = nextById.get(old.id);
       if (nw && recFingerprint(nw) !== recFingerprint(old)) stampCardCache.delete(old.id);
     });
+    /* 🔴 「나만의 소스」 반영(2026-08-27). 합치기를 이미 거친 값이라 **그대로 앉힌다** —
+       스티커 기록과 같다. 저장 자체는 `localStorage` 에만 하고, **여기서 `saveMySauces()` 를
+       부르지 않는다.** 그것은 서버로 다시 올리는(`schedulePush`) 함수라, 받아서 반영하는
+       이 자리에서 부르면 **받기 → 올리기 → 받기** 가 서로 물린다(메뉴 탭 주석에도 같은 경고가 있다).
+       ⚠️ 내용이 바뀐 카드의 저장분은 버린다 — 안 버리면 다른 기기에서 고친 내용이 들어와도
+          목록에는 **옛 카드**가 그대로 남는다(스티커에서 실제로 겪은 것과 같은 함정). */
+    if (p.mySauces) {
+      const 이전내소스 = mySauceData.records || [];
+      mySauceData = {
+        version: 1,
+        records: p.mySauces.records || [],
+        deleted: p.mySauces.deleted || [],
+      };
+      try { localStorage.setItem(MY_SAUCES_KEY, JSON.stringify(mySauceData)); } catch (e) { /* 무시 */ }
+      const 새것 = new Map(mySauceData.records.map((r) => [r.id, r]));
+      let 바뀐게있다 = 이전내소스.length !== mySauceData.records.length;
+      이전내소스.forEach((옛) => {
+        const 새 = 새것.get(옛.id);
+        if (!새 || recFingerprint(새) !== recFingerprint(옛)) { browseCardCache.delete(옛.id); 바뀐게있다 = true; }
+      });
+      /* 내 소스 탭을 보고 있으면 목록까지 새로 그린다. 다른 탭이면 다음에 켤 때 그려지므로 안 건드린다.
+         🔴 **내용이 진짜 달라졌을 때만** 그린다(2026-08-27에 겪었다). 소스를 저장하면 서버에 올린 것이
+            잠시 뒤 **그대로 되돌아오는데**, 그때마다 다시 그리면 `renderBrowseCatTabs()` 가 탭줄을
+            새로 만들면서 **초점을 잡고 있던 탭 버튼이 통째로 갈린다** — 저장 직후 초점을 그 탭에
+            내려앉혀 뒀는데 1초쯤 뒤 `<body>` 로 풀려 버렸다(실측).
+         ⚠️ 다른 기기에서 진짜로 소스가 늘거나 바뀌면 그때는 다시 그리는 것이 맞다. 막는 것은
+            **아무것도 안 바뀐 되울림**뿐이다. */
+      if (showMySauceOnly && 바뀐게있다) renderList();
+    }
     favMarks = p.favMarks || {};
     likedMarks = p.likedMarks || {};
     favorites.clear(); setsFromMarks(favMarks).forEach((id) => favorites.add(id));
@@ -6278,7 +6618,7 @@
        ■ 티스푼·국자 — 소스바는 **한 통에 도구가 하나씩** 꽂혀 있고 고를 수가 없다.
          도구 이름을 적으면 못 지키는 지시가 된다(`docs/CLAUDE.md` 「단위(양) 표기 방침」).
        ■ 그릇 — 쓰인 곳이 **전부 탕**이다(스키야키탕·토마토탕·지새기탕). 소스에는 0건.
-       ■ 바퀴 — 「두르기」인데 **두를 수가 없다.** 바퀴가 쓰인 재료 셋(참기름·간장소스·굴소스)을
+       ■ 바퀴 — 「두르기」인데 **두를 수가 없다.** 바퀴가 쓰인 재료 셋(참기름·완자간장소스·굴소스)을
          2026-08-24 서초점 사진에서 확인하니 **셋 다 통에 스푼이 꽂혀 있다.** 병이 아니다.
        ■ 어림 넷(적당히·넉넉하게·조금·한 꼬집) — **뜰 수 있으면 셀 수 있다.**
          남기자던 근거가 「참깨는 뜰 도구가 없다」였는데 그건 서초점 한 곳의 사정이었다(사용자님 정정).
@@ -6302,6 +6642,13 @@
       + ' stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' + path + '</svg>';
     const 빼기아이콘 = 아이콘틀('<path d="M6 12h12"/>');
     const 더하기아이콘 = 아이콘틀('<path d="M12 6v12M6 12h12"/>');
+    /* 담은 재료를 목록에서 **빼는** ✕ (2026-08-27 사용자님 요청).
+       🔴 `−` 와 뜻이 갈린다 — `−` 는 **양을 줄이고**(1에서 멈춘다), ✕ 는 **재료를 뺀다.**
+          예전엔 `−` 를 1 아래로 내리면 빠졌는데, 5스푼짜리를 빼려면 다섯 번 눌러야 했다.
+       🔴 **한 단계 작다(14px).** 이름 글자(15px) 옆에 얹히므로 글자보다 커 보이면 안 된다.
+          획은 조금 굵혀(2.4) 작아도 흐리지 않게 맞췄다 — `−`/`+` 는 18px·2.2 다. */
+    const 엑스아이콘 = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"'
+      + ' stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
 
     /* 🔴 이 화면에서는 **매장 이름표 그대로** 부른다(2026-08-25 사용자님 확정).
@@ -6322,6 +6669,18 @@
     // 재료 이름 → { q: '1', u: '스푼' }.  q 는 **문자열**이다 — 숫자 칸을 치는 도중에는
     // '' 나 '1.' 같은 어정쩡한 값이 들어온다(칸을 떠날 때 `focusout` 이 정리한다).
     const picked = new Map();
+    /* 「기타」 — 소스바에 없는 것을 직접 적는 자리(2026-08-27 사용자님 확정. 얼개 4절).
+       🔴 `picked` 와 **따로 둔다.** `picked` 는 재료 이름을 열쇠로 쓰는데, 기타는 이름이 비어 있을 수도
+          있고 같은 이름이 둘일 수도 있어서 열쇠가 못 된다. 배열이라 **적은 순서**도 그대로 남는다.
+       🔴 **여러 개** 담을 수 있다(사용자님 확정) — 탕 국물과 다른 것을 같이 넣는 경우가 막히지 않게.
+          ⚠️ 얼개 4절에는 「한 칸」으로 적혀 있었다. 그 기록이 낡은 것이다.
+       항목 하나 = `{ id, n: 이름, q: 양(문자열), u: 단위 }` — `q`·`u` 는 소스바 재료와 같은 꼴이다. */
+    const 기타 = [];
+    let 기타번호 = 0;
+    /* 🔴 직접 적는 재료 이름의 **최대 글자 수**. 자리표시 글자(「최대 20자」)와 `maxlength` 가
+       **같은 값에서 나온다** — 한쪽만 고쳐 둘이 어긋나는 일을 막는다.
+       ⚠️ 칸에 한 번에 **보이는** 글자 수와는 다르다. 보이는 수는 기기 폭에 따라 달라진다. */
+    const 이름최대 = 20;
     let query = '';
     let 돌아갈자리 = null;
 
@@ -6339,7 +6698,13 @@
          🔴 `aria-hidden` 이다 — 장식이고, 바로 옆에 이름 글자가 있어 낭독기가 두 번 읽으면 안 된다. */
       const thumb = '<span class="si-thumb" aria-hidden="true"></span>';
       const 부를이름 = 표시이름(n);   // 화면·낭독기 모두 이 이름으로 부른다(위 `소스바이름` 주석 참고)
-      const name = '<span class="si-name">' + esc(부를이름) + '</span>';
+      /* 🔴 이름 줄은 **담기 전후로 같은 상자**를 쓴다(`.si-namerow`). 담긴 줄에만 오른쪽 끝에 ✕ 가 붙는데,
+         상자가 다르면 담을 때마다 이름 자리가 미세하게 움직여 목록이 출렁인다
+         (아랫단 높이를 42px 로 고정해 둔 것과 같은 이유). */
+      const 이름줄 = (뺄수있나) => '<div class="si-namerow"><span class="si-name">' + esc(부를이름) + '</span>'
+        + (뺄수있나 ? '<button class="si-del" type="button" aria-label="' + esc(부를이름) + ' 빼기">' + 엑스아이콘 + '</button>' : '')
+        + '</div>';
+      const name = 이름줄(!!it);
       if (!it) {
         // 담기 버튼도 **이름 아래 오른쪽**이다 — 담기 전후로 줄 높이가 같아 목록이 안 출렁인다(2026-08-25 사용자님)
         return thumb + '<div class="si-body">' + name
@@ -6387,7 +6752,60 @@
       } else {
         names.forEach((n) => listEl.appendChild(줄만들기(n)));
       }
+      /* 🔴 「기타」는 **목록 맨 뒤**다(얼개 4절). 지점마다 소스바 구성이 다르고, 탕 국물처럼
+         소스바에 없는 것을 넣는 레시피가 있어서 직접 적는 자리를 둔다.
+         ⚠️ **검색 중에는 감춘다.** 검색은 소스바 36가지를 좁히는 것이라 직접 적은 것과 섞이면
+            「검색 결과가 없어요」 밑에 기타 줄이 남는 이상한 화면이 된다.
+            담아 둔 기타가 사라져 보일 수 있지만 **개수 줄에는 그대로 세어진다** — 검색을 지우면 다시 나온다. */
+      if (!query.trim()) {
+        기타.forEach((it) => listEl.appendChild(기타줄만들기(it)));
+        listEl.appendChild(기타추가버튼());
+      }
       발밑갱신();
+    }
+    /* 「기타」 줄 — 이름을 **직접 친다.** 양 조절은 소스바 재료와 똑같다(2026-08-27 사용자님 확정).
+       🔴 **그림 자리(`.si-thumb`)를 두지 않는다.** 직접 적는 것이라 일러스트가 생길 일이 없어서,
+          자리만 두면 **점선 네모가 영영 비어 있게** 된다. 대신 이름 칸이 그 폭을 다 쓴다.
+       ⚠️ 이름 칸은 **다시 그리지 않는다** — 치는 도중에 줄을 새로 만들면 초점이 날아간다
+          (소스바 재료의 숫자 칸과 같은 이유). 값만 model 에 적고 개수 줄만 고쳐 준다. */
+    function 기타줄만들기(it) {
+      const row = document.createElement('div');
+      row.className = 'si-row si-row--etc is-on';
+      row.dataset.etc = it.id;
+      /* 🔴 칸은 **스티커 기록 창과 같은 부품**이다(2026-08-27 사용자님 지시) —
+         왼쪽에 이름표(「재료」), 오른쪽에 자리표시 글자. `.stamp-field` 를 그대로 가져다 쓴다.
+         ⚠️ 그래서 글자가 **14px/400** 이다. 옆줄의 소스바 재료 이름(15px/700)보다 얇은데,
+            그쪽은 **읽는 이름**이고 여기는 **치는 칸**이라 갈래가 다르다. 스티커 창과 맞춘 것이다. */
+      row.innerHTML = '<div class="si-body"><div class="si-namerow">'
+        + '<label class="stamp-field stamp-field--light-ph si-etc-field">'
+        + '<span class="stamp-field-label">재료</span>'
+        + '<input class="si-etc-name" type="text" maxlength="' + 이름최대 + '" value="' + esc(it.n) + '"'
+        /* 🔴 **「재료를」을 뺐다**(2026-08-27 실측). 붙이면 320px 에서 칸이 163px 인데 글자가 **178px** 이라
+           15px 넘쳐 잘린다. 왼쪽 이름표가 이미 「재료」라서 뜻도 그대로 통한다.
+           ⚠️ 스티커 기록 창의 메모 칸(「간단하게 메모해보세요(최대 40자)」)과 같은 꼴이다. */
+        + ' placeholder="입력해보세요(최대 ' + 이름최대 + '자)" autocomplete="off"'
+        + ' aria-label="직접 입력한 재료 이름">'
+        + '</label>'
+        + '<button class="si-del" type="button" aria-label="이 재료 빼기">' + 엑스아이콘 + '</button>'
+        + '</div>'
+        + '<div class="si-below"><span class="si-step">'
+        + '<button type="button" data-step="-1" aria-label="기타 재료 양 줄이기">' + 빼기아이콘 + '</button>'
+        + '<input class="si-amt" type="text" inputmode="decimal" value="' + esc(it.q) + '" aria-label="기타 재료 양(스푼)">'
+        + '<span class="si-unit-txt" aria-hidden="true">' + esc(it.u) + '</span>'
+        + '<button type="button" data-step="1" aria-label="기타 재료 양 늘리기">' + 더하기아이콘 + '</button>'
+        + '</span></div></div>';
+      return row;
+    }
+    function 기타추가버튼() {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'si-etc-add';
+      b.id = 'sauceEtcAdd';
+      /* 🔴 글자는 **「재료 직접 입력하기」**다(2026-08-27 사용자님). 「기타 추가」였는데 바꿨다 —
+         「기타」는 저장 자료 안에서 쓰는 말이지 **처음 보는 사람이 아는 말이 아니다.**
+         무엇을 하는 버튼인지 글자가 그대로 말해 준다. */
+      b.innerHTML = 더하기아이콘 + '<span>재료 직접 입력하기</span>';
+      return b;
     }
     /* 🔴 아직 아무것도 안 담았을 때는 **무엇을 눌러야 하는지**를 알려 준다(2026-08-25 사용자님).
        `+` 를 글자가 아니라 **화면의 그 버튼 모양 그대로** 그린다 — 글자로 「(+) 버튼을 눌러…」라고 쓰면
@@ -6395,13 +6813,34 @@
        ⚠️ `aria-hidden` 을 걸지 않는다. 그래야 화면낭독기가 「더하기」로 읽어 문장이 성립한다 —
           숨기면 「를 눌러 재료를 담아 주세요」가 되어 주어가 사라진다. */
     const 담기안내 = '<i class="sauce-count-ic">+</i> 를 눌러 재료를 담아 주세요';
+    /* 🔴 **이름을 적은 기타만 센다.** 방금 누른 빈 칸은 아직 아무것도 아니라서,
+       세면 「2가지 담음」인데 화면에는 하나만 적혀 있는 꼴이 된다.
+       ⚠️ 「다음」이 눌리는 조건도 이 숫자를 쓴다(`버튼갱신`). */
+    const 담은개수 = () => picked.size + 기타.filter((it) => it.n.trim()).length;
+    /* 담은 것을 **저장할 꼴 그대로** 만든다 — `[이름, 양, 단위]` 의 배열이다.
+       🔴 2단계의 「담은 재료」 목록과 실제 저장이 **이 함수 하나**를 함께 쓴다.
+          따로 만들면 화면에 보이는 것과 저장되는 것이 어긋날 수 있다.
+       🔴 **소스바 순서대로**다. 레시피 데이터의 재료 정렬 기준(`sortIngs`)과 같은 순서라
+          상세 모달에서 기존 레시피와 똑같이 보인다.
+       🔴 이름은 **원래 이름(`SAUCE_BAR`)** 으로 적는다 — 화면에서 짧게 부르는 이름(`표시이름`)으로
+          적으면 레시피 데이터와 어긋나 재료 정렬과 검사기가 깨진다(위 `소스바이름` 주석).
+       🔴 **「기타」는 맨 뒤에 붙인다**(얼개 4절). 소스바에 없는 이름이라 `sortIngs` 가 자리를
+          못 정하는데, 그 함수는 모르는 이름을 맨 뒤로 보내므로 결과가 여기와 같다.
+       ⚠️ 양은 여기서 마지막으로 정리한다. 숫자 칸을 비운 채 넘어오면 `''` 가 그대로 남아
+          상세에서 양이 안 보인다. */
+    function 담은재료() {
+      const 양정리 = (q) => { const v = parseFloat(q); return String(isNaN(v) || v <= 0 ? 1 : v); };
+      return SAUCE_BAR.filter((n) => picked.has(n))
+        .map((n) => [n, 양정리(picked.get(n).q), picked.get(n).u])
+        .concat(기타.filter((it) => it.n.trim()).map((it) => [it.n.trim(), 양정리(it.q), it.u]));
+    }
     function 발밑갱신() {
-      const n = picked.size;
+      const n = 담은개수();
       if (n) countEl.textContent = n + '가지 담음';
       else countEl.innerHTML = 담기안내;
       countEl.classList.toggle('is-on', n > 0);
-      // 🔴 하나도 안 담으면 저장할 수 없다 — 이름만 있는 빈 소스는 목록에서 아무 뜻이 없다
-      saveBtn.disabled = n === 0;
+      // 🔴 아래 버튼이 눌리는 조건은 단계마다 다르다 — 한 곳(`버튼갱신`)에서만 정한다
+      버튼갱신();
     }
 
     // ── 담기·양·단위 ────────────────────────────────────────────────────────
@@ -6414,26 +6853,92 @@
        0.5 단위(0.5·1.5·2.5)는 17% 인데, 그것 때문에 모두가 두 배로 눌러야 했다 —
        「3스푼」에 네 번 눌러야 하던 것이 두 번이 된다.
        ⚠️ 0.5 는 **가운데 숫자를 눌러 직접 친다.** 어차피 `0.3` 같은 소수는 그 칸으로만 된다. */
-    function 양조절(n, d) {
-      const it = picked.get(n);
+    /* 줄 하나가 가리키는 항목을 찾는다 — 소스바 재료면 `picked`, 「기타」면 `기타` 배열에서.
+       🔴 양 조절·숫자 칸은 **두 종류가 같은 코드를 쓴다.** 화면에서 똑같이 생겼으니 동작도 같아야 한다. */
+    function 항목찾기(row) {
+      if (!row) return null;
+      if (row.dataset.etc) return 기타.find((x) => x.id === row.dataset.etc) || null;
+      return picked.get(row.dataset.n) || null;
+    }
+    // 줄 하나만 다시 그린다(기타·소스바 공통). 🔴 통째로 다시 그리면 치던 칸에서 초점이 날아간다.
+    function 줄다시그리기(row) {
+      const it = 항목찾기(row);
+      if (row.dataset.etc) {
+        if (it) row.replaceWith(기타줄만들기(it));
+        발밑갱신();
+        return;
+      }
+      줄갱신(row.dataset.n);
+    }
+    function 양조절(row, d) {
+      const it = 항목찾기(row);
       if (!it) return;
       let v = parseFloat(it.q);
       if (isNaN(v)) v = 1;                      // 칸을 비워 둔 채 −/+ 를 누른 경우
-      v = Math.round((v + d) * 100) / 100;
-      if (v > 최대양) v = 최대양;               // 위 `최대양` 주석 참고
-      // 🔴 1 아래로 내려가면 **목록에서 뺀다.** 0 스푼짜리 재료는 안 넣은 것과 같다.
-      //    직접 쳐 넣은 0.5 에서 `−` 를 누르면 0 이 되므로 이 조건에 걸려 빠진다 — 의도한 동작이다.
-      if (v < 1) picked.delete(n); else it.q = String(v);
-      줄갱신(n);
+      let 새값 = Math.round((v + d) * 100) / 100;
+      if (새값 > 최대양) 새값 = 최대양;         // 위 `최대양` 주석 참고
+      /* 🔴 **1 아래로는 안 내려간다**(2026-08-27 사용자님 확정. ✕ 가 생기면서 바뀌었다).
+         ■ 예전엔 1 에서 한 번 더 누르면 목록에서 빠졌다. 이제 **빼는 길은 ✕ 하나**다 —
+           단추 하나가 한 가지 일만 하게 나눈 것이다.
+         ⚠️ 직접 쳐 넣은 `0.5` 에서 `−` 를 누르면 **그대로 0.5 다**(1 로 올라가지 않는다).
+            새 값이 1 보다 작으면 아예 안 바꾸기 때문이다 — 내리려다 올라가면 놀란다. */
+      it.q = String(새값 >= 1 ? 새값 : v);
+      줄다시그리기(row);
+    }
+    /* 담은 재료를 목록에서 뺀다. 🔴 되돌리기를 두지 않는다 — 다시 담는 것이 `+` 한 번이라 잃을 것이 없다.
+       ⚠️ 「기타」는 **줄 자체가 사라진다**(소스바 재료는 `+` 가 있는 빈 줄로 되돌아간다). 적은 것이
+          곧 그 줄이라, 빼고 나면 남을 것이 없어서다. */
+    function 빼기(row) {
+      if (row.dataset.etc) {
+        const i = 기타.findIndex((x) => x.id === row.dataset.etc);
+        if (i >= 0) 기타.splice(i, 1);
+        row.remove();
+        발밑갱신();
+        return;
+      }
+      picked.delete(row.dataset.n);
+      줄갱신(row.dataset.n);
+    }
+    // 「기타」 한 줄을 새로 만든다. 🔴 이름은 비운 채로 시작한다 — 세지도, 저장되지도 않는다.
+    function 기타담기() {
+      const it = { id: 'e' + (++기타번호), n: '', q: '1', u: 기본단위 };
+      기타.push(it);
+      const 줄 = 기타줄만들기(it);
+      const 버튼 = listEl.querySelector('.si-etc-add');
+      if (버튼) listEl.insertBefore(줄, 버튼); else listEl.appendChild(줄);
+      발밑갱신();
+      /* 🔴 **초점을 칸으로 보내지 않는다**(2026-08-27 실기기에서 잡음. 한 번 그렇게 만들었다가 물렀다).
+         ■ 무엇이 보였나 — 누르는 순간 자판이 올라오면서 **방금 만든 줄을 통째로 덮었다.**
+           목록 맨 아래에 생기는 줄이라 자판 자리와 정확히 겹친다.
+         ■ 왜 안 고쳐지나 — 아이폰은 **손가락으로 누른 칸**은 자판 위로 올려 주지만,
+           코드가 보낸 초점에는 그렇게 해 주지 않는다. 그래서 덮인 채로 남는다.
+         🔴 대신 **줄을 보이는 자리로 데려오기만 한다.** 사람이 그 칸을 누르면 그때 사파리가
+            제 손으로 자판 위에 올려 준다 — 그 길이 확실하다.
+         ⚠️ 앱 규칙이기도 하다 — 「갑자기 글자 입력칸에 들어가면 당황스럽다」(`focusLanding` 주석). */
+      /* ⚠️ **줄만 보이게 하면 안 된다** — 새 줄 바로 아래가 「재료 직접 입력하기」 버튼인데,
+         줄에 딱 맞춰 내리면 그 버튼이 화면 밖으로 밀린다(실측). 새 줄은 늘 **끝에서 두 번째**라
+         목록을 맨 아래까지 내리면 줄과 버튼이 함께 보인다. */
+      listEl.scrollTop = listEl.scrollHeight;
     }
 
     listEl.addEventListener('click', (e) => {
+      if (e.target.closest('.si-etc-add')) { 기타담기(); return; }
       const row = e.target.closest('.si-row');
       if (!row) return;
-      const n = row.dataset.n;
       const step = e.target.closest('[data-step]');
-      if (e.target.closest('.si-add')) { 담기(n); return; }
-      if (step) { 양조절(n, Number(step.dataset.step)); return; }
+      if (e.target.closest('.si-add')) { 담기(row.dataset.n); return; }
+      if (e.target.closest('.si-del')) { 빼기(row); return; }
+      if (step) { 양조절(row, Number(step.dataset.step)); return; }
+    });
+    /* 「기타」 이름 칸 — 값만 적고 **줄을 다시 그리지 않는다**(치던 초점이 날아간다).
+       개수 줄만 고쳐 준다: 이름이 비었다 채워지는 순간 담은 개수가 하나 늘기 때문이다. */
+    listEl.addEventListener('input', (e) => {
+      const 칸 = e.target.closest('.si-etc-name');
+      if (!칸) return;
+      const it = 항목찾기(칸.closest('.si-row'));
+      if (!it) return;
+      it.n = 칸.value;
+      발밑갱신();
     });
     /* 숫자를 직접 치는 칸 — 치는 동안에는 다시 그리지 않는다(초점이 날아간다).
        🔴 **숫자와 소수점만 받는다**(2026-08-26 사용자님). `2~3`·`취향껏` 같은 자유 입력은 막는다 —
@@ -6444,7 +6949,7 @@
       const inp = e.target.closest('.si-amt');
       if (!inp) return;
       const row = inp.closest('.si-row');
-      const it = row && picked.get(row.dataset.n);
+      const it = 항목찾기(row);   // 소스바 재료와 「기타」가 같은 코드를 쓴다(위 `항목찾기` 주석)
       if (!it) return;
       let v = inp.value.replace(/[^0-9.]/g, '');
       const 조각 = v.split('.');
@@ -6470,7 +6975,7 @@
       const inp = e.target.closest('.si-amt');
       if (!inp) return;
       const row = inp.closest('.si-row');
-      const it = row && picked.get(row.dataset.n);
+      const it = 항목찾기(row);   // 소스바 재료와 「기타」가 같은 코드를 쓴다(위 `항목찾기` 주석)
       if (!it) return;
       const v = parseFloat(it.q);
       it.q = (!it.q || isNaN(v) || v <= 0) ? '1' : String(v);
@@ -6493,27 +6998,38 @@
        뒤 화면 스크롤 잠금 · `aria-hidden` · `inert` · 배경 비활성화를 **관찰자가 알아서** 맞춘다
        (위 `syncScrollLock` 주석 참고 — 닫는 길이 늘어도 빠뜨릴 일이 없게 만든 장치다).
        ⚠️ 여기서 그 속성들을 직접 건드리면 관찰자와 서로 덮어쓴다. 하지 말 것. */
-    function open() {
-      돌아갈자리 = popupOpener();
+    /* `옵션.돌아갈곳` — 닫았을 때 초점이 갈 자리를 부르는 쪽이 정한다(2026-08-27).
+       🔴 홈 박스에서 열 때 필요하다. 그 길은 **레시피 탭으로 옮긴 뒤** 창을 여는데,
+          그러면 눌렀던 홈 박스는 숨은 화면 안에 있어 되돌아갈 자리가 못 된다. */
+    function open(옵션) {
+      돌아갈자리 = (옵션 && 옵션.돌아갈곳) ? makeReturnTicket(옵션.돌아갈곳) : popupOpener();
+      단계 = 1;   // 🔴 늘 재료 담기부터 시작한다 — 2단계에서 닫았어도 다음에 열면 1단계다
       /* 🔴 **열 때 비운다**(2026-08-25 사용자님 지시 — 「닫으면 없어져야 하지 않나」).
          닫는 쪽에서 비우지 않는 이유: 오버레이가 0.22초에 걸쳐 사라지는 동안 아직 보이는데,
          그때 목록을 지우면 **담은 것이 눈앞에서 하나씩 풀리는 게 보인다.**
          열 때 비우면 결과는 같으면서 그 장면이 없다.
          ⚠️ 저장을 만들고 나면 여기가 「이어서 고치기」의 진입점이 된다 — 그때 조건을 나눠야 한다. */
       picked.clear();
+      기타.length = 0;   // 🔴 기타도 함께 비운다 — 안 비우면 다음에 열었을 때 지난번 것이 남는다
       query = '';
       searchInput.value = '';
       searchBox.classList.remove('has-value');
       render();
+      단계그리기();
       overlay.classList.add('open');
       // 다시 열 때는 늘 맨 위에서 시작한다(스티커 시트와 같은 이유 — opacity 로만 여닫혀 자리가 남는다)
       listEl.scrollTop = 0;
       requestAnimationFrame(() => focusDialogClose(closeBtn));
     }
-    function close() {
+    /* `초점복귀: false` 는 **저장하고 나갈 때** 쓴다(2026-08-27) — 그때는 화면이 「내 소스」 목록으로
+       옮겨 가고 `내소스로가기()` 가 초점을 그 탭에 내려앉힌다. 여기서 홈 박스로 되돌리면
+       두 곳이 초점을 두고 다투다가 **눈에 보이는 자리와 초점이 어긋난다.**
+       ⚠️ X·바깥 클릭·Esc 로 그냥 닫을 때는 **평소대로 되돌린다.** 기본값이 그쪽이다. */
+    function close(옵션) {
       overlay.classList.remove('open');
       const 표 = 돌아갈자리;
       돌아갈자리 = null;
+      if (옵션 && 옵션.초점복귀 === false) return;
       restorePopupFocus(표);
     }
     /* 🔴 담은 게 있으면 **먼저 묻는다**(2026-08-25 사용자님 확정 — 스티커 기록창과 같은 안전장치).
@@ -6523,10 +7039,23 @@
     function requestClose() {
       if (!overlay.classList.contains('open')) return;
       if (leaveConfirmIsOpen()) return;                     // 이미 묻는 중이면 두 번 안 띄운다
-      if (!picked.size) { close(); return; }
+      /* ⚠️ 2단계(이름·팁)에서도 **시트를 통째로 닫는다.** 1단계로 물러서지 않는다 —
+         X 는 「이 창을 그만둔다」는 뜻이고, 1단계로 가는 길은 아래 「뒤로」다.
+         담은 재료가 있으므로 여기서도 확인창이 뜬다. */
+      /* 🔴 **`담은개수()` 로 본다 — `picked.size` 가 아니다**(2026-08-27 사용자님이 잡으심).
+         `picked` 에는 소스바 재료만 들어 있어서, **직접 입력한 재료만 적어 놓고 X 를 누르면
+         아무것도 안 묻고 닫혔다.** 담은 것을 세는 곳은 한 군데(`담은개수`)로 모아 둔다. */
+      if (!담은개수()) { close(); return; }
       openLeaveConfirm(close, { sheet: sheet, closeBtn: closeBtn });
     }
-    openBtn.addEventListener('click', open);
+    /* 🔴 홈 박스에서 열면 **레시피 탭 + 내 소스로 옮긴 뒤** 창을 연다(얼개 2절 ①, 2026-08-27에 붙였다).
+       ■ 왜 — 창을 닫았을 때 홈이 아니라 **방금 만든 소스가 보이는 자리**에 있게 된다.
+       ⚠️ 옮기고 나면 눌렀던 홈 박스는 숨은 화면 안에 있어 되돌아갈 자리가 못 된다 —
+          그래서 「소스 만들기」 버튼을 돌아갈 자리로 넘겨준다. */
+    openBtn.addEventListener('click', () => {
+      내소스로가기();
+      open({ 돌아갈곳: mySauceMakeBtn });
+    });
     /* 🔴 여는 곳이 둘이 됐다(2026-08-26) — 홈 박스(`#homeSauce`)와 **내 소스 목록의 「소스 만들기」**.
        ⚠️ 두 번째 버튼을 여기서 `getElementById` 로 또 잡지 않는다 — 이 IIFE 는 소스 시트만 알아야 하고,
           목록 쪽 사정(언제 보이는지·언제 생기는지)까지 알면 두 곳이 서로 묶인다.
@@ -6540,11 +7069,153 @@
       if (e.key === 'Escape' && overlay.classList.contains('open')) requestClose();
     });
     sheet.addEventListener('keydown', (e) => trapFocusWithin(sheet, e));
+    /* 상단바를 눌렀을 때 이 시트가 할 일 — 위쪽 `소스시트상단바처리` 주석에 경위가 다 있다.
+       🔴 돌려주는 값이 **「가로챘나」**다. `true` 면 부르는 쪽이 상단바의 원래 동작을 멈춘다.
+       ⚠️ 담은 것이 없으면 `false` 를 돌려준다 — 시트만 조용히 닫히고 **탭 이동은 그대로 이어진다.**
+          잃을 것이 없는데 물으면 성가시기만 하다(`requestClose` 와 같은 판단). */
+    소스시트상단바처리 = (되살릴것) => {
+      if (!overlay.classList.contains('open')) return false;
+      if (leaveConfirmIsOpen()) return true;          // 이미 묻는 중이면 아무것도 더 하지 않는다
+      if (!담은개수()) { close(); return false; }   // 🔴 위 `requestClose` 와 같은 이유로 `담은개수()` 다
+      openLeaveConfirm(() => {
+        close();
+        if (되살릴것) 되살릴것();
+      }, { sheet: sheet, closeBtn: closeBtn });
+      return true;
+    };
 
-    // ⚠️ 저장은 아직 안 만들었다 — 이름·팁·사진을 받는 창이 다음 차례다.
-    saveBtn.addEventListener('click', () => {
-      if (window.showToast) window.showToast('저장 화면은 다음에 만들어요');
+    /* ══════════════════════════════════════════════════════════════════════
+       2단계 — 이름·팁을 받아 저장한다 (2026-08-27)
+
+       🔴 **고치기 전에 `docs/나만의소스-얼개.md` 5절을 읽을 것.**
+
+       🔴 **작은 창(모달)이 아니라 이 시트 안의 두 번째 화면이다**(2026-08-27 사용자님 지시로 바뀌었다).
+          ■ 왜 바뀌었나 — 처음에는 시트 위에 작은 창을 띄웠다. 그런데 아이폰에서 이름·팁 칸에
+            글자를 치고 자판을 내리면 **뒤 시트 위쪽 상단바 자리에 홈 화면이 비쳤다**(실기기).
+            사파리가 **입력칸을 자판 위로 올리려고 화면을 통째로 밀기** 때문이다 —
+            창이 짧아 굴릴 데가 없으면 화면을 민다.
+          ■ 시트처럼 길면 사파리가 **창 안에서** 굴려 칸을 보여 준다. 스티커 기록 시트에서
+            같은 증상이 안 나는 이유가 그것이다(사용자님이 라이브·터널 둘 다 확인).
+          ⚠️ **작은 창으로 되돌리지 말 것.** 화면 가운데에 두는 안·위로 올리는 안 둘 다 검토했고
+             이 구조로 대체됐다.
+
+       ■ 오가는 길 — 1단계에서 「다음」 → 2단계. 2단계에서 「뒤로」 → 1단계(담은 재료는 그대로).
+          X·바깥·Esc 는 **어느 단계에서든 시트를 통째로 닫는다**(담은 게 있으면 확인창).
+       ⚠️ **사진 칸은 아직 없다** — 「내 코드」에 실을지가 미정이라 판단 전에 안 붙였다(얼개 3절).
+       ══════════════════════════════════════════════════════════════════════ */
+    const titleEl = document.getElementById('sauceTitle');
+    const formEl = document.getElementById('sauceForm');
+    const ingsEl = document.getElementById('sauceSaveIngs');
+    const backBtn = document.getElementById('sauceBackBtn');
+    const nameInput = document.getElementById('sauceSaveName');
+    const tipInput = document.getElementById('sauceSaveTip');
+    let 단계 = 1;
+
+    // 🔴 아래 줄·제목·검색창이 단계마다 다르다. **바꾸는 곳은 이 함수 하나뿐**이어야 한다 —
+    //    여기저기서 따로 바꾸면 한 곳만 고쳤을 때 화면이 반쪽으로 어긋난다.
+    function 단계그리기() {
+      const 둘째 = 단계 === 2;
+      titleEl.textContent = 둘째 ? '소스 저장하기' : '소스 만들기';
+      listEl.hidden = 둘째;
+      formEl.hidden = !둘째;
+      // 🔴 2단계에서는 검색창을 감춘다 — 재료 목록이 없는 화면에서 검색은 뜻이 없다.
+      //    ⚠️ 검색어는 비우지 않는다. 「뒤로」로 돌아오면 보던 목록 그대로여야 한다.
+      searchBox.hidden = 둘째;
+      countEl.hidden = 둘째;
+      backBtn.hidden = !둘째;
+      /* 🔴 2단계에서는 아래 줄의 두 버튼을 **오른쪽에 나란히** 붙인다(2026-08-27 사용자님 지적).
+         1단계는 왼쪽이 「1가지 담음」이라는 **글**이고 오른쪽이 행동이라 양끝이 맞다.
+         2단계는 「뒤로」와 「저장」이 **둘 다 행동**인데 375px 에서 191px 이나 떨어져 있었다(실측) —
+         짝으로 안 읽히고 한 손으로 오가기도 멀다. 확인창(`.leave-confirm-actions`)도 붙여 놓는다. */
+      sheet.classList.toggle('is-step2', 둘째);
+      saveBtn.textContent = 둘째 ? '저장' : '다음';
+      발밑갱신();
+    }
+    /* 🔴 「다음」은 하나라도 담아야 눌린다. 「저장」은 **이름까지** 있어야 눌린다.
+       ⚠️ 공백만 친 이름은 빈 것으로 본다 — 「   」이라는 이름이 생기면 목록에서 구분이 안 된다. */
+    function 버튼갱신() {
+      saveBtn.disabled = 단계 === 2 ? !nameInput.value.trim() : 담은개수() === 0;
+    }
+    function 다음단계() {
+      if (!담은개수()) return;
+      /* 🔴 **이름이 빈 기타 줄은 여기서 버린다.** 눌러 놓고 안 적은 칸인데, 그대로 두면
+         「뒤로」로 돌아왔을 때 빈 줄이 남아 있고 저장 자료에도 이름 없는 재료가 섞인다.
+         ⚠️ 세지도 않던 줄이라 개수가 달라지지 않는다 — 눈에 띄는 변화는 빈 줄이 없어지는 것뿐이다. */
+      for (let i = 기타.length - 1; i >= 0; i--) if (!기타[i].n.trim()) 기타.splice(i, 1);
+      단계 = 2;
+      nameInput.value = '';
+      tipInput.value = '';
+      단계그리기();
+      /* 🔴 **담은 것을 여기서 한 번 보여 준다**(2026-08-27 사용자님 제안). 2단계에서는 개수 줄이
+         「뒤로」에 자리를 내줘서 **뭘 담았는지 아예 안 보였다** — 확인하려면 뒤로 갔다 와야 했다.
+         🔴 **상세 모달과 같은 부품(`renderIngList`)으로 그린다.** 저장하면 그 화면에서 이 모양
+            그대로 보이니, 이 목록이 곧 **미리보기**가 된다.
+         🔴 **읽기만 한다 — 여기서 고칠 수 없다.** 고치는 길은 바로 아래 「뒤로」다. 두 곳에서
+            고치게 하면 같은 일에 길이 둘이 된다.
+         ⚠️ 저장과 **같은 함수**(`담은재료`)를 쓴다. 보이는 것과 저장되는 것이 어긋나면 안 된다. */
+      ingsEl.hidden = false;
+      /* 🔴 여기서는 **매장 이름표 그대로** 부른다(2026-08-27 사용자님 확정) — 「마라시즈닝/고춧가루」가
+         아니라 「마라시즈닝」이다. 만들기 → 확인 → 저장이 한 흐름인데 중간에서 이름이 바뀌면
+         「내가 고른 게 이게 맞나」 싶어진다. 위 `소스바이름` 주석과 같은 근거다.
+         ⚠️ **저장되는 이름은 그대로 정식 이름**이다(`담은재료()` 는 안 건드린다) — 바꾸는 것은
+            화면 글자뿐이고, 레시피 데이터와 어긋나면 재료 정렬과 검사기가 깨진다.
+            그래서 상세 모달로 열면 그때는 병기가 나온다.
+         ⚠️ 사용자님이 **병기 자체를 없앨 생각**이라 하셨다(2026-08-27, 「매장에 공식적으로 써 있는
+            것만 쓰고 싶다」). 그러면 이 갈림 자체가 사라진다 — 그때 이 줄도 지우면 된다. */
+      renderIngList(ingsEl.querySelector('.sauce-ings-list'),
+        담은재료().map((i) => [표시이름(i[0]), i[1], i[2]]));
+      formEl.scrollTop = 0;
+      /* 초점은 **「뒤로」**로 내려앉힌다 — 화면이 바뀌었다는 것을 낭독기에 알리는 자리다.
+         🔴 **이름 칸으로 보내지 않는다**(앱 규칙 — 위 `focusLanding` 주석: 「갑자기 글자
+            입력칸에 들어가면 당황스럽다」). 아이폰에서 자판이 저절로 올라오는 것도 막는다. */
+      focusLanding(backBtn);
+    }
+    function 앞단계() {
+      단계 = 1;
+      단계그리기();
+      focusLanding(saveBtn);   // 방금 누른 「다음」이 있던 자리다
+    }
+    function 저장실행() {
+      const 이름 = nameInput.value.trim();
+      if (!이름 || !담은개수()) return;
+      const 지금 = Date.now();
+      /* 🔴 **소스바 순서대로** 적어 둔다. 레시피 데이터의 재료 정렬 기준(`sortIngs`)과 같은 순서라
+         상세 모달에서 기존 레시피와 똑같이 보인다.
+         🔴 이름은 **원래 이름(`SAUCE_BAR`)** 으로 적는다 — 화면에서 짧게 부르는 이름(`표시이름`)으로
+            적으면 레시피 데이터와 어긋나 재료 정렬과 검사기가 깨진다(위 `소스바이름` 주석).
+         ⚠️ 양은 마지막으로 한 번 더 정리한다. 숫자 칸을 비운 채 「다음」으로 넘어오면 `''` 가
+            그대로 저장돼 상세에서 양이 안 보인다. */
+      const 재료 = 담은재료();
+      mySauceData.records.push({
+        id: newMySauceId(),
+        name: 이름,
+        ings: 재료,
+        tip: tipInput.value.trim(),
+        addedAt: 지금,
+        // 🔴 처음 만들 때도 `editedAt` 을 넣는다 — 합치기가 「마지막으로 손댄 시각」으로 견주는데,
+        //    비워 두면 나중에 고치는 길이 생겼을 때 옛 기록만 기준이 달라진다.
+        editedAt: 지금,
+      });
+      saveMySauces();
+      close({ 초점복귀: false });
+      내소스로가기();
+      if (window.showToast) window.showToast('소스를 저장했어요');
+    }
+
+    nameInput.addEventListener('input', 버튼갱신);
+    /* 이름 칸에서 Enter — 아이폰 자판의 **「다음」**이 이 자리다(`enterkeyhint="next"`).
+       🔴 **저장하지 않는다.** 팁 칸으로 넘어간다 — 이름만 치고 자판을 눌렀다가 팁도 못 쓰고
+          저장돼 버리면 안 된다(한 번 그렇게 만들었다가 고쳤다).
+       ⚠️ 자판이 안 내려가므로 화면이 밀렸다 돌아오는 깜빡임도 없다. */
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); tipInput.focus(); }
     });
+    // 팁 칸에서 Enter — 아이폰 자판의 「완료」다(`enterkeyhint="done"`). 여기서는 저장으로 간다.
+    tipInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); 저장실행(); }
+    });
+    backBtn.addEventListener('click', 앞단계);
+    saveBtn.addEventListener('click', () => { if (단계 === 2) 저장실행(); else 다음단계(); });
 
     render();
   })();
