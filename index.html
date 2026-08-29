@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=842">
+<link rel="stylesheet" href="styles.css?v=843">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -827,7 +827,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round"><g transform="translate(12 12) scale(1.667) translate(-12 -12)"><path d="M6 6l12 12M18 6L6 18" stroke-width="1.02"/></g></svg>
       </button>
       <!-- 두 단계가 같은 자리를 쓴다 — 1단계 「소스 만들기」 / 2단계 「소스 저장하기」(script.js 가 바꾼다) -->
-      <p class="sauce-title" id="sauceTitle">재료를 담아볼까요?</p>
+      <p class="sauce-title" id="sauceTitle">재료를 담아주세요</p>
       <!-- 단계 표시 — 홈 배너의 점과 같은 문법(작은 점 셋 + 지금 자리만 알약).
            🔴 켜진 자리는 script.js 가 `is-on` 으로 옮긴다. 여기에 박지 말 것. -->
       <div class="sauce-steps" id="sauceSteps" role="group" aria-label="소스 만들기 단계">
@@ -886,6 +886,9 @@
         <button class="sauce-yn-btn" id="saucePhotoNo" type="button" role="radio" aria-checked="false">아니오</button>
       </div>
       <div class="sauce-photo" id="saucePhoto" hidden>
+        <!-- 🔴 「지우기」는 **사진 위**에 둔다(2026-08-29 사용자님 지시).
+             사진이 화면 폭을 꽉 채우면서 아래에 두었을 때 화면 밖으로 밀려 안 보였다. -->
+        <button class="sauce-photo-clear" id="saucePhotoClear" type="button" hidden>지우기</button>
         <button class="sauce-photo-btn" id="saucePhotoBtn" type="button">
           <span class="sauce-photo-empty" id="saucePhotoEmpty">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -895,7 +898,6 @@
           </span>
           <img class="sauce-photo-img" id="saucePhotoImg" alt="" hidden>
         </button>
-        <button class="sauce-photo-clear" id="saucePhotoClear" type="button" hidden>지우기</button>
         <input type="file" id="saucePhotoInput" accept="image/*" hidden aria-label="소스 사진 고르기">
       </div>
     </div>
@@ -1442,7 +1444,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=841"></script>
+<script src="script.js?v=843"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

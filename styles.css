@@ -6498,7 +6498,9 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
       사용자님이 짧은 쪽을 고르셨다. 이 자리는 **아직 저장 전**이라 실제로 잃는 것은 없다. */
 .sauce-photo-clear {
   display: block;
-  margin-top: 8px;
+  /* 🔴 사진 **위**에 오른쪽 끝으로 붙인다(2026-08-29). 사진이 화면 폭을 꽉 채우면서
+     아래에 두었을 때 화면 밖으로 밀려 안 보였다. */
+  margin: 0 0 8px auto;
   padding: 0;
   border: 0;
   background: none;
