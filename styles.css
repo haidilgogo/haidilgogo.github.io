@@ -6367,10 +6367,13 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   margin: 0 0 14px;
 }
 .taste-row[hidden] { display: none; }
-/* 🔴 상세 화면에서는 **좌우 여백 20px** 이 필요하다(2026-08-29 사용자님이 잡으심).
-   `.modal-desc` 가 `margin: 12px 20px 0` 을 갖는데 이 줄에는 없어서 **혼자 왼쪽 끝에 붙었다.**
+/* 🔴 상세 화면에서는 **설명 칸(`.modal-desc`)과 똑같은 여백**을 쓴다 — `margin: 12px 20px 0`.
+   (2026-08-29 사용자님이 두 번 잡으심 — 처음엔 좌우가 안 맞았고, 다음엔 위아래 간격이 어긋났다.)
+   ■ 이 줄이 **설명이 오던 자리**를 대신하므로, 여백도 그 자리 것을 그대로 물려받아야
+     사진→이름→(설명/키워드)→소스바 리듬이 기존 레시피와 같아진다.
+   ⚠️ `.taste-row` 의 `margin: 0 0 14px` 을 덮는다 — 그 값은 3단계 미리보기용이다.
    ⚠️ 3단계 미리보기(`#saucePreviewTastes`)에는 주지 않는다 — 거기는 카드 안이라 이미 여백이 있다. */
-#modalTastes { margin-left: 20px; margin-right: 20px; }
+#modalTastes { margin: 12px 20px 0; }
 .taste-chip {
   padding: 5px 10px;
   border-radius: 999px;
