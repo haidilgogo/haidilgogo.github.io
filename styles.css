@@ -6798,11 +6798,13 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
      ⚠️ 아래 여백 12px 은 예전에 이 자리에 있던 단계 점이 쓰던 값이다 — 그대로 물려받았다. */
   margin: 0 0 12px;
   font-size: 13px;
-  color: var(--text-muted);
+  /* 🔴 검정 · 굵기 400 이다(2026-08-29 사용자님 확정). 담기 전·후가 같다. */
+  color: #000;
+  font-weight: 400;
 }
 /* 담은 개수의 숫자만 빨갛게(2026-08-29 사용자님 지시).
-   🔴 굵기는 `.sauce-count.is-on` 이 줄 전체에 이미 700 을 주므로 여기서 또 주지 않는다. */
-.sauce-count-n { color: var(--brand-red); }
+   ⚠️ `<b>` 라서 글꼴이 저절로 굵어지는 것을 **되돌린다** — 줄 전체가 400 이므로 숫자만 굵으면 어긋난다. */
+.sauce-count-n { color: var(--brand-red); font-weight: inherit; }
 
 /* 안내문 속 담기 버튼 그림 — 목록의 `.si-add` 와 **같은 모양**이라야 「저걸 누르라」는 뜻이 통한다.
    🔴 글자(`+`)를 그대로 담고 있다. 화면낭독기가 「더하기」로 읽어야 문장이 성립하기 때문이다. */
@@ -6819,7 +6821,11 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   font-style: normal;
   line-height: 1;
 }
-.sauce-count.is-on { color: var(--text-dark); font-weight: 700; }
+/* 🔴 **담기 전·후 색과 굵기를 같게 둔다**(2026-08-29 사용자님 확정 — 검정 · 400).
+   예전에는 담은 뒤에만 진해지고 굵어졌는데(`--text-dark` + 700), 사용자님이 통일하기로 하셨다.
+   ⚠️ 그래서 두 상태를 가르는 것은 **글자 내용과 빨간 숫자**뿐이다. 색·굵기로는 안 갈린다.
+   ⚠️ 규칙은 남겨 둔다 — JS 가 `is-on` 을 계속 붙였다 뗐다 하고, 나중에 다시 쓸 수 있다. */
+.sauce-count.is-on { }
 .sauce-save {
   flex: none;
   border: 0;
