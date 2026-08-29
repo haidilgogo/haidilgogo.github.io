@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=847">
+<link rel="stylesheet" href="styles.css?v=856">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -828,11 +828,9 @@
       </button>
       <!-- 두 단계가 같은 자리를 쓴다 — 1단계 「소스 만들기」 / 2단계 「소스 저장하기」(script.js 가 바꾼다) -->
       <p class="sauce-title" id="sauceTitle">재료를 담아주세요</p>
-      <!-- 단계 표시 — 홈 배너의 점과 같은 문법(작은 점 셋 + 지금 자리만 알약).
-           🔴 켜진 자리는 script.js 가 `is-on` 으로 옮긴다. 여기에 박지 말 것. -->
-      <div class="sauce-steps" id="sauceSteps" role="group" aria-label="소스 만들기 단계">
-        <i></i><i></i><i></i>
-      </div>
+      <!-- 담은 개수 — **1단계에서만** 쓴다(2026-08-29 사용자님 지시로 발밑에서 여기로 올렸다).
+           🔴 글자는 script.js 가 넣는다. 여기에 박지 말 것. -->
+      <p class="sauce-count" id="sauceCount">재료를 담아 주세요</p>
       <!-- 이름표 — 레시피·메뉴 탭 검색창과 짝이다. 화면에는 「검색」이라는 자리표시 글자밖에 없어서
            낭독기로는 어느 검색인지 구분되지 않는다(2026-08-09 규칙). -->
       <div class="search-box" id="sauceSearchBox">
@@ -930,7 +928,13 @@
     <!-- 아래 줄은 두 단계가 함께 쓴다 — 1단계: 「담은 개수」 + 「다음」 / 2단계: 「뒤로」 + 「저장」.
          ⚠️ 글자와 보임/숨김은 script.js 가 바꾼다. 여기에 박지 말 것. -->
     <div class="sauce-foot">
-      <span class="sauce-count" id="sauceCount">재료를 담아 주세요</span>
+      <!-- 단계 표시 — 홈 배너의 점과 같은 문법(작은 점 셋 + 지금 자리만 알약).
+           🔴 **발밑 왼쪽**이다(2026-08-29 사용자님 지시). 「몇 단계 남았나」와 「다음」이 나란히 읽힌다.
+              세 단계 내내 같은 자리를 지킨다 — 개수 줄과 달리 늘 있다.
+           🔴 켜진 자리는 script.js 가 `is-on` 으로 옮긴다. 여기에 박지 말 것. -->
+      <div class="sauce-steps" id="sauceSteps" role="group" aria-label="소스 만들기 단계">
+        <i></i><i></i><i></i>
+      </div>
       <button class="sauce-back" id="sauceBackBtn" type="button" hidden>뒤로</button>
       <button class="sauce-save" id="sauceSaveBtn" type="button" disabled>다음</button>
     </div>
@@ -1455,7 +1459,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=855"></script>
+<script src="script.js?v=856"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
