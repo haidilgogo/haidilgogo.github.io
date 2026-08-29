@@ -499,6 +499,32 @@
     try { localStorage.setItem(MY_SAUCES_KEY, JSON.stringify(mySauceData)); } catch (e) { /* 시크릿 모드 등 저장 실패 무시 */ }
     schedulePush(); // 서버 사본 갱신 + 코드 생성(맨 아래 「내 데이터 코드」 절)
   }
+
+  /* ── 내 소스 사진 — **이 기기에만 둔다** (2026-08-29 사용자님 확정) ──────────────────
+     🔴 **저장 키를 따로 둔 것이 핵심이다.** 「내 코드」에 실리는 것은 `MY_SAUCES_KEY` 하나뿐이라
+        (`syncPayload`), 사진을 여기 두면 **동기화 코드를 한 줄도 안 건드려도 자동으로 안 실린다.**
+        ⚠️ 기록 안(`records[].photo`)에 넣고 나중에 빼는 방식은 **빠뜨리기 쉽다** — 합치기·올리기·
+           받기 세 곳을 전부 기억해야 한다. 그래서 처음부터 갈라 둔다.
+     🔴 **왜 안 싣나**(사용자님 확정) — 사진은 글자보다 훨씬 무겁다. 소스 하나가 지금 몇백 바이트인데
+        400px 사진은 40~80KB 다. 다른 기기에서 열면 이미지 자리가 비어 있고, 재료·이름·팁은 그대로 간다.
+     🔴 **모양은 `{ 기록id: dataURL }`** 이다. 기록과 같은 id 로 묶여 있어서 지울 때 같이 지운다.
+     ⚠️ 사진이 없는 소스는 키 자체가 없다 — `undefined` 가 곧 「사진 없음」이다. */
+  const MY_SAUCE_PHOTOS_KEY = 'haidilao_my_sauce_photos';
+  let mySaucePhotos = {};
+  try {
+    const 저장된사진 = JSON.parse(localStorage.getItem(MY_SAUCE_PHOTOS_KEY) || 'null');
+    if (저장된사진 && typeof 저장된사진 === 'object') mySaucePhotos = 저장된사진;
+  } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
+  /* 🔴 `schedulePush()` 를 **부르지 않는다.** 이 자료는 서버로 안 간다 — 위 주석 참고.
+     ⚠️ 저장이 실패할 수 있다(용량 초과·시크릿 모드). 실패하면 **false** 를 돌려주어
+        부르는 쪽이 사용자님께 알릴 수 있게 한다 — 조용히 사라지면 「저장했는데 사진이 없다」가 된다. */
+  function saveMySaucePhotos() {
+    try {
+      localStorage.setItem(MY_SAUCE_PHOTOS_KEY, JSON.stringify(mySaucePhotos));
+      return true;
+    } catch (e) { return false; }
+  }
+  function 사진가져오기(id) { return (id && mySaucePhotos[id]) || ''; }
   /* 🔴 접두어 `ms` 는 **레시피 id(`s1`·`h1`·`t1`)와도, 스티커 기록 id(`r…`)와도** 겹치지 않게 고른 것이다.
      셋이 같은 코드에 실려 한 덩어리로 오가므로 겹치면 서로 덮어쓴다. */
   function newMySauceId() {
@@ -513,12 +539,18 @@
         (`nameWithStar`)가 이 값을 먼저 쓴다. 위 `escHtml` 주석 참고.
      ⚠️ `mine: true` 가 카드·모달·걸러내기의 **갈림길**이다. 빼면 남의 레시피처럼 그려진다. */
   function mySauceToRecipe(rec) {
+    /* 🔴 사진이 있으면 `img` 에 실어 준다(2026-08-29). 그러면 **카드도 상세도 손댈 것이 없다** —
+       둘 다 `r.img` 갈래가 먼저 걸려 사진을 그린다(`homeCardBody` · `openModal`).
+       ⚠️ 사진은 이 기기에만 있다. 다른 기기에서는 `img` 가 비어 빈 자리가 나온다(그게 맞는 동작이다). */
+    const 사진 = 사진가져오기(rec.id);
     return {
       id: rec.id,
       cat: '소스',
       mine: true,
       name: rec.name || '',
       nameHtml: escHtml(rec.name || ''),
+      img: 사진 || undefined,
+      imgFit: 사진 ? 'cover' : undefined,
       ings: rec.ings || [],
       steps: [],
       tip: rec.tip || '',
@@ -3196,6 +3228,11 @@
     const 지울id = currentModalRecipe.id;
     mySauceData.records = mySauceData.records.filter((r) => r.id !== 지울id);
     if (mySauceData.deleted.indexOf(지울id) === -1) mySauceData.deleted.push(지울id);
+    /* 🔴 **사진도 같이 지운다**(2026-08-29). 안 지우면 소스는 사라졌는데 사진만 남아
+       저장 공간을 계속 먹는다 — 눈에 안 보이는 자료라 아무도 못 알아챈다.
+       ⚠️ `deleted` 에는 id 만 남으므로 사진은 다른 기기에서 되살아날 일이 없다(원래 안 실린다). */
+    delete mySaucePhotos[지울id];
+    saveMySaucePhotos();
     saveMySauces();
     browseCardCache.delete(지울id);
     resetModalMineDelete();
@@ -7164,6 +7201,83 @@
     const tipInput = document.getElementById('sauceSaveTip');
     let 단계 = 1;
 
+    /* ── 사진 (선택) — 2026-08-29 사용자님 확정 ─────────────────────────────────
+       🔴 **이 기기에만 저장된다.** 저장 키가 따로다(`MY_SAUCE_PHOTOS_KEY`) — 그 주석 참고.
+       🔴 **정사각으로 잘라 400px 로 줄인다.** 원본 그대로 두면 요즘 폰 사진이 한 장에 3~5MB 라
+          `localStorage`(대개 5MB)가 두어 장에 찬다. 카드·상세가 정사각이라 어차피 정사각으로 보인다.
+       🔴 **가운데를 기준으로 자른다** — 자를 자리를 고르게 하는 화면은 안 만들었다. 필요해지면 그때.
+       ⚠️ `URL.createObjectURL` 이 아니라 `FileReader` 를 쓴다 — 저장할 것은 화면에 잠깐 띄울 주소가
+          아니라 **글자로 남는 그림**(dataURL)이라서다.
+       ⚠️ 아이폰 사진은 회전 정보(EXIF)가 붙어 있는데, `createImageBitmap` 이 그것을 반영해 준다.
+          없는 브라우저에서는 `Image` 로 떨어진다(그때는 회전이 안 맞을 수 있다). */
+    const 사진칸 = document.getElementById('saucePhoto');
+    const 사진버튼 = document.getElementById('saucePhotoBtn');
+    const 사진빈자리 = document.getElementById('saucePhotoEmpty');
+    const 사진그림 = document.getElementById('saucePhotoImg');
+    const 사진빼기버튼 = document.getElementById('saucePhotoClear');
+    const 사진입력 = document.getElementById('saucePhotoInput');
+    const 사진최대 = 400;
+    let 고른사진 = '';   // 이번에 저장할 dataURL. '' 면 사진 없음
+
+    function 사진그리기() {
+      const 있다 = !!고른사진;
+      사진그림.hidden = !있다;
+      사진빈자리.hidden = 있다;
+      사진빼기버튼.hidden = !있다;
+      if (있다) 사진그림.src = 고른사진;
+      else 사진그림.removeAttribute('src');
+      사진버튼.setAttribute('aria-label', 있다 ? '사진 바꾸기' : '사진 고르기');
+    }
+    async function 정사각으로줄이기(file) {
+      const 그림 = await (async () => {
+        if (window.createImageBitmap) {
+          try { return await createImageBitmap(file); } catch (e) { /* 아래로 떨어진다 */ }
+        }
+        const url = await new Promise((res, rej) => {
+          const fr = new FileReader();
+          fr.onload = () => res(fr.result);
+          fr.onerror = () => rej(fr.error);
+          fr.readAsDataURL(file);
+        });
+        return await new Promise((res, rej) => {
+          const im = new Image();
+          im.onload = () => res(im);
+          im.onerror = rej;
+          im.src = url;
+        });
+      })();
+      const w = 그림.width, h = 그림.height;
+      const 변 = Math.min(w, h);                 // 짧은 쪽에 맞춰 가운데를 정사각으로
+      const sx = Math.round((w - 변) / 2), sy = Math.round((h - 변) / 2);
+      const 크기 = Math.min(사진최대, 변);        // 작은 사진을 억지로 키우지 않는다
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 크기;
+      cv.getContext('2d').drawImage(그림, sx, sy, 변, 변, 0, 0, 크기, 크기);
+      if (그림.close) 그림.close();
+      return cv.toDataURL('image/jpeg', 0.82);
+    }
+    사진버튼.addEventListener('click', () => 사진입력.click());
+    사진빼기버튼.addEventListener('click', () => {
+      고른사진 = '';
+      사진입력.value = '';   // 같은 파일을 다시 골라도 change 가 나게 비운다
+      사진그리기();
+      focusLanding(사진버튼);
+    });
+    사진입력.addEventListener('change', async () => {
+      const file = 사진입력.files && 사진입력.files[0];
+      if (!file) return;
+      사진칸.classList.add('is-busy');
+      try {
+        고른사진 = await 정사각으로줄이기(file);
+        사진그리기();
+      } catch (e) {
+        if (window.showToast) window.showToast('사진을 읽지 못했어요');
+      } finally {
+        사진칸.classList.remove('is-busy');
+        사진입력.value = '';
+      }
+    });
+
     // 🔴 아래 줄·제목·검색창이 단계마다 다르다. **바꾸는 곳은 이 함수 하나뿐**이어야 한다 —
     //    여기저기서 따로 바꾸면 한 곳만 고쳤을 때 화면이 반쪽으로 어긋난다.
     function 단계그리기() {
@@ -7217,6 +7331,11 @@
       const 원본 = 고치는중 ? (mySauceData.records || []).find((x) => x.id === 고치는중) : null;
       nameInput.value = 원본 ? (원본.name || '') : '';
       tipInput.value = 원본 ? (원본.tip || '') : '';
+      /* 🔴 고치는 중이면 **넣어 둔 사진도 불러온다**(2026-08-29) — 이름·팁과 같은 이유다.
+         안 불러오면 이름만 고치려고 들어왔다가 **사진이 조용히 사라진다.**
+         ⚠️ 새로 만드는 중이면 반드시 비운다 — 지난번에 고른 사진이 남으면 안 된다. */
+      고른사진 = 원본 ? 사진가져오기(원본.id) : '';
+      사진그리기();
       단계그리기();
       /* 🔴 **담은 것을 여기서 한 번 보여 준다**(2026-08-27 사용자님 제안). 2단계에서는 개수 줄이
          「뒤로」에 자리를 내줘서 **뭘 담았는지 아예 안 보였다** — 확인하려면 뒤로 갔다 와야 했다.
@@ -7290,10 +7409,21 @@
          ⚠️ 다른 기기에서 들어온 변경은 `applyPayload` 가 이미 같은 일을 하고 있다.
             여기가 **같은 기기에서 고쳤을 때** 빠져 있던 자리다. */
       if (고쳤나) browseCardCache.delete(고치는중);
+      /* 🔴 **사진은 따로 저장한다**(2026-08-29). 서버로 안 가는 자료라 `saveMySauces` 와 갈라 둔다.
+         ⚠️ 사진을 뺐으면 **키를 지운다** — 빈 글자로 두면 「사진 없음」인지 「빈 사진」인지 갈리지 않는다.
+         ⚠️ 저장이 실패할 수 있다(용량 초과). 그때는 **알린다** — 조용히 사라지면
+            「저장했는데 사진이 없다」가 되어 무엇이 잘못됐는지 알 길이 없다. */
+      const 저장할id = 고쳤나 ? 고치는중 : mySauceData.records[mySauceData.records.length - 1].id;
+      if (고른사진) mySaucePhotos[저장할id] = 고른사진;
+      else delete mySaucePhotos[저장할id];
+      const 사진저장됨 = saveMySaucePhotos();
       saveMySauces();
       close({ 초점복귀: false });
       내소스로가기();
-      if (window.showToast) window.showToast(고쳤나 ? '소스를 고쳤어요' : '소스를 저장했어요');
+      if (window.showToast) {
+        if (!사진저장됨 && 고른사진) window.showToast('사진은 저장하지 못했어요 (저장 공간 부족)');
+        else window.showToast(고쳤나 ? '소스를 고쳤어요' : '소스를 저장했어요');
+      }
     }
 
     nameInput.addEventListener('input', 버튼갱신);
