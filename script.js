@@ -7266,6 +7266,11 @@
        🔴 **설명 칸 대신**이다. 자세한 근거는 위 `TASTES` 주석에 있다.
        🔴 **선택이다** — 안 골라도 「다음」이 눌린다. 사진처럼 묻지 않는다. */
     const 맛칸 = document.getElementById('sauceTastes');
+    /* 🔴 **하나는 필수, 최대 다섯**(2026-08-29 사용자님 확정).
+       ■ 왜 다섯인가 — 320px 에서 다섯 개까지가 한 줄이다(실측. 여섯이면 두 줄).
+         ⚠️ 지금은 칩이 전부 세 글자라 이 값이 맞다. **네 글자를 넣으면 다시 재야 한다.**
+       ■ 다 채우면 안 고른 칩을 흐리게 하고 못 누르게 한다 — 눌러 보고 안 되는 것보다 미리 보이는 편이 낫다. */
+    const 맛최대 = 5;
     let 고른맛 = [];
     TASTES.forEach((t) => {
       const b = document.createElement('button');
@@ -7275,24 +7280,28 @@
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', () => {
         const i = 고른맛.indexOf(t);
+        if (i < 0 && 고른맛.length >= 맛최대) return;   // 다 찼으면 더 안 받는다
         if (i >= 0) 고른맛.splice(i, 1); else 고른맛.push(t);
         /* 🔴 **누를 때마다 `TASTES` 차례로 다시 담는다.** 누른 순서대로 두면 같은 조합인데도
            카드마다 순서가 달라져(「깔끔 고소 매콤」 vs 「고소 매콤 깔끔」) 목록이 들쭉날쭉해진다. */
         고른맛 = TASTES.filter((x) => 고른맛.indexOf(x) >= 0);
-        b.classList.toggle('is-on', i < 0);
-        b.setAttribute('aria-pressed', String(i < 0));
+        맛그리기();
       });
       맛칸.appendChild(b);
     });
     /* 고른 것을 화면에 다시 입힌다 — 수정으로 들어오거나 시트를 새로 열 때 쓴다.
        ⚠️ **`TASTES` 순서로 다시 담는다.** 누른 순서대로 두면 같은 조합인데 카드마다 순서가 달라진다. */
     function 맛그리기() {
-      고른맛 = TASTES.filter((t) => 고른맛.indexOf(t) >= 0);
+      고른맛 = TASTES.filter((t) => 고른맛.indexOf(t) >= 0).slice(0, 맛최대);
+      const 다참 = 고른맛.length >= 맛최대;
       [...맛칸.children].forEach((b) => {
         const on = 고른맛.indexOf(b.textContent) >= 0;
         b.classList.toggle('is-on', on);
         b.setAttribute('aria-pressed', String(on));
+        // 다 찼으면 안 고른 것만 흐리게. 고른 것은 눌러서 뺄 수 있어야 하므로 그대로 둔다
+        b.disabled = 다참 && !on;
       });
+      버튼갱신();
     }
 
     /* 🔴 사진 질문의 답 — `''`(아직 안 물음) · `'yes'` · `'no'` (2026-08-29 사용자님 확정).
@@ -7587,7 +7596,9 @@
       if (단계 === 3) { saveBtn.disabled = false; return; }
       const 이름있음 = !!nameInput.value.trim();
       const 사진답함 = 사진답 === 'no' || (사진답 === 'yes' && !!고른사진);
-      saveBtn.disabled = !(이름있음 && 사진답함);
+      // 🔴 키워드도 **하나는 있어야 한다**(2026-08-29 사용자님 확정) — 이 자리가 설명을 대신한다
+      const 키워드있음 = 고른맛.length > 0;
+      saveBtn.disabled = !(이름있음 && 사진답함 && 키워드있음);
     }
     function 다음단계() {
       if (!담은개수()) return;

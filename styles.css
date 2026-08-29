@@ -6298,6 +6298,14 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    🔴 **지금은 비어 있다.** 일러스트가 나오면 이 안에 `<img>` 를 넣으면 되고 줄 높이는 그대로다.
    ⚠️ 62px 는 그냥 정한 값이 아니다 — 찍어 온 사진을 이 크기로 줄여 보니 **통이 전부 똑같아 보여서**,
       일러스트는 「통을 빼고 내용물이 칸을 채우는」 그림이어야 한다는 조건이 여기서 나왔다. */
+/* 질문 옆 괄호 힌트 —「(최대 5개)」. 질문보다 한 단계 조용해야 질문이 먼저 읽힌다. */
+.stamp-q-hint {
+  margin-left: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
 /* ── 맛 키워드 (2026-08-29 사용자님 안) ─────────────────────────────────────
    🔴 **고르는 칩**(`.taste-btn`)과 **보여 주는 칩**(`.taste-chip`)이 다르다 —
       고르는 쪽은 누를 수 있어야 하고, 보여 주는 쪽은 읽기만 한다.
@@ -6322,6 +6330,12 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   border-color: var(--brand-red, #D0402E);
   background: var(--brand-red, #D0402E);
   color: #fff;
+}
+/* 🔴 다섯 개를 채우면 **안 고른 칩만** 흐려지고 안 눌린다(2026-08-29).
+   고른 칩은 그대로 둔다 — 눌러서 뺄 수 있어야 하기 때문이다. */
+.taste-btn:disabled {
+  opacity: .38;
+  cursor: default;
 }
 
 /* 보여 주는 자리 — 3단계 미리보기와 상세 화면. 설명이 오던 자리다.

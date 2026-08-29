@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=866">
+<link rel="stylesheet" href="styles.css?v=869">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -902,13 +902,18 @@
       <!-- 맛 키워드 — 2026-08-29 사용자님 안.
            🔴 **설명 칸 대신이다.** 8/25 에 설명을 뺀 이유가 「팁과 설명 둘 다 선택이면 둘 다 빈다」였는데,
               칩은 **누르기만 하면 되니 그 멈칫이 없다.**
-           🔴 **여러 개 고를 수 있고, 선택이다**(안 골라도 넘어간다).
-           🔴 열세 개는 **소스바 재료가 실제로 낼 수 있는 맛**에서 뽑았다(사용자님과 함께 정함).
+           🔴 **하나는 반드시 골라야 하고, 최대 다섯 개다**(2026-08-29 사용자님 확정).
+              ■ 왜 필수인가 — 이 자리가 설명을 대신하므로, 비면 상세 화면이 다시 허전해진다.
+              ■ 왜 다섯인가 — **320px 에서 다섯 개까지가 한 줄**이다(실측. 여섯이면 두 줄).
+                ⚠️ 지금은 칩이 전부 세 글자라 이 계산이 맞다. **네 글자 키워드를 넣으면 다시 재야 한다.**
+              ■ 다섯을 채우면 안 고른 칩이 흐려지고 안 눌린다 — 눌러 보고 안 되는 것보다 미리 보이는 편이 낫다.
+           🔴 **「맛」이 아니라 「키워드」라고 부른다**(2026-08-29). 목록에 맛(달콤한)·향(향긋한)·
+              느낌(묵직한)이 섞여 있어서 「맛인가요?」로 물으면 어긋난다. 「키워드」면 셋 다 담긴다.
               ⚠️ 물린 것들 — 자극적(맛의 종류가 아니라 세기) · 칼칼(매콤과 겹침) · 구수(고소와 겹침) ·
                  개운(상큼과 겹침) · 느끼(안 좋은 뜻).
            ⚠️ **한 번 정하면 줄이기 어렵다** — 이미 고른 사람이 있으면 옛 키워드가 남는다. 늘리는 것은 쉽다.
            🔴 칩은 script.js 가 `TASTES` 를 보고 그린다. 여기에 박지 말 것. -->
-      <p class="stamp-q">어떤 맛인가요?</p>
+      <p class="stamp-q">소스를 키워드로 표현해주세요<span class="stamp-q-hint">(최대 5개)</span><span class="stamp-q-star" aria-hidden="true">*</span></p>
       <div class="taste-pick" id="sauceTastes" role="group" aria-label="어떤 맛인가요?"></div>
       <!-- 🔴 **최대 60자**다(2026-08-27). 기존 레시피 팁 17개를 재 보니 40자면 3개, 60자면 2개가
            잘린다(가운데값 29자). 스티커 메모(40자)보다 긴 이유는 여기가 할 말이 더 많은 자리라서다. -->
@@ -1477,7 +1482,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=868"></script>
+<script src="script.js?v=869"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
