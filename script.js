@@ -5010,7 +5010,10 @@
       stampMemoEl.value = rec.memo || '';
       loadStampWith(rec.with); // 프리셋이면 그걸로, 자유 입력이면 '직접 입력'+글자
       setStampStore(rec.name); // 드롭다운 라벨·슬롯 스티커 세팅(edit 모드라 슬롯에 정적 표시)
-      stampSubmitEl.textContent = '저장';
+      /* 🔴 「수정하기」다(2026-08-29 사용자님 지시). 「저장」이었는데 새로 찍을 때의
+         **「스티커 붙이기」와 꼴이 어긋났다** — 둘 다 「~하기」로 맞춘다.
+         ⚠️ 소스 만들기 시트도 같은 규칙이다(「만들기」/「수정하기」). 한쪽만 되돌리지 말 것. */
+      stampSubmitEl.textContent = '수정하기';
       stampSubmitEl.disabled = false;
     } else {
       stampSlotEmpty.hidden = false;
