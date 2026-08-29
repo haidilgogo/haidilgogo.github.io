@@ -6325,6 +6325,26 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  /* 손끝 반응 — 앱의 다른 단추(`.si-add`)와 **같은 문법**이다.
+     🔴 `transform` 은 0.08s 로 짧게 — 길면 연달아 누를 때 굼떠 보인다. */
+  transition: border-color .15s, color .15s, background .15s, transform .08s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 🔴 hover 는 반드시 `@media (hover: hover)` 안에 둔다(2026-08-09 전수조사 6-2).
+   손가락에는 hover 가 없는데도 브라우저가 흉내를 내서, **누르고 뗀 뒤 색이 눌린 채로 남는다.** */
+@media (hover: hover) {
+  .taste-btn:not(:disabled):not(.is-on):hover {
+    border-color: var(--card-hover-border, #DCC9B4);
+    color: var(--brand-red, #D0402E);
+  }
+  /* 이미 고른 것에 올리면 **뺄 수 있다**는 신호로 살짝 어둡게 */
+  .taste-btn.is-on:hover { filter: brightness(.94); }
+}
+/* 🔴 `:active` 는 `@media` 밖이다 — **터치에도 필요하다**(`.si-add` 주석과 같은 이유). */
+.taste-btn:not(:disabled):active { transform: scale(.94); }
+.taste-btn:not(:disabled):not(.is-on):active {
+  border-color: var(--brand-red, #D0402E);
+  color: var(--brand-red, #D0402E);
 }
 .taste-btn.is-on {
   border-color: var(--brand-red, #D0402E);
@@ -6374,6 +6394,21 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+  /* 손끝 반응 — 맛 칩(`.taste-btn`)과 **같은 문법**이다. 둘 다 「골라서 켜는 단추」라 같아야 한다. */
+  transition: border-color .15s, color .15s, background .15s, transform .08s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .sauce-yn-btn:not(.is-on):hover {
+    border-color: var(--card-hover-border, #DCC9B4);
+    color: var(--brand-red, #D0402E);
+  }
+  .sauce-yn-btn.is-on:hover { filter: brightness(.94); }
+}
+.sauce-yn-btn:active { transform: scale(.97); }   /* 폭이 넓어 0.94 는 과하다 */
+.sauce-yn-btn:not(.is-on):active {
+  border-color: var(--brand-red, #D0402E);
+  color: var(--brand-red, #D0402E);
 }
 .sauce-yn-btn.is-on {
   border-color: var(--brand-red, #D0402E);
