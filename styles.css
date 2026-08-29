@@ -6259,6 +6259,87 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    🔴 **지금은 비어 있다.** 일러스트가 나오면 이 안에 `<img>` 를 넣으면 되고 줄 높이는 그대로다.
    ⚠️ 62px 는 그냥 정한 값이 아니다 — 찍어 온 사진을 이 크기로 줄여 보니 **통이 전부 똑같아 보여서**,
       일러스트는 「통을 빼고 내용물이 칸을 채우는」 그림이어야 한다는 조건이 여기서 나왔다. */
+/* ── 사진 맞추기(자르기) 창 — 2026-08-29 사용자님 요청 ──────────────────────────
+   🔴 소스 만들기 시트 **위**에 뜬다. 시트가 `z-index` 를 얼마나 쓰든 그보다 위여야 한다.
+   🔴 틀은 **정사각**이고 넘치는 그림은 잘라 보여 준다(`overflow: hidden`).
+      보이는 그대로가 저장되므로 여기 크기를 바꾸면 잘리는 범위도 바뀐다.
+   ⚠️ `touch-action: none` 이 있어야 끌기와 핀치가 **화면 스크롤에 뺏기지 않는다.** */
+.crop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, .55);
+}
+.crop-overlay.open { display: flex; }
+.crop-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  background: var(--bg-cream, #FBF5EA);
+  box-sizing: border-box;
+}
+.crop-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #3A241F;
+}
+.crop-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #E9DFD2;
+  touch-action: none;      /* 끌기·핀치를 이 틀이 가져간다 */
+  cursor: grab;
+  user-select: none;
+}
+.crop-frame:active { cursor: grabbing; }
+.crop-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+  max-width: none;         /* 전역 max-width:100% 가 배율 계산을 망친다 */
+  will-change: transform;
+  pointer-events: none;    /* 끌기는 틀이 받는다 */
+}
+.crop-hint {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: #AD8177;
+  text-align: center;
+}
+.crop-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.crop-actions button {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.crop-cancel {
+  border: 1px solid #E4D5C3;
+  background: #fff;
+  color: #7A5A4F;
+}
+.crop-done {
+  border: 0;
+  background: var(--brand-red, #D0402E);
+  color: #fff;
+}
+
 /* ── 소스 저장 화면의 사진 칸 (2026-08-29 사용자님 확정) ─────────────────────────
    🔴 **정사각이다** — 카드·상세 썸네일이 정사각이라 여기서 보는 모양과 저장 뒤 모양이 같다.
    🔴 점선을 쓴다 — 소스바 재료 그림 자리(`.si-thumb`)와 같은 「아직 비었다」 표시다.

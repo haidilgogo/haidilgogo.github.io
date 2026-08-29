@@ -7228,7 +7228,14 @@
       else 사진그림.removeAttribute('src');
       사진버튼.setAttribute('aria-label', 있다 ? '사진 바꾸기' : '사진 고르기');
     }
-    async function 정사각으로줄이기(file) {
+    /* 고른 파일을 **자르기 화면에 띄울 그림**으로 읽는다.
+       🔴 여기서는 자르지 않는다 — 자르는 것은 사용자님이 맞춘 뒤 `자른그림만들기` 가 한다.
+       🔴 너무 큰 원본은 **긴 쪽 1600px** 로 한 번 줄인다. 요즘 폰 사진(4000px 넘음)을 그대로
+          띄우면 끌 때마다 느려진다. 1600px 이면 400px 로 자를 때 4배까지 확대해도 안 뭉갠다.
+       ⚠️ 아이폰 사진은 회전 정보(EXIF)가 붙어 있는데 `createImageBitmap` 이 반영해 준다.
+          없는 브라우저에서는 `Image` 로 떨어진다(그때는 회전이 안 맞을 수 있다). */
+    const 띄울최대 = 1600;
+    async function 읽어들이기(file) {
       const 그림 = await (async () => {
         if (window.createImageBitmap) {
           try { return await createImageBitmap(file); } catch (e) { /* 아래로 떨어진다 */ }
@@ -7246,16 +7253,138 @@
           im.src = url;
         });
       })();
-      const w = 그림.width, h = 그림.height;
-      const 변 = Math.min(w, h);                 // 짧은 쪽에 맞춰 가운데를 정사각으로
-      const sx = Math.round((w - 변) / 2), sy = Math.round((h - 변) / 2);
-      const 크기 = Math.min(사진최대, 변);        // 작은 사진을 억지로 키우지 않는다
+      const 긴쪽 = Math.max(그림.width, 그림.height);
+      const 배 = 긴쪽 > 띄울최대 ? 띄울최대 / 긴쪽 : 1;
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(그림.width * 배);
+      cv.height = Math.round(그림.height * 배);
+      cv.getContext('2d').drawImage(그림, 0, 0, cv.width, cv.height);
+      if (그림.close) 그림.close();
+      return cv.toDataURL('image/jpeg', 0.9);
+    }
+    /* ── 사진 맞추기 (자르기) — 2026-08-29 사용자님 요청 ──────────────────────────
+       🔴 **가운데 자동 자르기로는 부족하다**(사용자님 지적). 세로로 긴 사진을 넣으면 위아래가
+          잘려서, 정작 소스 그릇이 화면 밖으로 나갈 수 있다.
+       🔴 **틀은 정사각이고 그림을 옮기고 키운다.** 틀 밖으로 빈자리가 생기지 않게 늘 붙들어 둔다
+          (`가두기`) — 그래야 어떤 위치에서도 잘라낸 그림에 흰 구석이 안 생긴다.
+       🔴 **잘라낼 자리는 화면에 보이는 그대로다.** 틀에 보이는 만큼만 `canvas` 로 옮겨 그린다 —
+          「보이는 것 = 저장되는 것」이라 따로 미리보기를 만들 필요가 없다.
+       ⚠️ 손가락 두 개(핀치)와 휠을 **둘 다** 받는다. 폰에서는 핀치, 맥에서는 휠이다.
+       ⚠️ 확대는 **틀을 꽉 채우는 배율(`최소배율`)이 바닥**이다. 그보다 작게는 못 줄인다 —
+          줄일 수 있게 하면 그림 옆에 빈자리가 생긴다. */
+    const 자르기막 = document.getElementById('cropOverlay');
+    const 자르기틀 = document.getElementById('cropFrame');
+    const 자르기그림 = document.getElementById('cropImg');
+    const 자르기취소 = document.getElementById('cropCancel');
+    const 자르기완료 = document.getElementById('cropDone');
+    let 최소배율 = 1, 배율 = 1, 이동x = 0, 이동y = 0;   // 이동은 틀 가운데 기준(px)
+    let 자르기복귀 = null;
+
+    function 자르기그리기() {
+      자르기그림.style.transform =
+        'translate(-50%,-50%) translate(' + 이동x + 'px,' + 이동y + 'px) scale(' + 배율 + ')';
+    }
+    /* 🔴 그림이 틀을 늘 덮게 붙든다. 안 하면 끌다가 구석에 흰자리가 생기고, 그대로 잘리면
+       저장된 사진에 흰 띠가 남는다. */
+    function 가두기() {
+      if (배율 < 최소배율) 배율 = 최소배율;
+      const 틀 = 자르기틀.clientWidth;
+      const 폭 = 자르기그림.naturalWidth * 배율, 높이 = 자르기그림.naturalHeight * 배율;
+      const 여유x = Math.max(0, (폭 - 틀) / 2), 여유y = Math.max(0, (높이 - 틀) / 2);
+      이동x = Math.min(여유x, Math.max(-여유x, 이동x));
+      이동y = Math.min(여유y, Math.max(-여유y, 이동y));
+    }
+    function 자르기열기(dataURL, 되돌아갈곳) {
+      자르기복귀 = 되돌아갈곳 || null;
+      자르기그림.onload = () => {
+        const 틀 = 자르기틀.clientWidth;
+        최소배율 = Math.max(틀 / 자르기그림.naturalWidth, 틀 / 자르기그림.naturalHeight);
+        배율 = 최소배율; 이동x = 0; 이동y = 0;
+        자르기그림.style.width = 자르기그림.naturalWidth + 'px';
+        자르기그림.style.height = 자르기그림.naturalHeight + 'px';
+        가두기(); 자르기그리기();
+      };
+      자르기그림.src = dataURL;
+      자르기막.classList.add('open');
+      자르기막.removeAttribute('inert');
+      자르기막.setAttribute('aria-hidden', 'false');
+      focusLanding(자르기완료);
+    }
+    function 자르기닫기() {
+      자르기막.classList.remove('open');
+      자르기막.setAttribute('inert', '');
+      자르기막.setAttribute('aria-hidden', 'true');
+      자르기그림.removeAttribute('src');
+      const 갈곳 = 자르기복귀; 자르기복귀 = null;
+      if (갈곳) focusLanding(갈곳);
+    }
+    /* 보이는 만큼을 그대로 400px 정사각으로 옮겨 그린다. */
+    function 자른그림만들기() {
+      const 틀 = 자르기틀.clientWidth;
+      const 원본에서의틀 = 틀 / 배율;                       // 틀이 원본에서 차지하는 크기
+      const 중심x = 자르기그림.naturalWidth / 2 - 이동x / 배율;
+      const 중심y = 자르기그림.naturalHeight / 2 - 이동y / 배율;
+      const sx = 중심x - 원본에서의틀 / 2, sy = 중심y - 원본에서의틀 / 2;
+      const 크기 = Math.min(사진최대, Math.round(원본에서의틀));
       const cv = document.createElement('canvas');
       cv.width = cv.height = 크기;
-      cv.getContext('2d').drawImage(그림, sx, sy, 변, 변, 0, 0, 크기, 크기);
-      if (그림.close) 그림.close();
+      cv.getContext('2d').drawImage(자르기그림, sx, sy, 원본에서의틀, 원본에서의틀, 0, 0, 크기, 크기);
       return cv.toDataURL('image/jpeg', 0.82);
     }
+    // 끌기 — 마우스·손가락 하나
+    let 끄는중 = false, 시작x = 0, 시작y = 0;
+    자르기틀.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch' && e.isPrimary === false) return;
+      끄는중 = true; 시작x = e.clientX - 이동x; 시작y = e.clientY - 이동y;
+      자르기틀.setPointerCapture(e.pointerId);
+    });
+    자르기틀.addEventListener('pointermove', (e) => {
+      if (!끄는중 || 손가락.size >= 2) return;
+      이동x = e.clientX - 시작x; 이동y = e.clientY - 시작y;
+      가두기(); 자르기그리기();
+    });
+    ['pointerup', 'pointercancel'].forEach((n) =>
+      자르기틀.addEventListener(n, () => { 끄는중 = false; }));
+    // 손가락 두 개로 벌리기 — 폰에서 쓰는 길이다
+    const 손가락 = new Map();
+    let 시작거리 = 0, 시작배율 = 1;
+    자르기틀.addEventListener('touchstart', (e) => {
+      [...e.touches].forEach((t) => 손가락.set(t.identifier, t));
+      if (e.touches.length === 2) {
+        끄는중 = false;
+        시작거리 = 두점거리(e.touches[0], e.touches[1]);
+        시작배율 = 배율;
+      }
+    }, { passive: true });
+    자르기틀.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 2) return;
+      e.preventDefault();   // 화면 자체가 확대되는 것을 막는다
+      const d = 두점거리(e.touches[0], e.touches[1]);
+      if (시작거리 > 0) { 배율 = Math.min(6, 시작배율 * (d / 시작거리)); 가두기(); 자르기그리기(); }
+    }, { passive: false });
+    ['touchend', 'touchcancel'].forEach((n) => 자르기틀.addEventListener(n, (e) => {
+      [...e.changedTouches].forEach((t) => 손가락.delete(t.identifier));
+      if (e.touches.length < 2) 시작거리 = 0;
+    }, { passive: true }));
+    function 두점거리(a, b) {
+      return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    }
+    // 휠 — 맥에서 쓰는 길이다(트랙패드 오므리기도 휠로 온다)
+    자르기틀.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      배율 = Math.min(6, Math.max(최소배율, 배율 * (e.deltaY > 0 ? 0.94 : 1.06)));
+      가두기(); 자르기그리기();
+    }, { passive: false });
+
+    자르기취소.addEventListener('click', 자르기닫기);
+    자르기완료.addEventListener('click', () => {
+      고른사진 = 자른그림만들기();
+      자르기닫기();
+      사진그리기();
+    });
+    // 바깥을 눌러도 닫힌다 — 취소와 같다(고른 사진은 안 바뀐다)
+    자르기막.addEventListener('click', (e) => { if (e.target === 자르기막) 자르기닫기(); });
+
     사진버튼.addEventListener('click', () => 사진입력.click());
     사진빼기버튼.addEventListener('click', () => {
       고른사진 = '';
@@ -7263,13 +7392,17 @@
       사진그리기();
       focusLanding(사진버튼);
     });
+    /* 🔴 고른 사진을 **바로 넣지 않고 자르기 화면으로 보낸다**(2026-08-29 사용자님 요청).
+       예전에는 가운데를 자동으로 잘라 그대로 넣었는데, 세로로 긴 사진은 위아래가 잘려
+       정작 소스가 화면 밖으로 나갔다.
+       ⚠️ 여기서 만드는 것은 **자르기 화면에 띄울 큰 그림**이다 — 저장할 그림이 아니다.
+          너무 크면 확대할 여지가 없으므로 저장 크기(400px)보다 넉넉히 둔다. */
     사진입력.addEventListener('change', async () => {
       const file = 사진입력.files && 사진입력.files[0];
       if (!file) return;
       사진칸.classList.add('is-busy');
       try {
-        고른사진 = await 정사각으로줄이기(file);
-        사진그리기();
+        자르기열기(await 읽어들이기(file), 사진버튼);
       } catch (e) {
         if (window.showToast) window.showToast('사진을 읽지 못했어요');
       } finally {

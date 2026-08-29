@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=835">
+<link rel="stylesheet" href="styles.css?v=836">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -913,6 +913,25 @@
   </div>
 </div>
 
+<!-- 사진 맞추기 — 사진을 고르면 뜬다 (2026-08-29 사용자님 요청).
+     🔴 **소스 만들기 시트 위에 뜬다.** 시트를 닫지 않으므로 취소하면 하던 자리 그대로다.
+     🔴 **입력칸이 없다** — 그래서 「짧은 창은 아이폰에서 자판이 화면을 민다」는 문제(2026-08-27)에
+        걸리지 않는다. 그 규칙은 글자를 치는 창에만 해당한다.
+     ⚠️ 틀 안의 그림은 script.js 가 `transform` 으로 옮기고 키운다. 여기에 크기를 박지 말 것. -->
+<div class="crop-overlay" id="cropOverlay" aria-hidden="true" inert>
+  <div class="crop-card" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+    <p class="crop-title" id="cropTitle">사진 맞추기</p>
+    <div class="crop-frame" id="cropFrame">
+      <img class="crop-img" id="cropImg" alt="" draggable="false">
+    </div>
+    <p class="crop-hint">끌어서 옮기고, 손가락 두 개로 벌려 크게 볼 수 있어요</p>
+    <div class="crop-actions">
+      <button class="crop-cancel" id="cropCancel" type="button">취소</button>
+      <button class="crop-done" id="cropDone" type="button">완료</button>
+    </div>
+  </div>
+</div>
+
 <!-- 스티커 입력 시트 — ➕에서 열림. 점선 슬롯에 지점 고르고 찍으면 스티커가 탁! 붙음 -->
 <div class="stamp-sheet-overlay" id="stampSheetOverlay" aria-hidden="true" inert>
   <div class="stamp-sheet" role="dialog" aria-modal="true" aria-label="스티커 붙이기">
@@ -1412,7 +1431,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=834"></script>
+<script src="script.js?v=836"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
