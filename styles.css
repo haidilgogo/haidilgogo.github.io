@@ -6317,8 +6317,17 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    🔴 상세 화면을 흉내 낸 것이 아니라 **같은 부품**을 쓴다(재료 줄 = `renderIngList`).
       흉내 내면 상세가 바뀔 때 여기가 조용히 어긋난다. */
 .sauce-preview {
-  padding: 4px 0 8px;
+  /* 🔴 **스크롤 설정은 `.sauce-list`·`.sauce-form` 과 똑같아야 한다**(2026-08-29 사용자님이 잡으심).
+     이 세 줄이 빠져 있어서 3단계에서 아래가 잘린 채 **굴러가지 않았다.**
+     ⚠️ `min-height: 0` 이 없으면 flex 자식이 안 줄어들어 스크롤이 아예 안 생긴다.
+     ⚠️ `overscroll-behavior-y: contain` 은 끝에서 당겨도 뒤 화면·새로고침으로 안 번지게 한다. */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 18px 20px calc(24px + env(safe-area-inset-bottom, 0px));
 }
+.sauce-preview[hidden] { display: none; }
 .sauce-preview-card {
   padding: 14px;
   border: 1px solid #F0E2D2;
@@ -6451,6 +6460,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
       ⚠️ 내 소스 **카드·상세**의 빈 자리에는 점선을 안 쓴다(사용자님이 빼기로 하셨다).
          여기는 **눌러야 하는 자리**라 테두리가 있어야 단추로 읽힌다 — 그래서 다르다. */
 .sauce-photo {
+  position: relative;   /* 「지우기」를 사진 위에 얹기 위한 기준 */
   margin: 0 0 14px;
 }
 .sauce-photo-btn {
@@ -6496,20 +6506,26 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 /* 🔴 글자는 「지우기」다(2026-08-29 사용자님 확정).
    ⚠️ 앱에서 「지우기」는 되돌릴 수 없는 삭제에 쓰는 말이라 처음엔 「사진 없이 할게요」로 뒀는데,
       사용자님이 짧은 쪽을 고르셨다. 이 자리는 **아직 저장 전**이라 실제로 잃는 것은 없다. */
+/* 🔴 **사진 오른쪽 아래에 얹는다**(2026-08-29 사용자님 지시).
+   ■ 사진 아래에 두었더니 사진이 화면 폭을 꽉 채우면서 **화면 밖으로 밀려 안 보였다.**
+     위로 올려도 사진과 떨어져 보였다. 사진 안에 얹으면 사진이 아무리 커도 늘 같이 보인다.
+   ■ **어두운 알약에 흰 글자**다 — 사진 색이 무엇이든 읽혀야 한다. 밝은 사진 위 흰 글자나
+     어두운 사진 위 갈색 글자는 묻힌다.
+   ⚠️ 사진 단추 **안에** 넣으면 안 된다(단추 안 단추는 못 쓴다). 형제로 두고 얹는다. */
 .sauce-photo-clear {
-  display: block;
-  /* 🔴 사진 **위**에 오른쪽 끝으로 붙인다(2026-08-29). 사진이 화면 폭을 꽉 채우면서
-     아래에 두었을 때 화면 밖으로 밀려 안 보였다. */
-  margin: 0 0 8px auto;
-  padding: 0;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 7px 12px;
   border: 0;
-  background: none;
-  color: #AD8177;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
   font-size: 13px;
-  font-weight: 600;
-  text-decoration: underline;
+  font-weight: 700;
   cursor: pointer;
 }
+.sauce-photo-clear:active { background: rgba(0, 0, 0, .7); }
 /* 사진을 줄이는 동안 — 큰 사진은 잠깐 걸린다. 아무 반응이 없으면 안 눌린 줄 안다 */
 .sauce-photo.is-busy .sauce-photo-btn { opacity: .5; pointer-events: none; }
 /* 🔴 `display` 를 준 요소에는 `hidden` 속성이 안 먹는다 — CSS 가 이긴다.
