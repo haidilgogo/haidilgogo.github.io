@@ -6455,8 +6455,11 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 }
 .sauce-photo-btn {
   display: block;
-  width: 120px;
-  height: 120px;
+  /* 🔴 180px 로 키웠다(2026-08-29 사용자님). 120px 은 넣은 사진이 잘 안 보였다 —
+     여기가 「제대로 들어갔나」를 확인하는 자리라 작으면 확인이 안 된다.
+     ⚠️ 320px 에서도 좌우 여백(20px씩)을 빼면 280px 이 남아 넉넉히 들어간다. */
+  width: 180px;
+  height: 180px;
   padding: 0;
   border: 1px dashed #DFCEBA;
   border-radius: 12px;
@@ -6488,6 +6491,9 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   border-style: solid;
   border-color: #F0E2D2;
 }
+/* 🔴 글자는 「지우기」다(2026-08-29 사용자님 확정).
+   ⚠️ 앱에서 「지우기」는 되돌릴 수 없는 삭제에 쓰는 말이라 처음엔 「사진 없이 할게요」로 뒀는데,
+      사용자님이 짧은 쪽을 고르셨다. 이 자리는 **아직 저장 전**이라 실제로 잃는 것은 없다. */
 .sauce-photo-clear {
   display: block;
   margin-top: 8px;
