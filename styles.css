@@ -6201,13 +6201,42 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    이 값에 걸려 있다 — 바꾸면 그쪽도 같이 다시 재야 한다. */
 .sauce-top {
   flex: none;
-  padding: 24px 20px 12px;
+  /* 🔴 위 여백 16px 은 **상세 화면 머리 줄(`.modal-header`)과 같은 값**이다(2026-08-29 사용자님이
+     잡으심). 24px 이던 것을 내렸다 — 같은 자리에 같은 모양인데 시트만 8px 낮아서, 두 화면을
+     오가면 머리 줄이 살짝 움직였다. ⚠️ 한쪽만 되돌리지 말 것. */
+  padding: 16px 20px 12px;
   border-bottom: 1px solid var(--card-border);
+}
+
+/* ── 단계 표시 (1·2·3) — 2026-08-29 사용자님 요청 ─────────────────────────────
+   🔴 홈 배너의 점(`.mf-dots`)과 **같은 문법**이다 — 작은 점 셋에 지금 자리만 알약으로 길쭉하게.
+      앱에 이미 있는 모양이라 새로 익힐 것이 없다.
+   🔴 **제목 아래 한 줄**로 둔다(사용자님 확정). 제목 옆에 붙이는 안은 320px 에서 빡빡했다 —
+      제목 「재료를 담아볼까요?」가 120px 인데 남는 자리가 67px 뿐이었다(실측).
+      ⚠️ 대신 320px 에서 재료가 한 줄 덜 보인다. 알고 정한 것이다. */
+.sauce-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.sauce-steps i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E0CDB8;
+  display: block;
+  transition: width .18s, background .18s;
+}
+.sauce-steps i.is-on {
+  width: 16px;
+  border-radius: 3px;
+  background: var(--brand-red, #D0402E);
 }
 /* 🔴 크기·굵기는 `.mn-sheet-title`(내 메뉴 시트 제목)과 같은 값이다(2026-08-26 사용자님).
    시트 제목은 이 한 벌로 통일한다 — 원래 18px/700 이라 혼자 크고 얇았다. */
 .sauce-title {
-  margin: 0 0 12px;
+  margin: 0 0 8px;   /* 아래에 단계 점이 오므로 12px → 8px (점 줄이 12px 를 갖는다) */
   padding-right: 34px;     /* 닫기 X 자리 — 겹치지 않게 */
   font-size: 16px;
   font-weight: 800;

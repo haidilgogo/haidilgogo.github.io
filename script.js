@@ -7199,6 +7199,7 @@
     const titleEl = document.getElementById('sauceTitle');
     const formEl = document.getElementById('sauceForm');
     const previewEl = document.getElementById('saucePreview');
+    const stepsEl = document.getElementById('sauceSteps');
     const backBtn = document.getElementById('sauceBackBtn');
     const nameInput = document.getElementById('sauceSaveName');
     const tipInput = document.getElementById('sauceSaveTip');
@@ -7453,8 +7454,18 @@
       const 첫째 = 단계 === 1, 둘째 = 단계 === 2, 셋째 = 단계 === 3;
       /* 🔴 고치는 중이면 제목이 다르다(2026-08-27) — 새로 만드는 것과 헷갈리면
          「내가 지금 뭘 하고 있나」를 화면이 안 알려 주는 셈이 된다. */
+      /* 🔴 제목 규칙 — **본문에 질문이 없는 단계만 제목이 묻는다**(2026-08-29 사용자님과 정함).
+         ■ 1단계는 재료 목록뿐이라 제목이 그 역할을 한다 → 「재료를 담아볼까요?」
+         ■ 2단계는 본문에 질문이 셋(이름·팁·사진)이라 제목까지 물으면 겹친다 → 「소스 꾸미기」
+         ■ 3단계는 카드뿐이라 제목이 묻는다 → 「이렇게 저장할까요?」
+         🔴 **고치는 중이면 「소스 고치기」로 덮는다**(사용자님 확정). 말투는 어긋나지만
+            어디쯤인지는 아래 점이 알려 주므로, 제목은 「무엇을 하는 중인가」만 말하면 된다.
+            수정은 가끔 들어가는 길이라 그 사실을 알려 주는 것이 더 값지다. */
       titleEl.textContent = 고치는중 ? '소스 고치기'
-        : (셋째 ? '이렇게 저장할까요?' : 둘째 ? '소스 저장하기' : '소스 만들기');
+        : (셋째 ? '이렇게 저장할까요?' : 둘째 ? '소스 꾸미기' : '재료를 담아볼까요?');
+      // 단계 점 — 지금 자리만 알약으로 길어진다
+      [...stepsEl.children].forEach((el, i) => el.classList.toggle('is-on', i === 단계 - 1));
+      stepsEl.setAttribute('aria-label', '전체 3단계 중 ' + 단계 + '단계');
       listEl.hidden = !첫째;
       formEl.hidden = !둘째;
       previewEl.hidden = !셋째;
