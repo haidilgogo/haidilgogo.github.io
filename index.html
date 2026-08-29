@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=836">
+<link rel="stylesheet" href="styles.css?v=837">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -847,15 +847,40 @@
             스티커 기록 시트가 멀쩡했던 이유가 그것이다.
          ⚠️ **사진 칸은 아직 없다.** 「내 코드」에 실을지가 미정이라 판단 전에 안 붙였다(얼개 3절).
             붙일 자리는 이름 칸 **위**다. -->
+    <!-- 2단계: 이름·팁·사진을 받는다. 3단계: 완성본을 보여 준다.
+         🔴 **차례는 이름 → 팁 → 사진**이다(2026-08-29 사용자님 지시).
+            사진이 맨 위에 있었는데, 필수인 이름을 먼저 묻는 것이 자연스럽다.
+         🔴 **담은 재료 목록은 여기서 뺐다**(2026-08-29). 8/27 에 넣었던 이유는 「2단계에서
+            뭘 담았는지 아예 안 보인다」였는데, **3단계가 그 일을 대신한다.**
+         🔴 **작은 창을 쓰지 않는 이유** — 아이폰에서 자판이 올라오면 짧은 창은 굴릴 데가 없어서
+            사파리가 화면을 통째로 민다(2026-08-27 실기기 확인). 이 시트처럼 길면 안 그런다. -->
     <div class="sauce-form" id="sauceForm" hidden>
       <p class="stamp-req-note"><span class="stamp-req-star">*</span> 필수 입력</p>
-      <!-- 사진 (선택) — 2026-08-29 사용자님 확정.
-           🔴 **이 기기에만 저장된다.** 「내 코드」로 다른 기기에 옮겨도 사진은 안 따라간다
-              (저장 키가 따로다 — script.js 의 `MY_SAUCE_PHOTOS_KEY` 주석 참고).
-           🔴 자리는 **이름 칸 위**다. 카드에서도 사진이 이름 위에 오므로 순서가 같다.
-           ⚠️ `capture` 는 안 붙인다 — 붙이면 **카메라만** 열려 앨범에서 못 고른다. -->
-      <p class="stamp-q">사진을 넣어볼까요?</p>
-      <div class="sauce-photo" id="saucePhoto">
+      <p class="stamp-q">어떤 이름이 좋을까요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
+      <!-- 🔴 **최대 10자**다(2026-08-27 사용자님 확정). 이름표를 「소스 이름」으로 늘리면서 칸이
+           28px 좁아진 만큼 글자 수를 줄여 상쇄한 것이다 — 둘은 짝이니 한쪽만 되돌리지 말 것.
+           ⚠️ **직접 입력 재료는 20자 그대로**다. 두 칸의 제한이 다른 것은 일부러 그런 것이다. -->
+      <div class="stamp-fields">
+        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">소스 이름</span><input type="text" id="sauceSaveName" maxlength="10" placeholder="홍길동소스(최대 10자)" autocomplete="off" enterkeyhint="next" aria-label="소스 이름"></label>
+      </div>
+      <!-- 🔴 **최대 60자**다(2026-08-27). 기존 레시피 팁 17개를 재 보니 40자면 3개, 60자면 2개가
+           잘린다(가운데값 29자). 스티커 메모(40자)보다 긴 이유는 여기가 할 말이 더 많은 자리라서다. -->
+      <p class="stamp-q">나만의 팁이 있나요?</p>
+      <div class="stamp-fields">
+        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">팁</span><input type="text" id="sauceSaveTip" maxlength="60" placeholder="간단하게 적어보세요(최대 60자)" autocomplete="off" enterkeyhint="done" aria-label="나만의 팁"></label>
+      </div>
+      <!-- 사진 — **묻고 나서 연다**(2026-08-29 사용자님 지시).
+           🔴 예/아니오가 **필수**다. 「아니오」면 사진 칸 없이 넘어가고, 「예」면 사진을 골라야 넘어간다.
+           🔴 **왜 물어보나** — 그냥 칸만 두면 사진을 넣을 수 있다는 것을 모르고 지나친다.
+              대신 사진을 안 넣을 사람도 한 번 더 눌러야 한다. 알고 정한 것이다.
+           🔴 **수정으로 들어오면 답을 기억한다** — 사진이 있던 소스는 「예」, 없던 소스는 「아니오」로
+              시작한다. 이름·팁을 불러오는 것과 같은 규칙이다(빈 채로 두면 매번 다시 답해야 한다). -->
+      <p class="stamp-q">소스 이미지가 있나요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
+      <div class="sauce-yn" id="saucePhotoAsk" role="radiogroup" aria-label="소스 이미지가 있나요?">
+        <button class="sauce-yn-btn" id="saucePhotoYes" type="button" role="radio" aria-checked="false">예</button>
+        <button class="sauce-yn-btn" id="saucePhotoNo" type="button" role="radio" aria-checked="false">아니오</button>
+      </div>
+      <div class="sauce-photo" id="saucePhoto" hidden>
         <button class="sauce-photo-btn" id="saucePhotoBtn" type="button">
           <span class="sauce-photo-empty" id="saucePhotoEmpty">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -865,43 +890,24 @@
           </span>
           <img class="sauce-photo-img" id="saucePhotoImg" alt="" hidden>
         </button>
-        <button class="sauce-photo-clear" id="saucePhotoClear" type="button" hidden>사진 빼기</button>
+        <button class="sauce-photo-clear" id="saucePhotoClear" type="button" hidden>사진 없이 할게요</button>
         <input type="file" id="saucePhotoInput" accept="image/*" hidden aria-label="소스 사진 고르기">
       </div>
-      <p class="stamp-q">어떤 이름이 좋을까요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
-      <!-- 🔴 **최대 10자**다(2026-08-27 사용자님 확정. 20자에서 줄였다).
-           근거 = 레시피 이름 59개 중 10자를 넘는 것은 **하나뿐**이고(「라젤(이 아는 동생)소스」 13자)
-           58개가 8자 이하다. 그리고 10자면 320px 칸(14자 들어감)에 **치는 글자가 늘 다 보인다.**
-           ⚠️ 이름표를 「이름」에서 「소스 이름」으로 늘리면서 칸이 28px 좁아졌는데(200→172px),
-              글자 수를 줄여 그만큼 상쇄했다. 둘은 짝이다 — 한쪽만 되돌리지 말 것.
-           ⚠️ **직접 입력 재료는 20자 그대로**다(같은 날 사용자님 확정). 두 칸의 제한이 다른 것은
-              일부러 그런 것이다 — 소스 이름은 목록 카드에 나오고 재료는 목록 안에 나온다. -->
-      <div class="stamp-fields">
-        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">소스 이름</span><input type="text" id="sauceSaveName" maxlength="10" placeholder="홍길동소스(최대 10자)" autocomplete="off" enterkeyhint="next" aria-label="소스 이름"></label>
+    </div>
+    <!-- 3단계: 완성본 미리보기 (2026-08-29 사용자님 안).
+         🔴 **저장한 뒤 보게 될 모습 그대로**여야 한다 — 그래야 「이대로 확정할까요」가 뜻이 있다.
+            그래서 재료 이름은 **정식 이름(병기 포함)** 으로 그린다. 1·2단계에서 짧게 부르던 것과
+            다른 것은 일부러 그런 것이다.
+         🔴 재료 줄은 상세 모달과 **같은 부품**(`renderIngList`)으로 그린다. -->
+    <div class="sauce-preview" id="saucePreview" hidden>
+      <div class="sauce-preview-card">
+        <div class="sauce-preview-thumb" id="saucePreviewThumb"></div>
+        <p class="sauce-preview-name" id="saucePreviewName"></p>
+        <p class="sauce-preview-label">소스바</p>
+        <div class="ing-box" id="saucePreviewIngs"></div>
+        <p class="sauce-preview-tip" id="saucePreviewTip" hidden></p>
       </div>
-      <!-- 🔴 「기억하고 싶은 팁이 있나요?」에서 바꿨다(2026-08-27 사용자님). 그 말은 스티커 기록에서
-           그대로 가져온 것이었는데, **스티커는 일기라 「기억」이 맞지만 여기 팁은 다음에 만들 때
-           쓰거나 친구에게 알려 줄 요령**이다. 「나만의 소스」와 말이 이어지고, 만드는 요령이든
-           먹는 법이든 다 담긴다.
-           ⚠️ 옆 질문이 「어떤 이름이 **좋을까요**?」라 묻는 말이 겹치지 않는다. 한쪽만 바꾸지 말 것.
-           🔴 **최대 60자**다(2026-08-27 사용자님. 40자로 줄였다가 되돌렸다).
-             근거 = 기존 레시피의 팁 17개를 재 보니 **40자면 3개가 잘리고 60자면 2개만 잘린다**
-             (가운데값 29자 · 가장 김 68자). 스티커 메모(40자)보다 긴 이유는 **여기가 할 말이 더
-             많은 자리**라서다 — 스티커는 「누구와 갔다」는 한마디지만 팁은 만드는 요령이라 문장이 길다.
-             ⚠️ 60자면 상세 화면에서 320px 기준 **세 줄**까지 간다. 넘치지는 않는다.
-           ⚠️ 괄호 앞을 띄우지 않는다. 스티커의 두 칸이 전부 붙여 쓴다(「메모해보세요(최대 40자)」). -->
-      <p class="stamp-q">나만의 팁이 있나요?</p>
-      <div class="stamp-fields">
-        <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">팁</span><input type="text" id="sauceSaveTip" maxlength="60" placeholder="간단하게 적어보세요(최대 60자)" autocomplete="off" enterkeyhint="done" aria-label="나만의 팁"></label>
-      </div>
-      <!-- 담은 재료 — 저장하기 전에 한 번 보여 준다 (2026-08-27 사용자님 제안).
-           🔴 안쪽 줄은 JS 가 `renderIngList` 로 그린다. **상세 모달과 같은 부품**이라
-              저장한 뒤 보게 될 모양과 똑같다 — 이 목록이 곧 미리보기다.
-           🔴 **읽기만 한다.** 고치는 길은 아래 「뒤로」 하나다. -->
-      <div class="sauce-ings" id="sauceSaveIngs" hidden>
-        <p class="stamp-q">담은 재료</p>
-        <div class="ing-box sauce-ings-list"></div>
-      </div>
+      <p class="sauce-preview-ask">이대로 저장할까요?</p>
     </div>
     <!-- 아래 줄은 두 단계가 함께 쓴다 — 1단계: 「담은 개수」 + 「다음」 / 2단계: 「뒤로」 + 「저장」.
          ⚠️ 글자와 보임/숨김은 script.js 가 바꾼다. 여기에 박지 말 것. -->
@@ -1431,7 +1437,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=836"></script>
+<script src="script.js?v=838"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

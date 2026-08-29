@@ -7089,7 +7089,10 @@
           그러면 눌렀던 홈 박스는 숨은 화면 안에 있어 되돌아갈 자리가 못 된다. */
     function open(옵션) {
       돌아갈자리 = (옵션 && 옵션.돌아갈곳) ? makeReturnTicket(옵션.돌아갈곳) : popupOpener();
-      단계 = 1;   // 🔴 늘 재료 담기부터 시작한다 — 2단계에서 닫았어도 다음에 열면 1단계다
+      단계 = 1;   // 🔴 늘 재료 담기부터 시작한다 — 2·3단계에서 닫았어도 다음에 열면 1단계다
+      /* 🔴 사진과 그 답도 비운다(2026-08-29). 안 비우면 **지난번에 고른 사진이 새 소스에 붙는다.**
+         `고치는중` 이면 `다음단계()` 가 저장해 둔 값으로 다시 채운다. */
+      고른사진 = ''; 사진답 = ''; 이단계채움 = false;
       /* 🔴 **열 때 비운다**(2026-08-25 사용자님 지시 — 「닫으면 없어져야 하지 않나」).
          닫는 쪽에서 비우지 않는 이유: 오버레이가 0.22초에 걸쳐 사라지는 동안 아직 보이는데,
          그때 목록을 지우면 **담은 것이 눈앞에서 하나씩 풀리는 게 보인다.**
@@ -7195,7 +7198,7 @@
        ══════════════════════════════════════════════════════════════════════ */
     const titleEl = document.getElementById('sauceTitle');
     const formEl = document.getElementById('sauceForm');
-    const ingsEl = document.getElementById('sauceSaveIngs');
+    const previewEl = document.getElementById('saucePreview');
     const backBtn = document.getElementById('sauceBackBtn');
     const nameInput = document.getElementById('sauceSaveName');
     const tipInput = document.getElementById('sauceSaveTip');
@@ -7210,6 +7213,13 @@
           아니라 **글자로 남는 그림**(dataURL)이라서다.
        ⚠️ 아이폰 사진은 회전 정보(EXIF)가 붙어 있는데, `createImageBitmap` 이 그것을 반영해 준다.
           없는 브라우저에서는 `Image` 로 떨어진다(그때는 회전이 안 맞을 수 있다). */
+    /* 🔴 사진 질문의 답 — `''`(아직 안 물음) · `'yes'` · `'no'` (2026-08-29 사용자님 확정).
+       빈 값이면 「다음」이 안 눌린다. 필수 질문이라 그렇다. */
+    let 사진답 = '';
+    /* 🔴 2단계 값을 **한 번만** 채우게 하는 깃발. 「뒤로」로 오르내려도 쳐 둔 것이 안 지워진다. */
+    let 이단계채움 = false;
+    const 사진예 = document.getElementById('saucePhotoYes');
+    const 사진아니오 = document.getElementById('saucePhotoNo');
     const 사진칸 = document.getElementById('saucePhoto');
     const 사진버튼 = document.getElementById('saucePhotoBtn');
     const 사진빈자리 = document.getElementById('saucePhotoEmpty');
@@ -7381,16 +7391,42 @@
       고른사진 = 자른그림만들기();
       자르기닫기();
       사진그리기();
+      버튼갱신();   // 🔴 사진이 생겼으니 막혀 있던 「다음」이 풀린다
     });
     // 바깥을 눌러도 닫힌다 — 취소와 같다(고른 사진은 안 바뀐다)
     자르기막.addEventListener('click', (e) => { if (e.target === 자르기막) 자르기닫기(); });
 
+    /* 예/아니오를 그린다. 「아니오」면 사진 칸을 접고 **고른 사진도 버린다** —
+       접어 두기만 하면 「아니오」인데 사진이 저장되는 어긋남이 생긴다. */
+    function 사진답그리기() {
+      사진예.classList.toggle('is-on', 사진답 === 'yes');
+      사진아니오.classList.toggle('is-on', 사진답 === 'no');
+      사진예.setAttribute('aria-checked', String(사진답 === 'yes'));
+      사진아니오.setAttribute('aria-checked', String(사진답 === 'no'));
+      사진칸.hidden = 사진답 !== 'yes';
+      버튼갱신();
+    }
+    사진예.addEventListener('click', () => {
+      사진답 = 'yes'; 사진답그리기(); 사진그리기();
+      // 아직 안 골랐으면 곧바로 앨범을 연다 — 「예」를 누른 뜻이 그것이다
+      if (!고른사진) 사진입력.click();
+    });
+    사진아니오.addEventListener('click', () => {
+      사진답 = 'no';
+      고른사진 = '';        // 🔴 골라 둔 사진을 버린다 — 위 주석 참고
+      사진그리기();
+      사진답그리기();
+    });
     사진버튼.addEventListener('click', () => 사진입력.click());
+    /* 🔴 「사진 없이 할게요」는 **답을 「아니오」로 되돌린다**(2026-08-29). 사진만 비우고
+       「예」로 남겨 두면 「다음」이 막힌 채 이유를 모르게 된다 — 예라고 했는데 사진이 없어서다. */
     사진빼기버튼.addEventListener('click', () => {
       고른사진 = '';
       사진입력.value = '';   // 같은 파일을 다시 골라도 change 가 나게 비운다
+      사진답 = 'no';
       사진그리기();
-      focusLanding(사진버튼);
+      사진답그리기();
+      focusLanding(사진아니오);
     });
     /* 🔴 고른 사진을 **바로 넣지 않고 자르기 화면으로 보낸다**(2026-08-29 사용자님 요청).
        예전에는 가운데를 자동으로 잘라 그대로 넣었는데, 세로로 긴 사진은 위아래가 잘려
@@ -7414,30 +7450,42 @@
     // 🔴 아래 줄·제목·검색창이 단계마다 다르다. **바꾸는 곳은 이 함수 하나뿐**이어야 한다 —
     //    여기저기서 따로 바꾸면 한 곳만 고쳤을 때 화면이 반쪽으로 어긋난다.
     function 단계그리기() {
-      const 둘째 = 단계 === 2;
+      const 첫째 = 단계 === 1, 둘째 = 단계 === 2, 셋째 = 단계 === 3;
       /* 🔴 고치는 중이면 제목이 다르다(2026-08-27) — 새로 만드는 것과 헷갈리면
          「내가 지금 뭘 하고 있나」를 화면이 안 알려 주는 셈이 된다. */
-      titleEl.textContent = 둘째 ? (고치는중 ? '소스 고치기' : '소스 저장하기')
-                                 : (고치는중 ? '소스 고치기' : '소스 만들기');
-      listEl.hidden = 둘째;
+      titleEl.textContent = 고치는중 ? '소스 고치기'
+        : (셋째 ? '이렇게 저장할까요?' : 둘째 ? '소스 저장하기' : '소스 만들기');
+      listEl.hidden = !첫째;
       formEl.hidden = !둘째;
-      // 🔴 2단계에서는 검색창을 감춘다 — 재료 목록이 없는 화면에서 검색은 뜻이 없다.
+      previewEl.hidden = !셋째;
+      // 🔴 1단계에서만 검색창·개수 줄을 보인다 — 재료 목록이 없는 화면에서 검색은 뜻이 없다.
       //    ⚠️ 검색어는 비우지 않는다. 「뒤로」로 돌아오면 보던 목록 그대로여야 한다.
-      searchBox.hidden = 둘째;
-      countEl.hidden = 둘째;
-      backBtn.hidden = !둘째;
+      searchBox.hidden = !첫째;
+      countEl.hidden = !첫째;
+      backBtn.hidden = 첫째;
       /* 🔴 2단계에서는 아래 줄의 두 버튼을 **오른쪽에 나란히** 붙인다(2026-08-27 사용자님 지적).
          1단계는 왼쪽이 「1가지 담음」이라는 **글**이고 오른쪽이 행동이라 양끝이 맞다.
          2단계는 「뒤로」와 「저장」이 **둘 다 행동**인데 375px 에서 191px 이나 떨어져 있었다(실측) —
          짝으로 안 읽히고 한 손으로 오가기도 멀다. 확인창(`.leave-confirm-actions`)도 붙여 놓는다. */
-      sheet.classList.toggle('is-step2', 둘째);
-      saveBtn.textContent = 둘째 ? '저장' : '다음';
+      sheet.classList.toggle('is-step2', !첫째);
+      saveBtn.textContent = 셋째 ? '저장' : '다음';
       발밑갱신();
     }
     /* 🔴 「다음」은 하나라도 담아야 눌린다. 「저장」은 **이름까지** 있어야 눌린다.
        ⚠️ 공백만 친 이름은 빈 것으로 본다 — 「   」이라는 이름이 생기면 목록에서 구분이 안 된다. */
+    /* 🔴 단계마다 「다음」이 눌리는 조건이 다르다.
+       ■ 1단계 — 하나라도 담아야 한다
+       ■ 2단계 — 이름이 있어야 하고, **사진 질문에 답해야** 한다.
+                 「예」라고 했으면 사진까지 골라야 한다(2026-08-29 사용자님 확정) —
+                 「예」라고 해 놓고 안 고르면 앞뒤가 안 맞는다.
+       ■ 3단계 — 늘 눌린다(여기서 하는 일은 확인뿐이다)
+       ⚠️ 공백만 친 이름은 빈 것으로 본다 — 「   」이라는 이름이 생기면 목록에서 구분이 안 된다. */
     function 버튼갱신() {
-      saveBtn.disabled = 단계 === 2 ? !nameInput.value.trim() : 담은개수() === 0;
+      if (단계 === 1) { saveBtn.disabled = 담은개수() === 0; return; }
+      if (단계 === 3) { saveBtn.disabled = false; return; }
+      const 이름있음 = !!nameInput.value.trim();
+      const 사진답함 = 사진답 === 'no' || (사진답 === 'yes' && !!고른사진);
+      saveBtn.disabled = !(이름있음 && 사진답함);
     }
     function 다음단계() {
       if (!담은개수()) return;
@@ -7459,16 +7507,30 @@
         기타.splice(i, 1);
       }
       단계 = 2;
-      /* 🔴 고치는 중이면 **적어 둔 이름·팁을 채워 준다**(2026-08-27). 비워 두면 고치러 왔는데
-         이름을 다시 쳐야 한다. ⚠️ 새로 만드는 중이면 반드시 비운다 — 지난번 값이 남으면 안 된다. */
-      const 원본 = 고치는중 ? (mySauceData.records || []).find((x) => x.id === 고치는중) : null;
-      nameInput.value = 원본 ? (원본.name || '') : '';
-      tipInput.value = 원본 ? (원본.tip || '') : '';
+      /* 🔴 **처음 올라올 때만 채운다**(2026-08-29에 고침).
+         ■ 무엇이 잘못됐었나 — 1단계로 「뒤로」 갔다가 다시 「다음」을 누르면 **쳐 둔 이름·팁과
+           골라 둔 사진이 통째로 지워졌다.** 올라올 때마다 값을 다시 넣고 있었기 때문이다.
+           재료는 그대로 남는데 이름만 사라져서, 재료를 고치러 갔다 온 사람이 다시 쳐야 했다.
+         ■ 고치는 중이면 **적어 둔 이름·팁·사진을 채워 준다**(2026-08-27). 비워 두면 고치러 왔는데
+           이름을 다시 쳐야 한다.
+         ⚠️ 새로 만드는 중이면 비운다 — 지난번 값이 남으면 안 된다. 그 비우기는 `open()` 이 한다. */
+      if (!이단계채움) {
+        이단계채움 = true;
+        const 원본 = 고치는중 ? (mySauceData.records || []).find((x) => x.id === 고치는중) : null;
+        nameInput.value = 원본 ? (원본.name || '') : '';
+        tipInput.value = 원본 ? (원본.tip || '') : '';
       /* 🔴 고치는 중이면 **넣어 둔 사진도 불러온다**(2026-08-29) — 이름·팁과 같은 이유다.
          안 불러오면 이름만 고치려고 들어왔다가 **사진이 조용히 사라진다.**
          ⚠️ 새로 만드는 중이면 반드시 비운다 — 지난번에 고른 사진이 남으면 안 된다. */
-      고른사진 = 원본 ? 사진가져오기(원본.id) : '';
+        고른사진 = 원본 ? 사진가져오기(원본.id) : '';
+      /* 🔴 **답도 함께 기억한다**(2026-08-29 사용자님 확정) — 사진이 있던 소스는 「예」,
+         없던 소스는 「아니오」로 시작한다. 이름·팁을 불러오는 것과 같은 규칙이다.
+         ⚠️ 빈 채로 두면 이름 한 글자 고치러 들어와도 사진 질문에 매번 다시 답해야 한다.
+         ⚠️ 새로 만드는 중이면 **아직 안 물은 상태**로 둔다 — 그래야 한 번은 묻게 된다. */
+        사진답 = 원본 ? (고른사진 ? 'yes' : 'no') : '';
+      }
       사진그리기();
+      사진답그리기();
       단계그리기();
       /* 🔴 **담은 것을 여기서 한 번 보여 준다**(2026-08-27 사용자님 제안). 2단계에서는 개수 줄이
          「뒤로」에 자리를 내줘서 **뭘 담았는지 아예 안 보였다** — 확인하려면 뒤로 갔다 와야 했다.
@@ -7477,25 +7539,43 @@
          🔴 **읽기만 한다 — 여기서 고칠 수 없다.** 고치는 길은 바로 아래 「뒤로」다. 두 곳에서
             고치게 하면 같은 일에 길이 둘이 된다.
          ⚠️ 저장과 **같은 함수**(`담은재료`)를 쓴다. 보이는 것과 저장되는 것이 어긋나면 안 된다. */
-      ingsEl.hidden = false;
-      /* 🔴 여기서는 **매장 이름표 그대로** 부른다(2026-08-27 사용자님 확정) — 「마라시즈닝(고춧가루)」가
-         아니라 「마라시즈닝」이다. 만들기 → 확인 → 저장이 한 흐름인데 중간에서 이름이 바뀌면
-         「내가 고른 게 이게 맞나」 싶어진다. 위 `소스바이름` 주석과 같은 근거다.
-         ⚠️ **저장되는 이름은 그대로 정식 이름**이다(`담은재료()` 는 안 건드린다) — 바꾸는 것은
-            화면 글자뿐이고, 레시피 데이터와 어긋나면 재료 정렬과 검사기가 깨진다.
-            그래서 상세 모달로 열면 그때는 병기가 나온다.
-         ⚠️ 사용자님이 **병기 자체를 없앨 생각**이라 하셨다(2026-08-27, 「매장에 공식적으로 써 있는
-            것만 쓰고 싶다」). 그러면 이 갈림 자체가 사라진다 — 그때 이 줄도 지우면 된다. */
-      renderIngList(ingsEl.querySelector('.sauce-ings-list'),
-        담은재료().map((i) => [표시이름(i[0]), i[1], i[2]]));
       formEl.scrollTop = 0;
       /* 초점은 **「뒤로」**로 내려앉힌다 — 화면이 바뀌었다는 것을 낭독기에 알리는 자리다.
          🔴 **이름 칸으로 보내지 않는다**(앱 규칙 — 위 `focusLanding` 주석: 「갑자기 글자
             입력칸에 들어가면 당황스럽다」). 아이폰에서 자판이 저절로 올라오는 것도 막는다. */
       focusLanding(backBtn);
     }
+    /* 🔴 3단계 — **저장한 뒤 보게 될 모습 그대로** 그린다(2026-08-29 사용자님 안).
+       그래야 「이대로 저장할까요?」가 뜻이 있다.
+       🔴 재료 이름은 **정식 이름(병기 포함)** 이다 — 1·2단계에서 짧게 부르던 것과 다른 것은
+          일부러 그런 것이다. 저장하면 상세 화면에서 이렇게 보인다.
+       🔴 재료 줄은 상세 모달과 **같은 부품**(`renderIngList`)으로 그린다. */
+    function 미리보기그리기() {
+      const 썸 = document.getElementById('saucePreviewThumb');
+      썸.innerHTML = 고른사진
+        ? '<img src="' + 고른사진 + '" alt="">'
+        : '';
+      썸.classList.toggle('is-empty', !고른사진);
+      document.getElementById('saucePreviewName').textContent = nameInput.value.trim();
+      renderIngList(document.getElementById('saucePreviewIngs'), sortIngs(담은재료()));
+      const 팁칸 = document.getElementById('saucePreviewTip');
+      const 팁 = tipInput.value.trim();
+      팁칸.hidden = !팁;
+      팁칸.textContent = 팁 ? '💡 ' + 팁 : '';
+    }
+    function 다음단계2() {
+      if (saveBtn.disabled) return;
+      단계 = 3;
+      미리보기그리기();
+      단계그리기();
+      previewEl.scrollTop = 0;
+      focusLanding(backBtn);
+    }
+    /* 🔴 「뒤로」는 **한 단계씩** 돌아간다. 3단계에서 누르면 2단계로, 2단계에서 누르면 1단계로.
+       ⚠️ 3단계에서 곧장 1단계로 보내면 이름을 고치려던 사람이 재료 목록에 떨어진다. */
     function 앞단계() {
-      단계 = 1;
+      const 갈곳 = 단계 === 3 ? 2 : 1;
+      단계 = 갈곳;
       단계그리기();
       focusLanding(saveBtn);   // 방금 누른 「다음」이 있던 자리다
     }
@@ -7569,10 +7649,16 @@
     });
     // 팁 칸에서 Enter — 아이폰 자판의 「완료」다(`enterkeyhint="done"`). 여기서는 저장으로 간다.
     tipInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); 저장실행(); }
+      // 🔴 이제 **다음**이다 — 3단계(미리보기)가 생겨서 여기서 바로 저장하면 그 화면을 건너뛴다.
+      if (e.key === 'Enter') { e.preventDefault(); 다음단계2(); }
     });
     backBtn.addEventListener('click', 앞단계);
-    saveBtn.addEventListener('click', () => { if (단계 === 2) 저장실행(); else 다음단계(); });
+    /* 아래 버튼 하나가 단계마다 다른 일을 한다 — 1: 다음 / 2: 다음 / 3: 저장 */
+    saveBtn.addEventListener('click', () => {
+      if (단계 === 3) 저장실행();
+      else if (단계 === 2) 다음단계2();
+      else 다음단계();
+    });
 
     render();
   })();
