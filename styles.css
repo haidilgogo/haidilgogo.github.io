@@ -6356,15 +6356,10 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   font-weight: 800;
   color: #3A241F;
 }
-.sauce-preview-tip {
-  margin: 12px 0 0;
-  padding: 12px;
-  border-radius: 12px;
-  background: #FDF1EF;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: #7A5A4F;
-}
+/* 🔴 모양은 `.tip-box`(상세 화면과 같은 부품)가 갖는다. 여기서는 **위 여백만** 준다 —
+   두 곳에 색·테두리를 따로 적으면 상세가 바뀔 때 미리보기가 조용히 어긋난다. */
+.sauce-preview-tip { margin-top: 12px; }
+.sauce-preview-tip[hidden] { display: none; }
 .sauce-preview-ask {
   margin: 14px 0 0;
   font-size: 14px;
@@ -6506,26 +6501,30 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 /* 🔴 글자는 「지우기」다(2026-08-29 사용자님 확정).
    ⚠️ 앱에서 「지우기」는 되돌릴 수 없는 삭제에 쓰는 말이라 처음엔 「사진 없이 할게요」로 뒀는데,
       사용자님이 짧은 쪽을 고르셨다. 이 자리는 **아직 저장 전**이라 실제로 잃는 것은 없다. */
-/* 🔴 **사진 오른쪽 아래에 얹는다**(2026-08-29 사용자님 지시).
-   ■ 사진 아래에 두었더니 사진이 화면 폭을 꽉 채우면서 **화면 밖으로 밀려 안 보였다.**
-     위로 올려도 사진과 떨어져 보였다. 사진 안에 얹으면 사진이 아무리 커도 늘 같이 보인다.
-   ■ **어두운 알약에 흰 글자**다 — 사진 색이 무엇이든 읽혀야 한다. 밝은 사진 위 흰 글자나
-     어두운 사진 위 갈색 글자는 묻힌다.
-   ⚠️ 사진 단추 **안에** 넣으면 안 된다(단추 안 단추는 못 쓴다). 형제로 두고 얹는다. */
+/* 🔴 **사진 오른쪽 위의 X**다(2026-08-29 사용자님 지시).
+   ■ 글자(「지우기」)를 사진 **아래**에 두었더니 사진이 화면 폭을 꽉 채우면서 화면 밖으로 밀렸고,
+     **위**로 올리니 사진과 떨어져 보였다. 사진 안 모서리면 사진이 아무리 커도 늘 같이 보인다.
+   ■ **어두운 동그라미에 흰 X** — 사진 색이 무엇이든 읽혀야 한다. 밝은 사진 위 흰 아이콘이나
+     어두운 사진 위 갈색 아이콘은 묻힌다.
+   ⚠️ 사진 단추 **안에** 넣으면 안 된다(단추 안 단추는 못 쓴다). 형제로 두고 얹는다.
+   ⚠️ 손가락으로 누르는 자리라 **32px** 로 둔다. 아이콘은 14px 이지만 누를 자리는 그보다 커야 한다. */
 .sauce-photo-clear {
   position: absolute;
   right: 10px;
-  bottom: 10px;
-  padding: 7px 12px;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: 50%;
   background: rgba(0, 0, 0, .55);
   color: #fff;
-  font-size: 13px;
-  font-weight: 700;
   cursor: pointer;
 }
-.sauce-photo-clear:active { background: rgba(0, 0, 0, .7); }
+.sauce-photo-clear:active { background: rgba(0, 0, 0, .72); }
 /* 사진을 줄이는 동안 — 큰 사진은 잠깐 걸린다. 아무 반응이 없으면 안 눌린 줄 안다 */
 .sauce-photo.is-busy .sauce-photo-btn { opacity: .5; pointer-events: none; }
 /* 🔴 `display` 를 준 요소에는 `hidden` 속성이 안 먹는다 — CSS 가 이긴다.

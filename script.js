@@ -7578,7 +7578,8 @@
       const 팁칸 = document.getElementById('saucePreviewTip');
       const 팁 = tipInput.value.trim();
       팁칸.hidden = !팁;
-      팁칸.textContent = 팁 ? '💡 ' + 팁 : '';
+      // 🔴 글자는 안쪽 칸에만 넣는다 — 전구(`img`)는 형제라 여기서 지우면 안 된다
+      document.getElementById('saucePreviewTipText').textContent = 팁;
     }
     function 다음단계2() {
       if (saveBtn.disabled) return;
