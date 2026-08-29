@@ -495,9 +495,18 @@
       };
     }
   } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
+  /* 🔴 **성공했는지 돌려준다**(2026-08-29 사용자님 지시로 바뀜). 예전에는 실패를 조용히 삼켰다.
+     소스 만들기는 실패하면 **창을 안 닫고 그 자리에 머무는** 쪽으로 정했기 때문에, 부르는 쪽이
+     성패를 알아야 한다.
+     ⚠️ **실패하면 서버로도 안 올린다** — 기기에 없는 것을 서버에만 올리면 둘이 어긋난다.
+     ⚠️ 스티커·즐겨찾기·좋아요는 아직 옛 방식(조용히 삼킴)이다. 한 건이 몇백 바이트라
+        공간이 찰 일이 사실상 없어서 이번에는 안 건드렸다(사용자님 확정). */
   function saveMySauces() {
-    try { localStorage.setItem(MY_SAUCES_KEY, JSON.stringify(mySauceData)); } catch (e) { /* 시크릿 모드 등 저장 실패 무시 */ }
+    try {
+      localStorage.setItem(MY_SAUCES_KEY, JSON.stringify(mySauceData));
+    } catch (e) { return false; }
     schedulePush(); // 서버 사본 갱신 + 코드 생성(맨 아래 「내 데이터 코드」 절)
+    return true;
   }
 
   /* ── 내 소스 사진 — **이 기기에만 둔다** (2026-08-29 사용자님 확정) ──────────────────
@@ -7481,7 +7490,11 @@
          2단계는 「뒤로」와 「저장」이 **둘 다 행동**인데 375px 에서 191px 이나 떨어져 있었다(실측) —
          짝으로 안 읽히고 한 손으로 오가기도 멀다. 확인창(`.leave-confirm-actions`)도 붙여 놓는다. */
       sheet.classList.toggle('is-step2', !첫째);
-      saveBtn.textContent = 셋째 ? '저장' : '다음';
+      /* 🔴 3단계 버튼은 **새로 만들 때 「만들기」, 고칠 때 「저장」**이다(2026-08-29 사용자님 지시).
+         누르면 실제로 다른 일이 일어나는 자리라 여기서만 가른다 —
+         새로 만들면 소스가 늘고, 고치면 원래 것이 덮어써진다.
+         ⚠️ 실패 알림도 이 글자와 짝이다(`저장실패알림`). 한쪽만 바꾸지 말 것. */
+      saveBtn.textContent = 셋째 ? (고치는중 ? '저장' : '만들기') : '다음';
       발밑갱신();
     }
     /* 🔴 「다음」은 하나라도 담아야 눌린다. 「저장」은 **이름까지** 있어야 눌린다.
@@ -7614,15 +7627,41 @@
          합치기가 「마지막으로 손댄 시각」으로 견주므로, 다른 기기의 옛 내용이 이걸 덮지 않는다.
          ⚠️ 고치던 소스가 그새 사라졌으면(다른 기기에서 지웠다) **새로 넣는다.** 없는 것을 고치려다
             사용자님이 방금 한 일이 통째로 사라지는 편보다 낫다. */
+      /* 🔴 **고치는 중이면 새로 넣지 않고 그 기록을 고친다**(2026-08-27 「수정하기」).
+         `id` 와 `addedAt` 은 그대로 두고 `editedAt` 만 새로 찍는다 —
+         합치기가 「마지막으로 손댄 시각」으로 견주므로, 다른 기기의 옛 내용이 이걸 덮지 않는다.
+         ⚠️ 고치던 소스가 그새 사라졌으면(다른 기기에서 지웠다) **새로 넣는다.** 없는 것을 고치려다
+            사용자님이 방금 한 일이 통째로 사라지는 편보다 낫다. */
       const 자리 = 고치는중 ? (mySauceData.records || []).findIndex((x) => x.id === 고치는중) : -1;
-      if (자리 >= 0) {
+      const 고쳤나 = 자리 >= 0;
+      const 저장할id = 고쳤나 ? 고치는중 : newMySauceId();
+
+      /* 🔴 **하나라도 저장에 실패하면 아무것도 바꾸지 않고 그 자리에 머문다**(2026-08-29 사용자님 지시).
+         ■ 예전에는 사진만 조용히 빠진 채 소스가 저장되고 창이 닫혔다. 그러면 목록에 가서야
+           사진이 없는 것을 알게 되고, 무엇을 해야 할지 알 길이 없다.
+         ■ **사진을 먼저 써 본다** — 무거운 쪽이라 여기서 걸린다. 실패하면 되돌리고 나간다.
+         ⚠️ 되돌리기가 핵심이다. 메모리만 바꿔 두고 나가면 **화면에는 있는데 저장소에는 없는**
+            어긋난 상태가 남는다. */
+      const 이전사진 = mySaucePhotos[저장할id];
+      if (고른사진) mySaucePhotos[저장할id] = 고른사진;
+      else delete mySaucePhotos[저장할id];
+      if (!saveMySaucePhotos()) {
+        if (이전사진 === undefined) delete mySaucePhotos[저장할id];
+        else mySaucePhotos[저장할id] = 이전사진;
+        saveMySaucePhotos();
+        저장실패알림(고쳤나);
+        return;
+      }
+
+      const 이전기록 = mySauceData.records.slice();
+      if (고쳤나) {
         const 옛것 = mySauceData.records[자리];
         mySauceData.records[자리] = Object.assign({}, 옛것, {
           name: 이름, ings: 재료, tip: 팁, editedAt: 지금,
         });
       } else {
         mySauceData.records.push({
-          id: newMySauceId(),
+          id: 저장할id,
           name: 이름,
           ings: 재료,
           tip: 팁,
@@ -7632,28 +7671,29 @@
           editedAt: 지금,
         });
       }
-      const 고쳤나 = 자리 >= 0;
+      if (!saveMySauces()) {
+        mySauceData.records = 이전기록;            // 기록도 되돌린다
+        if (이전사진 === undefined) delete mySaucePhotos[저장할id];
+        else mySaucePhotos[저장할id] = 이전사진;
+        saveMySaucePhotos();
+        저장실패알림(고쳤나);
+        return;
+      }
       /* 🔴 고친 소스의 **카드 저장분을 버린다**(2026-08-29 사용자님이 잡으심).
          목록 카드는 id 로 재사용하는데(`browseCardCache`), 안 버리면 이름·재료를 고쳐도
          **옛 카드가 그대로** 남는다 — 저장값은 바뀌었는데 화면만 안 바뀌어서
          「수정이 안 된다」로 보인다(새로고침하면 그제야 바뀌었다).
-         ⚠️ 다른 기기에서 들어온 변경은 `applyPayload` 가 이미 같은 일을 하고 있다.
-            여기가 **같은 기기에서 고쳤을 때** 빠져 있던 자리다. */
+         ⚠️ 다른 기기에서 들어온 변경은 `applyPayload` 가 이미 같은 일을 하고 있다. */
       if (고쳤나) browseCardCache.delete(고치는중);
-      /* 🔴 **사진은 따로 저장한다**(2026-08-29). 서버로 안 가는 자료라 `saveMySauces` 와 갈라 둔다.
-         ⚠️ 사진을 뺐으면 **키를 지운다** — 빈 글자로 두면 「사진 없음」인지 「빈 사진」인지 갈리지 않는다.
-         ⚠️ 저장이 실패할 수 있다(용량 초과). 그때는 **알린다** — 조용히 사라지면
-            「저장했는데 사진이 없다」가 되어 무엇이 잘못됐는지 알 길이 없다. */
-      const 저장할id = 고쳤나 ? 고치는중 : mySauceData.records[mySauceData.records.length - 1].id;
-      if (고른사진) mySaucePhotos[저장할id] = 고른사진;
-      else delete mySaucePhotos[저장할id];
-      const 사진저장됨 = saveMySaucePhotos();
-      saveMySauces();
       close({ 초점복귀: false });
       내소스로가기();
+      if (window.showToast) window.showToast(고쳤나 ? '소스를 저장했어요' : '소스를 만들었어요');
+    }
+    /* 🔴 실패했을 때 무엇을 하다 실패했는지 말해 준다(2026-08-29 사용자님 지시).
+       「저장」과 「만들기」는 누른 버튼 글자와 같아야 한다 — 다른 말이 나오면 뭘 하다 실패한 건지 흐려진다. */
+    function 저장실패알림(고쳤나) {
       if (window.showToast) {
-        if (!사진저장됨 && 고른사진) window.showToast('사진은 저장하지 못했어요 (저장 공간 부족)');
-        else window.showToast(고쳤나 ? '소스를 고쳤어요' : '소스를 저장했어요');
+        window.showToast(고쳤나 ? '소스 저장에 실패했어요' : '소스 만들기에 실패했어요');
       }
     }
 
