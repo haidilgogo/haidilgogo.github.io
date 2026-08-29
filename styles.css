@@ -6367,11 +6367,18 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   margin: 0 0 14px;
 }
 .taste-row[hidden] { display: none; }
+/* 🔴 상세 화면에서는 **좌우 여백 20px** 이 필요하다(2026-08-29 사용자님이 잡으심).
+   `.modal-desc` 가 `margin: 12px 20px 0` 을 갖는데 이 줄에는 없어서 **혼자 왼쪽 끝에 붙었다.**
+   ⚠️ 3단계 미리보기(`#saucePreviewTastes`)에는 주지 않는다 — 거기는 카드 안이라 이미 여백이 있다. */
+#modalTastes { margin-left: 20px; margin-right: 20px; }
 .taste-chip {
   padding: 5px 10px;
   border-radius: 999px;
   background: #FDF1EE;
-  color: #A2553F;
+  /* 🔴 글자를 진하게 했다(2026-08-29 사용자님 「잘 안 보여요」).
+     예전 `#A2553F` 는 배경과 **대비가 4.86** 이었다 — 기준(4.5)은 넘지만 12.5px 작은 글씨라 빠듯했다.
+     지금 `#7A2E1C` 는 **8.5** 다. ⚠️ 브랜드 빨강(`#D0402E`)은 4.26 이라 오히려 더 안 보인다. */
+  color: #7A2E1C;
   font-size: 12.5px;
   font-weight: 700;
 }
