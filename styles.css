@@ -6800,6 +6800,10 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   font-size: 13px;
   color: var(--text-muted);
 }
+/* 담은 개수의 숫자만 빨갛게(2026-08-29 사용자님 지시).
+   🔴 굵기는 `.sauce-count.is-on` 이 줄 전체에 이미 700 을 주므로 여기서 또 주지 않는다. */
+.sauce-count-n { color: var(--brand-red); }
+
 /* 안내문 속 담기 버튼 그림 — 목록의 `.si-add` 와 **같은 모양**이라야 「저걸 누르라」는 뜻이 통한다.
    🔴 글자(`+`)를 그대로 담고 있다. 화면낭독기가 「더하기」로 읽어야 문장이 성립하기 때문이다. */
 .sauce-count-ic {

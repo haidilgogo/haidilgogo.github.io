@@ -6934,7 +6934,11 @@
     }
     function 발밑갱신() {
       const n = 담은개수();
-      if (n) countEl.textContent = n + '가지 담음';
+      /* 🔴 숫자만 빨갛게(2026-08-29 사용자님 지시). 몇 개 담았는지가 이 줄에서 가장 먼저 읽혀야 한다.
+         ⚠️ 숫자는 우리가 만든 것이라 그대로 얹어도 안전하다 — 사용자가 친 글자가 아니다. */
+      /* ⚠️ **한 덩어리(`<span>`)로 감싼다.** 이 줄은 `inline-flex` + `gap: 4px` 라(안내문의 `+` 그림
+         때문에 그렇다), 감싸지 않으면 숫자가 **별개 조각으로 잡혀 「3 가지」처럼 띄어진다**(화면에서 잡음). */
+      if (n) countEl.innerHTML = '<span><b class="sauce-count-n">' + n + '</b>가지 담음</span>';
       else countEl.innerHTML = 담기안내;
       countEl.classList.toggle('is-on', n > 0);
       // 🔴 아래 버튼이 눌리는 조건은 단계마다 다르다 — 한 곳(`버튼갱신`)에서만 정한다
