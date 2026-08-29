@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=864">
+<link rel="stylesheet" href="styles.css?v=866">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -899,6 +899,17 @@
       <div class="stamp-fields">
         <label class="stamp-field stamp-field--light-ph"><span class="stamp-field-label">소스 이름</span><input type="text" id="sauceSaveName" maxlength="10" placeholder="홍길동소스(최대 10자)" autocomplete="off" enterkeyhint="next" aria-label="소스 이름"></label>
       </div>
+      <!-- 맛 키워드 — 2026-08-29 사용자님 안.
+           🔴 **설명 칸 대신이다.** 8/25 에 설명을 뺀 이유가 「팁과 설명 둘 다 선택이면 둘 다 빈다」였는데,
+              칩은 **누르기만 하면 되니 그 멈칫이 없다.**
+           🔴 **여러 개 고를 수 있고, 선택이다**(안 골라도 넘어간다).
+           🔴 열세 개는 **소스바 재료가 실제로 낼 수 있는 맛**에서 뽑았다(사용자님과 함께 정함).
+              ⚠️ 물린 것들 — 자극적(맛의 종류가 아니라 세기) · 칼칼(매콤과 겹침) · 구수(고소와 겹침) ·
+                 개운(상큼과 겹침) · 느끼(안 좋은 뜻).
+           ⚠️ **한 번 정하면 줄이기 어렵다** — 이미 고른 사람이 있으면 옛 키워드가 남는다. 늘리는 것은 쉽다.
+           🔴 칩은 script.js 가 `TASTES` 를 보고 그린다. 여기에 박지 말 것. -->
+      <p class="stamp-q">어떤 맛인가요?</p>
+      <div class="taste-pick" id="sauceTastes" role="group" aria-label="어떤 맛인가요?"></div>
       <!-- 🔴 **최대 60자**다(2026-08-27). 기존 레시피 팁 17개를 재 보니 40자면 3개, 60자면 2개가
            잘린다(가운데값 29자). 스티커 메모(40자)보다 긴 이유는 여기가 할 말이 더 많은 자리라서다. -->
       <p class="stamp-q">나만의 팁이 있나요?</p>
@@ -915,6 +926,8 @@
       <div class="sauce-preview-card">
         <div class="sauce-preview-thumb" id="saucePreviewThumb"></div>
         <p class="sauce-preview-name" id="saucePreviewName"></p>
+        <!-- 고른 맛 — 이름 아래. 상세 화면에서도 같은 자리(설명이 오던 자리)에 나온다 -->
+        <div class="taste-row" id="saucePreviewTastes" hidden></div>
         <p class="sauce-preview-label">소스바</p>
         <div class="ing-box" id="saucePreviewIngs"></div>
         <!-- 🔴 상세 화면과 **같은 부품**(`.tip-box`)을 쓴다(2026-08-29 사용자님이 잡으심).
@@ -1211,6 +1224,8 @@
     </div>
     <!-- 설명 — 박스 없이 문단 -->
     <p class="modal-desc" id="modalDesc"></p>
+    <!-- 내 소스의 맛 키워드(2026-08-29). 기존 레시피에는 안 나온다 — `desc` 와 자리를 나눠 쓴다. -->
+    <div class="taste-row" id="modalTastes" hidden></div>
     <div class="modal-body">
       <div id="modalOrderWrap">
         <h3 class="modal-section-title">주문</h3>
@@ -1462,7 +1477,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=865"></script>
+<script src="script.js?v=868"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

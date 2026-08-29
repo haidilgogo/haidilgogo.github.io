@@ -518,6 +518,25 @@
         400px 사진은 40~80KB 다. 다른 기기에서 열면 이미지 자리가 비어 있고, 재료·이름·팁은 그대로 간다.
      🔴 **모양은 `{ 기록id: dataURL }`** 이다. 기록과 같은 id 로 묶여 있어서 지울 때 같이 지운다.
      ⚠️ 사진이 없는 소스는 키 자체가 없다 — `undefined` 가 곧 「사진 없음」이다. */
+  /* 🔴 **내 소스의 맛 키워드**(2026-08-29 사용자님과 정함). 설명 칸 대신이다.
+     ■ 왜 칩인가 — 8/25 에 설명(`desc`)을 뺀 이유가 「팁과 설명 둘 다 선택이면 **둘 다 빈다**」였다.
+       빈 칸 앞에서 뭘 쓸지 멈칫하기 때문인데, **누르기만 하면 되는 칩은 그 멈칫이 없다.**
+     ■ 열세 개는 **소스바 재료가 실제로 낼 수 있는 맛**에서 뽑았다 —
+       고소(땅콩참깨소스·참깨) · 매콤(고추기름·태국고추) · 얼얼(마라시즈닝·산초기름) ·
+       알싸(다진 마늘·와사비) · 달콤(스위트칠리소스·설탕) · 짭짤(완자간장소스·굴소스) ·
+       새콤(중국식초·산고추) · 향긋(고수·다진 파) · 감칠맛(굴소스·미원) · 묵직(발효장류) 등.
+     🔴 **말꼴은 「~한」으로 통일한다**(2026-08-29 사용자님 지시). 어근만 쓰던 것을 바꿨다.
+        ⚠️ **「감칠맛」만 예외다** — 「감칠맛한」은 말이 안 된다(「감칠맛 나는」이 맞다).
+           혼자 꼴이 다르지만 그대로 둔다.
+     ⚠️ **물린 것** — 자극적(맛의 종류가 아니라 세기이고 좋게도 나쁘게도 읽힌다).
+        칼칼·구수·개운·느끼는 겹치거나 안 좋은 뜻이라 한 번 뺐다가 **사용자님 지시로 다시 넣었다.**
+     🔴 **한 번 정하면 줄이기 어렵다** — 이미 고른 사람이 있으면 저장값에 옛 키워드가 남는다.
+        늘리는 것은 안전하다. 줄일 때는 저장된 기록을 어떻게 할지 함께 정해야 한다.
+     ⚠️ **「담백」을 다른 것과 같이 골라도 막지 않는다**(사용자님 확정). 앞뒤가 안 맞는 조합이
+        나올 수 있지만, 고르는 사람의 뜻을 앱이 판정하지 않기로 했다. */
+  const TASTES = ['고소한', '매콤한', '얼얼한', '알싸한', '달콤한', '짭짤한', '새콤한', '상큼한',
+                  '향긋한', '감칠맛', '담백한', '묵직한', '깔끔한', '칼칼한', '구수한', '개운한', '느끼한'];
+
   const MY_SAUCE_PHOTOS_KEY = 'haidilao_my_sauce_photos';
   let mySaucePhotos = {};
   try {
@@ -560,10 +579,19 @@
       nameHtml: escHtml(rec.name || ''),
       img: 사진 || undefined,
       imgFit: 사진 ? 'cover' : undefined,
+      // 🔴 고른 맛을 실어 준다(2026-08-29). 상세 화면이 설명 자리에 칩으로 그린다.
+      tastes: Array.isArray(rec.tastes) ? rec.tastes : [],
       ings: rec.ings || [],
       steps: [],
       tip: rec.tip || '',
     };
+  }
+  /* 맛 칩을 그린다 — 미리보기와 상세가 **같은 함수**를 쓴다. 흉내 내면 한쪽만 바뀔 수 있다.
+     ⚠️ 값은 `TASTES` 안의 것만 들어오지만, 옛 저장값에 없는 말이 섞일 수 있으므로 걸러서 그린다. */
+  function renderTasteRow(el, 맛들) {
+    const 목록 = (맛들 || []).filter((t) => TASTES.indexOf(t) >= 0);
+    el.hidden = 목록.length === 0;
+    el.innerHTML = 목록.map((t) => '<span class="taste-chip">' + escHtml(t) + '</span>').join('');
   }
   /* 🔴 **최신순**이다 — `byPopular`(인기순)를 쓰지 않는다. 내 소스에는 좋아요가 아예 없어서
      인기순으로 세우면 전부 동점이 되고 동점 규칙만 남는데, **왜 그 순서인지가 코드에서 안 보인다.**
@@ -3042,6 +3070,8 @@
     } else {
       descEl.style.display = 'none';
     }
+    // 🔴 내 소스의 맛 칩 — 설명이 오던 자리다. 기존 레시피에는 `tastes` 가 없어 저절로 감춰진다.
+    renderTasteRow(document.getElementById('modalTastes'), r.tastes);
     /* 🔴 내 소스에서는 **즐겨찾기·좋아요를 감춘다**(2026-08-27) — 목록 카드에서 뺀 것과 같은 이유다
        (얼개 3절: 좋아요는 모든 방문자가 함께 보는 숫자이고, 즐겨찾기는 몇 개 안 되는 목록에서
        추릴 이유가 없다). **목록에는 없는데 상세에만 있으면** 눌러 놓고도 어디서도 안 보인다.
@@ -7110,7 +7140,7 @@
       단계 = 1;   // 🔴 늘 재료 담기부터 시작한다 — 2·3단계에서 닫았어도 다음에 열면 1단계다
       /* 🔴 사진과 그 답도 비운다(2026-08-29). 안 비우면 **지난번에 고른 사진이 새 소스에 붙는다.**
          `고치는중` 이면 `다음단계()` 가 저장해 둔 값으로 다시 채운다. */
-      고른사진 = ''; 사진답 = ''; 이단계채움 = false;
+      고른사진 = ''; 사진답 = ''; 고른맛 = []; 이단계채움 = false;
       /* 🔴 **열 때 비운다**(2026-08-25 사용자님 지시 — 「닫으면 없어져야 하지 않나」).
          닫는 쪽에서 비우지 않는 이유: 오버레이가 0.22초에 걸쳐 사라지는 동안 아직 보이는데,
          그때 목록을 지우면 **담은 것이 눈앞에서 하나씩 풀리는 게 보인다.**
@@ -7232,6 +7262,39 @@
           아니라 **글자로 남는 그림**(dataURL)이라서다.
        ⚠️ 아이폰 사진은 회전 정보(EXIF)가 붙어 있는데, `createImageBitmap` 이 그것을 반영해 준다.
           없는 브라우저에서는 `Image` 로 떨어진다(그때는 회전이 안 맞을 수 있다). */
+    /* ── 맛 키워드 (선택·여러 개) — 2026-08-29 사용자님 안 ──────────────────────
+       🔴 **설명 칸 대신**이다. 자세한 근거는 위 `TASTES` 주석에 있다.
+       🔴 **선택이다** — 안 골라도 「다음」이 눌린다. 사진처럼 묻지 않는다. */
+    const 맛칸 = document.getElementById('sauceTastes');
+    let 고른맛 = [];
+    TASTES.forEach((t) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'taste-btn';
+      b.textContent = t;
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', () => {
+        const i = 고른맛.indexOf(t);
+        if (i >= 0) 고른맛.splice(i, 1); else 고른맛.push(t);
+        /* 🔴 **누를 때마다 `TASTES` 차례로 다시 담는다.** 누른 순서대로 두면 같은 조합인데도
+           카드마다 순서가 달라져(「깔끔 고소 매콤」 vs 「고소 매콤 깔끔」) 목록이 들쭉날쭉해진다. */
+        고른맛 = TASTES.filter((x) => 고른맛.indexOf(x) >= 0);
+        b.classList.toggle('is-on', i < 0);
+        b.setAttribute('aria-pressed', String(i < 0));
+      });
+      맛칸.appendChild(b);
+    });
+    /* 고른 것을 화면에 다시 입힌다 — 수정으로 들어오거나 시트를 새로 열 때 쓴다.
+       ⚠️ **`TASTES` 순서로 다시 담는다.** 누른 순서대로 두면 같은 조합인데 카드마다 순서가 달라진다. */
+    function 맛그리기() {
+      고른맛 = TASTES.filter((t) => 고른맛.indexOf(t) >= 0);
+      [...맛칸.children].forEach((b) => {
+        const on = 고른맛.indexOf(b.textContent) >= 0;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+    }
+
     /* 🔴 사진 질문의 답 — `''`(아직 안 물음) · `'yes'` · `'no'` (2026-08-29 사용자님 확정).
        빈 값이면 「다음」이 안 눌린다. 필수 질문이라 그렇다. */
     let 사진답 = '';
@@ -7567,7 +7630,9 @@
          ⚠️ 빈 채로 두면 이름 한 글자 고치러 들어와도 사진 질문에 매번 다시 답해야 한다.
          ⚠️ 새로 만드는 중이면 **아직 안 물은 상태**로 둔다 — 그래야 한 번은 묻게 된다. */
         사진답 = 원본 ? (고른사진 ? 'yes' : 'no') : '';
+        고른맛 = 원본 && Array.isArray(원본.tastes) ? 원본.tastes.slice() : [];
       }
+      맛그리기();
       사진그리기();
       사진답그리기();
       단계그리기();
@@ -7596,6 +7661,7 @@
         : '';
       썸.classList.toggle('is-empty', !고른사진);
       document.getElementById('saucePreviewName').textContent = nameInput.value.trim();
+      renderTasteRow(document.getElementById('saucePreviewTastes'), 고른맛);
       renderIngList(document.getElementById('saucePreviewIngs'), sortIngs(담은재료()));
       /* 🔴 물음은 **「이대로 만들까요?」 하나로 통일한다**(2026-08-29 사용자님 확정).
          새로 만들 때든 고칠 때든 같은 말이다.
@@ -7673,7 +7739,7 @@
       if (고쳤나) {
         const 옛것 = mySauceData.records[자리];
         mySauceData.records[자리] = Object.assign({}, 옛것, {
-          name: 이름, ings: 재료, tip: 팁, editedAt: 지금,
+          name: 이름, ings: 재료, tip: 팁, tastes: 고른맛.slice(), editedAt: 지금,
         });
       } else {
         mySauceData.records.push({
@@ -7681,6 +7747,7 @@
           name: 이름,
           ings: 재료,
           tip: 팁,
+          tastes: 고른맛.slice(),
           addedAt: 지금,
           // 🔴 처음 만들 때도 `editedAt` 을 넣는다 — 합치기가 「마지막으로 손댄 시각」으로 견주는데,
           //    비워 두면 옛 기록만 기준이 달라진다.

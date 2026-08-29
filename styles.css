@@ -6298,6 +6298,50 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    🔴 **지금은 비어 있다.** 일러스트가 나오면 이 안에 `<img>` 를 넣으면 되고 줄 높이는 그대로다.
    ⚠️ 62px 는 그냥 정한 값이 아니다 — 찍어 온 사진을 이 크기로 줄여 보니 **통이 전부 똑같아 보여서**,
       일러스트는 「통을 빼고 내용물이 칸을 채우는」 그림이어야 한다는 조건이 여기서 나왔다. */
+/* ── 맛 키워드 (2026-08-29 사용자님 안) ─────────────────────────────────────
+   🔴 **고르는 칩**(`.taste-btn`)과 **보여 주는 칩**(`.taste-chip`)이 다르다 —
+      고르는 쪽은 누를 수 있어야 하고, 보여 주는 쪽은 읽기만 한다.
+   ⚠️ 열세 개가 320px 에서 세 줄, 393px 에서 세 줄이다(실측). 더 늘리면 줄이 늘어난다. */
+.taste-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+.taste-btn {
+  padding: 9px 14px;
+  border: 1px solid #E4D5C3;
+  border-radius: 999px;
+  background: #fff;
+  color: #7A5A4F;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.taste-btn.is-on {
+  border-color: var(--brand-red, #D0402E);
+  background: var(--brand-red, #D0402E);
+  color: #fff;
+}
+
+/* 보여 주는 자리 — 3단계 미리보기와 상세 화면. 설명이 오던 자리다.
+   🔴 누를 수 없다. 걸러내기를 붙이는 것은 나중 일이고, 지금 누르게 하면 「눌러도 아무 일이 없다」가 된다. */
+.taste-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+}
+.taste-row[hidden] { display: none; }
+.taste-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #FDF1EE;
+  color: #A2553F;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
 /* ── 예/아니오 (사진 질문) — 2026-08-29 사용자님 확정 ───────────────────────────
    🔴 **고르기 전에는 둘 다 꺼져 있다.** 필수 질문이라 답하기 전에는 「다음」이 안 눌린다 —
       미리 하나를 켜 두면 답한 것처럼 보여서 그 규칙이 화면과 어긋난다. */
