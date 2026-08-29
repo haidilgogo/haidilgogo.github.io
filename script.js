@@ -7458,11 +7458,15 @@
          ■ 1단계는 재료 목록뿐이라 제목이 그 역할을 한다 → 「재료를 담아볼까요?」
          ■ 2단계는 본문에 질문이 셋(이름·팁·사진)이라 제목까지 물으면 겹친다 → 「소스 꾸미기」
          ■ 3단계는 카드뿐이라 제목이 묻는다 → 「이렇게 저장할까요?」
-         🔴 **고치는 중이면 「소스 고치기」로 덮는다**(사용자님 확정). 말투는 어긋나지만
-            어디쯤인지는 아래 점이 알려 주므로, 제목은 「무엇을 하는 중인가」만 말하면 된다.
-            수정은 가끔 들어가는 길이라 그 사실을 알려 주는 것이 더 값지다. */
-      titleEl.textContent = 고치는중 ? '소스 고치기'
-        : (셋째 ? '이렇게 저장할까요?' : 둘째 ? '소스 꾸미기' : '재료를 담아볼까요?');
+         🔴 **새로 만들 때와 고칠 때는 3단계에서만 갈린다**(2026-08-29 사용자님과 정함).
+            ■ 왜 갈라야 하나 — 저장을 누르면 새로 만들 때는 소스가 **늘고**, 고칠 때는 원래 것이
+              **덮어써진다.** 그 차이를 모르면 「복사본을 만들려 했는데 원본이 바뀌었다」가 된다.
+            ■ 왜 1·2단계는 안 갈라도 되나 — 고치러 들어오면 재료·이름·팁·사진이 **이미 채워져
+              있다.** 그것 자체가 「고치는 중」이라는 신호라 제목이 또 말할 이유가 없다.
+            ⚠️ 예전(2026-08-27)에는 세 단계를 전부 「소스 고치기」로 덮었다. 그때는 **단계 표시도
+               3단계도 없었기** 때문이다. 지금은 점이 어디쯤인지 알려 준다. 되돌리지 말 것. */
+      titleEl.textContent = 셋째 ? (고치는중 ? '이렇게 수정할까요?' : '이렇게 저장할까요?')
+        : 둘째 ? '소스 꾸미기' : '재료를 담아볼까요?';
       // 단계 점 — 지금 자리만 알약으로 길어진다
       [...stepsEl.children].forEach((el, i) => el.classList.toggle('is-on', i === 단계 - 1));
       stepsEl.setAttribute('aria-label', '전체 3단계 중 ' + 단계 + '단계');
@@ -7569,6 +7573,9 @@
       썸.classList.toggle('is-empty', !고른사진);
       document.getElementById('saucePreviewName').textContent = nameInput.value.trim();
       renderIngList(document.getElementById('saucePreviewIngs'), sortIngs(담은재료()));
+      // 아래 묻는 말도 제목과 짝을 맞춘다 — 한쪽만 「저장」이면 어긋나 보인다
+      document.querySelector('.sauce-preview-ask').textContent =
+        고치는중 ? '이대로 수정할까요?' : '이대로 저장할까요?';
       const 팁칸 = document.getElementById('saucePreviewTip');
       const 팁 = tipInput.value.trim();
       팁칸.hidden = !팁;
