@@ -9,7 +9,7 @@
 <meta name="robots" content="noindex, follow">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=878">
+<link rel="stylesheet" href="styles.css?v=880">
 <link rel="stylesheet" href="article.css?v=24">
 <meta name="theme-color" content="#FCF9F5">
 <style>
@@ -975,6 +975,37 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   }, { passive: true });
 
   paint();
+
+  /* ══ 내 소스에서 넘어온 값 채우기 (2026-08-30, 얼개 6절 「제보 연결」) ═══════════
+     앱의 내 소스 상세에서 「제보하기」를 누르면 이 페이지로 온다.
+     🔴 **주소에 값을 안 싣는다** — 재료가 30가지면 주소가 수백 자가 되고 기록에도 그대로 남는다.
+        앱이 `sessionStorage` 에 담아 두고, 여기서 꺼내 쓴다(탭을 닫으면 저절로 사라진다).
+     🔴 **한 번 쓰고 지운다.** 안 지우면 폼을 다시 열 때마다 같은 값이 또 채워진다.
+     🔴 **값을 넣은 뒤 `input` 을 한 번 흘려 준다** — 글자 수 표시·보내기 잠금 풀기·칸 늘어나기가
+        전부 `input` 에 걸려 있어서, 값만 넣으면 **칸이 3줄에 갇힌 채 글자가 잘려 보인다.**
+     ⚠️ 담기지 않았거나 값이 깨졌으면 **그냥 빈 폼**이다. 여기서 막지 않는다. */
+  try {
+    var 넘김 = sessionStorage.getItem('haidilao_report_prefill');
+    if (넘김 && new URLSearchParams(location.search).get('from') === 'mysauce') {
+      sessionStorage.removeItem('haidilao_report_prefill');
+      var 온것 = JSON.parse(넘김);
+      /* 🔴 **`paint()` 를 먼저 부른다.** 갈래를 고르기 전에는 재료·팁 칸이 `data-off` 로 숨어 있는데,
+         숨은 칸은 높이가 0 이라 **칸 늘리기가 0px 로 계산된다** — 값은 들어갔는데 3줄에 갇혀
+         뒷줄이 잘려 보인다(2026-08-30 에 실제로 그랬다). 칸을 먼저 띄우고 값을 넣는다. */
+      state.kind = 'recipe';                       // 갈래를 미리 골라 준다
+      paint();
+      [
+        ['rName', 온것.name || ''],
+        ['rIng',  (온것.ings || []).join('\n')],
+        ['rTip',  온것.tip || '']
+      ].forEach(function (한칸) {
+        var el = document.getElementById(한칸[0]);
+        if (!el || !한칸[1]) return;
+        el.value = 한칸[1];
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+  } catch (e) { /* 못 꺼내도 빈 폼으로 그냥 쓴다 */ }
 
   /* 🟢 미리보기 — `?done=1` 로 열면 **아무것도 안 보내고** 접수 완료 화면만 띄운다.
      화면을 손볼 때마다 실제로 한 건씩 보내지 않아도 된다(시트·디스코드에 시험 줄이 안 쌓인다).

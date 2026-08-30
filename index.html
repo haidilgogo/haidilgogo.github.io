@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=878">
+<link rel="stylesheet" href="styles.css?v=880">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -962,6 +962,19 @@
   </div>
 </div>
 
+<!-- 공유 대비책 — 폰 공유 창을 못 쓸 때만 뜬다 (2026-08-30, 얼개 6절).
+     🔴 **상세 모달 위에 뜬다** — 자르기 창이 소스 시트 위에 뜨는 것과 같은 얼개다.
+     🔴 그림을 그대로 보여 주고 **길게 눌러 저장**하게 한다. 내려받기 단추를 두지 않는 이유는
+        아이폰 사파리가 그 방식을 제대로 못 받기 때문이다(얼개 6절에 미리 적어 둔 대비책).
+     ⚠️ 그림 주소는 script.js 가 넣고 닫을 때 놓아준다. 여기에 박지 말 것. -->
+<div class="share-overlay" id="shareOverlay" aria-hidden="true" inert>
+  <div class="share-card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+    <p class="share-title" id="shareTitle">길게 눌러 저장하세요</p>
+    <div class="share-img-wrap"><img class="share-img" id="shareImg" alt="내 소스 카드 이미지"></div>
+    <button class="share-close" id="shareClose" type="button">닫기</button>
+  </div>
+</div>
+
 <!-- 사진 맞추기 — 사진을 고르면 뜬다 (2026-08-29 사용자님 요청).
      🔴 **소스 만들기 시트 위에 뜬다.** 시트를 닫지 않으므로 취소하면 하던 자리 그대로다.
      🔴 **입력칸이 없다** — 그래서 「짧은 창은 아이폰에서 자판이 화면을 민다」는 문제(2026-08-27)에
@@ -1264,6 +1277,17 @@
         <!-- 🔴 내 소스에만 보인다. **스티커 기록 보기와 같은 얼개**다(2026-08-27 사용자님 지시) —
              둘을 한 줄에 나란히 놓고, 지우기가 확인 상태가 되면 수정 쪽이 줄어 문구가 한 줄에 들어간다.
              ⚠️ 줄 전체를 `hidden` 으로 여닫는다. 버튼을 하나씩 숨기면 남은 하나가 줄 전체로 늘어난다. -->
+        <!-- 🔴 **내보내기 두 갈래 — 내 소스에만 보인다**(얼개 6절 「내보내기 — 공유와 제보」).
+             🔴 **한 줄에 나란히 둔다**(2026-08-30 사용자님 안). 둘 다 「이 소스를 밖으로 내보낸다」라
+                성격이 같고, 이름도 「공유하기 · 제보하기」로 짝이 맞아 무엇을 하는 자리인지 바로 읽힌다.
+             🔴 **아래 「수정·삭제」와는 줄을 가른다** — 그쪽은 「관리」라 성격이 다르다.
+                셋을 한 줄에 넣으면 삭제가 「한 번 더 누르면 삭제돼요」로 길어질 때 320px 에서 자리가 안 난다.
+             ⚠️ 「공유하기」 글자는 script.js 가 잠깐 「그리는 중…」으로 바꾼다.
+             ⚠️ 예전 이름은 「이미지로 공유」였다(2026-08-30 사용자님 지시로 바뀜). -->
+        <div class="modal-out-btns" id="modalOutBtns" hidden>
+          <button class="modal-out-btn" id="modalShareBtn" type="button">공유하기</button>
+          <button class="modal-out-btn" id="modalReportBtn" type="button">제보하기</button>
+        </div>
         <div class="modal-mine-btns" id="modalMineBtns" hidden>
           <button class="modal-mine-btn modal-mine-edit" id="modalMineEdit" type="button">수정</button>
           <button class="modal-mine-btn modal-mine-delete" id="modalMineDelete" type="button">삭제</button>
@@ -1482,7 +1506,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=872"></script>
+<script src="script.js?v=880"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

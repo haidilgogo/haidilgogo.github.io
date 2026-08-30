@@ -3123,6 +3123,10 @@
           삭제돼요」가 떠 있어, 무심코 누르면 **엉뚱한 소스가 지워진다.** */
     /* 🔴 **줄 전체**를 여닫는다(2026-08-27) — 버튼을 하나씩 숨기면 남은 하나가 줄 전체로 늘어난다. */
     if (modalMineBtns) modalMineBtns.hidden = !r.mine;
+    /* 🔴 내보내기(공유하기·제보하기)도 내 소스에만 보인다(2026-08-30).
+       ⚠️ **줄 전체**를 여닫는다 — 버튼을 하나씩 숨기면 남은 하나가 줄 전체로 늘어난다
+          (「수정·삭제」에서 이미 겪은 함정이다). */
+    if (modalOutBtns) modalOutBtns.hidden = !r.mine;
     resetModalMineDelete();
 
     const orderWrap = document.getElementById('modalOrderWrap');
@@ -3269,6 +3273,430 @@
      🔴 지운 id 는 `deleted` 에 남긴다 — 안 남기면 다른 기기와 합칠 때 **지운 소스가 되살아난다.**
      ⚠️ 카드 무늬 저장분(`browseCardCache`)도 함께 버린다. 남겨 두면 같은 id 로 다시 만들 일은
         없지만 쓸모없는 카드가 계속 쌓인다. */
+  /* ══════════════════════════════════════════════════════════════════════════
+     내 소스 **이미지로 공유** (2026-08-30, 얼개 6절)
+     ══════════════════════════════════════════════════════════════════════════
+     🔴 **화면 캡처가 아니라 `canvas` 에 다시 그린다**(2026-08-25 사용자님 확정).
+        캡처 방식(html2canvas 등)은 폰트가 깨지거나 사진이 비는 일이 잦다. 내 소스는 글자와
+        기기 안 사진뿐이라 **처음부터 그려도 화면과 같게 나온다.**
+     🔴 **색·크기는 상세 화면에서 그대로 가져온다.** 아래 값들은 전부 `styles.css` 에 있는 것이고,
+        화면 쪽을 고치면 **여기도 같이 고쳐야 한다**(자동으로 안 따라온다).
+     🔴 **받는 친구는 보고 따라 만든다** — 그림이라 앱이 읽을 내용이 없다. 그래서 맨 아래에
+        주소를 적어 어디서 온 것인지 알게 한다.
+     ⚠️ **물린 것 둘**(2026-08-25) — 재료 타일을 겹친 썸네일 · 양을 그림 크기로 보이기.
+        **다시 제안하지 말 것**(근거는 얼개 6절).
+     ⚠️ 재료 그림(일러스트)은 안 쓴다 — 글자로 그린다. */
+  const 공유폭 = 400;          // 그리는 기준 폭(논리 픽셀). 아래 값들이 전부 이 폭 기준이다
+  const 공유배율 = 3;          // 실제 그림은 1200px — 폰 화면에서 흐리지 않게
+  const 공유여백 = 20;         // 상세 화면의 좌우 여백(.modal-desc·.ing-box 와 같은 값)
+  const 공유글꼴 = "'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif";
+
+  /* 글자를 칸 폭에 맞춰 여러 줄로 쪼갠다.
+     🔴 **어절 단위로 먼저 끊는다** — 화면의 `word-break: keep-all` 과 같은 규칙이다.
+        한 어절이 통째로 칸보다 길 때만(띄어쓰기 없는 긴 이름) 글자 사이에서 끊는다
+        (화면의 `overflow-wrap: anywhere` 에 해당). */
+  function 줄나누기(ctx, 글, 최대폭) {
+    const 줄 = [];
+    (String(글 == null ? '' : 글)).split('\n').forEach((문단) => {
+      let 현재 = '';
+      문단.split(' ').forEach((어절, i) => {
+        const 후보 = i === 0 ? 어절 : 현재 + ' ' + 어절;
+        if (현재 && ctx.measureText(후보).width > 최대폭) { 줄.push(현재); 현재 = 어절; }
+        else 현재 = 후보;
+        // 어절 하나가 칸보다 길면 글자 사이에서 끊는다
+        while (ctx.measureText(현재).width > 최대폭 && 현재.length > 1) {
+          let n = 현재.length;
+          while (n > 1 && ctx.measureText(현재.slice(0, n)).width > 최대폭) n--;
+          줄.push(현재.slice(0, n));
+          현재 = 현재.slice(n);
+        }
+      });
+      줄.push(현재);
+    });
+    return 줄;
+  }
+
+  // 모서리가 둥근 네모. `roundRect` 가 없는 옛 브라우저를 위해 직접 그린다
+  function 둥근네모(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // 그림 한 장을 불러온다. 못 불러오면 `null` — 그림 없이 계속 그린다(전구·사진 둘 다 없어도 된다)
+  function 그림불러오기(주소) {
+    return new Promise((resolve) => {
+      if (!주소) return resolve(null);
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = () => resolve(null);
+      im.src = 주소;
+    });
+  }
+
+  /* 소스 하나를 그림 한 장으로 그린다. 돌려주는 것은 `Blob`(PNG).
+     🔴 **두 번 훑는다** — 먼저 높이를 재고(`재기`), 그 높이로 캔버스를 만든 뒤 실제로 그린다.
+        재료 개수가 2개에서 15개까지 오가고 팁도 길이가 제각각이라 높이를 미리 알 수 없다. */
+  async function 내소스그림만들기(r) {
+    // 글자 재기용 임시 캔버스(높이를 알아내기 전에도 폭을 재야 한다)
+    const 자 = document.createElement('canvas').getContext('2d');
+    const 폰트 = (크기, 굵기) => (굵기 ? 굵기 + ' ' : '') + 크기 + 'px ' + 공유글꼴;
+
+    const 사진 = await 그림불러오기(r.img || '');
+    const 전구 = await 그림불러오기('assets/icons/bulb.png?v=1');
+    const 로고 = await 그림불러오기('assets/icons/logo-mark-color-v2.png?v=1');
+    /* 🔴 **로고 글꼴을 먼저 실어 둔다.** `canvas` 는 아직 안 실린 글꼴을 만나면 기다려 주지 않고
+       **대체 글꼴로 그려 버린다** — 그러면 첫 장만 서명이 다르게 나온다.
+       ⚠️ Paperlogy 는 「하딜고고」 세 글자짜리 서브셋이라, 그 글자를 함께 넘겨야 실제로 실린다.
+       ⚠️ 못 실어도 그냥 진행한다 — Pretendard 로 나올 뿐 그림이 깨지지는 않는다. */
+    try {
+      if (document.fonts && document.fonts.load) await document.fonts.load("500 12px 'Paperlogy'", '하딜고고');
+    } catch (e) { /* 글꼴을 못 실어도 그림은 그린다 */ }
+
+    const 안쪽폭 = 공유폭 - 공유여백 * 2;
+    const 상자안왼 = 공유여백 + 14;              // .ing-box 의 좌우 안여백 14px
+    const 상자안오 = 공유폭 - 공유여백 - 14;
+    const 단위x = 상자안오 - 40;                 // .ing-unit min-width 40, 왼쪽 정렬
+    const 양오른 = 단위x - 12;                   // .ing-row gap 12
+    const 이름최대 = 양오른 - 32 - 12 - 상자안왼; // .ing-amt min-width 32
+
+    // ── 1) 높이 재기 ──────────────────────────────────────────────
+    /* 🔴 **머리에 상표를 놓는다**(2026-08-30 사용자님 안).
+       ■ 왜 위인가 — 세로로 긴 그림이라 **카톡 말풍선에서는 윗부분만 보인다.** 상표가 위에 있으면
+         탭하지 않아도 어디서 온 것인지 읽힌다.
+       ■ 덤 — 사진이 맨 위 가장자리에 붙어 있으면 「잘라 온 조각」처럼 보인다. 머리가 생기면 카드가 된다.
+       🔴 **앱 상단바(`.topbar-brand`)와 같은 모습**이다 — 마크 25×22 + Paperlogy 19px 로고 색.
+       🔴 **아래 서명에서는 「하딜고고」를 뺐다** — 위에서 이미 말했으므로 겹친다. 주소만 남긴다.
+          위 = 누가 만들었나 · 아래 = 어디로 가면 되나. */
+    const 머리높이 = 22;                          // 마크 높이(.topbar-logo-mark)
+    let y = 공유여백 + 머리높이 + 14;
+    if (사진) y += 안쪽폭 + 16;                  // 정사각 사진 + .modal-header 위 여백 16
+
+    자.font = 폰트(23, '800');
+    const 이름줄 = 줄나누기(자, r.name || '', 안쪽폭);
+    y += 이름줄.length * 30;
+
+    // 키워드 알약 — 미리 자리를 잡아 둔다(그릴 때 다시 계산하지 않게)
+    자.font = 폰트(12.5, '700');
+    const 맛들 = (r.tastes || []).slice(0, 5);
+    const 알약 = [];
+    if (맛들.length) {
+      let cx = 공유여백, cy = y + 16;
+      맛들.forEach((t) => {
+        const w = 자.measureText(t).width + 20;   // padding 5px 10px
+        if (cx > 공유여백 && cx + w > 공유폭 - 공유여백) { cx = 공유여백; cy += 32; }
+        알약.push({ t: t, x: cx, y: cy, w: w });
+        cx += w + 6;
+      });
+      y = cy + 26 + 22;                           // 알약 높이 26 + 아래 여백 22(.modal-body 위 여백)
+    } else {
+      y += 22;
+    }
+
+    y += 21 + 10;                                 // 「소스바」 제목 + .modal-section-title 아래 여백 10
+
+    // 재료 줄 — 이름이 길면 줄이 늘어난다
+    /* 🔴 **옵션(`i[3]`)은 이름 아래 작은 글씨**다 — 상세 화면(`renderIngList` 의 `.ing-opt`)과 같다.
+       ⚠️ `ingLabel` 을 쓰면 「매운소고기소스(건더기만)」처럼 괄호로 붙어 버린다. 2026-08-29 에
+          **일부러 아래로 내린 것**이라(인계 ②) 그림에서도 같은 모양이어야 한다.
+       ⚠️ 이름은 `정식재료이름()` 을 거친다 — 옛 이름으로 저장된 소스도 지금 이름으로 그린다. */
+    자.font = 폰트(15, '500');
+    const 재료들 = (r.ings || []).map((i) => {
+      const 줄 = 줄나누기(자, 정식재료이름(i[0] || ''), 이름최대);
+      const 옵션 = i[3] || '';
+      return { 줄: 줄, 옵션: 옵션, 양: i[1] || '', 단위: i[2] || '',
+               높이: Math.max(40, 18 + 줄.length * 20 + (옵션 ? 16 : 0)) };
+    });
+    const 상자높이 = 8 + 재료들.reduce((s, it) => s + it.높이, 0);  // .ing-box 위아래 안여백 4+4
+    y += 상자높이;
+
+    // 팁 — 있으면 로즈 상자
+    let 팁줄 = null, 팁높이 = 0;
+    if (r.tip) {
+      자.font = 폰트(14, '');
+      팁줄 = 줄나누기(자, r.tip, 안쪽폭 - 28 - 26);  // 좌우 안여백 14+14, 전구 18 + 사이 8
+      팁높이 = 30 + 팁줄.length * 22;                // 위아래 안여백 15+15
+      y += 28 + 팁높이;                              // .modal-body 의 gap 28
+    }
+
+    y += 24 + 16 + 24;                              // 주소 줄 위 여백 + 줄 높이 + 맨 아래 여백
+    const 공유높이 = Math.round(y);
+
+    // ── 2) 실제로 그리기 ──────────────────────────────────────────
+    const cv = document.createElement('canvas');
+    cv.width = 공유폭 * 공유배율;
+    cv.height = 공유높이 * 공유배율;
+    const c = cv.getContext('2d');
+    c.scale(공유배율, 공유배율);
+    c.textBaseline = 'top';
+
+    c.fillStyle = '#FCF9F5';                        // --bg-card
+    c.fillRect(0, 0, 공유폭, 공유높이);
+
+    /* 머리 상표 — 마크 + 워드마크. 앱 상단바(`.topbar-brand`)와 같은 구성이다
+       (마크 25×22 · Paperlogy 500 19px · 로고 색 · 사이 6px · 세로 가운데 맞춤).
+       🔴 **글자를 「잉크가 찍힌 자리」로 맞춘다**(2026-08-30 사용자님이 어긋난 것을 잡으심).
+          ■ 무엇이 잘못됐었나 — `textBaseline:'top'` 에 눈대중 `+2` 를 더했더니 **글자가 1.5px 위로**
+            떠 있었다(픽셀로 재서 확인: 마크 가운데 31 · 글자 가운데 29.5).
+          ■ 왜 — 글꼴의 `top` 은 글자 위에 빈 공간(어센트 여유)을 포함한 자리라, 글자 자체의
+            위아래와 다르다. 화면의 `align-items:center` 는 브라우저가 알아서 해 주지만 `canvas` 는 안 해 준다.
+          🔴 그래서 `actualBoundingBox` 로 **실제 글자 높이를 재서** 마크 한가운데에 놓는다.
+             눈대중 숫자를 다시 박지 말 것 — 글꼴이 바뀌면 또 어긋난다.
+          ⚠️ 아주 옛 브라우저에는 `actualBoundingBox*` 가 없다. 없으면 예전처럼 대충 놓는다. */
+    const 마크폭 = Math.round(머리높이 * 256 / 223);   // 로고 마크는 256×223 이다
+    if (로고) c.drawImage(로고, 공유여백, 공유여백, 마크폭, 머리높이);
+    c.font = "500 19px 'Paperlogy', " + 공유글꼴;
+    c.fillStyle = '#E0301E';                            // --brand-red (로고 색)
+    const 머리가운데 = 공유여백 + 머리높이 / 2;
+    /* ⚠️ **재기 전에 기준선을 먼저 바꿔야 한다.** `actualBoundingBox*` 는 **지금 기준선에서** 잰 값이라,
+       `top` 인 채로 재고 `alphabetic` 로 그리면 딴 자리에 찍힌다(2026-08-30 에 실제로 그랬다). */
+    c.textBaseline = 'alphabetic';
+    const 상표자 = c.measureText('하딜고고');
+    const 상표x = 공유여백 + (로고 ? 마크폭 + 6 : 0);
+    if (상표자.actualBoundingBoxAscent != null) {
+      const 위 = 상표자.actualBoundingBoxAscent, 아래 = 상표자.actualBoundingBoxDescent;
+      // 기준선을 여기 놓으면 **글자의 위아래 한가운데**가 마크 한가운데에 온다
+      c.fillText('하딜고고', 상표x, 머리가운데 + (위 - 아래) / 2);
+    } else {
+      c.textBaseline = 'top';
+      c.fillText('하딜고고', 상표x, 공유여백 + 2);
+    }
+    c.textBaseline = 'top';                             // 아래 글자들은 다시 `top` 기준이다
+
+    let 커서 = 공유여백 + 머리높이 + 14;
+
+    if (사진) {
+      c.save();
+      둥근네모(c, 공유여백, 커서, 안쪽폭, 안쪽폭, 12);
+      c.clip();
+      /* 정사각 칸에 **꽉 채워** 그린다(`object-fit: cover` 와 같다).
+         ⚠️ 저장할 때 이미 정사각으로 잘라 두므로 대개 그대로 들어가지만,
+            옛 자료나 잘리지 않은 사진이 와도 안 찌그러지게 여기서도 맞춘다. */
+      const 비 = Math.max(안쪽폭 / 사진.width, 안쪽폭 / 사진.height);
+      const dw = 사진.width * 비, dh = 사진.height * 비;
+      c.drawImage(사진, 공유여백 + (안쪽폭 - dw) / 2, 커서 + (안쪽폭 - dh) / 2, dw, dh);
+      c.restore();
+      c.strokeStyle = '#E6D4BA';                    // --card-border
+      c.lineWidth = 1;
+      둥근네모(c, 공유여백 + .5, 커서 + .5, 안쪽폭 - 1, 안쪽폭 - 1, 12);
+      c.stroke();
+      커서 += 안쪽폭 + 16;
+    }
+
+    c.fillStyle = '#241C18';                        // --text-darkest
+    c.font = 폰트(23, '800');
+    이름줄.forEach((줄) => { c.fillText(줄, 공유여백, 커서 + 4); 커서 += 30; });
+
+    if (알약.length) {
+      c.font = 폰트(12.5, '700');
+      알약.forEach((p) => {
+        c.fillStyle = '#FDF1EE';
+        둥근네모(c, p.x, p.y, p.w, 26, 13);
+        c.fill();
+        c.strokeStyle = '#F1D5CD';
+        c.lineWidth = 1;
+        둥근네모(c, p.x + .5, p.y + .5, p.w - 1, 25, 13);
+        c.stroke();
+        c.fillStyle = '#A2553F';
+        c.fillText(p.t, p.x + 10, p.y + 6);
+      });
+      커서 = 알약[알약.length - 1].y + 26 + 22;
+    } else {
+      커서 += 22;
+    }
+
+    c.fillStyle = '#241C18';
+    c.font = 폰트(16, '700');
+    c.fillText('소스바', 공유여백, 커서 + 2);
+    커서 += 21 + 10;
+
+    // 재료 상자
+    c.fillStyle = '#fff';
+    둥근네모(c, 공유여백, 커서, 안쪽폭, 상자높이, 8);
+    c.fill();
+    c.strokeStyle = '#E6D4BA';
+    c.lineWidth = 1;
+    둥근네모(c, 공유여백 + .5, 커서 + .5, 안쪽폭 - 1, 상자높이 - 1, 8);
+    c.stroke();
+
+    let 줄y = 커서 + 4;
+    재료들.forEach((it, idx) => {
+      const 가운데 = 줄y + it.높이 / 2;
+      c.fillStyle = '#3A241F';
+      c.font = 폰트(15, '500');
+      const 글묶음 = it.줄.length * 20 + (it.옵션 ? 16 : 0);
+      const 글시작 = 가운데 - 글묶음 / 2 + 2;
+      it.줄.forEach((줄, i) => c.fillText(줄, 상자안왼, 글시작 + i * 20));
+      if (it.옵션) {                                  // .ing-opt — 12px, .ing-unit 과 같은 색
+        c.fillStyle = '#AD8177';
+        c.font = 폰트(12, '');
+        c.fillText(it.옵션, 상자안왼, 글시작 + it.줄.length * 20 + 2);
+      }
+      /* 🔴 **양·단위는 첫 줄에 맞춘다** — 이름이 두 줄이어도 숫자가 가운데로 내려앉지 않게.
+         화면 쪽(`.ing-row--opt`)과 같은 규칙이다. */
+      c.fillStyle = '#E0301E';                      // --brand-red
+      c.font = 폰트(14, '700');
+      c.textAlign = 'right';
+      c.fillText(it.양, 양오른, 글시작 + 1);
+      c.textAlign = 'left';
+      c.fillStyle = '#AD8177';
+      c.font = 폰트(12, '');
+      c.fillText(it.단위, 단위x, 글시작 + 3);
+      줄y += it.높이;
+      if (idx < 재료들.length - 1) {                // 마지막 줄에는 구분선을 안 긋는다
+        c.fillStyle = 'rgba(0,0,0,.05)';
+        c.fillRect(상자안왼, 줄y, 상자안오 - 상자안왼, 1);
+      }
+    });
+    커서 += 상자높이;
+
+    if (팁줄) {
+      커서 += 28;
+      c.fillStyle = '#FDF1EE';
+      둥근네모(c, 공유여백, 커서, 안쪽폭, 팁높이, 8);
+      c.fill();
+      c.strokeStyle = '#F1D5CD';
+      c.lineWidth = 1;
+      둥근네모(c, 공유여백 + .5, 커서 + .5, 안쪽폭 - 1, 팁높이 - 1, 8);
+      c.stroke();
+      if (전구) c.drawImage(전구, 공유여백 + 14, 커서 + 17, 18, 18);
+      c.fillStyle = '#7a3b33';
+      c.font = 폰트(14, '');
+      팁줄.forEach((줄, i) => c.fillText(줄, 공유여백 + 14 + 26, 커서 + 15 + i * 22 + 3));
+      커서 += 팁높이;
+    }
+
+    /* 맨 아래 주소 — **어디로 가면 되는지**만 적는다(얼개 6절).
+       🔴 이름(「하딜고고」)은 **머리로 올라갔다**(2026-08-30). 여기에 다시 적으면 겹친다.
+       ⚠️ 화면 문구 규칙(꿀팁·발도장·마라탕 금지)은 여기에도 적용된다. */
+    커서 += 24;
+    c.fillStyle = '#9A8A83';                        // --text-muted
+    c.font = 폰트(12, '600');
+    c.textAlign = 'center';
+    c.fillText('haidilgogo.com', 공유폭 / 2, 커서);
+    c.textAlign = 'left';
+
+    /* 🔴 **JPEG 으로 내보낸다**(2026-08-30 사용자님 확정). PNG 는 사진이 들어가면 1.5MB 가 넘어
+       카톡으로 보낼 때 데이터를 많이 쓰고 셀룰러에서 몇 초씩 걸린다(실기기에서 확인).
+       ■ 재서 견준 값 — 잡티가 많은 최악 조건에서 PNG 1,775KB · JPEG 0.92 685KB. 실제 사진은 더 줄어든다.
+       🔴 **품질은 0.92 아래로 내리지 말 것.** 이 그림은 글자가 대부분이라, 0.85 밑으로 가면
+          글자 테두리에 눌린 자국(링잉)이 보이기 시작한다. 0.92 는 1200px 에서 눈으로 구분되지 않는다.
+       ⚠️ 배경이 투명하지 않아 JPEG 으로 바꿔도 잃는 것이 없다(크림색으로 꽉 채워 그린다). */
+    return new Promise((resolve) => cv.toBlob(resolve, 'image/jpeg', 0.92));
+  }
+
+  /* 「이미지로 공유」 버튼 (2026-08-30).
+     🔴 **먼저 폰의 공유 창(`navigator.share`)을 써 본다** — 거기서 카톡·메시지로 바로 넘어간다.
+     🔴 **안 되면 그림을 화면에 띄운다**(얼개 6절에 미리 정해 둔 대비책). 길게 눌러 저장하면 된다.
+        ■ 언제 안 되나 — 맥 크롬처럼 파일 공유를 지원 안 하는 브라우저, 그림 그리는 사이에
+          「방금 눌렀다」는 자격이 풀린 경우.
+        ■ **취소(`AbortError`)는 대비책을 안 띄운다** — 사용자가 그만둔 것인데 창이 또 뜨면 이상하다.
+     ⚠️ 그림 그리기는 0.1초 안쪽이라 대개 공유 창이 그대로 뜬다.
+     ⚠️ 이 창은 상세 모달 **위**에 뜬다 — 자르기 창이 소스 시트 위에 뜨는 것과 같은 얼개다.
+        그래서 `SCROLL_LOCK_OVERLAYS` 에는 **안 넣는다**(아래 모달이 이미 잠갔다). */
+  const modalOutBtns = document.getElementById('modalOutBtns');
+  const modalShareBtn = document.getElementById('modalShareBtn');
+  const shareOverlay = document.getElementById('shareOverlay');
+  const shareImg = document.getElementById('shareImg');
+  const shareClose = document.getElementById('shareClose');
+  let 공유그림주소 = '';
+  const 공유보기열림 = () => !!shareOverlay && shareOverlay.classList.contains('open');
+  function 공유보기닫기() {
+    if (!공유보기열림()) return;
+    shareOverlay.classList.remove('open');
+    shareOverlay.setAttribute('inert', '');
+    shareOverlay.setAttribute('aria-hidden', 'true');
+    shareImg.removeAttribute('src');
+    /* 🔴 주소를 반드시 놓아준다 — 안 놓으면 그림이 메모리에 그대로 남는다.
+       한 장이 1200px PNG 라 여러 번 열면 쌓인다. */
+    if (공유그림주소) { URL.revokeObjectURL(공유그림주소); 공유그림주소 = ''; }
+    focusLanding(modalShareBtn);
+  }
+  function 공유보기열기(blob) {
+    if (공유그림주소) URL.revokeObjectURL(공유그림주소);
+    공유그림주소 = URL.createObjectURL(blob);
+    shareImg.src = 공유그림주소;
+    shareOverlay.classList.add('open');
+    shareOverlay.removeAttribute('inert');
+    shareOverlay.setAttribute('aria-hidden', 'false');
+    focusLanding(shareClose);
+  }
+  if (modalShareBtn) modalShareBtn.addEventListener('click', async () => {
+    const r = currentModalRecipe;
+    if (!r || !r.mine || modalShareBtn.disabled) return;
+    /* 그리는 동안 **버튼을 잠그고 글자를 바꾼다**(2026-08-30 사용자님과 정함).
+       ■ 왜 잠그나 — 연달아 누르면 그림을 여러 장 그리고 공유 창도 겹쳐 뜬다.
+         잠기면 CSS(`.modal-out-btn:disabled`)가 흐리게(55%) 만든다.
+       ■ 왜 글자도 바꾸나 — 사진이 크면 폰에서 0.5초쯤 걸린다. 아무 반응이 없으면 안 눌린 줄 안다.
+       🔴 **말줄임표를 안 쓴다**(사용자님 지적). 앱 문구는 전부 「~어요」체이고
+          (「복사했어요」·「사진을 읽지 못했어요」), 말줄임표를 쓰는 곳은 안내 줄인
+          「불러오는 중…」 하나뿐이다. **버튼에는 안 어울린다.** */
+    const 원래글자 = modalShareBtn.textContent;
+    modalShareBtn.disabled = true;
+    modalShareBtn.textContent = '만들고 있어요';
+    let blob = null;
+    try { blob = await 내소스그림만들기(r); } catch (e) { blob = null; }
+    modalShareBtn.disabled = false;
+    modalShareBtn.textContent = 원래글자;
+    if (!blob) { alert('이미지를 만들지 못했어요'); return; }
+    const 파일 = new File([blob], (r.name || '내소스') + '.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [파일] })) {
+      try {
+        await navigator.share({ files: [파일] });
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+    }
+    공유보기열기(blob);
+  });
+  /* ── 「제보하기」 — 만든 소스를 그대로 제보 폼에 담아 넘긴다 (2026-08-30, 얼개 6절) ────
+     🔴 **주소에 실어 보내지 않는다**(얼개 6절). 재료가 30가지면 주소가 수백 자가 되고,
+        주소는 기록(방문 기록·서버 로그)에 그대로 남는다. **기기에 잠깐 담아** 넘긴다.
+     🔴 `sessionStorage` 를 쓴다 — **탭을 닫으면 저절로 사라진다.** `localStorage` 면 제보를
+        그만두고 나가도 값이 남아, 나중에 폼을 그냥 열었을 때 엉뚱하게 채워진다.
+     🔴 **폼 칸이 이미 맞는다**(얼개 6절) — 이름 → 「레시피 이름」, 재료 → 「소스바에서 담는 재료와 양」,
+        팁 → 「나만의 팁」. 갈래도 「레시피 추가해주세요!」로 미리 골라 준다.
+     ⚠️ **「매장에서 주문해야 하는 항목」은 안 채운다.** 얼개의 표에는 「기타 칸」이 거기 붙어 있지만,
+        내 소스의 「기타」는 **직접 입력한 소스바 재료**이지 종업원에게 주문하는 것이 아니다
+        (공깃밥·날계란 같은 것). 그래서 재료 칸에 함께 넣는다.
+     ⚠️ 재료 줄꼴은 폼의 예시(`땅콩참깨소스 2스푼`)를 그대로 따른다.
+     ⚠️ 사진은 안 넘긴다 — 폼에 사진 칸이 없다. */
+  const modalReportBtn = document.getElementById('modalReportBtn');
+  const REPORT_PREFILL_KEY = 'haidilao_report_prefill';
+  if (modalReportBtn) modalReportBtn.addEventListener('click', () => {
+    const r = currentModalRecipe;
+    if (!r || !r.mine) return;
+    const 재료줄 = (r.ings || []).map((i) => {
+      const 양단위 = [i[1], i[2]].filter(Boolean).join('');   // 「2스푼」 · 양이 없으면 「적당히」
+      return (ingLabel(i) + ' ' + 양단위).trim();
+    });
+    let 담았나 = false;
+    try {
+      sessionStorage.setItem(REPORT_PREFILL_KEY, JSON.stringify({
+        name: r.name || '', ings: 재료줄, tip: r.tip || '',
+      }));
+      담았나 = true;
+    } catch (e) { /* 담지 못해도 폼은 그냥 연다 — 손으로 적으면 된다 */ }
+    location.href = 담았나 ? 'report.html?from=mysauce' : 'report.html';
+  });
+
+  if (shareOverlay) {
+    shareClose.addEventListener('click', 공유보기닫기);
+    shareOverlay.addEventListener('click', (e) => { if (e.target === shareOverlay) 공유보기닫기(); });
+    /* 🔴 Esc 는 **캡처 단계**로 잡는다 — 안 그러면 이 창을 닫은 Esc 가 아래 상세 모달까지 닫는다.
+       「작성 중인데 나갈까요?」 확인창이 쓰는 것과 같은 처방이다. */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && 공유보기열림()) { e.stopPropagation(); 공유보기닫기(); }
+    }, true);
+    shareOverlay.addEventListener('keydown', (e) => trapFocusWithin(shareOverlay, e));
+  }
+
   const modalMineBtns = document.getElementById('modalMineBtns');
   const modalMineEdit = document.getElementById('modalMineEdit');
   /* 「수정하기」 — 이 소스를 담은 채로 만들기 시트를 연다(2026-08-27 사용자님 요청).
