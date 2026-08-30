@@ -43,6 +43,39 @@
         사용자님이 소스바에서 확인해 주시면 그때 한 줄씩 더한다. */
   const CHUNKY = ['매운소고기소스', '청유훠궈소스'];
 
+  /* ── 상세 **안내 말풍선** 문구 (2026-08-30 사용자님과 정함) ──────────────────────
+     🔴 **설명(`desc`)과 성격이 다르다.** 설명은 「그 레시피만의 사연」이고, 이쪽은
+        **여러 레시피에 똑같이 붙는 표준 안내**다. 그래서 레시피마다 문장을 적지 않고
+        **표시(`notes: ['계량']`)만 세운다** — 문구를 고칠 때 여기 한 곳만 고치면 전부 따라온다.
+     🔴 **말투가 설명과 다르다** — 설명은 평서체(「…소스이다」)인데 안내는 **존댓말**이다.
+        화면이 사용자에게 말을 거는 자리라 그렇다(앱의 다른 안내와 같다).
+     🔴 **붙는 자리는 「소스바」 제목 옆 ⓘ 하나뿐이다.** 둘 다 결국 **재료와 양**에 대한 이야기라
+        거기 모아 둔다. 둘 다 붙으면 말풍선 안에서 줄이 나뉜다(`white-space: pre-line`).
+        ⚠️ 설명 아래에 따로 두는 자리도 만들어 봤다가 **없앴다** — 주문 항목 위에 오게 되어
+           주문에도 해당하는 것처럼 읽혔고, 쓸 문구도 없었다.
+     🔴 **계량 — 원인을 안 밝힌다.** 「촬영용이라」·「해외 지점이라」처럼 이유가 제각각이어서,
+        사실만 적고 이유는 그 레시피의 `desc` 에 적는다.
+        ⚠️ 「촬영용 계량 도구로」라고 쓰면 세트 촬영·해외 지점에는 안 맞는다(2026-08-30에 물렸다).
+     ⚠️ **매장마다 도구가 다르다**는 이야기는 여기 넣지 않는다 — 그건 43개 **전부**에 해당해서,
+        레시피마다 붙일 것이 아니라 가이드 같은 한 곳에 둬야 한다(아직 안 정함). */
+  const RECIPE_NOTES = {
+    판독: '원본에 적힌 레시피와 실제 만드는 과정이 달라, 직접 판독하여 최대한 반영했습니다.',
+    계량: '소스바 계량 도구와 차이가 있어, 용량이 다를 수 있으니 참고해주세요.',
+  };
+  /* 소스바 안내는 **제목 옆 ⓘ** 뒤에 숨는다(2026-08-30 사용자님 안).
+     ⚠️ 상세를 열 때마다 **반드시 닫아 둔다** — 안 닫으면 다른 소스를 열었는데 말풍선이 떠 있다. */
+  function 소스바안내채우기(표시들) {
+    const btn = document.getElementById('ingNoteBtn');
+    const pop = document.getElementById('ingNotePop');
+    if (!btn || !pop) return;
+    // ⚠️ 표에 없는 이름은 조용히 건너뛴다 — 오타로 적어도 화면이 깨지지 않는다
+    const 붙일것 = (표시들 || []).filter((k) => RECIPE_NOTES[k]);
+    btn.hidden = 붙일것.length === 0;
+    pop.hidden = true;                       // 열 때는 늘 닫힌 상태로 시작
+    btn.setAttribute('aria-expanded', 'false');
+    pop.textContent = 붙일것.map((k) => RECIPE_NOTES[k]).join('\n');
+  }
+
   /* ── 재료 **이름 바뀜표** — 2026-08-29 사용자님 지시로 미리 만들어 둔다 ──────────────
      🔴 **왜 있나** — 저장해 둔 「내 소스」에는 **그때의 이름이 그대로 적힌다.** 나중에 소스바 재료의
         이름을 바꾸면, 옛 이름은 `SAUCE_BAR` 에 없으므로 `고칠것담기` 가 그것을 **「직접 입력한 재료」**
@@ -217,7 +250,7 @@
       ings: [['소금', '3', '스푼'], ['참기름', '3', '스푼'], ['고추기름', '0.5', '스푼'], ['다진 마늘', '1', '스푼'], ['참깨', '1', '스푼'], ['마라시즈닝(고춧가루)', '1', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's4', date: '2026-01-27', cat: '소스', emoji: '🥣', img: 'assets/cards/화령소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5E1C8,#E8C79A)', name: '화령소스', source: '네이버블로그 sjsilver23', person: '화령', desc: '하이디라오 부산역점 직원이 네이버 블로거인 <b>지금이네(sjsilver23)</b>에게 가져다준 소스로, 너무 맛있어서 레시피를 손민수했다고 한다.',
+    { id: 's4', date: '2026-01-27', cat: '소스', emoji: '🥣', img: 'assets/cards/화령소스.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5E1C8,#E8C79A)', heroDesc: '이것은 소스인가 맥주 안주인가', heroImg: 'assets/monthly-sauce/s4.jpg?v=1', name: '화령소스', source: '네이버블로그 sjsilver23', person: '화령', desc: '하이디라오 부산역점 직원이 네이버 블로거인 <b>지금이네(sjsilver23)</b>에게 가져다준 소스로, 너무 맛있어서 레시피를 손민수했다고 한다.',
       ings: [['땅콩참깨소스', '0.25', '스푼'], ['스위트칠리소스', '3.5~4', '스푼'], ['튀긴대두', '2~3', '스푼'], ['참기름', '0.5', '스푼'], ['고추기름', '0.5', '스푼'], ['양파', '3', '스푼'], ['다진 파', '3', '스푼'], ['다진 마늘', '1', '스푼']],
       steps: [],
       tip: '튀긴대두, 다진 마늘, 다진 파, 양파는 많으면 많을수록 맛있음' },
@@ -229,11 +262,11 @@
       ings: [['땅콩참깨소스', '0.5', '스푼'], ['다진 파', '', '넉넉하게'], ['스위트칠리소스', '0.5', '스푼'], ['다진 마늘', '3', '스푼'], ['굴소스', '1', '스푼'], ['매운소고기소스', '1', '스푼', '건더기만'], ['청유훠궈소스', '2', '스푼', '건더기만'], ['땅콩가루', '2', '스푼'], ['만구향', '1', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's5', date: '2025-04-11', cat: '소스', emoji: '🥣', img: 'assets/cards/영지소스_2025.jpg?v=4', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5E6D3,#E8C9A0)', name: '영지소스', ver: '2025', source: 'YouTube 채널십오야', star: true, person: '이영지', desc: '<b>나영석의 보글보글</b> 촬영 중 <b>이영지</b>가 공개한 소스로, <b>나영석</b>이 <u>그룹 활동을 하고 있음에도 불구하고 솔로 가수가 되기 위해 노력하고 있는 느낌의 소스다</u>라고 했다.',
+    { id: 's5', date: '2025-04-11', cat: '소스', emoji: '🥣', img: 'assets/cards/영지소스_2025.jpg?v=4', imgFit: 'cover', tint: 'linear-gradient(160deg,#F5E6D3,#E8C9A0)', name: '영지소스', ver: '2025', source: 'YouTube 채널십오야', star: true, person: '이영지', notes: ['계량'], desc: '<b>나영석의 보글보글</b> 촬영 중 <b>이영지</b>가 공개한 소스로, <b>나영석</b>이 <u>그룹 활동을 하고 있음에도 불구하고 솔로 가수가 되기 위해 노력하고 있는 느낌의 소스다</u>라고 했다.',
       ings: [['땅콩참깨소스', '2', '스푼'], ['스위트칠리소스', '1.5', '스푼'], ['태국고추', '2', '스푼'], ['마라시즈닝(고춧가루)', '1.5', '스푼'], ['다진 파', '1.5', '스푼'], ['다진 마늘', '1', '스푼'], ['참기름', '2', '바퀴'], ['완자간장소스', '1', '바퀴'], ['오향우육(다진 고기)', '1.5', '스푼'], ['참깨', '', '적당히'], ['설탕', '', '한 꼬집'], ['땅콩가루', '', '한 꼬집']],
       steps: [],
       tip: '' },
-    { id: 's7', date: '2025-04-11', cat: '소스', emoji: '🥣', img: 'assets/cards/마크소스.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#FDEBD0,#F5C99B)', name: '마크소스', source: 'YouTube 채널십오야', star: true, person: '마크', desc: '<b>나영석의 보글보글</b> 촬영 중 <b>마크</b>가 최초로 공개한 소스로, <b>나영석</b>이 <u>그룹 활동에 최적화된 소스다</u>라고 했다.',
+    { id: 's7', date: '2025-04-11', cat: '소스', emoji: '🥣', img: 'assets/cards/마크소스.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#FDEBD0,#F5C99B)', name: '마크소스', source: 'YouTube 채널십오야', star: true, person: '마크', notes: ['계량'], desc: '<b>나영석의 보글보글</b> 촬영 중 <b>마크</b>가 최초로 공개한 소스로, <b>나영석</b>이 <u>그룹 활동에 최적화된 소스다</u>라고 했다.',
       ings: [['땅콩참깨소스', '2', '스푼'], ['다진 마늘', '1.5', '스푼'], ['양파', '1.5', '스푼'], ['굴소스', '1', '스푼'], ['태국고추', '1', '스푼'], ['완자간장소스', '2', '스푼'], ['오향우육(다진 고기)', '', '적당히'], ['다진 파', '', '적당히'], ['땅콩가루', '', '적당히'], ['마라시즈닝(고춧가루)', '', '적당히']],
       steps: [],
       tip: '' },
@@ -245,26 +278,26 @@
       ings: [['참기름', '2', '스푼'], ['소금', '0.5', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['태국고추', '1', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's17', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/세훈소스(간장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#EFE3CE,#DBC5A0)', name: '세훈소스', ver: '간장', source: 'YouTube 밥은영', star: true, person: '세훈', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>엑소</b>의 <b>세훈</b>이 공개한 소스이다.',
+    { id: 's17', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/세훈소스(간장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#EFE3CE,#DBC5A0)', name: '세훈소스', ver: '간장', source: 'YouTube 밥은영', star: true, person: '세훈', notes: ['계량'], desc: '유튜브 <b>밥은영</b> 촬영 중 <b>엑소</b>의 <b>세훈</b>이 공개한 소스이다.',
       order: [['우유/청유 마라훠궈', '1', '스푼']],
       ings: [['완자간장소스', '3', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '3', '스푼'], ['양파', '3', '스푼'], ['고수', '2', '스푼'], ['태국고추', '', '적당히']],
       steps: [],
       tip: '홍탕 1T는 취향에 맞게 넣기' },
-    { id: 's18', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/세훈소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6EEDD,#E7D6BA)', name: '세훈소스', ver: '마장', source: 'YouTube 밥은영', star: true, person: '세훈', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>엑소</b>의 <b>세훈</b>이 공개한 소스로, <u>정통파들은 소스바 대신 홍탕에 있는 고추기름을 넣는다</u>라고 했다.',
+    { id: 's18', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/세훈소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6EEDD,#E7D6BA)', name: '세훈소스', ver: '마장', source: 'YouTube 밥은영', star: true, person: '세훈', notes: ['계량'], desc: '유튜브 <b>밥은영</b> 촬영 중 <b>엑소</b>의 <b>세훈</b>이 공개한 소스로, <u>정통파들은 소스바 대신 홍탕에 있는 고추기름을 넣는다</u>라고 했다.',
       order: [['우유/청유 마라훠궈', '1', '국자']],
       ings: [['땅콩참깨소스', '3', '스푼'], ['다진 파', '3', '스푼'], ['양파', '2', '스푼'], ['고수', '1', '스푼'], ['다진 마늘', '0.5', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's19', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(참기름).jpg?v=1', heroImg: 'assets/monthly-sauce/s19.jpg?v=6', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7EFD8,#EBDBB0)', name: '박은영소스', ver: '참기름', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '중식 여신 박은영 셰프의 참기름 소스', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스이다.',
+    { id: 's19', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(참기름).jpg?v=1', heroImg: 'assets/monthly-sauce/s19.jpg?v=6', imgFit: 'cover', tint: 'linear-gradient(160deg,#F7EFD8,#EBDBB0)', name: '박은영소스', ver: '참기름', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '중식 여신 박은영 셰프의 참기름 소스', notes: ['계량'], desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스이다.',
       ings: [['참기름', '4', '스푼'], ['중국식초', '1', '스푼'], ['다진 마늘', '2', '스푼'], ['소금', '', '한 꼬집']],
       steps: [],
       tip: '' },
-    { id: 's20', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6DFC8,#ECBE96)', name: '박은영소스', ver: '마장', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '은영 셰프의 시그니처 마장 소스', desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스로, <u>핫바리들은 잘 모르는 두 가지 소스(부추 소스, 홍두부 소스)가 들어가야 된다</u>라고 했다.',
+    { id: 's20', date: '2026-06-09', cat: '소스', emoji: '🥣', img: 'assets/cards/박은영소스(마장).jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F6DFC8,#ECBE96)', name: '박은영소스', ver: '마장', source: 'YouTube 밥은영', star: true, person: '박은영', heroDesc: '은영 셰프의 시그니처 마장 소스', notes: ['계량'], desc: '유튜브 <b>밥은영</b> 촬영 중 <b>박은영</b> 셰프가 공개한 소스로, <u>핫바리들은 잘 모르는 두 가지 소스(부추 소스, 홍두부 소스)가 들어가야 된다</u>라고 했다.',
       order: [['우유/청유 마라훠궈', '1', '스푼']],
       ings: [['땅콩참깨소스', '3', '스푼'], ['중국식초', '2', '스푼'], ['산초기름', '1', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['태국고추', '1', '스푼'], ['라조장', '1', '스푼'], ['부추소스', '1', '스푼'], ['발효두부소스', '0.33', '스푼']],
       steps: [],
       tip: '부추 소스, 홍두부 소스가 소스바에 없는 경우에는 하이디라오 직원분께 요청하기' },
-    { id: 's21', date: '2025-04-26', cat: '소스', emoji: '🥣', img: 'assets/cards/장하오소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2EEE6,#E2DACB)', name: '장하오소스', source: 'MBC 전지적 참견 시점', star: true, person: '장하오', desc: '<b>전지적 참견 시점</b> 촬영 중 <b>제로베이스원</b>의 <b>장하오</b>가 멤버들과 함께 하이디라오에 방문했을 때 공개한 소스이다.',
+    { id: 's21', date: '2025-04-26', cat: '소스', emoji: '🥣', img: 'assets/cards/장하오소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2EEE6,#E2DACB)', name: '장하오소스', source: 'YouTube 엠뚜루마뚜루 : MBC 공식 종합 채널', star: true, person: '장하오', desc: '<b>전지적 참견 시점</b> 촬영 중 <b>제로베이스원</b>의 <b>장하오</b>가 멤버들과 함께 하이디라오에 방문했을 때 공개한 소스이다.',
       ings: [['다진 파', '1', '스푼'], ['양파', '0.5', '스푼'], ['다진 마늘', '0.5', '스푼'], ['발효콩장', '1', '스푼'], ['참기름', '2', '스푼'], ['굴소스', '1', '스푼'], ['완자간장소스', '0.5', '스푼'], ['오향우육(다진 고기)', '1', '스푼'], ['발효두부소스', '2', '스푼'], ['버섯소스', '1', '스푼'], ['매운소고기소스', '1', '스푼'], ['태국고추', '', '적당히'], ['고수', '', '적당히'], ['참깨', '', '적당히'], ['중국식초', '', '적당히']],
       steps: [],
       tip: '태국고추, 고수, 참깨, 중국식초는 취향에 맞게 넣기' },
@@ -280,7 +313,7 @@
       ings: [['땅콩참깨소스', '2', '스푼'], ['발효콩장', '1', '스푼'], ['중국식초', '1', '스푼'], ['굴소스', '1', '스푼'], ['칠리갈릭소스', '1', '스푼'], ['완자간장소스', '1', '스푼'], ['다진 파', '', '적당히'], ['양파', '', '적당히']],
       steps: [],
       tip: '' },
-    { id: 's25', date: '2025-02-28', cat: '소스', emoji: '🥣', img: 'assets/cards/우기소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F0EFD9,#D6D4A2)', name: '우기소스', source: 'YouTube 미연zip MIYEON', star: true, person: '우기', desc: '<b>(여자)아이들</b> <b>미연</b>의 유튜브 촬영 중 같은 멤버 <b>우기</b>가 공개한 소스로, 자막으로 안내된 레시피와 실제 제조 과정이 달라 영상을 직접 판독해 만든 그대로 옮겨 적었다.',
+    { id: 's25', date: '2025-02-28', cat: '소스', emoji: '🥣', img: 'assets/cards/우기소스.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F0EFD9,#D6D4A2)', name: '우기소스', source: 'YouTube 미연zip MIYEON', star: true, person: '우기', notes: ['판독'], desc: '<b>(여자)아이들</b> <b>미연</b>의 유튜브 촬영 중 같은 멤버 <b>우기</b>가 공개한 소스로, <b>미연</b>이 맛을 보더니 <u>그냥 식초인데</u>라고 했다.',
       ings: [['땅콩참깨소스', '2', '스푼'], ['중국식초', '5', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['고수', '1', '스푼'], ['땅콩가루', '1', '스푼']],
       steps: [],
       tip: '' },
@@ -308,11 +341,11 @@
       ings: [['참기름', '2', '스푼'], ['고추기름', '3', '스푼'], ['다진 마늘', '2', '스푼'], ['다진 파', '2', '스푼'], ['소금', '0.5', '스푼'], ['설탕', '0.8', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's32', date: '2025-09-24', cat: '소스', emoji: '🥣', img: 'assets/cards/킹키소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#E7EDF7,#C6D3E8)', name: '킹키소스', source: 'YouTube 권또또 KWONTTOTTO', person: '킹키', desc: '유튜브 <b>또렌드대탐험</b> 촬영 중 <b>킹키</b>가 하이디라오가 난생처음이라며 소스를 만들고 있던 손님에게 도움을 받아 만든 소스로, 맛을 보더니 <u>단맛 들어간 땅콩버터가 사실 맛있잖아요</u>라며 설탕을 왕창 넣은 버전으로 확정했다.',
+    { id: 's32', date: '2025-09-24', cat: '소스', emoji: '🥣', img: 'assets/cards/킹키소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#E7EDF7,#C6D3E8)', name: '킹키소스', source: 'YouTube 권또또 KWONTTOTTO', person: '킹키', notes: ['판독'], desc: '유튜브 <b>또렌드대탐험</b> 촬영 중 <b>킹키</b>가 하이디라오가 난생처음이라며 소스를 만들고 있던 손님에게 도움을 받아 만든 소스로, 맛을 보더니 <u>단맛 들어간 땅콩버터가 사실 맛있잖아요</u>라며 설탕을 왕창 넣은 버전으로 확정했다.',
       ings: [['땅콩참깨소스', '1', '스푼'], ['참깨', '1', '스푼'], ['다진 파', '1', '스푼'], ['스위트칠리소스', '1', '스푼'], ['고추기름', '0.5', '스푼'], ['다진 마늘', '1', '스푼'], ['양파', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['와사비', '', '조금'], ['설탕', '', '넉넉하게']],
       steps: [],
       tip: '' },
-    { id: 's33', date: '2025-09-24', cat: '소스', emoji: '🥣', img: 'assets/cards/킹키의 코로 만든소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#EDEFF3,#CBD2DC)', name: '킹키의 코로 만든소스', nameHtml: '킹키<span class="name-sub">의 코로 만든</span>소스', source: 'YouTube 권또또 KWONTTOTTO', person: '킹키', desc: '유튜브 <b>또렌드대탐험</b> 촬영 중 <b>킹키</b>가 소스바 재료들의 냄새를 맡아 가며 만든 소스로, <u>코로 만든 소스</u>라고 했다.',
+    { id: 's33', date: '2025-09-24', cat: '소스', emoji: '🥣', img: 'assets/cards/킹키가 코로 만든소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#EDEFF3,#CBD2DC)', name: '킹키가 코로 만든소스', nameHtml: '킹키<span class="name-sub">가 코로 만든</span>소스', source: 'YouTube 권또또 KWONTTOTTO', person: '킹키', desc: '유튜브 <b>또렌드대탐험</b> 촬영 중 <b>킹키</b>가 소스바 재료들의 냄새를 맡아 가며 만든 소스로, <u>코로 만든 소스</u>라고 했다.',
       ings: [['버섯소스', '1', '스푼'], ['참깨', '1', '스푼'], ['참기름', '0.5', '스푼'], ['다진 마늘', '', '조금'], ['오향우육(다진 고기)', '2', '스푼'], ['굴소스', '1', '스푼'], ['마라시즈닝(고춧가루)', '1', '스푼'], ['매운소고기소스', '0.5', '스푼']],
       steps: [],
       tip: '' },
@@ -326,6 +359,14 @@
       tip: '너무 짜면 간장소스를 0.5스푼만 넣거나 취향에 맞게 조절하기' },
     { id: 's36', date: '2024-02-13', cat: '소스', emoji: '🥣', img: 'assets/cards/사인클소스(오리지널)_2024.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#6B7799,#4A5470)', name: '사인클소스', ver: '오리지널 · 2024', source: 'X @gimsyabeu', person: '사회인 게임클럽', desc: '유튜버 <b>사회인 게임클럽</b>의 횐이인 <b>김샤브</b>가 추천하는 소스로, <b>건희소스</b>와 궁합이 좋다고 한다.',
       ings: [['완자간장소스', '1.5', '스푼'], ['스위트칠리소스', '2', '스푼'], ['굴소스', '0.5', '스푼'], ['고추기름', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['고수', '', '적당히'], ['태국고추', '', '적당히'], ['땅콩가루', '', '적당히']],
+      steps: [],
+      tip: '' },
+    { id: 's37', date: '2026-07-08', cat: '소스', emoji: '🥣', img: 'assets/cards/우승소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#E8D9C4,#C9AE8C)', name: '우승소스', source: 'YouTube LionsTV', notes: ['계량'], desc: '<b>삼성 라이온즈</b> 우완 투수인 <b>이승현</b> 선수가 삼튜브 촬영 중 소개한 소스로, <u>월남쌈 찍어 먹으면 맛있다</u>고 했다.',
+      ings: [['땅콩참깨소스', '1', '스푼'], ['다진 마늘', '0.5', '스푼'], ['다진 파', '1', '스푼'], ['고추기름', '1', '스푼'], ['태국고추', '1', '스푼']],
+      steps: [],
+      tip: '' },
+    { id: 's38', date: '2026-07-08', cat: '소스', emoji: '🥣', img: 'assets/cards/지광소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#D8C7AE,#B79A73)', name: '지광소스', source: 'YouTube LionsTV', notes: ['계량'], desc: '<b>삼성 라이온즈</b> 투수인 <b>최지광</b> 선수가 삼튜브 촬영 중 소개한 소스로, 고추기름인 줄 알고 잘못 넣은 청유훠궈소스가 킥이 되어서 호평을 받았다.',
+      ings: [['양파', '3', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '2', '스푼'], ['청유훠궈소스', '4', '스푼'], ['굴소스', '0.33', '스푼'], ['완자간장소스', '0.5', '스푼']],
       steps: [],
       tip: '' },
     { id: 'b3', cat: '탕', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
@@ -1365,6 +1406,7 @@
   const MONTHLY_SAUCE_PINS = {
     '2026-07': 's19',
     '2026-08': 's19',
+    '2026-09': 's4',   // 화령소스 (2026-08-30 사용자님 지정)
   };
   function monthKey(now) {
     return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
@@ -3108,6 +3150,9 @@
     }
     // 🔴 내 소스의 맛 칩 — 설명이 오던 자리다. 기존 레시피에는 `tastes` 가 없어 저절로 감춰진다.
     renderTasteRow(document.getElementById('modalTastes'), r.tastes);
+    /* 안내 줄 — `notes` 에 적힌 표시만큼 그린다. 없으면 줄 전체를 감춘다.
+       ⚠️ 표에 없는 이름은 조용히 건너뛴다 — 오타로 적어도 화면이 깨지지 않는다. */
+    소스바안내채우기(r.notes);
     /* 🔴 내 소스에서는 **즐겨찾기·좋아요를 감춘다**(2026-08-27) — 목록 카드에서 뺀 것과 같은 이유다
        (얼개 3절: 좋아요는 모든 방문자가 함께 보는 숫자이고, 즐겨찾기는 몇 개 안 되는 목록에서
        추릴 이유가 없다). **목록에는 없는데 상세에만 있으면** 눌러 놓고도 어디서도 안 보인다.
@@ -3599,6 +3644,60 @@
      ⚠️ 그림 그리기는 0.1초 안쪽이라 대개 공유 창이 그대로 뜬다.
      ⚠️ 이 창은 상세 모달 **위**에 뜬다 — 자르기 창이 소스 시트 위에 뜨는 것과 같은 얼개다.
         그래서 `SCROLL_LOCK_OVERLAYS` 에는 **안 넣는다**(아래 모달이 이미 잠갔다). */
+  /* ⓘ 여닫기 — **누르면 열리고 다시 누르면 닫힌다.** 터치에는 hover 가 없어서 이 길이 반드시 있어야 한다.
+     ⚠️ 마우스로 올려서 보는 것은 CSS 가 맡는다(`@media (hover: hover)`). 여기서는 손대지 않는다.
+     ⚠️ 바깥을 누르거나 Esc 로도 닫는다 — 열어 놓고 잊으면 다른 것을 가린다. */
+  const ingNoteBtn = document.getElementById('ingNoteBtn');
+  const ingNotePop = document.getElementById('ingNotePop');
+  if (ingNoteBtn && ingNotePop) {
+    /* 🔴 **화살표는 아이콘을 가리켜야 하고, 위에 자리가 없으면 아래로 뒤집는다.**
+       ■ 화살표 자리 — 제목 길이가 달라지면 아이콘도 옮겨 가므로 **잴 때마다 다시 넣는다.**
+       ■ 뒤집기 — 상세는 스크롤되므로 소스바 제목이 화면 맨 위에 올 수 있다. 그때 위로 띄우면 잘린다.
+         ⚠️ 재려면 **먼저 보여야 한다** — 숨긴 요소는 높이가 0 이다(2026-08-30 사진 자르기에서 겪은 것과 같다).
+            그래서 `hidden` 을 먼저 풀고 잰 뒤 자리를 정한다. */
+    function 말풍선자리잡기() {
+      const 머리 = ingNoteBtn.parentElement;
+      ingNotePop.style.setProperty('--arw',
+        (ingNoteBtn.offsetLeft + ingNoteBtn.offsetWidth / 2) + 'px');
+      ingNotePop.classList.remove('note-pop--below');
+      const 위쪽여유 = 머리.getBoundingClientRect().top - modalScroll.getBoundingClientRect().top;
+      if (위쪽여유 < ingNotePop.offsetHeight + 12) ingNotePop.classList.add('note-pop--below');
+    }
+    ingNoteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();                   // 바깥 누름으로 곧바로 되닫히지 않게
+      const 열려있나 = !ingNotePop.hidden;
+      ingNotePop.hidden = 열려있나;
+      if (!열려있나) 말풍선자리잡기();
+      ingNoteBtn.setAttribute('aria-expanded', String(!열려있나));
+    });
+    /* 마우스로 올려서 볼 때(CSS 가 띄운다)도 자리는 맞춰야 한다 — 뜨기 직전에 재 둔다.
+       ⚠️ 터치 기기에서는 `mouseenter` 가 탭 뒤에 따라오기도 하지만, 자리만 다시 잡으므로 해롭지 않다. */
+    ingNoteBtn.parentElement.addEventListener('mouseenter', () => {
+      if (ingNotePop.hidden) { ingNotePop.hidden = false; 말풍선자리잡기(); ingNotePop.hidden = true; }
+    });
+    /* 🔴 **상세 안쪽 클릭은 `document` 까지 안 온다** — `modalScroll` 이 `stopPropagation()` 으로
+       막아 두었다(바깥을 눌러 상세를 닫는 장치 때문이다). 그래서 **양쪽에 다 붙인다.**
+       ⚠️ `document` 에만 붙이면 말풍선이 안 닫힌다(2026-08-30에 실제로 그랬다). */
+    const 바깥눌림 = (e) => {
+      if (ingNotePop.hidden) return;
+      if (ingNotePop.contains(e.target) || ingNoteBtn.contains(e.target)) return;
+      ingNotePop.hidden = true;
+      ingNoteBtn.setAttribute('aria-expanded', 'false');
+    };
+    document.addEventListener('click', 바깥눌림);
+    modalScroll.addEventListener('click', 바깥눌림);
+    /* 🔴 Esc 는 **캡처 단계**로 잡는다 — 안 그러면 말풍선을 닫은 Esc 가 상세 모달까지 닫는다.
+       공유 대비책 창이 쓰는 것과 같은 처방이다. */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !ingNotePop.hidden) {
+        e.stopPropagation();
+        ingNotePop.hidden = true;
+        ingNoteBtn.setAttribute('aria-expanded', 'false');
+        ingNoteBtn.focus({ preventScroll: true });
+      }
+    }, true);
+  }
+
   const modalOutBtns = document.getElementById('modalOutBtns');
   const modalShareBtn = document.getElementById('modalShareBtn');
   const shareOverlay = document.getElementById('shareOverlay');
@@ -7277,15 +7376,24 @@
     function 보이는재료() {
       const q = query.trim();
       if (!q) return SAUCE_BAR;
+      // 🔴 **검색은 정식 이름으로 한다** — 화면에 「마라시즈닝」만 보여도 「고춧가루」로 쳐서 찾을 수 있다
       return SAUCE_BAR.filter((n) => n.indexOf(q) >= 0);
     }
+
     function 줄HTML(n) {
       const it = picked.get(n);
       /* 그림 자리 — 아직 비어 있다(2026-08-25 사용자님이 「자리는 두자」고 하셨다. 크기감을 보기 위해서다).
          일러스트가 나오면 여기에 `<img src="assets/sauce-bar/…">` 를 넣고 styles.css 의 점선을 지운다.
          🔴 `aria-hidden` 이다 — 장식이고, 바로 옆에 이름 글자가 있어 낭독기가 두 번 읽으면 안 된다. */
       const thumb = '<span class="si-thumb" aria-hidden="true"></span>';
-      const 부를이름 = n;   // 🔴 정식 이름 그대로다 — 위 주석 참고(2026-08-29 에 짧은 이름을 없앴다)
+      /* 🔴 **정식 이름(병기 포함) 그대로 부른다**(2026-08-29 `90ab51e`).
+         ■ 왜 — 고를 때와 저장 뒤 이름이 같아야 한다. 예전에 이 화면만 짧게 불렀더니
+           「고를 때는 마라시즈닝인데 저장하면 마라시즈닝(고춧가루)」라 달라 보였다(사용자님 지적).
+         ⚠️ **2026-08-30 에 잠깐 다시 뗐다가 되돌렸다.** 뗀 근거가 「320px 에서 줄이 감긴다」였는데,
+            **재는 값을 잘못 읽은 것**이었다(줄 높이 103px 을 칸 폭으로 착각). 실제로는 칸이 172px 이고
+            가장 긴 이름이 127px 이라 **320px 에서도 셋 다 한 줄에 들어간다**(다시 재서 확인).
+            🔴 「좁아서 감긴다」는 이유로 다시 떼자고 제안하지 말 것 — 사실이 아니다. */
+      const 부를이름 = n;
       /* 🔴 이름 줄은 **담기 전후로 같은 상자**를 쓴다(`.si-namerow`). 담긴 줄에만 오른쪽 끝에 ✕ 가 붙는데,
          상자가 다르면 담을 때마다 이름 자리가 미세하게 움직여 목록이 출렁인다
          (아랫단 높이를 42px 로 고정해 둔 것과 같은 이유). */
