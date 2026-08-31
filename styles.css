@@ -6633,10 +6633,11 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    ⚠️ 한 변을 비워야(`border-right-color: transparent`) 도는 것이 눈에 보인다. 다 채우면 그냥 동그라미다. */
 .btn-spin {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  margin-right: 6px;
-  vertical-align: -2px;
+  /* 🔴 **글자 없이 혼자 선다**(2026-08-31) — 그래서 오른쪽 여백을 두지 않는다.
+     여백이 남아 있으면 버튼 가운데에서 3px 왼쪽으로 밀린다. 크기도 14 → 16px 로 조금 키웠다. */
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
   border: 2px solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;

@@ -3797,9 +3797,14 @@
           「불러오는 중…」 하나뿐이다. **버튼에는 안 어울린다.** */
     const 원래글자 = modalShareBtn.textContent;
     modalShareBtn.disabled = true;
-    /* ⏳ 글자 앞에 **도는 표시**를 붙인다(2026-08-31 사용자님 요청) — 제보 폼과 같은 모양이다.
-       ⚠️ 되돌릴 때는 `textContent` 로 넣으므로 표시도 함께 사라진다. */
-    modalShareBtn.innerHTML = '<span class="btn-spin" aria-hidden="true"></span>만들고 있어요';
+    /* ⏳ **도는 표시만 둔다 — 글자는 뺀다**(2026-08-31 사용자님 확정).
+       🔴 왜 글자를 뺐나 — 320px 에서 버튼 안쪽이 **104px** 인데 「도는 표시 + 만들고 있어요」가
+          **107px** 이라 두 줄로 감겼다. 글자를 줄이거나 크기를 낮춰도 딱 104px 이라 여유가 0 이었다.
+          표시가 이미 「하는 중」을 말해 주고 버튼도 흐려지므로, 글자 없이도 뜻이 통한다.
+       🔴 **낭독기에는 남긴다**(`.sr-only`) — 눈으로 못 보는 사람에게는 도는 표시가 아무 말도 안 한다.
+       ⚠️ 되돌릴 때는 `textContent` 로 넣으므로 표시도 숨은 글자도 함께 사라진다. */
+    modalShareBtn.innerHTML =
+      '<span class="btn-spin" aria-hidden="true"></span><span class="sr-only">만들고 있어요</span>';
     let blob = null;
     try { blob = await 내소스그림만들기(r); } catch (e) { blob = null; }
     modalShareBtn.disabled = false;
