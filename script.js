@@ -598,7 +598,7 @@
   /* 🔴 **내 소스의 맛 키워드**(2026-08-29 사용자님과 정함). 설명 칸 대신이다.
      ■ 왜 칩인가 — 8/25 에 설명(`desc`)을 뺀 이유가 「팁과 설명 둘 다 선택이면 **둘 다 빈다**」였다.
        빈 칸 앞에서 뭘 쓸지 멈칫하기 때문인데, **누르기만 하면 되는 칩은 그 멈칫이 없다.**
-     ■ 열세 개는 **소스바 재료가 실제로 낼 수 있는 맛**에서 뽑았다 —
+     ■ 처음 열세 개는 **소스바 재료가 실제로 낼 수 있는 맛**에서 뽑았다 —
        고소(땅콩참깨소스·참깨) · 매콤(고추기름·태국고추) · 얼얼(마라시즈닝·산초기름) ·
        알싸(다진 마늘·와사비) · 달콤(스위트칠리소스·설탕) · 짭짤(완자간장소스·굴소스) ·
        새콤(중국식초·산고추) · 향긋(고수·다진 파) · 감칠맛(굴소스·미원) · 묵직(발효장류) 등.
@@ -606,13 +606,28 @@
         ⚠️ **「감칠맛」만 예외다** — 「감칠맛한」은 말이 안 된다(「감칠맛 나는」이 맞다).
            혼자 꼴이 다르지만 그대로 둔다.
      ⚠️ **물린 것** — 자극적(맛의 종류가 아니라 세기이고 좋게도 나쁘게도 읽힌다).
-        칼칼·구수·개운·느끼는 겹치거나 안 좋은 뜻이라 한 번 뺐다가 **사용자님 지시로 다시 넣었다.**
+     🔴 **구수한·칼칼한·개운한은 뺐다**(2026-08-31 사용자님 확정). 각각 고소한·매콤한·깔끔한과 겹쳐서
+        「어느 걸 골라야 하지」에서 멈칫하게 만들던 자리다. 남긴 쪽이 소스바 재료에 더 맞다 —
+        구수한은 된장·누룽지 쪽 말이고, 칼칼한은 국물 쪽 말이라 소스에는 덜 붙는다.
+        ⚠️ 이 셋은 8/29 에 한 번 뺐다가 사용자님 지시로 되돌렸던 것이다. **이번에 다시 뺀 것이 확정이다.**
+        ⚠️ 뺄 수 있었던 이유는 **아직 배포 전**이라 이 키워드로 저장된 소스가 없어서다(사용자님 확인).
+           배포 뒤에는 같은 방식으로 못 뺀다 — 저장값에 옛 키워드가 남는다.
+        ⚠️ 느끼한은 **남겼다**(사용자님이 셋만 지목하셨다).
      🔴 **한 번 정하면 줄이기 어렵다** — 이미 고른 사람이 있으면 저장값에 옛 키워드가 남는다.
         늘리는 것은 안전하다. 줄일 때는 저장된 기록을 어떻게 할지 함께 정해야 한다.
      ⚠️ **「담백」을 다른 것과 같이 골라도 막지 않는다**(사용자님 확정). 앞뒤가 안 맞는 조합이
         나올 수 있지만, 고르는 사람의 뜻을 앱이 판정하지 않기로 했다. */
-  const TASTES = ['고소한', '매콤한', '얼얼한', '알싸한', '달콤한', '짭짤한', '새콤한', '상큼한',
-                  '향긋한', '감칠맛', '담백한', '묵직한', '깔끔한', '칼칼한', '구수한', '개운한', '느끼한'];
+  /* 🔴 **차례는 「비슷한 맛끼리 뭉치기」다**(2026-08-31 사용자님이 직접 짜신 순서).
+     ■ 왜 이 차례인가 — 이 칸은 **훑어보며 고르는 자리**다(정하고 오는 자리가 아니다).
+       그래서 가나다순이 아니라 갈래끼리 붙였다. 뭉침은 이렇게 읽힌다 —
+       고소 / 달콤·짭짤 / 새콤·상큼 / 매콤·얼얼·알싸 / 묵직·느끼 / 깔끔·담백 / 향긋·감칠맛
+     ■ **앞 여섯 개에 기본 맛을 몰아 뒀다** — 대부분의 소스가 앞줄에서 끝난다.
+       무거운 쪽(묵직·느끼)에서 가벼운 쪽(개운·깔끔·담백)으로 흐른다.
+     ⚠️ 감칠맛이 짭짤과 멀리 떨어진 것은 **알고 그대로 둔 것이다**(혼자 「~한」 꼴이 아니라 맨 끝이 덜 튄다).
+     🔴 **순서를 바꾸는 것은 안전하다 — 빼는 것만 위험하다**(저장된 소스에 옛 키워드가 남는다). */
+  const TASTES = ['고소한', '달콤한', '짭짤한', '새콤한', '상큼한',
+                  '매콤한', '얼얼한', '알싸한', '묵직한', '느끼한',
+                  '깔끔한', '담백한', '향긋한', '감칠맛'];
 
   const MY_SAUCE_PHOTOS_KEY = 'haidilao_my_sauce_photos';
   let mySaucePhotos = {};
@@ -3166,13 +3181,12 @@
        한 번 더 눌러 확인한다 — 이미 앱에 있는 방식이라 새로 배울 것이 없다.
        ⚠️ 상세를 열 때마다 확인 상태를 **반드시 푼다.** 안 풀면 다른 소스를 열었는데 「한 번 더 누르면
           삭제돼요」가 떠 있어, 무심코 누르면 **엉뚱한 소스가 지워진다.** */
-    /* 🔴 **줄 전체**를 여닫는다(2026-08-27) — 버튼을 하나씩 숨기면 남은 하나가 줄 전체로 늘어난다. */
-    if (modalMineBtns) modalMineBtns.hidden = !r.mine;
-    /* 🔴 내보내기(공유하기·제보하기)도 내 소스에만 보인다(2026-08-30).
-       ⚠️ **줄 전체**를 여닫는다 — 버튼을 하나씩 숨기면 남은 하나가 줄 전체로 늘어난다
-          (「수정·삭제」에서 이미 겪은 함정이다). */
+    /* 🔴 아랫줄(공유하기·제보하기·⋯)은 **내 소스에만** 보인다.
+       ⚠️ **줄 전체**를 여닫는다 — 버튼을 하나씩 숨기면 남은 것이 줄 전체로 늘어난다. */
     if (modalOutBtns) modalOutBtns.hidden = !r.mine;
-    resetModalMineDelete();
+    /* ⚠️ 상세를 열 때마다 ⋯ 메뉴를 **반드시 닫는다.** 열어 둔 채 다른 소스를 열면
+       엉뚱한 소스 위에 메뉴가 떠 있게 된다(옛 「한 번 더 누르면 삭제돼요」와 같은 함정이다). */
+    더보기닫기();
 
     const orderWrap = document.getElementById('modalOrderWrap');
     if (r.order && r.order.length > 0) {
@@ -3337,18 +3351,34 @@
   const 공유글꼴 = "'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif";
 
   /* 글자를 칸 폭에 맞춰 여러 줄로 쪼갠다.
-     🔴 **어절 단위로 먼저 끊는다** — 화면의 `word-break: keep-all` 과 같은 규칙이다.
-        한 어절이 통째로 칸보다 길 때만(띄어쓰기 없는 긴 이름) 글자 사이에서 끊는다
+     🔴 **한글은 음절, 영문은 어절에서 끊는다**(2026-08-31 사용자님 확정) — 화면과 같은 규칙이다.
+        ⚠️ 예전에는 **어절 단위**로 끊었다. 그때 주석에 「화면의 `word-break: keep-all` 과 같다」고
+           적어 뒀는데, 2026-08-30 에 화면을 음절 단위로 바꾸면서 **이쪽만 안 따라왔다.**
+           그래서 같은 소스를 화면에서 볼 때와 그림으로 보낼 때 줄이 서로 달랐다.
+        ■ 실제로 달라지는 것은 **팁이 있는 소스뿐**이다(실측). 재료 이름은 띄어쓰기가 없어
+          예전에도 글자에서 끊고 있었다. 팁은 줄 끝이 꽉 차서 한 줄쯤 짧아진다.
+     🔴 **닫는 기호는 앞 조각에 붙인다** — 안 그러면 `)` 나 `,` 가 다음 줄 첫머리로 떨어진다.
+     ⚠️ 아주 긴 영문 한 덩어리는 그래도 칸을 넘으므로 글자 사이에서 끊는다
         (화면의 `overflow-wrap: anywhere` 에 해당). */
   function 줄나누기(ctx, 글, 최대폭) {
     const 줄 = [];
     (String(글 == null ? '' : 글)).split('\n').forEach((문단) => {
+      // 한글·기호는 한 글자씩, 영문·숫자는 한 덩어리로 — 이것이 곧 「한글 음절 · 영문 어절」이다
+      const 조각들 = [];
+      (문단.match(/[A-Za-z0-9]+|\s+|[^A-Za-z0-9\s]/g) || []).forEach((조각) => {
+        const 앞 = 조각들[조각들.length - 1];
+        if (앞 && !/^\s+$/.test(앞) && /^[)\]}」』,.!?%·:;]$/.test(조각)) 조각들[조각들.length - 1] = 앞 + 조각;
+        else 조각들.push(조각);
+      });
       let 현재 = '';
-      문단.split(' ').forEach((어절, i) => {
-        const 후보 = i === 0 ? 어절 : 현재 + ' ' + 어절;
-        if (현재 && ctx.measureText(후보).width > 최대폭) { 줄.push(현재); 현재 = 어절; }
-        else 현재 = 후보;
-        // 어절 하나가 칸보다 길면 글자 사이에서 끊는다
+      조각들.forEach((조각) => {
+        if (!현재 && /^\s+$/.test(조각)) return;      // 줄 첫머리 공백은 버린다
+        const 후보 = 현재 + 조각;
+        if (현재 && ctx.measureText(후보).width > 최대폭) {
+          줄.push(현재.replace(/\s+$/, ''));
+          현재 = /^\s+$/.test(조각) ? '' : 조각;
+        } else 현재 = 후보;
+        // 조각 하나가 칸보다 길면 글자 사이에서 끊는다
         while (ctx.measureText(현재).width > 최대폭 && 현재.length > 1) {
           let n = 현재.length;
           while (n > 1 && ctx.measureText(현재.slice(0, n)).width > 최대폭) n--;
@@ -3356,7 +3386,7 @@
           현재 = 현재.slice(n);
         }
       });
-      줄.push(현재);
+      줄.push(현재.replace(/\s+$/, ''));
     });
     return 줄;
   }
@@ -3644,9 +3674,12 @@
      ⚠️ 그림 그리기는 0.1초 안쪽이라 대개 공유 창이 그대로 뜬다.
      ⚠️ 이 창은 상세 모달 **위**에 뜬다 — 자르기 창이 소스 시트 위에 뜨는 것과 같은 얼개다.
         그래서 `SCROLL_LOCK_OVERLAYS` 에는 **안 넣는다**(아래 모달이 이미 잠갔다). */
-  /* ⓘ 여닫기 — **누르면 열리고 다시 누르면 닫힌다.** 터치에는 hover 가 없어서 이 길이 반드시 있어야 한다.
+  /* ⓘ 여닫기 — **누르면 열린다. 다시 눌러도 또 열린다(닫히지 않는다).**
+     🔴 아이콘은 **여는 일만 한다**(2026-08-31 사용자님 확정). 5초면 저절로 닫히므로 「눌러서 닫기」는
+        쓸 일이 거의 없는데, 반대로 **읽다 만 것을 한 번 더 보려고 누르는** 일은 실제로 생긴다.
+        예전(토글)에는 그때 닫혀 버렸다. ⚠️ 여는 쪽으로 다시 뒤집자고 제안하지 말 것.
      ⚠️ 마우스로 올려서 보는 것은 CSS 가 맡는다(`@media (hover: hover)`). 여기서는 손대지 않는다.
-     ⚠️ 바깥을 누르거나 Esc 로도 닫는다 — 열어 놓고 잊으면 다른 것을 가린다. */
+     ⚠️ 닫는 길은 셋이다 — **바깥 누름 · Esc · 5초**. 열어 놓고 잊으면 다른 것을 가린다. */
   const ingNoteBtn = document.getElementById('ingNoteBtn');
   const ingNotePop = document.getElementById('ingNotePop');
   if (ingNoteBtn && ingNotePop) {
@@ -3663,12 +3696,41 @@
       const 위쪽여유 = 머리.getBoundingClientRect().top - modalScroll.getBoundingClientRect().top;
       if (위쪽여유 < ingNotePop.offsetHeight + 12) ingNotePop.classList.add('note-pop--below');
     }
+    /* ⏱ **눌러서 연 말풍선은 5초 뒤에 저절로 닫힌다**(2026-08-31 사용자님 확정).
+       ⚠️ 처음에 8초로 붙였다가 **사용자님이 길다고 하셔서 5초로 줄인 것이다.** 늘리자고 다시 제안하지 말 것.
+       ⚠️ **마우스로 올려서 보는 것은 여기와 무관하다** — 그쪽은 CSS(`@media (hover: hover)`)가
+          맡으므로 올려 둔 동안 계속 떠 있다.
+       🔴 **사라지는 모습이 두 가지다**(2026-08-31 사용자님 확정) —
+          · **시간이 다 됐을 때**(`말풍선사라짐`) = 0.25초 흐려지며 사라진다. 갑자기 툭 없어지면
+            「내가 뭘 눌렀나」 싶은데, 흐려지면 「시간이 다 됐구나」로 읽힌다.
+          · **손으로 닫을 때**(바깥 누름·Esc) = **즉시** 사라진다. 내가 누른 것에 대한 반응이라 빨라야 한다.
+       🔴 닫기를 한 곳(`말풍선닫기`)으로 모았다 — 어느 길로 닫히든 **타이머 둘을 다 지운다.**
+          안 지우면 다음에 연 것을 남은 타이머가 닫아 버린다(실제로 걸리는 함정이다). */
+    let 자동닫기 = 0, 사라짐 = 0;
+    function 말풍선닫기() {
+      clearTimeout(자동닫기); clearTimeout(사라짐);
+      ingNotePop.classList.remove('note-pop--fade');
+      ingNotePop.hidden = true;
+      ingNoteBtn.setAttribute('aria-expanded', 'false');
+    }
+    function 말풍선사라짐() {
+      /* 🔴 마우스를 올려 둔 채라면 **흐리지 않고 그냥 닫는다.** 흐리는 사이에 CSS(hover)가
+         다시 띄워서 사라졌다 튀어나오는 깜빡임이 생긴다. 터치에는 hover 가 없어 해당하지 않는다. */
+      if (ingNoteBtn.parentElement.matches(':hover')) { 말풍선닫기(); return; }
+      ingNotePop.classList.add('note-pop--fade');
+      사라짐 = setTimeout(말풍선닫기, 250);
+    }
+    function 말풍선열기() {
+      clearTimeout(자동닫기); clearTimeout(사라짐);
+      ingNotePop.classList.remove('note-pop--fade');   // 흐려지던 중에 다시 눌렀을 때
+      ingNotePop.hidden = false;
+      말풍선자리잡기();
+      ingNoteBtn.setAttribute('aria-expanded', 'true');
+      자동닫기 = setTimeout(말풍선사라짐, 5000);
+    }
     ingNoteBtn.addEventListener('click', (e) => {
       e.stopPropagation();                   // 바깥 누름으로 곧바로 되닫히지 않게
-      const 열려있나 = !ingNotePop.hidden;
-      ingNotePop.hidden = 열려있나;
-      if (!열려있나) 말풍선자리잡기();
-      ingNoteBtn.setAttribute('aria-expanded', String(!열려있나));
+      말풍선열기();                            // 🔴 누를 때마다 다시 뜨고 5초를 처음부터 다시 센다
     });
     /* 마우스로 올려서 볼 때(CSS 가 띄운다)도 자리는 맞춰야 한다 — 뜨기 직전에 재 둔다.
        ⚠️ 터치 기기에서는 `mouseenter` 가 탭 뒤에 따라오기도 하지만, 자리만 다시 잡으므로 해롭지 않다. */
@@ -3681,8 +3743,7 @@
     const 바깥눌림 = (e) => {
       if (ingNotePop.hidden) return;
       if (ingNotePop.contains(e.target) || ingNoteBtn.contains(e.target)) return;
-      ingNotePop.hidden = true;
-      ingNoteBtn.setAttribute('aria-expanded', 'false');
+      말풍선닫기();
     };
     document.addEventListener('click', 바깥눌림);
     modalScroll.addEventListener('click', 바깥눌림);
@@ -3691,8 +3752,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !ingNotePop.hidden) {
         e.stopPropagation();
-        ingNotePop.hidden = true;
-        ingNoteBtn.setAttribute('aria-expanded', 'false');
+        말풍선닫기();
         ingNoteBtn.focus({ preventScroll: true });
       }
     }, true);
@@ -3737,7 +3797,9 @@
           「불러오는 중…」 하나뿐이다. **버튼에는 안 어울린다.** */
     const 원래글자 = modalShareBtn.textContent;
     modalShareBtn.disabled = true;
-    modalShareBtn.textContent = '만들고 있어요';
+    /* ⏳ 글자 앞에 **도는 표시**를 붙인다(2026-08-31 사용자님 요청) — 제보 폼과 같은 모양이다.
+       ⚠️ 되돌릴 때는 `textContent` 로 넣으므로 표시도 함께 사라진다. */
+    modalShareBtn.innerHTML = '<span class="btn-spin" aria-hidden="true"></span>만들고 있어요';
     let blob = null;
     try { blob = await 내소스그림만들기(r); } catch (e) { blob = null; }
     modalShareBtn.disabled = false;
@@ -3796,7 +3858,43 @@
     shareOverlay.addEventListener('keydown', (e) => trapFocusWithin(shareOverlay, e));
   }
 
-  const modalMineBtns = document.getElementById('modalMineBtns');
+  /* ⋯ 메뉴 — 수정·삭제를 접어 둔 자리(2026-08-31, 「C안」).
+     🔴 **소스바 안내 말풍선과 같은 얼개**다 — 누르면 열리고, 바깥을 누르거나 Esc 로 닫힌다.
+        새 방식을 늘리지 않으려고 일부러 같게 맞췄다.
+     🔴 **상세 안쪽 클릭은 `document` 까지 안 온다** — `modalScroll` 이 `stopPropagation()` 으로
+        막아 두었다(바깥을 눌러 상세를 닫는 장치 때문이다). 그래서 **양쪽에 다 붙인다.**
+        ⚠️ 말풍선에서 이미 겪은 함정이다(`document` 에만 붙이면 안 닫힌다).
+     🔴 Esc 는 **캡처 단계**로 잡는다 — 안 그러면 메뉴를 닫은 Esc 가 상세 모달까지 닫는다. */
+  const modalMoreBtn = document.getElementById('modalMoreBtn');
+  const modalMoreMenu = document.getElementById('modalMoreMenu');
+  function 더보기닫기() {
+    if (!modalMoreMenu || modalMoreMenu.hidden) return;
+    modalMoreMenu.hidden = true;
+    if (modalMoreBtn) modalMoreBtn.setAttribute('aria-expanded', 'false');
+  }
+  if (modalMoreBtn && modalMoreMenu) {
+    modalMoreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();                       // 바깥 누름으로 곧바로 되닫히지 않게
+      const 열려있나 = !modalMoreMenu.hidden;
+      modalMoreMenu.hidden = 열려있나;
+      modalMoreBtn.setAttribute('aria-expanded', String(!열려있나));
+    });
+    const 바깥눌림 = (e) => {
+      if (modalMoreMenu.hidden) return;
+      if (modalMoreMenu.contains(e.target) || modalMoreBtn.contains(e.target)) return;
+      더보기닫기();
+    };
+    document.addEventListener('click', 바깥눌림);
+    if (modalScroll) modalScroll.addEventListener('click', 바깥눌림);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modalMoreMenu.hidden) {
+        e.stopPropagation();
+        더보기닫기();
+        modalMoreBtn.focus({ preventScroll: true });
+      }
+    }, true);
+  }
+
   const modalMineEdit = document.getElementById('modalMineEdit');
   /* 「수정하기」 — 이 소스를 담은 채로 만들기 시트를 연다(2026-08-27 사용자님 요청).
      🔴 **상세를 먼저 닫는다.** 안 닫으면 시트 뒤에 상세가 그대로 남아, 시트를 X 로 닫았을 때
@@ -3805,29 +3903,35 @@
   if (modalMineEdit) modalMineEdit.addEventListener('click', () => {
     const r = currentModalRecipe;
     if (!r || !r.mine || !window.openSauceSheet) return;
+    더보기닫기();
     closeModal();
     window.openSauceSheet({ 고칠것: r });
   });
   const modalMineDelete = document.getElementById('modalMineDelete');
-  let modalMineDeleteArmed = false;
-  function resetModalMineDelete() {
-    if (!modalMineDelete) return;
-    modalMineDeleteArmed = false;
-    modalMineDelete.textContent = '삭제';
-    modalMineDelete.classList.remove('armed');
-    clearTimeout(modalMineDelete._t);
-  }
+  /* 🔴 **지우기는 확인 창으로 묻는다**(2026-08-31 사용자님 확정).
+     ■ 예전에는 「한 번 더 누르면 삭제돼요」로 그 자리에서 물었다. 버튼이 ⋯ 메뉴 안으로 들어가면서
+       못 쓰게 됐다 — 누르는 순간 **메뉴가 닫혀 그 자리가 사라진다.**
+     ■ 앱에 이미 있는 확인 창을 **글자만 갈아 끼워** 쓴다. 안전한 쪽(「그대로 두기」)이 채운 버튼이고
+       초점도 거기로 간다 — 실수로 Enter 를 눌러도 잃는 것이 없다.
+     🔴 문구는 사용자님이 확정한 것이다(「이 소스를 지울까요?」 / 「지우면 되돌릴 수 없어요.」).
+        ⚠️ 제목에 소스 이름을 넣는 안은 **물렸다**(2026-08-31). 다시 제안하지 말 것.
+     ⚠️ **id 를 미리 붙들어 둔다** — 확인 창이 떠 있는 동안 `currentModalRecipe` 가 바뀔 수 있다. */
   if (modalMineDelete) modalMineDelete.addEventListener('click', () => {
     if (!currentModalRecipe || !currentModalRecipe.mine) return;
-    if (!modalMineDeleteArmed) {
-      modalMineDeleteArmed = true;
-      modalMineDelete.textContent = '한 번 더 누르면 삭제돼요';
-      modalMineDelete.classList.add('armed');
-      clearTimeout(modalMineDelete._t);
-      modalMineDelete._t = setTimeout(resetModalMineDelete, 3000);
-      return;
-    }
+    더보기닫기();
     const 지울id = currentModalRecipe.id;
+    openLeaveConfirm(() => 내소스지우기(지울id), {
+      sheet: document.getElementById('modalCard'),
+      closeBtn: modalClose,
+      text: {
+        title: '이 소스를 지울까요?',
+        desc: '지우면 되돌릴 수 없어요.',
+        stay: '그대로 두기',
+        go: '삭제',
+      },
+    });
+  });
+  function 내소스지우기(지울id) {
     mySauceData.records = mySauceData.records.filter((r) => r.id !== 지울id);
     if (mySauceData.deleted.indexOf(지울id) === -1) mySauceData.deleted.push(지울id);
     /* 🔴 **사진도 같이 지운다**(2026-08-29). 안 지우면 소스는 사라졌는데 사진만 남아
@@ -3837,7 +3941,6 @@
     saveMySaucePhotos();
     saveMySauces();
     browseCardCache.delete(지울id);
-    resetModalMineDelete();
     closeModal();
     renderList();
     /* 🔴 **초점이 갈 자리를 준다**(2026-08-27). 상세를 닫으면 원래 눌렀던 **카드로 돌아가는데,
@@ -3850,7 +3953,7 @@
           탭줄은 `.main` 밖이라 걸리지 않는다. */
     focusLanding(browseCatTabsEl.querySelector('.tab-btn--mine'));
     showShareToast('소스를 지웠어요');
-  });
+  }
 
   // 모바일 전체화면 상세: 오버레이가 상단바 아래에서 시작하도록 실제 높이를 CSS 변수로 전달
   const topbarEl = document.querySelector('.topbar');
@@ -5794,6 +5897,8 @@
   const leaveConfirmBox = leaveConfirmOverlay && leaveConfirmOverlay.querySelector('.leave-confirm');
   const leaveConfirmStay = document.getElementById('leaveConfirmStay');
   const leaveConfirmGo = document.getElementById('leaveConfirmGo');
+  const leaveConfirmTitle = document.getElementById('leaveConfirmTitle');
+  const leaveConfirmDesc = document.getElementById('leaveConfirmDesc');
   let leaveConfirmReturnFocus = null;   // 기록 창 안에서 초점이 있던 자리
   let leaveConfirmPending = null;       // 「나가기」를 누르면 이어서 할 일
 
@@ -5820,9 +5925,24 @@
      ⚠️ 안 적어 두면 소스 만들기에서 「계속 작성」을 눌러도 초점이 **스티커 기록창** 기준으로
         판정돼 밖으로 새어 나간다. */
   let leaveConfirmHost = null;   // { sheet, closeBtn }
+  /* 🔴 **글자를 갈아 끼울 수 있다**(2026-08-31). 내 소스 「삭제」가 이 창을 같이 쓴다 —
+     초점·잠금·복귀 처리가 여기 다 들어 있어서, 비슷한 창을 새로 만드는 것보다 이쪽이 안전하다.
+     ⚠️ 안 넘기면 **원래 문구(작성 중인 내용을 그만둘까요?)로 되돌린다.** 한 번 갈아 끼운 글자가
+        남아 있으면 다음에 다른 곳에서 열었을 때 엉뚱한 말이 뜬다. */
+  const LEAVE_CONFIRM_기본 = {
+    title: '작성 중인 내용을 그만둘까요?',
+    desc: '지금 나가면 입력한 내용이 사라져요.',
+    stay: '계속 작성',
+    go: '나가기',
+  };
   function openLeaveConfirm(onLeave, opts) {
     if (!leaveConfirmOverlay) { onLeave && onLeave(); return; }   // 마크업이 없으면 옛 동작대로
     opts = opts || {};
+    const 글 = Object.assign({}, LEAVE_CONFIRM_기본, opts.text || {});
+    if (leaveConfirmTitle) leaveConfirmTitle.textContent = 글.title;
+    if (leaveConfirmDesc) leaveConfirmDesc.textContent = 글.desc;
+    if (leaveConfirmStay) leaveConfirmStay.textContent = 글.stay;
+    if (leaveConfirmGo) leaveConfirmGo.textContent = 글.go;
     // 인자를 안 주면 예전 그대로 스티커 기록창을 지킨다
     leaveConfirmHost = {
       sheet: opts.sheet || stampSheetEl,
@@ -7880,8 +8000,8 @@
     const 사진예 = document.getElementById('saucePhotoYes');
     const 사진아니오 = document.getElementById('saucePhotoNo');
     const 사진칸 = document.getElementById('saucePhoto');
-    const 사진버튼 = document.getElementById('saucePhotoBtn');
-    const 사진빈자리 = document.getElementById('saucePhotoEmpty');
+    const 사진버튼 = document.getElementById('saucePhotoBtn');       // 빈 칸 가운데 「이미지 고르기」
+    const 사진바꾸기 = document.getElementById('saucePhotoChange');   // 사진 위 오른쪽 위 연필
     const 사진그림 = document.getElementById('saucePhotoImg');
     const 사진빼기버튼 = document.getElementById('saucePhotoClear');
     const 사진입력 = document.getElementById('saucePhotoInput');
@@ -7890,12 +8010,14 @@
 
     function 사진그리기() {
       const 있다 = !!고른사진;
+      /* 🔴 **빈 칸이면 가운데 알약, 사진이 있으면 오른쪽 위 한 쌍**이다(2026-08-31).
+         칸 자체는 버튼이 아니므로 여기서 갈아 끼우는 것은 **버튼 셋**뿐이다. */
       사진그림.hidden = !있다;
-      사진빈자리.hidden = 있다;
+      사진버튼.hidden = 있다;
+      사진바꾸기.hidden = !있다;
       사진빼기버튼.hidden = !있다;
       if (있다) 사진그림.src = 고른사진;
       else 사진그림.removeAttribute('src');
-      사진버튼.setAttribute('aria-label', 있다 ? '사진 바꾸기' : '사진 고르기');
     }
     /* 고른 파일을 **자르기 화면에 띄울 그림**으로 읽는다.
        🔴 여기서는 자르지 않는다 — 자르는 것은 사용자님이 맞춘 뒤 `자른그림만들기` 가 한다.
@@ -7984,8 +8106,11 @@
       자르기막.setAttribute('inert', '');
       자르기막.setAttribute('aria-hidden', 'true');
       자르기그림.removeAttribute('src');
+      /* 🔴 **함수로 받을 수 있다**(2026-08-31). 사진 칸은 자르기가 끝나면 버튼이 바뀌어서
+         (「이미지 고르기」 → 연필) **열 때 정한 자리가 닫을 때는 숨어 있다.** 닫는 순간에 정해야 맞는다. */
       const 갈곳 = 자르기복귀; 자르기복귀 = null;
-      if (갈곳) focusLanding(갈곳);
+      const 실제 = typeof 갈곳 === 'function' ? 갈곳() : 갈곳;
+      if (실제) focusLanding(실제);
     }
     /* 보이는 만큼을 그대로 400px 정사각으로 옮겨 그린다. */
     function 자른그림만들기() {
@@ -8048,8 +8173,11 @@
     자르기취소.addEventListener('click', 자르기닫기);
     자르기완료.addEventListener('click', () => {
       고른사진 = 자른그림만들기();
-      자르기닫기();
+      /* 🔴 **화면을 먼저 그리고 나서 닫는다**(2026-08-31). 닫는 쪽이 초점을 옮기는데,
+         그 자리(연필 「이미지 바꾸기」)는 사진이 생겨야 나타난다. 순서가 반대면
+         **아직 숨어 있는 버튼으로 보내게 되어 초점이 사라진다.** 실제로 그랬다. */
       사진그리기();
+      자르기닫기();
       버튼갱신();   // 🔴 사진이 생겼으니 막혀 있던 「다음」이 풀린다
     });
     // 바깥을 눌러도 닫힌다 — 취소와 같다(고른 사진은 안 바뀐다)
@@ -8077,6 +8205,7 @@
       사진답그리기();
     });
     사진버튼.addEventListener('click', () => 사진입력.click());
+    사진바꾸기.addEventListener('click', () => 사진입력.click());
     /* 🔴 「사진 없이 할게요」는 **답을 「아니오」로 되돌린다**(2026-08-29). 사진만 비우고
        「예」로 남겨 두면 「다음」이 막힌 채 이유를 모르게 된다 — 예라고 했는데 사진이 없어서다. */
     사진빼기버튼.addEventListener('click', () => {
@@ -8097,7 +8226,11 @@
       if (!file) return;
       사진칸.classList.add('is-busy');
       try {
-        자르기열기(await 읽어들이기(file), 사진버튼);
+        /* 🔴 **`고른사진` 으로 정한다 — 버튼의 `hidden` 으로 정하면 안 된다.**
+           「완료」는 `고른사진` 을 채우고 → **자르기를 닫고**(여기서 초점이 옮겨 간다) → 그 다음에
+           화면을 다시 그린다. 닫는 순간에는 버튼이 아직 안 바뀌어 있어서, 곧 숨을 버튼으로 가 버린다.
+           2026-08-31 에 실제로 그랬다(초점이 사라졌다). */
+        자르기열기(await 읽어들이기(file), () => (고른사진 ? 사진바꾸기 : 사진버튼));
       } catch (e) {
         if (window.showToast) window.showToast('사진을 읽지 못했어요');
       } finally {
