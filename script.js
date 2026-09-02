@@ -7566,6 +7566,25 @@
     /* 🔴 소스 만들기에서 고를 수 있는 재료 — `만들기제외` 를 뺀 것이다(그 주석 참고).
        ⚠️ **검색으로도 안 나온다.** 걸러 낸 뒤에 찾기 때문이다. */
     const 고를수있는재료 = SAUCE_BAR.filter((n) => 만들기제외.indexOf(n) < 0);
+    /* 재료 그림 캐시 번호 — `assets/sauce-bar/*.webp` 를 갈아 끼우면 1 올린다(아래 `줄HTML` 의 thumb 주석 참고). */
+    const SAUCE_IMG_V = 1;
+    /* 🔴 **그림 파일이 없는 재료를 기억해 둔다** — 목록은 검색 글자를 칠 때마다 통째로 다시 그려지는데,
+       그때마다 없는 파일을 41번씩 다시 청하면 낭비다(첫 한 번은 어쩔 수 없다). 한 번 실패한 이름은
+       다음부터 img 를 아예 안 넣는다. 페이지를 새로 열면 비워지므로 파일을 넣은 뒤 새로고침하면 뜬다.
+       ■ `load`·`error` 는 부모로 안 올라오므로 **잡기 단계(capture)** 로 목록 상자에서 받는다 —
+         줄마다 손잡이를 다는 대신 한 번만 단다. */
+    const 그림없음 = new Set();
+    listEl.addEventListener('error', (e) => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement) || !img.closest('.si-thumb')) return;
+      그림없음.add(img.closest('.si-row').dataset.n);
+      img.remove();                                      // 점선 빈칸으로 돌아간다
+    }, true);
+    listEl.addEventListener('load', (e) => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement) || !img.closest('.si-thumb')) return;
+      img.parentNode.classList.add('has-img');           // 점선을 지운다(styles.css)
+    }, true);
     function 보이는재료() {
       const q = query.trim();
       if (!q) return 고를수있는재료;
@@ -7575,10 +7594,18 @@
 
     function 줄HTML(n) {
       const it = picked.get(n);
-      /* 그림 자리 — 아직 비어 있다(2026-08-25 사용자님이 「자리는 두자」고 하셨다. 크기감을 보기 위해서다).
-         일러스트가 나오면 여기에 `<img src="assets/sauce-bar/…">` 를 넣고 styles.css 의 점선을 지운다.
-         🔴 `aria-hidden` 이다 — 장식이고, 바로 옆에 이름 글자가 있어 낭독기가 두 번 읽으면 안 된다. */
-      const thumb = '<span class="si-thumb" aria-hidden="true"></span>';
+      /* 그림 자리(2026-09-02 그림을 붙였다. 자리는 2026-08-25 사용자님이 「자리는 두자」고 하셔서 먼저 잡아 둔 것이다).
+         🔴 **파일 이름 = 재료 이름 그대로 + `.webp`** — `assets/sauce-bar/산초기름(화조유).webp` 처럼 괄호·띄어쓰기까지
+            그대로다(2026-09-02 사용자님 확정). 앱이 `assets/menu/가물치(가시주의).webp` 로 이미 그렇게 하고 있어 라이브에서 검증된 방식이고,
+            이름표(변환표)가 없어 재료가 늘어도 코드를 안 고친다. ⚠️ 그래서 **재료 이름을 바꾸면 파일 이름도 같이 바꿔야 한다.**
+         🔴 **그림이 없는 재료는 지금처럼 점선 빈칸**이다 — 못 읽은 img 는 빠지고(위 `error` 손잡이), 뜬 것만 `has-img` 를 붙여
+            점선을 지운다(styles.css `.si-thumb.has-img`). 셀럽 얼굴(`assets/people/`)과 같은 방식이라 나중에 파일만 넣으면 저절로 뜬다.
+            ⚠️ 없는 파일마다 404 가 **페이지당 한 번** 난다(`그림없음`). 있는 것 목록을 따로 두면 파일과 어긋나 관리가 두 벌이 된다.
+         🔴 `SAUCE_IMG_V` 는 그림을 갈아 끼울 때 올린다 — 안 올리면 폰이 옛 그림을 계속 보여 준다(다른 `?v=` 와 같은 이유).
+         🔴 `aria-hidden` 이다 — 장식이고, 바로 옆에 이름 글자가 있어 낭독기가 두 번 읽으면 안 된다. `alt=""` 도 같은 뜻이다. */
+      const thumb = '<span class="si-thumb" aria-hidden="true">'
+        + (그림없음.has(n) ? '' : '<img src="assets/sauce-bar/' + esc(n) + '.webp?v=' + SAUCE_IMG_V + '" alt="" draggable="false">')
+        + '</span>';
       /* 🔴 **정식 이름(병기 포함) 그대로 부른다**(2026-08-29 `90ab51e`).
          ■ 왜 — 고를 때와 저장 뒤 이름이 같아야 한다. 예전에 이 화면만 짧게 불렀더니
            「고를 때는 마라시즈닝인데 저장하면 마라시즈닝(고춧가루)」라 달라 보였다(사용자님 지적).
