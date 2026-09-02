@@ -4506,6 +4506,12 @@ a[href] {
   background: var(--bg-cream);
   border-radius: inherit;
 }
+/* 🔴 기본 이미지(2026-09-02 사용자님 확정) — 소스 담긴 종지에 숟가락. 크림 바탕 위에 통째로 보이게 `contain`.
+   사방 6% 여백을 둔다 — 종지가 칸 가장자리에 닿으면 사진처럼 「잘린」 느낌이 난다. 상세 칸(343px)·카드(약 170px)가 같은 규칙이다. */
+.hc-mine-thumb > img {
+  width: 100%; height: 100%; display: block; box-sizing: border-box;
+  object-fit: contain; padding: 6%;
+}
 /* 1~5위 순위 배지: 전부 같은 검정 알약(쿠팡이츠 방식, 2026-07-25 — 1위만 금색+왕관이던 처리는
    되돌림). 1~3위는 메달 아이콘(.hp-medal)이 앞에 붙어 폭만 넓어지고, 높이는 5개 전부 동일해야
    하므로 inline-flex + 고정 line-height로 img가 baseline에 영향 주지 않게 막는다. 폭은
