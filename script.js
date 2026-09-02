@@ -2934,7 +2934,7 @@
      ■ 왜 이 그림인가 — 「다 만들어 놓은 소스」라는 뜻. 방울이 떨어지는 그림은 「넣는 중」이라 직접 추가한 재료 쪽(`renderIngList`)에 쓴다.
        처음엔 반대로 배정했다가 사용자님이 바로잡으셨다(review/기타재료-그림-요청-2026-09-02.md 맨 위).
      ■ `r.img` 에는 **넣지 않는다** — 그 자리에 넣으면 공유 이미지(`내소스그림만들기`)와 이야기 배경까지 이 그림이 따라간다.
-       카드·상세 두 자리만 이 함수를 거치므로 여기서만 그린다.
+       카드·상세 두 자리와 소스 만들기 3단계 미리보기(`미리보기그리기`, 2026-09-03 추가)가 이 함수를 거친다.
      ■ 목록 카드와 상세 칸(343px)이 같은 그림을 쓴다 — 1080 한 장으로 둘 다 선명하다. 크림 배경 위에 `contain` 으로 앉힌다(styles.css). */
   function mineThumbHtml() {
     return '<span class="hc-mine-thumb" aria-hidden="true">'
@@ -6500,6 +6500,20 @@
       }
     }
 
+    /* 🔴 내 소스 **사진**도 창 사이를 맞춘다(2026-09-03). 사진은 기기에만 있지만 같은 브라우저의
+       창 둘은 저장소를 같이 쓴다 — 한쪽이 사진을 넣거나 지운 뒤 다른 쪽이 낡은 사진표를 통째로
+       다시 쓰면(`saveMySaucePhotos` 는 표 전체를 저장한다) 그 사진이 사라진다.
+       ⚠️ 여기서도 `saveMySaucePhotos()` 를 부르지 않는다 — 읽어 오는 자리다. */
+    if (syncAll || key === MY_SAUCE_PHOTOS_KEY) {
+      let 저장된사진 = null;
+      try { 저장된사진 = JSON.parse(localStorage.getItem(MY_SAUCE_PHOTOS_KEY) || 'null'); } catch (e) { 저장된사진 = null; }
+      if (저장된사진 && typeof 저장된사진 === 'object') {
+        mySaucePhotos = 저장된사진;
+        (mySauceData.records || []).forEach((r) => browseCardCache.delete(r.id));
+        if (showMySauceOnly) renderList();
+      }
+    }
+
     // 🔴 다른 탭에서 코드를 불러오면 이 탭도 그 코드를 따라간다(5차 교차검증 1번).
     //   이 항목만 빠져 있어서, 탭1이 코드 A를 불러온 뒤 탭2에서 B를 불러오면 **탭1은 계속 A로
     //   전송했다.** 다른 데이터는 이 함수가 이미 탭 사이를 맞추고 있으므로 코드도 같이 맞춘다.
@@ -6521,7 +6535,12 @@
   window.addEventListener('storage', (e) => {
     if (e.key === null) {
       syncExternalState();
-    } else if ([FAVORITES_KEY, LIKED_KEY, LIKE_COUNTS_KEY, STAMPS_KEY, SYNC_CODE_KEY].includes(e.key)) {
+    } else if ([FAVORITES_KEY, LIKED_KEY, LIKE_COUNTS_KEY, STAMPS_KEY, SYNC_CODE_KEY,
+                MY_SAUCES_KEY, MY_SAUCE_PHOTOS_KEY].includes(e.key)) {
+      /* 🔴 내 소스 두 키(2026-09-03 전체 검사에서 코덱스가 잡음). `syncExternalState()` 안에는
+         `MY_SAUCES_KEY` 처리가 2026-08-27 부터 있었는데 **이 목록에만 빠져 있어서** 창 둘을 띄우면
+         한쪽에서 저장한 소스가 다른 쪽에 새로고침 전까지 안 보였고, 그 낡은 창이 다시 저장하면
+         **새 소스를 옛 목록으로 덮어쓸 수 있었다.** 사진 키도 같은 이유로 같이 맞춘다. */
       syncExternalState(e.key);
     }
   });
@@ -8506,9 +8525,12 @@
        🔴 재료 줄은 상세 모달과 **같은 부품**(`renderIngList`)으로 그린다. */
     function 미리보기그리기() {
       const 썸 = document.getElementById('saucePreviewThumb');
+      /* 🔴 사진이 없으면 **카드·상세와 같은 기본 그림**(`mineThumbHtml`)을 보인다(2026-09-03 전체 검사 뒤 정리).
+         2026-08-29 엔 이 자리를 비워 뒀지만, 9/2 에 카드·상세에 기본 그림이 들어가면서 여기만 빈 상자로 남아
+         「저장한 뒤 보게 될 모습 그대로」(위 주석)와 어긋났다. 사용자가 넣은 사진이 있으면 그것만 보인다. */
       썸.innerHTML = 고른사진
         ? '<img src="' + 고른사진 + '" alt="">'
-        : '';
+        : mineThumbHtml();
       썸.classList.toggle('is-empty', !고른사진);
       document.getElementById('saucePreviewName').textContent = nameInput.value.trim();
       renderTasteRow(document.getElementById('saucePreviewTastes'), 고른맛);
