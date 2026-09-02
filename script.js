@@ -679,6 +679,10 @@
                   '매콤한', '얼얼한', '알싸한', '묵직한', '느끼한',
                   '깔끔한', '담백한', '향긋한', '감칠맛'];
 
+  /* 🔴 소스바 재료 그림(`assets/sauce-bar/<재료 이름>.webp`) 캐시 번호 — 그림을 갈아 끼우면 1 올린다.
+     쓰는 곳 둘: 소스 만들기의 재료 고르는 화면(`줄HTML`) · 레시피 상세의 재료 줄(`renderIngList`, 2026-09-02 확정).
+     안 올리면 폰이 옛 그림을 계속 보여 준다(다른 `?v=` 와 같은 이유). */
+  const SAUCE_IMG_V = 2;
   const MY_SAUCE_PHOTOS_KEY = 'haidilao_my_sauce_photos';
   let mySaucePhotos = {};
   try {
@@ -3110,7 +3114,17 @@
       row.className = 'ing-row' + (이름반복 ? ' ing-row--same' : '') + (옵션 ? ' ing-row--opt' : '');
       /* 🔴 `escHtml` 을 거친다 — 「나만의 소스」의 **직접 입력 재료는 사용자님이 치는 글자**라
          그대로 얹으면 `<b>` 같은 것이 글자가 아니라 명령으로 읽힌다(맨 위 `escHtml` 주석). */
+      /* 🔴 **재료 그림 칸(2026-09-02 사용자님 확정).** 소스바 재료면 `assets/sauce-bar/` 그림을 36px 로 붙인다(320px 에서는 30px — styles.css).
+         ■ 왜 — 재료 10줄을 이름을 다 읽지 않고 색으로 훑고, 매장 통 앞에서 내용물 색으로 대조한다. 오향우육처럼 낯선 이름은 그림이 설명을 맡는다(㉗).
+         ⚠️ 공유 이미지(카톡 카드)에는 아직 안 넣었다 — 화면과 카드가 달라 보이는 것을 알고 두신 것이다.
+         ■ 이름이 반복되는 줄과 소스바에 없는 재료(내 소스의 직접 입력 「기타」)는 **빈 칸**만 둔다 — 그래야 이름 세로줄이 맞는다.
+         ■ 파일이 없는 재료(사진 대기분 7)는 `onerror` 로 img 만 빠지고 빈 칸이 남는다. 재료 고르는 화면과 같은 방식이다.
+         ■ 소스바에 없는 이름에는 img 자체를 안 만든다 — 없는 파일을 매번 청하지 않으려는 것이다. */
+      const 그림 = (!이름반복 && SAUCE_BAR.indexOf(i[0]) >= 0)
+        ? '<img src="assets/sauce-bar/' + escHtml(i[0]) + '.webp?v=' + SAUCE_IMG_V + '" alt="" draggable="false" onerror="this.remove()">'
+        : '';
       row.innerHTML = `
+        <span class="ing-pic" aria-hidden="true">${그림}</span>
         <span class="ing-name">${이름반복 ? '' : escHtml(i[0])}${옵션 ? `<span class="ing-opt">${escHtml(옵션)}</span>` : ''}</span>
         <span class="ing-amt">${escHtml(i[1])}</span>
         <span class="ing-unit">${escHtml(i[2])}</span>
@@ -7566,8 +7580,6 @@
     /* 🔴 소스 만들기에서 고를 수 있는 재료 — `만들기제외` 를 뺀 것이다(그 주석 참고).
        ⚠️ **검색으로도 안 나온다.** 걸러 낸 뒤에 찾기 때문이다. */
     const 고를수있는재료 = SAUCE_BAR.filter((n) => 만들기제외.indexOf(n) < 0);
-    /* 재료 그림 캐시 번호 — `assets/sauce-bar/*.webp` 를 갈아 끼우면 1 올린다(아래 `줄HTML` 의 thumb 주석 참고). */
-    const SAUCE_IMG_V = 1;
     /* 🔴 **그림 파일이 없는 재료를 기억해 둔다** — 목록은 검색 글자를 칠 때마다 통째로 다시 그려지는데,
        그때마다 없는 파일을 41번씩 다시 청하면 낭비다(첫 한 번은 어쩔 수 없다). 한 번 실패한 이름은
        다음부터 img 를 아예 안 넣는다. 페이지를 새로 열면 비워지므로 파일을 넣은 뒤 새로고침하면 뜬다.

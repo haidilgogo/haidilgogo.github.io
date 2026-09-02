@@ -1991,8 +1991,28 @@ a[href] {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 0;
+  padding: 6px 0;   /* 🔴 2026-09-02 사용자님 확정: 11px 이었다. 36px 그림 칸이 들어와 줄이 40 → 48px 가 되도록 줄였다 */
   border-bottom: 1px solid rgba(0, 0, 0, .05);
+}
+/* 🔴 재료 그림 칸(2026-09-02 사용자님 확정). 재료 고르는 화면(.si-thumb.has-img)의 그림을 36px 로 줄인 것이다.
+   🔴 **배경은 투명**이다(사용자님) — 재료 줄이 이미 테두리 상자 안에 있어서 칸마다 크림 상자를 또 두면 상자 속 상자가 된다.
+      그림자는 메뉴 탭 값 그대로. 파일이 없으면 img 가 빠지고 **빈자리**만 남아 이름 세로줄을 지킨다. */
+.ing-pic {
+  flex: none; width: 36px; height: 36px;
+  overflow: hidden;
+}
+.ing-pic > img {
+  width: 100%; height: 100%; object-fit: contain; display: block;
+  filter: drop-shadow(0 0.5px 1px rgba(80, 30, 20, 0.22)) drop-shadow(0 1px 2px rgba(80, 30, 20, 0.13));
+}
+/* 🔴 320px(아이폰 SE 1세대)에서만 그림을 30px 로, 간격을 8px 로 줄인다(2026-09-02 사용자님).
+   36px 그림이 들어오면서 이름 칸이 154 → 106px 로 좁아져 `산고추(고추장아찌)`·`마라시즈닝(고춧가루)` 둘이 두 줄로 감겼다(실측).
+   375px 부터는 칸이 161px 라 문제없다. 이렇게 하면 320px 이름 칸이 124px 로 넓어져 41가지가 다 한 줄이다(실측).
+   ⚠️ 줄 높이도 48 → 42px 로 낮아진다 — 그림이 줄에서 가장 높은 요소라서다. */
+@media (max-width: 340px) {
+  .ing-row { gap: 8px; }
+  .ing-pic { width: 30px; height: 30px; }
+  .ing-amt { min-width: 26px; }
 }
 
 .ing-name {
@@ -6955,15 +6975,22 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   flex: none;
   width: 80px;
   height: 80px;
-  border-radius: 10px;
+  border-radius: 8px;           /* 🔴 메뉴 탭 썸네일(.mn-card-thumb)과 같은 값(2026-09-02 사용자님 확정). 10 이었다 */
   background: #F4EDE4;
   border: 1px dashed #DFCEBA;   /* 🔴 점선은 「아직 비었다」는 표시다. 그림이 뜬 칸만 아래 .has-img 가 지운다 */
   overflow: hidden;
 }
 .si-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* 그림이 실제로 뜬 칸(2026-09-02). script.js 가 img 의 onload 에서 붙인다 — 파일이 없는 재료는 점선 그대로다.
+/* 그림이 실제로 뜬 칸(2026-09-02). script.js 가 img 의 load 에서 붙인다 — 파일이 없는 재료는 점선 그대로다.
+   🔴 **메뉴 탭 썸네일(.mn-card-thumb)과 같은 처리다**(2026-09-02 사용자님 지적) — 크림 배경 #FBF4E6 위에 그림을 두고
+      그림에 두 겹 그림자. 같은 80px 그릇 그림이 화면마다 다르게 보이면 안 된다. 값은 거기서 그대로 가져왔다 — 새로 정한 값이 아니다.
+      ⚠️ 배경을 투명으로 두면 흰 종지가 흰 줄에 묻힌다(메뉴 탭에서 8/4 에 겪은 것과 같다).
    ⚠️ 테두리를 `none` 으로 하면 1px 만큼 칸이 줄어 줄이 흔들린다. 색만 투명하게 한다. */
-.si-thumb.has-img { border-color: transparent; background: transparent; }
+.si-thumb.has-img { border-color: transparent; background: #FBF4E6; }
+.si-thumb.has-img > img {
+  object-fit: contain;
+  filter: drop-shadow(0 0.5px 1px rgba(80, 30, 20, 0.22)) drop-shadow(0 2px 3.5px rgba(80, 30, 20, 0.13));
+}
 .si-row:last-child { border-bottom: 0; }
 .si-row.is-on { background: #FFF9F7; }
 /* 🔴 이름은 **두 줄까지** 간다(2026-08-25 실측). 그림 자리(62px)가 들어오면서 이름 칸이 99px 로
