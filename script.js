@@ -535,7 +535,7 @@
         '국물에 넣어 익혀 먹는다',
       ],
       tip: '' },
-    { id: 'e4', cat: '히든메뉴', emoji: '🌯', img: 'assets/cards/두유피말이.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBF0DC,#EBD8B0)', name: '두유피말이', source: 'Instagram @lee._.soom', desc: '두유피튀김을 전골에 담갔다 빼서 고기랑 돌돌돌 말아가지고 전골에 푸우우우욱 익혀서 호록하고 먹는 히든 메뉴이다.',
+    { id: 'e4', cat: '히든메뉴', emoji: '🌯', img: 'assets/cards/두유피말이.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBF0DC,#EBD8B0)', name: '두유피말이', source: 'Instagram @lee._.soom', desc: '두유피튀김을 전골에 담갔다 빼서 고기랑 돌돌돌 말아가지고 전골에 푸우우우욱 익혀서 호록하고 먹는 히든 메뉴이다.',
       order: [['두유피튀김', '1', '인분'], ['우삼겹', '1', '인분'], ['새우완자', '1', '인분'], ['거름망', '', '']],
       ings: [],
       steps: [
