@@ -2455,6 +2455,30 @@ a[href] {
 .ing-row--opt {
   align-items: flex-start;
 }
+/* 「우유/청유 마라훠궈」 두 줄 펼침(2026-09-03) — 첫 줄은 구분선을 빼고, 사이에 작은 「또는」. 들여쓰기는 이름 칸에 맞춘다(그림 36 + 간격 12). */
+.ing-row--pair { border-bottom: none; padding-bottom: 2px; }
+.ing-or {
+  padding: 0 0 2px calc(36px + 12px);
+  font-size: 12px;
+  color: #AD8177;   /* .ing-opt 와 같은 색 — 덧붙는 말 */
+}
+@media (max-width: 340px) {
+  .ing-or { padding-left: calc(30px + 8px); }
+}
+
+/* 그릇별 묶음(2026-09-03 사용자님 확정, 안 B — 그릇마다 상자 따로). script.js `renderIngGroups`.
+   #modalIngs 가 묶음일 때 .ing-box 대신 .ing-groups 가 되고, 안에 「N번 그릇」 라벨 + .ing-box 가 반복된다.
+   라벨 색·굵기는 .modal-section-title(제목)보다 한 단계 아래 — 「소스바」 제목 밑의 소제목이라서. */
+.ing-groups > .bowl-lab {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8A5A48;
+  padding: 0 6px 6px;
+}
+.ing-groups > .bowl-lab + .ing-box + .bowl-lab { margin-top: 14px; }
+/* 「1그릇 × 3」의 「× 3」만 재료 양과 같은 빨강 + 한 단계 굵게(2026-09-04 사용자님 확정).
+   13px 라벨이라 굵기만으로는 차이가 잘 안 보여 색을 같이 쓴다. 그릇마다 내용이 같은 탕에서만 나온다. */
+.ing-groups > .bowl-lab > .bowl-x { color: var(--brand-red); font-weight: 800; }
 
 .ing-opt {
   display: block;
@@ -6539,6 +6563,16 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   gap: 8px;
   margin: 0 0 14px;
 }
+/* 질문과 예/아니오 사이 한 줄 안내(2026-09-03) — 「아니오」면 기본 이미지가 들어간다는 것을 고르기 전에 알린다.
+   제보 페이지 `.rp-help` 와 같은 자리·크기. 질문(`.stamp-q` 아래 여백 10)에 4 를 당겨 붙이고, 버튼과는 10 을 둔다. */
+.sauce-yn-hint {
+  margin: -4px 0 10px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #9A8A83;   /* --text-muted */
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+}
+.sauce-yn-hint-no { color: #A2553F; font-weight: 700; }   /* 「아니오」만 갈색 굵게 — 맛 알약 글자색과 같다(대비 4.86). 빨강은 경고처럼 읽혀 안 씀 */
 .sauce-yn-btn {
   flex: 1;
   height: 44px;

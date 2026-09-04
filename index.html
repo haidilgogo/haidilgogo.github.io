@@ -75,7 +75,7 @@
 <link rel="image_src" href="/assets/icons/og-image-v6.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="styles.css?v=909">
+<link rel="stylesheet" href="styles.css?v=918">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -871,7 +871,12 @@
            🔴 **수정으로 들어오면 답을 기억한다** — 사진이 있던 소스는 「예」, 없던 소스는 「아니오」로
               시작한다. 이름·팁을 불러오는 것과 같은 규칙이다(빈 채로 두면 매번 다시 답해야 한다). -->
       <p class="stamp-q">소스 이미지가 있나요?<span class="stamp-q-star" aria-hidden="true">*</span></p>
-      <div class="sauce-yn" id="saucePhotoAsk" role="radiogroup" aria-label="소스 이미지가 있나요?">
+      <!-- 🔴 「아니오」면 기본 이미지가 들어간다는 안내(2026-09-03 사용자님 확정). **항상 보이고, 질문과 버튼 사이**에 둔다 —
+           제보 페이지의 「질문 → 안내 한 줄(.rp-help) → 입력칸」 순서와 같다. 고르기 전에 알려 주는 것이 목적이라
+           「아니오」를 누른 뒤에만 보이는 안은 접었고, 3단계에는 안 적는다(이미 그림이 보인다).
+           「아니오」는 버튼 이름 그대로 꺾쇠로 감싸고 갈색 굵게 — 빨강은 필수 표시·켜진 상태에 쓰므로 안내문에서는 경고처럼 읽힌다(2안). -->
+      <p class="sauce-yn-hint" id="saucePhotoHint"><b class="sauce-yn-hint-no">「아니오」</b>를 선택하면 기본 이미지가 보여요</p>
+      <div class="sauce-yn" id="saucePhotoAsk" role="radiogroup" aria-label="소스 이미지가 있나요?" aria-describedby="saucePhotoHint">
         <button class="sauce-yn-btn" id="saucePhotoYes" type="button" role="radio" aria-checked="false">예</button>
         <button class="sauce-yn-btn" id="saucePhotoNo" type="button" role="radio" aria-checked="false">아니오</button>
       </div>
@@ -1566,7 +1571,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=7"></script>
-<script src="script.js?v=936"></script>
+<script src="script.js?v=953"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
