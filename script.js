@@ -446,7 +446,7 @@
       ings: [['양파', '3', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '2', '스푼'], ['청유훠궈소스', '4', '스푼'], ['굴소스', '0.33', '스푼'], ['완자간장소스', '0.5', '스푼']],
       steps: [],
       tip: '' },
-    { id: 'b3', cat: '탕', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
+    { id: 'b3', cat: '탕', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
       order: [['맑은 탕/맹물', '', '']],
       /* 🔴 다섯 번째 칸 = 몇 번 그릇(2026-09-04 사용자님 확정). 소스 그릇 2개를 쓴다.
          1번 = 완자간장소스 한 그릇 가득 · 2번 = 나머지 재료 전부. */
@@ -457,7 +457,7 @@
         '소스 그릇에 덜어둔 물로 취향에 맞게 간을 맞춘다',
       ],
       tip: '' },
-    { id: 'b4', cat: '탕', emoji: '🍲', img: 'assets/cards/토마토탕.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 토마토탕이다.',
+    { id: 'b4', cat: '탕', emoji: '🍲', img: 'assets/cards/토마토탕.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#FFE9E0,#FFC9B8)', name: '토마토탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 토마토탕이다.',
       order: [['맑은 탕/맹물', '', ''], ['청유마라훠궈', '1~2', '국자']],   // 2026-09-04 사용자님 확정 — 토마토탕은 청유만
       ings: [['방울토마토', '', '넉넉하게'], ['굴소스', '3', '스푼']],
       steps: [
@@ -472,7 +472,7 @@
        ■ 43스푼이라 소스 그릇 하나에 안 들어간다. 글에도 「한번에 다 안 담기니 나눠서 담으셔요」만 있고 그릇 나눔은 없다 → 그릇 개수를 정하지 않고 만드는 법 2번 문장으로만 적는다(사용자님 문장).
        ■ 그릇 나눔 후보(미확정 — 직접 담아 본 뒤에만 반영): 1) 땅콩참깨 5 / 2) 완자간장 4·굴소스 5·소금 / 3) 참기름 4·산초기름 6·다진 마늘 5 / 4) 청유훠궈 6·매운소고기 2·고추기름 6.
        ■ 매운소고기소스 2스푼은 글의 「1-2스푼 추천」에서 온 것. 나머지 양은 글과 일치(2026-09-05 대조). */
-    { id: 'b5', cat: '탕', emoji: '🍲', img: 'assets/cards/마라훠궈탕.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '마라훠궈탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라훠궈탕이다.',
+    { id: 'b5', cat: '탕', emoji: '🍲', img: 'assets/cards/마라훠궈탕.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#F2DDD3,#D9A48F)', name: '마라훠궈탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 마라훠궈탕이다.',
       order: [['맑은 탕/맹물', '', '']],
       ings: [['청유훠궈소스', '6', '스푼'], ['산초기름(화조유)', '6', '스푼'], ['굴소스', '5', '스푼'], ['고추기름', '6', '스푼'], ['땅콩참깨소스', '5', '스푼'], ['다진 마늘', '5', '스푼'], ['완자간장소스', '4', '스푼'], ['참기름', '4', '스푼'], ['소금', '', '한 꼬집'], ['매운소고기소스', '2', '스푼']],
       steps: [
@@ -565,7 +565,7 @@
         '국물에 넣어 익혀 먹는다',
       ],
       tip: '' },
-    { id: 'e4', cat: '히든메뉴', emoji: '🌯', img: 'assets/cards/두유피말이.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBF0DC,#EBD8B0)', name: '두유피말이', source: 'Instagram @lee._.soom', desc: '두유피튀김을 전골에 담갔다 빼서 고기랑 돌돌돌 말아가지고 전골에 푸우우우욱 익혀서 호록하고 먹는 히든 메뉴이다.',
+    { id: 'e4', cat: '히든메뉴', emoji: '🌯', img: 'assets/cards/두유피말이.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#FBF0DC,#EBD8B0)', name: '두유피말이', source: 'Instagram @lee._.soom', desc: '두유피튀김을 전골에 담갔다 빼서 고기랑 돌돌돌 말아가지고 전골에 푸우우우욱 익혀서 호록하고 먹는 히든 메뉴이다.',
       order: [['두유피튀김', '1', '인분'], ['우삼겹', '1', '인분'], ['새우완자', '1', '인분'], ['거름망', '', '']],
       ings: [],
       steps: [
@@ -660,14 +660,48 @@
      기록 하나 = `{ id, name, ings: [[재료, 양, 단위]], tip, addedAt, editedAt }`
      🔴 `deleted` 는 **지운 id 목록**이다. 안 남기면 다른 기기와 합칠 때 지운 소스가 되살아난다. */
   let mySauceData = { version: 1, records: [], deleted: [] };
+  /* 🔴 **기록을 하나씩 검사해 이상한 것만 걸러 낸다**(2026-09-05 배포 전 검사 F02, 코덱스 발견).
+     저장값·서버값의 JSON 이 통째로 깨진 것은 위 try/catch 가 막지만, **기록 한 칸이 `null` 이거나
+     `ings` 가 목록이 아니면** 목록 정렬(`addedAt` 읽기)·상세(`ings.map`)에서 오류가 나 「내 소스」
+     탭이 통째로 안 열렸다.
+     ■ 서버 쪽: Firebase 는 목록을 `{0:…,1:…}` 로 저장하므로 앞 칸이 비면 `[null, …]` 로 돌아온다
+       (에뮬레이터 실측). **앞 칸 `null` 만이라면** `기록합치기` 가 건너뛰어 안 걸렸다(원본 코드로 실측,
+       2026-09-05). 그러나 서버가 `ings` 가 목록이 아닌 기록을 보내면 옛 코드는 상세에서 멈췄다(코덱스 실측).
+       잘못된 자료가 실제로 어떤 경로로 생기는지는 다 입증하지 못했으므로, 세 갈래(저장값·다른 창·서버) 모두
+       여기서 막는다.
+     ■ 멀쩡한 기록은 **같은 객체 그대로** 돌려준다(복사하지 않는다) — 지문(fingerprint)이 안 바뀌어
+       불필요한 서버 push 가 생기지 않는다. 고칠 것이 있는 기록만 새 객체로 만든다.
+     ■ `id` 없는 기록은 버린다(합치기·삭제 묘비가 id 로 움직인다). */
+  function 내소스기록정돈(목록) {
+    if (!Array.isArray(목록)) return [];
+    const 결과 = [];
+    목록.forEach((r) => {
+      if (!r || typeof r !== 'object' || typeof r.id !== 'string' || !r.id) return;
+      const ings = Array.isArray(r.ings) ? r.ings.filter((i) => Array.isArray(i) && typeof i[0] === 'string') : [];
+      const 그대로 = Array.isArray(r.ings) && ings.length === r.ings.length
+        && (r.name === undefined || typeof r.name === 'string')
+        && (r.tip === undefined || typeof r.tip === 'string')
+        && (r.tastes === undefined || Array.isArray(r.tastes));
+      결과.push(그대로 ? r : Object.assign({}, r, {
+        ings,
+        name: typeof r.name === 'string' ? r.name : '',
+        tip: typeof r.tip === 'string' ? r.tip : '',
+        tastes: Array.isArray(r.tastes) ? r.tastes : [],
+      }));
+    });
+    return 결과;
+  }
+  function 지운목록정돈(목록) {
+    return Array.isArray(목록) ? 목록.filter((id) => typeof id === 'string' && id) : [];
+  }
   try {
     const 저장된내소스 = JSON.parse(localStorage.getItem(MY_SAUCES_KEY));
     if (저장된내소스 && Array.isArray(저장된내소스.records)) {
       mySauceData = {
         version: 1,
-        records: 저장된내소스.records,
+        records: 내소스기록정돈(저장된내소스.records),
         // 옛 저장값에 `deleted` 가 없을 수 있다 — 없으면 빈 목록으로 시작한다
-        deleted: Array.isArray(저장된내소스.deleted) ? 저장된내소스.deleted : [],
+        deleted: 지운목록정돈(저장된내소스.deleted),
       };
     }
   } catch (e) { /* 손상된 저장값은 무시하고 새로 시작 */ }
@@ -4182,14 +4216,26 @@
     });
   });
   function 내소스지우기(지울id) {
+    const 이전기록 = mySauceData.records;
+    const 이전지운것 = mySauceData.deleted.slice();
     mySauceData.records = mySauceData.records.filter((r) => r.id !== 지울id);
     if (mySauceData.deleted.indexOf(지울id) === -1) mySauceData.deleted.push(지울id);
+    /* 🔴 **기록 저장이 성공한 뒤에만 사진을 지운다**(2026-09-05 배포 전 검사 F01, 코덱스 발견).
+       예전엔 사진을 먼저 지우고 기록 저장을 나중에 했다. 기록 저장이 실패하면(저장 공간 부족 등)
+       소스는 남는데 **사진만 사라진 채** 「지웠어요」라고 알렸다 — 새로고침하면 소스가 사진 없이 돌아왔다.
+       ■ 실패하면 기록을 되돌리고 실패 알림을 낸다. 상세 창은 그대로 두어 다시 시도할 수 있게 한다.
+       ■ 알림 문구 「소스를 지우지 못했어요」는 만들기 실패 문구(「소스 만들기에 실패했어요」)와 같은 꼴. */
+    if (!saveMySauces()) {
+      mySauceData.records = 이전기록;
+      mySauceData.deleted = 이전지운것;
+      showShareToast('소스를 지우지 못했어요');
+      return;
+    }
     /* 🔴 **사진도 같이 지운다**(2026-08-29). 안 지우면 소스는 사라졌는데 사진만 남아
        저장 공간을 계속 먹는다 — 눈에 안 보이는 자료라 아무도 못 알아챈다.
        ⚠️ `deleted` 에는 id 만 남으므로 사진은 다른 기기에서 되살아날 일이 없다(원래 안 실린다). */
     delete mySaucePhotos[지울id];
     saveMySaucePhotos();
-    saveMySauces();
     browseCardCache.delete(지울id);
     closeModal();
     renderList();
@@ -6646,7 +6692,7 @@
       const 저장된것 = readStoredObject(MY_SAUCES_KEY);
       if (Array.isArray(저장된것.records) || localStorage.getItem(MY_SAUCES_KEY) === null) {
         mySauceData = Array.isArray(저장된것.records)
-          ? { version: 1, records: 저장된것.records, deleted: Array.isArray(저장된것.deleted) ? 저장된것.deleted : [] }
+          ? { version: 1, records: 내소스기록정돈(저장된것.records), deleted: 지운목록정돈(저장된것.deleted) }   // F02: 다른 창이 쓴 값도 검사
           : { version: 1, records: [], deleted: [] };
         // 내용이 어떻게 달라졌는지 견줄 방법이 없는 자리다 — 카드 저장분은 통째로 비운다(내 소스 것만).
         mySauceData.records.forEach((r) => browseCardCache.delete(r.id));
@@ -7195,8 +7241,8 @@
       const 이전내소스 = mySauceData.records || [];
       mySauceData = {
         version: 1,
-        records: p.mySauces.records || [],
-        deleted: p.mySauces.deleted || [],
+        records: 내소스기록정돈(p.mySauces.records),   // F02: 서버에서 온 값도 검사(Firebase 빈 칸 → null)
+        deleted: 지운목록정돈(p.mySauces.deleted),
       };
       try { localStorage.setItem(MY_SAUCES_KEY, JSON.stringify(mySauceData)); } catch (e) { /* 무시 */ }
       /* 🔴 **다른 기기에서 지운 소스의 사진도 여기서 지운다**(2026-09-02 전체 검사에서 잡음).
@@ -8160,7 +8206,11 @@
       overlay.classList.add('open');
       // 다시 열 때는 늘 맨 위에서 시작한다(스티커 시트와 같은 이유 — opacity 로만 여닫혀 자리가 남는다)
       listEl.scrollTop = 0;
-      requestAnimationFrame(() => focusDialogClose(closeBtn));
+      /* 🔴 **초점이 실제로 닿을 때까지 다시 시도한다**(2026-09-05 배포 전 검사 F03, 코덱스 발견).
+         이 시트는 스티커 시트처럼 `opacity`·`visibility` 전환(0.22초)으로 열려서, 첫 프레임에 한 번만
+         `focus()` 하면 아직 안 보이는 버튼이라 초점이 **창 밖(연 버튼)에 그대로 남았다.**
+         스티커 시트가 쓰는 `focusDialogCloseWhenReady` 와 같은 방법으로 맞춘다. */
+      focusDialogCloseWhenReady(closeBtn);
     }
     /* `초점복귀: false` 는 **저장하고 나갈 때** 쓴다(2026-08-27) — 그때는 화면이 「내 소스」 목록으로
        옮겨 가고 `내소스로가기()` 가 초점을 그 탭에 내려앉힌다. 여기서 홈 박스로 되돌리면
