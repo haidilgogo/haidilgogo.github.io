@@ -2968,7 +2968,8 @@
      ■ 왜 이 그림인가 — 「다 만들어 놓은 소스」라는 뜻. 방울이 떨어지는 그림은 「넣는 중」이라 직접 추가한 재료 쪽(`renderIngList`)에 쓴다.
        처음엔 반대로 배정했다가 사용자님이 바로잡으셨다(review/기타재료-그림-요청-2026-09-02.md 맨 위).
      🔴 2026-09-03 실기기 확인 뒤 **다시 바꿔 끼웠다**(사용자님 지시, 보고 판단) — 지금 이 파일(`_내소스기본.webp`)은 **방울 그림**,
-       재료 줄의 `_직접입력.webp` 는 **소스 담긴 종지**다. 방울 그림은 세로로 길어 36px 에선 종지가 콩알만 했기 때문.
+       재료 줄의 `_직접입력.webp` 는 **소스 담긴 종지**였다. 방울 그림은 세로로 길어 36px 에선 종지가 콩알만 했기 때문.
+       ⚠️ 2026-09-05 — 직접 입력 재료에는 **그림을 안 넣기로**(사용자님) 해서 `_직접입력.webp` 는 지웠다(변환기 EXTRA 에서도 뺌).
        파일 이름은 그대로 두고 내용만 바꿨다(`make_sauce_bar_images.py` EXTRA). 되돌리면 이 주석도 같이.
      ■ 2026-09-05 — 방울 그림을 **사용자님이 픽셀메이터로 종지를 키운 판**(`_내소스기본-가로.png`)으로 갈았다(배치는 그대로 = 방울이 내 소스 기본).
        36px 에서 종지가 콩알만 하던 문제를 그림 쪽에서 풀었다. 종지 밑에 바닥 그림자(#3C2814, 흐림)도 사용자님이 넣었다 — 다른 재료 그림 41장에는 그림자가 없다(이 그림만 내 소스 카드용이라 다르게 봄).
@@ -3175,7 +3176,9 @@
     if (Object.prototype.hasOwnProperty.call(ORDER_IMG, name)) {
       return ORDER_IMG[name] ? '<img src="assets/menu/' + escHtml(ORDER_IMG[name]) + '.webp" alt="" draggable="false" onerror="this.remove()">' : '';
     }
-    return '<img src="assets/sauce-bar/_직접입력.webp?v=' + SAUCE_IMG_V + '" alt="" draggable="false" onerror="this.remove()">';
+    /* 🔴 소스바에 없는 이름(내 소스의 「기타」 직접 입력)은 **그림을 안 넣는다**(2026-09-05 사용자님 확정 — 「사진 없는 게 낫다」).
+       2026-09-02~09-05 에는 공통 그림 `_직접입력.webp`(소스 담긴 종지)를 넣었었다. 빈 칸(`.ing-pic`)은 그대로 두어 이름 세로줄을 맞춘다. */
+    return '';
   }
   /* 🔴 그릇별 묶음(2026-09-03 사용자님 확정 — 「안 B: 그릇마다 상자 따로」). 탕은 소스바 재료를 그릇 여러 개에 나눠 담는다.
      `ings` 다섯 번째 칸이 그릇 번호(1·2·3 또는 '2·3' 같은 묶음)다. 한 줄이라도 있으면 「N번 그릇」 라벨 + 상자로 나눠 그리고,
@@ -3265,9 +3268,9 @@
          ■ 이름이 반복되는 줄과 소스바에 없는 재료(내 소스의 직접 입력 「기타」)는 **빈 칸**만 둔다 — 그래야 이름 세로줄이 맞는다.
          ■ 파일이 없는 재료(사진 대기분 7)는 `onerror` 로 img 만 빠지고 빈 칸이 남는다. 재료 고르는 화면과 같은 방식이다.
          ■ 소스바에 없는 이름에는 img 자체를 안 만든다 — 없는 파일을 매번 청하지 않으려는 것이다. */
-      /* 🔴 소스바에 없는 이름(내 소스의 「기타」 직접 입력)은 **공통 그림 `_직접입력.webp`**(2026-09-02 사용자님 확정).
+      /* 🔴 소스바에 없는 이름(내 소스의 「기타」 직접 입력)은 **그림 없이 빈 칸**(2026-09-05 사용자님 확정 — 그전엔 공통 그림 `_직접입력.webp`).
          ⚠️ 2026-09-03 부터 이 파일의 내용은 **소스 담긴 종지**다(방울 그림과 바꿔 끼움 — `mineThumbHtml` 주석). 파일 없는 소스바 재료(사진 대기 7)는 그대로 빈자리 — 「곧 온다」와 「원래 없다」를 갈라 둔다. */
-      const 그림 = 이름반복 ? '' : 재료그림HTML(i[0]);   // 소스바 재료 → 그 그림 · 주문 항목 → 메뉴 그림 · 그 밖(직접 입력) → _직접입력
+      const 그림 = 이름반복 ? '' : 재료그림HTML(i[0]);   // 소스바 재료 → 그 그림 · 주문 항목 → 메뉴 그림 · 그 밖(직접 입력) → 빈 칸
       row.innerHTML = `
         <span class="ing-pic" aria-hidden="true">${그림}</span>
         <span class="ing-name">${이름반복 ? '' : escHtml(i[0])}${옵션 ? `<span class="ing-opt">${escHtml(옵션)}</span>` : ''}</span>
@@ -3634,12 +3637,12 @@
     const 사진 = await 그림불러오기(r.img || '');
     /* 🔴 화면과 같은 그림을 카드에도 그린다(2026-09-03 사용자님 지시 — 그전엔 「화면과 달라 보이는 것을 알고」 안 넣었다).
        ■ 사진 없는 내 소스 → 카드·상세와 같은 기본 그림(`_내소스기본`)을 맨 위 칸에 `contain` + 6% 여백으로(`.hc-mine-thumb` 규칙).
-       ■ 재료 줄 → 소스바 재료는 그 재료 그림, 직접 입력은 `_직접입력`. 36px, 이름 앞(`.ing-pic` 과 같은 자리).
+       ■ 재료 줄 → 소스바 재료는 그 재료 그림, 직접 입력은 **그림 없음**(2026-09-05 사용자님 확정). 36px, 이름 앞(`.ing-pic` 과 같은 자리).
        ⚠️ 못 불러오면 `null` — 그 자리만 비우고 계속 그린다(화면의 `onerror` 와 같다). */
     const 기본그림 = 사진 ? null : await 그림불러오기('assets/sauce-bar/_내소스기본.webp?v=' + SAUCE_IMG_V);
     const 재료그림 = {};
     await Promise.all((r.ings || []).map((i) => 정식재료이름(i[0] || '')).filter((n, k, arr) => arr.indexOf(n) === k).map(async (n) => {
-      재료그림[n] = await 그림불러오기('assets/sauce-bar/' + (SAUCE_BAR.indexOf(n) >= 0 ? n : '_직접입력') + '.webp?v=' + SAUCE_IMG_V);
+      재료그림[n] = SAUCE_BAR.indexOf(n) >= 0 ? await 그림불러오기('assets/sauce-bar/' + n + '.webp?v=' + SAUCE_IMG_V) : null;
     }));
     const 전구 = await 그림불러오기('assets/icons/bulb.png?v=1');
     const 로고 = await 그림불러오기('assets/icons/logo-mark-color-v2.png?v=1');
@@ -4043,12 +4046,22 @@
     modalShareBtn.textContent = 원래글자;
     if (!blob) { alert('이미지를 만들지 못했어요'); return; }
     const 파일 = new File([blob], (r.name || '내소스') + '.jpg', { type: 'image/jpeg' });
-    if (navigator.canShare && navigator.canShare({ files: [파일] })) {
+    /* 🔴 **하딜고고 주소를 그림과 함께 실어 보낸다**(2026-09-05 사용자님 — 「주소만 일단 넣어보고 공유 테스트」).
+       ■ 글(text·title)은 안 붙인다 — 주소만. 글 한 줄 + 줄바꿈 안은 사용자님이 시험 뒤 정하기로 함.
+       ■ 받는 앱이 무엇을 쓰는지는 앱마다 다르다 — 아이폰 메시지는 그림+링크, 카카오톡은 그림만 남길 수 있다.
+       ■ 폰 공유 창은 **https 에서만** 열린다(`navigator.share` 는 안전한 문맥 전용). http 시험 주소(192.168.x.x)에서는
+         늘 아래 대비책(길게 눌러 저장)으로 떨어진다 — 앱 잘못이 아니다(2026-09-05 사용자님 질문으로 확인).
+       ⚠️ 주소를 못 싣는 브라우저가 있으면 그림만이라도 보낸다(두 번째 canShare). */
+    const 공유주소 = 'https://haidilgogo.com/';
+    const 시도 = [{ files: [파일], url: 공유주소 }, { files: [파일] }];
+    for (const data of 시도) {
+      if (!(navigator.canShare && navigator.canShare(data))) continue;
       try {
-        await navigator.share({ files: [파일] });
+        await navigator.share(data);
         return;
       } catch (e) {
         if (e && e.name === 'AbortError') return;
+        break;   // 공유 창이 열렸다가 실패한 것이면 그림만으로 다시 시도하지 않고 대비책으로
       }
     }
     공유보기열기(blob);
