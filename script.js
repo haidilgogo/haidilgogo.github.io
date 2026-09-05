@@ -2998,7 +2998,7 @@
      ⚠️ 이모지·색(`tint`)으로 내려가면 안 된다 — 내 소스에는 둘 다 없어서(사용자님이 물리셨다)
         빈 네모와 `undefined` 배경이 그려진다. */
   /* 🔴 **기본 이미지가 들어갔다**(2026-09-02 사용자님 확정 — 「다음 차례」 2번).
-     `assets/sauce-bar/_내소스기본.webp`(1080) — **지금은 숟가락에서 소스 방울이 흰 종지로 떨어지는 그림(방울 그림)**이다. 코덱스가 소스바 재료 그림(43장)과 같은 화풍으로 그렸고,
+     `assets/sauce-bar/내소스기본.webp`(1080. 🔴 2026-09-05 배포 뒤 `_내소스기본` 에서 이름을 바꿈 — GitHub Pages(제킬)는 `_` 로 시작하는 파일을 내보내지 않아 라이브에서 404 였다. 앞으로 배포 파일 이름은 `_` 로 시작하지 않는다) — **지금은 숟가락에서 소스 방울이 흰 종지로 떨어지는 그림(방울 그림)**이다. 코덱스가 소스바 재료 그림(43장)과 같은 화풍으로 그렸고,
      2026-09-05 사용자님이 픽셀메이터로 종지를 키운 판이다(아래 이력 참고).
      ■ (2026-09-02 처음 정할 때는 「소스 담긴 종지에 숟가락」 = 「다 만들어 놓은 소스」 그림이었고, 방울 그림은 직접 입력 재료 쪽에 썼다 — 9/3 에 둘을 바꿔 끼웠고 9/5 에 직접 입력 그림은 없앴다.)
        처음엔 반대로 배정했다가 사용자님이 바로잡으셨다(review/기타재료-그림-요청-2026-09-02.md 맨 위).
@@ -3014,7 +3014,7 @@
      ■ 목록 카드와 상세 칸(343px)이 같은 그림을 쓴다 — 1080 한 장으로 둘 다 선명하다. 크림 배경 위에 `contain` 으로 앉힌다(styles.css). */
   function mineThumbHtml() {
     return '<span class="hc-mine-thumb" aria-hidden="true">'
-      + '<img src="assets/sauce-bar/_내소스기본.webp?v=' + SAUCE_IMG_V + '" alt="" draggable="false"></span>';
+      + '<img src="assets/sauce-bar/내소스기본.webp?v=' + SAUCE_IMG_V + '" alt="" draggable="false"></span>';
   }
   function homeCardBody(r, eager) {
     // 🔴 내 소스는 사진이 없으면 재료 이름이 그 자리를 채운다(바로 위 주석). 이모지·색으로 안 내려간다.
@@ -3671,10 +3671,10 @@
 
     const 사진 = await 그림불러오기(r.img || '');
     /* 🔴 화면과 같은 그림을 카드에도 그린다(2026-09-03 사용자님 지시 — 그전엔 「화면과 달라 보이는 것을 알고」 안 넣었다).
-       ■ 사진 없는 내 소스 → 카드·상세와 같은 기본 그림(`_내소스기본`)을 맨 위 칸에 `contain` + 6% 여백으로(`.hc-mine-thumb` 규칙).
+       ■ 사진 없는 내 소스 → 카드·상세와 같은 기본 그림(`내소스기본.webp`)을 맨 위 칸에 `contain` + 6% 여백으로(`.hc-mine-thumb` 규칙).
        ■ 재료 줄 → 소스바 재료는 그 재료 그림, 직접 입력은 **그림 없음**(2026-09-05 사용자님 확정). 36px, 이름 앞(`.ing-pic` 과 같은 자리).
        ⚠️ 못 불러오면 `null` — 그 자리만 비우고 계속 그린다(화면의 `onerror` 와 같다). */
-    const 기본그림 = 사진 ? null : await 그림불러오기('assets/sauce-bar/_내소스기본.webp?v=' + SAUCE_IMG_V);
+    const 기본그림 = 사진 ? null : await 그림불러오기('assets/sauce-bar/내소스기본.webp?v=' + SAUCE_IMG_V);
     const 재료그림 = {};
     await Promise.all((r.ings || []).map((i) => 정식재료이름(i[0] || '')).filter((n, k, arr) => arr.indexOf(n) === k).map(async (n) => {
       재료그림[n] = SAUCE_BAR.indexOf(n) >= 0 ? await 그림불러오기('assets/sauce-bar/' + n + '.webp?v=' + SAUCE_IMG_V) : null;
