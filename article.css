@@ -194,10 +194,16 @@
    ⚠️ env(safe-area-inset-bottom)를 쓰지 않는다 — 이 사이트는 viewport-fit=cover를 쓰지 않기로
    확정했고(사파리 상단바 회귀), 그러면 env()는 항상 0이라 아무 일도 하지 않는다.
    그래서 앱의 다른 하단 여백과 같은 고정값(모바일 34 / 데스크탑 24)을 쓴다. */
+/* 별도 기사 페이지(body.art-page)의 본문은 앱 안 칼럼 창과 같은 .column-sheet 를 쓴다.
+   앱 안에서는 창(폭은 화면별 시안으로 정함), 여기서는 틀 역할이라 이 페이지에서만 틀 폭을 따른다.
+   2026-09-07 반응형 설계(docs/반응형-설계.md). */
+.art-page .column-sheet {
+  max-width: var(--frame-max);
+}
 .art-footer {
   box-sizing: border-box;
   width: 100%;
-  max-width: 440px;
+  max-width: var(--frame-max); /* 옛 440px — 2026-09-07 반응형 */
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;

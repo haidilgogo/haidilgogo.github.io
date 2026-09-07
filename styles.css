@@ -60,6 +60,10 @@
 
 /* 자주 쓰는 색 이름표(변수). 색을 바꾸려면 여기 한 곳만 고치면 전체에 반영됨 */
 :root {
+  /* 틀(상단바·본문·탭바) 최대 폭 — 2026-09-07 반응형 설계(docs/반응형-설계.md).
+     옛 440 단일 기둥 → 화면 폭에 맞춰 채우되 여기까지. 네이버 PC 메인 실측 1,280(안쪽 여백 20px 포함).
+     폰 폭(≤440)에서는 max-width 가 안 걸리므로 옛 모습과 같다. */
+  --frame-max: 1280px;
   --brand-red: #E0301E;        /* 메인 브랜드 빨강 (버튼·강조·아이콘) */
   --brand-red-hover: #CC2A1A;  /* 버튼 hover 시 진해지는 빨강 */
   --brand-red-active: #B42416; /* 버튼 누를 때(press) 더 진한 빨강 */
@@ -198,7 +202,7 @@ a[href] {
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: var(--frame-max); /* 옛 440px — 2026-09-07 반응형 */
   margin: 0 auto;
   padding: 0 20px; /* 앱 고정폭 440 기둥 → 가로 패딩도 고정(5vw는 모니터 넓으면 40까지 커져 로고↔히어로 정렬 어긋남, 2026-07-21) */
   display: flex;
@@ -637,7 +641,7 @@ a[href] {
 .main {
   flex: 1;
   width: 100%;
-  max-width: 440px;
+  max-width: var(--frame-max); /* 옛 440px — 2026-09-07 반응형 */
   margin: 0 auto;
   padding: 24px 20px 70px;
 }
