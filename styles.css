@@ -730,7 +730,11 @@ a[href] {
 /* 히어로 카드 (1:1, 원본 이미지 안 잘림) */
 .mf-hero {
   position: relative;
-  flex: 0 0 100%;                /* 100% = 패딩 안쪽 폭(컨테이너-40px) — 인셋은 .mf-scroll padding이 담당, 카드 항상 가운데(2026-07-21) */
+  /* 폭 = min(안쪽 폭 100%, 400px) — 2026-09-07 반응형 A안(사용자님 확정, docs/반응형-설계.md).
+     폰(안쪽 폭 < 400)은 예전 100% 그대로(393px 아이폰에서 353, 변경 전과 동일 실측).
+     화면 440부터 400에서 멈추고, 그 위로는 남는 자리에 다음 장이 나란히 붙는다(옆으로 밀기 유지).
+     🔴 미디어쿼리 문턱을 두지 않는다 — 481px에서 440→400으로 뚝 떨어지던 것을 코덱스가 실측해 이렇게 바꿨다. */
+  flex: 0 0 min(100%, 400px);
   scroll-snap-align: center;
   scroll-snap-stop: always;      /* 한 번 스와이프 = 한 장만(빠르게 튕겨도 다음 장에서 멈춤) */
   aspect-ratio: 1 / 1;
@@ -742,6 +746,13 @@ a[href] {
   cursor: pointer;
   /* 그림자 없음(플랫) — 그림자가 간격으로 번져 배경과 다른 띠로 보이던 문제 해결(2026-07-21) */
   -webkit-tap-highlight-color: transparent;
+}
+/* 카드가 안쪽 폭보다 작아지는 441px부터는 왼쪽 정렬 스냅(2026-09-07 반응형 A안).
+   가운데 스냅을 그대로 두면 첫 장이 가운데로 끌려가 왼쪽이 빈다. 440 이하는 카드=100%라 가운데=왼쪽이므로 건드리지 않는다.
+   🔴 위 .mf-hero 블록보다 뒤에 있어야 이긴다(같은 특이성 — 앞에 뒀다가 center 에 덮인 적 있음). */
+@media (min-width: 441px) {
+  .mf-hero { scroll-snap-align: start; }
+  .mf-scroll { scroll-padding-left: 20px; }
 }
 .mf-hero img {
   width: 100%; height: 100%;
