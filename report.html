@@ -194,6 +194,12 @@
 .rp-btn:active { transform: scale(.98); background: var(--bg-cream); }
 .rp-btn--go { background: var(--brand-red); border-color: var(--brand-red); color: #fff; font-weight: 800; }
 .rp-btn--go:active { background: var(--brand-red-active); }
+/* 마우스 hover(2026-09-07 사용자님 지적) — 이미지 출처·개인정보의 닫기(.art-more-btn--close:hover #F7F3EF)와 같은 값,
+   보내기는 앱 버튼 관습대로 --brand-red-hover. 🔴 hover 는 반드시 @media (hover: hover) 안에(터치 기기 잔상 방지). */
+@media (hover: hover) {
+  .rp-btn:hover { background: #F7F3EF; }
+  .rp-btn--go:hover:not(:disabled) { background: var(--brand-red-hover); border-color: var(--brand-red-hover); }
+}
 /* 🔴 필수값 전까지 비활성 — 「왜 안 눌리는지」를 같이 알려준다.
    비활성만 걸고 이유를 안 적으면 사용자가 무엇을 안 채웠는지 모른 채 헤맨다. */
 .rp-btn--go:disabled { background: #DCCFC6; border-color: #DCCFC6; color: #fff; opacity: 1; }
