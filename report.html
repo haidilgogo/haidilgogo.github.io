@@ -98,6 +98,7 @@
   min-height: 48px; padding: 0 14px; box-sizing: border-box;
   font-size: 14px; font-weight: 600; color: var(--text-muted);
   font-family: inherit; -webkit-tap-highlight-color: transparent;
+  cursor: pointer; /* 버튼은 기본이 화살표라 손가락 모양을 따로 적어야 한다(2026-09-07 사용자님 지적 — 이 파일에만 빠져 있었다) */
   transition: background .12s, border-color .12s, color .12s, transform .08s;
 }
 .rp-kind.on { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
@@ -194,7 +195,9 @@
   border-radius: 12px; border: 1px solid #DED6CE;
   background: #fff; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--text-dark); line-height: 1.4;
   -webkit-tap-highlight-color: transparent; transition: background .15s, opacity .15s;
+  cursor: pointer; /* 출처·개인정보 닫기(.art-more-btn cursor: pointer)와 같게 — 이 파일에만 빠져 있었다(2026-09-07) */
 }
+.rp-btn:disabled { cursor: default; } /* 못 누르는 보내기는 화살표 */
 .rp-btn:active { background: #F0EAE4; } /* = .art-more-btn--close:active (눌림 scale 없음, 배경만) */
 .rp-btn--go { background: var(--brand-red); border-color: var(--brand-red); color: #fff; font-weight: 800; }
 .rp-btn--go:active { background: var(--brand-red-active); }
