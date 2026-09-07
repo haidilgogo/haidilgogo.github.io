@@ -6,7 +6,8 @@
 
    구현 방식:
    - 예전 모바일 규칙 @media (max-width: 640/767/900px) → @media all 로 바꿔 "항상 적용".
-   - 앱 폭은 .topbar-inner / .main 의 max-width: 440px 하나로 조절(이 숫자만 바꾸면 폭 변경).
+   - 앱 폭은 :root 의 --frame-max(600, 2026-09-07 반응형) 하나로 조절 — .topbar-inner / .main 과 창 8개(.modal·.stamp-sheet·.stamp-view·.column-sheet·.story-phone)가 같이 따른다.
+     옛 440 단일 기둥은 접은 갤럭시 폴드8(브라우저 폭 475)에서 양옆 여백이 보여 600으로 올렸다(docs/반응형-설계.md).
    - @media (hover: hover) = 마우스 올렸을 때만 나오는 잔효과(카드 살짝 뜸). 레이아웃 아님, 유지.
    - @media (min-width: 100000px) = 절대 적용 안 됨(옛 데스크탑 전용 가챠 확대를 비활성화한 흔적).
    ============================================================================ */
@@ -1342,7 +1343,7 @@ a[href] {
 
   .modal {
     width: 100%;
-    max-width: 440px;
+    max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정, docs/반응형-설계.md) */
     height: 100%;
     max-height: none;
     box-shadow: none;
@@ -3290,7 +3291,7 @@ a[href] {
 .stamp-sheet {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정, docs/반응형-설계.md) */
   max-height: 88vh;
   overflow-y: auto;
   overscroll-behavior-y: contain; /* 맨 위에서 당겨도 브라우저 새로고침으로 안 번지게(레시피 모달과 동일) */
@@ -3311,7 +3312,7 @@ a[href] {
     align-items: stretch;
   }
   .stamp-sheet {
-    max-width: 440px;
+    max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정, docs/반응형-설계.md) */
     height: 100%;
     max-height: none;
     box-sizing: border-box;
@@ -3338,7 +3339,7 @@ a[href] {
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  max-width: 440px;
+  max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정, docs/반응형-설계.md) */
   max-height: 88vh;
   display: flex;
   flex-direction: column;
@@ -3454,7 +3455,7 @@ a[href] {
     align-items: stretch;
   }
   .stamp-view {
-    max-width: 440px;
+    max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정, docs/반응형-설계.md) */
     max-height: none;
     flex: 1;
     border-radius: 18px;
@@ -4220,7 +4221,7 @@ a[href] {
 .story-phone {
   position: relative; /* 탭 존·CTA의 기준 */
   width: 100%;
-  max-width: 440px;
+  max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정, docs/반응형-설계.md) */
   height: 100%;
   background: #000;
   display: flex;
@@ -4314,8 +4315,9 @@ a[href] {
   z-index: 1;
 }
 .story-img {
-  width: 88%;                     /* 살짝 줄임 — 이미지 밖(좌우·아래)은 슬라이드 넘김 영역 */
-  max-width: 400px;
+  width: 88%; /* svh 를 모르는 옛 브라우저용 폴백 — 아래 줄이 덮어쓴다 */
+  width: min(88%, max(100svh - 260px, 240px)); /* 2026-09-07: 사진·캡션 한 변 = min(판 폭 88%, 화면 높이 − 여유 260, 바닥 240). 폰(393×695)은 346 그대로. 옛 max-width 400 제거 */
+  max-width: none; /* 옛 400 상한 제거(2026-09-07) — 위 식이 상한 역할 */
   aspect-ratio: 1 / 1;            /* 정사각 = 정사각 원본이라 잘림 없음 */
   border-radius: 0;               /* r값 제거(2026-07-23) */
   object-fit: cover;
@@ -4360,8 +4362,9 @@ a[href] {
 @keyframes storyToggleIn { from { opacity: 0; transform: translate(-50%, -108%) scale(.92); } to { opacity: 1; transform: translate(-50%, -120%) scale(1); } }
 /* 제목·버전·설명 모두 이미지와 같은 폭(88%)으로 → 왼쪽 끝 정렬 일치, 전부 왼쪽 정렬 */
 .story-rname, .story-rver, .story-desc {
-  width: 88%;
-  max-width: 400px;
+  width: 88%; /* svh 를 모르는 옛 브라우저용 폴백 — 아래 줄이 덮어쓴다 */
+  width: min(88%, max(100svh - 260px, 240px)); /* 2026-09-07: 사진·캡션 한 변 = min(판 폭 88%, 화면 높이 − 여유 260, 바닥 240). 폰(393×695)은 346 그대로. 옛 max-width 400 제거 */
+  max-width: none; /* 옛 400 상한 제거(2026-09-07) — 위 식이 상한 역할 */
   padding-left: 0; padding-right: 0;
   text-align: left;
 }
@@ -4378,8 +4381,9 @@ a[href] {
   font-size: 13.5px;
   line-height: 1.65;
   margin-top: 14px;
-  width: 88%;                     /* 이미지와 같은 폭 → 왼쪽 끝 정렬 일치 */
-  max-width: 400px;
+  width: 88%; /* svh 를 모르는 옛 브라우저용 폴백 — 아래 줄이 덮어쓴다 */
+  width: min(88%, max(100svh - 260px, 240px)); /* 2026-09-07: 사진·캡션 한 변 = min(판 폭 88%, 화면 높이 − 여유 260, 바닥 240). 폰(393×695)은 346 그대로. 옛 max-width 400 제거 */
+  max-width: none; /* 옛 400 상한 제거(2026-09-07) — 위 식이 상한 역할 */
   padding-left: 0; padding-right: 0;
   text-align: left;              /* 설명만 왼쪽 정렬(제목은 가운데 유지) */
   display: -webkit-box;
@@ -5466,7 +5470,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 .column-overlay[hidden] { display: none; }
 .column-sheet {
   position: relative;
-  width: 100%; max-width: 440px;
+  width: 100%; max-width: var(--frame-max); /* 옛 440px → 틀과 같은 상한(600) — 2026-09-07 창 8개 확장(사용자님 확정). 별도 기사 페이지(article.css .art-page)도 같은 값 */
   min-height: 100%;
   background: var(--bg-card);
 }
