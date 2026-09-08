@@ -1086,6 +1086,12 @@ a[href] {
     text-decoration-color: var(--brand-red);
   }
 }
+/* 터치 반응 — 미디어쿼리 밖(2026-09-08 사용자 확정). 검정 음영을 끈 대신 눌렀을 때 빨강.
+   `.credit-note a:active`(article.css)와 같은 방식 — :hover 와 :active 를 나눠야 폰에서 반응이 산다. */
+.footer-report:active {
+  color: var(--brand-red);
+  text-decoration-color: var(--brand-red);
+}
 .footer-report-ic,
 .footer-credit-ic { /* 💌 대체 봉투 아이콘 — currentColor로 링크 색·호버 빨강 자동 추종(2026-07-24) */
   width: 13px;
@@ -1179,6 +1185,7 @@ a[href] {
 @media (hover: hover) {   /* 터치 잔상 방지 — 2026-08-09 전수조사 6-2 */
   .footer-credit:hover { color: var(--brand-red); text-decoration-color: var(--brand-red); }
 }
+.footer-credit:active { color: var(--brand-red); text-decoration-color: var(--brand-red); }   /* 터치 반응 — 미디어쿼리 밖(2026-09-08) */
 
 /* 처리방침 링크 — `.footer-credit` 과 같은 값이다(크기·굵기·색·밑줄). 아이콘만 없다.
    ⚠️ 값을 바꾸려면 `.footer-credit` 과 같이 바꿀 것. 둘이 갈리면 한 줄에 섞였을 때 티가 난다. */
@@ -1196,6 +1203,7 @@ a[href] {
 @media (hover: hover) {   /* 터치 잔상 방지 — 2026-08-09 전수조사 6-2 */
   .footer-privacy:hover { color: var(--brand-red); text-decoration-color: var(--brand-red); }
 }
+.footer-privacy:active { color: var(--brand-red); text-decoration-color: var(--brand-red); }   /* 터치 반응 — 미디어쿼리 밖(2026-09-08) */
 
 
 @media all {
@@ -2764,6 +2772,9 @@ a[href] {
 @media (hover: hover) {
   .map-dd-item:hover { background: rgba(255, 255, 255, .6); }
 }
+/* 터치 반응 — 미디어쿼리 밖(2026-09-08 사용자 확정). 누르면 다른 지도 앱으로 넘어가는 항목이라
+   넘어가기 직전에 「이걸 눌렀다」가 보여야 옆 항목 오누름을 바로 알아챈다. 호버와 같은 값. */
+.map-dd-item:active { background: rgba(255, 255, 255, .6); }
 .map-dd-ic {
   flex: none;
   width: 24px;
@@ -6192,7 +6203,12 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 /* 🔴 「전체 지우기」는 제목 바로 옆이다(2026-08-04 사용자 요청). 예전엔 `margin-left:auto` 로
    오른쪽 끝에 붙어 있었는데, 그러면 닫기 X 와 **사이가 1px** 이라 닫으려다 잘못 누를 수 있었다(재서 확인).
    되돌릴 수 없는 동작이라 간격을 벌리는 것보다 **왼쪽(지우기) / 오른쪽(닫기)로 편을 가르는** 편이 낫다. */
-.mn-sheet-clear { background:none; border:0; font-family:inherit; font-size:13px; color:var(--text-muted); text-decoration:underline; cursor:pointer; }
+.mn-sheet-clear { background:none; border:0; font-family:inherit; font-size:13px; color:var(--text-muted); text-decoration:underline; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:color .15s ease; }
+/* 올리면·누르면 브랜드 빨강 — 글자 링크 공통 방식(2026-09-08 사용자 확정). hover 는 @media 안, :active 는 밖 */
+@media (hover: hover) {
+  .mn-sheet-clear:hover { color: var(--brand-red); }
+}
+.mn-sheet-clear:active { color: var(--brand-red); }
 /* 🔴 닫기 X 를 제목 줄에 맞춘다(2026-08-04 사용자 요청) — 「담은 목록」·「전체 지우기」와 한 줄로 읽히게.
    X 는 제목 줄 밖에 절대 위치라 기본값(top:9px)이면 세로 중심이 3px 위였다(재서 확인).
    계산: 시트 위 여백 24px + 제목 줄 높이 19px 의 절반 = 중심 33.5px → 44px 버튼의 top = 33.5 − 22 = 11.5px.
@@ -6939,6 +6955,8 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .12s, transform .08s;
 }
 .crop-cancel {
   border: 1px solid #E4D5C3;
@@ -6950,6 +6968,10 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   background: var(--brand-red, #D0402E);
   color: #fff;
 }
+/* 눌림 반응 — 「계속 작성 / 나가기」 확인 버튼(.leave-confirm-btn)과 같은 값(2026-09-08 사용자 확정).
+   빨강 버튼은 더 진한 빨강, 흰 버튼은 옅은 갈색 그늘, 둘 다 살짝(.98) 눌린다. */
+.crop-cancel:active { background: rgba(43, 18, 13, 0.05); transform: scale(0.98); }
+.crop-done:active { background: var(--brand-red-active); transform: scale(0.98); }
 
 /* ── 소스 저장 화면의 사진 칸 (2026-08-29 사용자님 확정) ─────────────────────────
    🔴 **정사각이다** — 카드·상세 썸네일이 정사각이라 여기서 보는 모양과 저장 뒤 모양이 같다.
