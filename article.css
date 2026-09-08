@@ -290,6 +290,7 @@
 @media (hover: hover) {
   .credit-links a:hover { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }
 }
+.credit-links a:active { color: var(--brand-red-dark); text-decoration-color: var(--brand-red-dark); }   /* 터치 반응 — 미디어쿼리 밖(2026-09-08). 같은 페이지 .credit-note a:active 와 같은 값 */
 
 /* 출처 안내 문단 안의 링크(제보 폼) — **브랜드 빨강**(2026-08-05 사용자 지시).
    그전에는 본문과 같은 검정에 밑줄로만 링크임을 알렸는데, 눈에 안 띄어서 색을 줬다.
