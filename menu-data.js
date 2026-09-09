@@ -95,7 +95,7 @@ window.MENU_DATA = {
     {
      "n": "차돌박이(지방 적음)",
      "img": true,
-     "part": false,
+     "part": true,
      "jeju": false,
      "up": "고기",
      "sub": "소양돈고기"
@@ -689,6 +689,14 @@ window.MENU_DATA = {
      "sub": "콩제품과 면류"
     },
     {
+     "n": "치즈 분모자",
+     "img": true,
+     "part": true,
+     "jeju": false,
+     "up": "두부·면",
+     "sub": "콩제품과 면류"
+    },
+    {
      "n": "치즈떡",
      "img": true,
      "part": false,
@@ -790,9 +798,17 @@ window.MENU_DATA = {
      "sub": "근경류"
     },
     {
+     "n": "싱싱 야채모둠",
+     "img": true,
+     "part": true,
+     "jeju": false,
+     "up": "채소·버섯",
+     "sub": "잎채류"
+    },
+    {
      "n": "야채모둠",
      "img": true,
-     "part": false,
+     "part": true,
      "jeju": false,
      "up": "채소·버섯",
      "sub": "잎채류"
