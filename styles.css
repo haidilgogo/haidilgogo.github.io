@@ -6728,6 +6728,9 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
       이제 공유하기를 빨갛게 **채운다**(.modal-out-btn--main). */
 .modal-out-btns { display: flex; gap: 10px; margin-bottom: 10px; }
 .modal-out-btns[hidden] { display: none; }   /* `display:flex` 가 `hidden` 을 이기지 않게 */
+/* 공개 레시피의 「공유하기」 줄(2026-09-12) — 내 소스 줄과 같은 자리·같은 버튼 모양(.modal-out-btn--main), 버튼 하나뿐이라 꽉 찬다 */
+.modal-share-row { display: flex; margin-bottom: 10px; }
+.modal-share-row[hidden] { display: none; }
 .modal-out-btn {
   flex: 1;
   min-width: 0;

@@ -1422,6 +1422,8 @@
   const modalScroll = document.getElementById('recipe-modal-scroll');
   const modalClose = document.getElementById('modalClose');
   const modalFavBtn = document.getElementById('modalFavBtn');
+  const modalShareLinkBtn = document.getElementById('modalShareLinkBtn'); // 레시피 링크 공유(2026-09-12)
+  const modalShareRow = document.getElementById('modalShareRow');           // 그 버튼이 든 줄 — 줄 전체를 여닫는다
 
   // 검색 보정: 괄호·공백을 뺀 형태로도 맞춘다(예: `건희소스(오리지널)` ↔ `건희소스 오리지널`)
   // ⚠️ 2026-08-29 에 이 두 이름에서는 괄호가 빠졌지만(`라젤이 아는 동생소스`) 보정은 그대로 둔다 —
@@ -3425,6 +3427,9 @@
        ⚠️ `hidden` 이라 화면낭독기와 Tab 순서에서도 함께 빠진다. */
     modalFavBtn.hidden = !!r.mine;
     modalLikeBtn.hidden = !!r.mine;
+    /* 🔴 공개 레시피의 「공유하기」(링크) 줄은 **공개 레시피에만**, 내 소스 줄(#modalOutBtns, 그림 공유)은 **내 소스에만**.
+       둘 다 줄 전체를 여닫는다(사용자님 확정 A안, 2026-09-12). */
+    modalShareRow.hidden = !!r.mine;
     setPressedState(modalFavBtn, favorites.has(r.id));
     setPressedState(modalLikeBtn, likedByMe.has(r.id));
     modalLikeCount.textContent = getLikeCount(r.id);
@@ -3492,17 +3497,32 @@
 
     // 상세를 새 화면처럼 history에 한 칸 쌓아, 안드로이드 뒤로가기·iOS 엣지 스와이프가
     // 사이트를 떠나는 대신 상세만 닫게 한다. 스토리 위에서 연 경우에도 한 칸만 빠져 스토리는 남는다.
+    // 🔴 공유 주소(2026-09-12) — 공개 레시피는 주소에 `?r=<id>` 를 함께 적는다(인스타 스토리·카톡 링크용,
+    //    아래 「레시피 공유 주소로 들어온 경우」 참고). 내 소스는 받는 사람 기기에 없으니 주소에 적지 않는다.
+    const 주소 = 레시피공유주소(r);
     if (!wasOpen && modalHistoryRecipeId() !== r.id) {
       try {
         // 레시피 id도 함께 기록해야 X로 닫은 뒤 '앞으로 가기' 했을 때 같은 상세를 복원할 수 있다.
-        history.pushState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: r.id }, '', location.href);
+        history.pushState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: r.id }, '', 주소);
       } catch (err) {
         // pushState를 막는 환경에서도 X·Esc 닫기는 정상 동작
       }
+    } else if (modalHistoryRecipeId() !== r.id) {
+      // 상세가 열린 채로 다른 레시피로 바뀌는 경우 — 기록 칸을 더 쌓지 않고 지금 칸의 id·주소만 바꾼다
+      try { history.replaceState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: r.id }, '', 주소); } catch (err) {}
     }
+  }
+  /* 공개 레시피(RECIPES)면 `/?r=<id>`, 내 소스면 그냥 `/`. 주소의 다른 꼬리(`?_r=` 새로고침 표시 등)는 버린다. */
+  function 레시피공유주소(r) {
+    const 공개 = RECIPES.some((x) => x.id === r.id);
+    return location.pathname + (공개 ? '?r=' + encodeURIComponent(r.id) : '');
   }
 
   function finishCloseModal() {
+    // 기록(pushState) 없이 닫힌 경우 주소에 `?r=` 이 남아 있으면 지운다 — 남으면 새로고침에 상세가 다시 뜬다
+    if (!modalHistoryRecipeId() && new URLSearchParams(location.search).has('r')) {
+      try { history.replaceState(history.state, '', location.pathname); } catch (err) {}
+    }
     modalOverlay.classList.remove('open', 'from-story');
     modalOverlay.setAttribute('aria-hidden', 'true');
     modalOverlay.inert = true;
@@ -3550,6 +3570,12 @@
     if (modalOverlay.classList.contains('open')) {
       // 왼쪽 가장자리 뒤로가기: 모달 기록에서 기본 화면 기록으로 이동했으므로 상세를 닫는다.
       if (!historyRecipeId) closeModal({ fromHistory: true });
+      // 🔴 열린 채로 **다른** 레시피 기록으로 옮겨간 경우(2026-09-12, 공유 주소가 생기며 실제로 생긴다 —
+      //    링크로 연 상세에서 다른 상세를 열고 뒤로 간 경우). 내용만 바꿔 끼운다.
+      else if (currentModalRecipe?.id !== historyRecipeId) {
+        const 다른 = 아이디로레시피찾기(historyRecipeId);
+        if (다른) openModal(다른);
+      }
       return;
     }
     // X로 닫은 뒤 오른쪽 가장자리 앞으로가기: Safari가 보여준 상세 미리보기가 다시
@@ -6966,6 +6992,30 @@
   }
 
   favShareBtn.addEventListener('click', shareSite);
+
+  /* 🔴 레시피 링크 공유(2026-09-12) — 상세 맨 아래 「공유하기」 줄(modalShareRow > modalShareLinkBtn, 사용자님 확정 A안).
+     ■ 그림이 아니라 **주소만** 보낸다 — `?r=<id>`(위 「레시피공유주소」). 받는 쪽이 누르면 그 상세가 바로 뜬다.
+     ■ 왜 — 홈화면 앱에는 주소창이 없어서 사용자가 레시피 링크를 얻을 길이 이것뿐이다(사용자님 지적).
+     ■ 내 소스는 이 줄이 숨고 #modalOutBtns 의 「공유하기」(그림)가 대신한다 — 링크로는 다른 기기에서 못 연다.
+     ⚠️ 카톡 미리보기는 하딜고고 대표 이미지·제목이다(레시피별 사진은 개별 페이지가 있어야 한다). */
+  async function shareRecipeLink() {
+    const r = currentModalRecipe;
+    if (!r || r.mine) return;
+    const url = location.origin + 레시피공유주소(r);
+    const 이름 = r.name + (r.ver ? ' (' + r.ver + ')' : '');
+    const shareData = { title: 이름 + ' 레시피 · 하딜고고', url };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (err) { /* 취소 등은 무시 */ }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showShareToast('링크가 복사되었어요!');
+    } catch (err) {
+      showShareToast('링크 복사에 실패했어요');
+    }
+  }
+  modalShareLinkBtn.addEventListener('click', shareRecipeLink);
   topShareBtn.addEventListener('click', shareSite);
   if (storeShareBtn) storeShareBtn.addEventListener('click', shareSite);
   const stampShareBtn = document.getElementById('stampShareBtn'); // 스티커 섹션(모바일) 공유 버튼
@@ -8889,6 +8939,25 @@
     });
 
     render();
+  })();
+
+  /* ── 레시피 공유 주소로 들어온 경우(2026-09-12) ──
+     `haidilgogo.com/?r=s4` 처럼 들어오면 그 레시피 상세를 바로 연다. 인스타 스토리·카톡에 레시피 링크를 걸기 위한 것.
+     ■ 공개 레시피(RECIPES)만 — 내 소스는 받는 사람 기기에 없다.
+     ■ 첫 기록 칸은 깨끗한 주소(`/`)로 바꿔 둔다 → 상세를 닫으면(뒤로가기) 주소에서 `?r=` 이 빠지고,
+       새로고침해도 상세가 다시 뜨지 않는다. 앞으로 가기는 popstate 가 기록의 id 로 되살린다.
+     ■ 없는 id 면 알림만 띄운다. 스플래시가 덮고 있는 동안은 알림이 안 보이니 그 뒤에 띄운다.
+     ⚠️ 로고 새로고침(`?_r=`)은 홈으로 가는 것이라 `?r=` 을 버리는 게 맞다(homeBtn 참고). */
+  (function 공유주소로열기() {
+    const id = new URLSearchParams(location.search).get('r');
+    if (!id) return;
+    try { history.replaceState({ ...(history.state || {}), [MODAL_HISTORY_KEY]: null }, '', location.pathname); } catch (err) {}
+    const r = RECIPES.find((x) => x.id === id);
+    if (!r) {
+      setTimeout(() => showShareToast('그 레시피를 찾을 수 없어요'), document.getElementById('splash') ? 1500 : 0);
+      return;
+    }
+    openModal(r);
   })();
 })();
 
