@@ -218,9 +218,9 @@
     { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 – 05:00', tel: '02-2136-9939' },
     // 부천점 영업시간 03:00→05:00(2026-09-09 사용자 확정). 네이버·캐치테이블·8월 방문 후기가 05:00, 카카오만 03:00.
     { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 05:00', tel: '032-666-0118' },
-    { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 현대타워랜드 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
+    { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 2001아울렛 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
     { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
-    // 오픈 예정(2026-07-24 추가) — 안산점과 같은 방식으로 STORE_CATCH만 'soon'을 둔다(제목 옆 배지는 사용자가 뺐음).
+    // 오픈 예정(2026-07-24 추가) — STORE_CATCH만 'soon'을 둔다(제목 옆 배지는 사용자가 뺐음). 안산점도 이 방식이었다가 2026-09-17 열었다.
     // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 스티커 매장 선택 비활성이 동시에 걸린다.
     // 🔴 주소는 도로명까지만 확정 — 건물명은 오픈 확정 후 사용자가 알려주면 채운다. 영업시간·전화도 그때.
     { region: '부산', name: '부산점',    addr: '부산 부산진구 중앙대로 654',                     hours: '미정' },
@@ -236,20 +236,21 @@
   //            "items":[{"id":<번호>,"name":"하이디라오 …"} 로 들어 있다. 14곳을 한 번에 훑어 뽑았다.
   //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
   //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
-  //    ⚠️ 오픈 예정(안산점·부산점)은 네이버에 아직 없어 번호가 없다. 그 둘은 지도 버튼 자체가 비활성이라
-  //       필요 없다. (부산점은 이름으로 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
+  //    ⚠️ 오픈 예정 부산점은 네이버에 아직 없어 번호가 없다. 지도 버튼 자체가 비활성이라 필요 없다.
+  //       (부산점은 이름으로 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
+  //    ⚠️ 안산점(2026-10-01 오픈)은 2026-09-17 기준 네이버·카카오 미등록이라 번호가 없다 → 이름 검색으로 뜬다.
+  //       등록되면 번호를 뽑아 여기와 STORE_KAKAO_ID 에 한 줄씩 넣을 것.
   //    뽑는 법: m.map.naver.com/search?query=하이디라오+<지점>&mapMode=0 을 받아 오면
   //            HTML 안에 "items":[{"id":<번호>,"name":"하이디라오 …"} 로 들어 있다.
   //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
   //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
-  //    ⚠️ 오픈 예정(안산점·부산점)은 네이버에 아직 없어서 번호가 없다. 그 둘은 지도 버튼 자체가
-  //       비활성이라 필요 없다. (부산점은 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
+  //    ⚠️ 오픈 예정 부산점은 네이버에 아직 없어서 번호가 없다. 지도 버튼 자체가 비활성이라 필요 없다.
   // 🔴 지점별 카카오 장소번호(2026-08-04). 네이버와 **번호 체계가 다르다** — 서로 못 바꿔 쓴다.
   //    뽑는 법: m.map.kakao.com/actions/searchView?q=하이디라오+<지점> 의 HTML 안
   //            <li class="search_item base" data-id="<번호>"> 에 들어 있다.
   //    ⚠️ 카카오 등록명이 우리와 다른 곳이 있다(번호로 걸어서 화면엔 영향 없다):
   //       홍대점→홍대지점 · 코엑스점→COEX점 · 제주점→제주도점
-  //    ⚠️ 오픈 예정(안산점·부산점)은 번호가 없다. 지도 버튼 자체가 비활성이라 필요 없다.
+  //    ⚠️ 오픈 예정 부산점은 번호가 없다(지도 버튼 비활성). 안산점도 아직 미등록(위 네이버 주석 참고).
   const STORE_KAKAO_ID = {
     '명동점': '1820258951',
     '서초점': '1372079546',
@@ -279,7 +280,6 @@
     '제주점': '2024934566',
   };
   // 지점별 캐치테이블 예약·웨이팅 링크(있는 지점만 '예약' 버튼 표시). 키 = STORES의 name.
-  // 안산점은 링크가 없어 예약 버튼 안 뜸.
   const STORE_CATCH = {
     '명동점': 'https://app.catchtable.co.kr/ct/shop/haidilao_myungdong?type=WAITING&currentSuggestionType=SHOP_NAME',
     '서초점': 'https://app.catchtable.co.kr/ct/shop/haidilao_seocho?type=WAITING&foodKeywords=%ED%95%98%EC%9D%B4%EB%94%94%EB%9D%BC%EC%98%A4&currentSuggestionType=SHOP_NAME',
@@ -293,9 +293,25 @@
     '부산역점': 'https://app.catchtable.co.kr/ct/shop/haidilaobusan?type=WAITING&currentSuggestionType=SHOP_NAME',
     '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
-    '안산점': 'soon', // 2026-07-25 오픈 예정 — 캐치테이블 아직 안 열림. 열리면 'soon'을 실제 URL로 교체.
+    // 안산점은 2026-10-01 오픈(캐치테이블 예약 달력이 10/1부터 열림, 2026-09-17 확인). 캐치테이블 등록명은
+    // 「안산고잔점」이지만 우리 표기는 「안산점」 유지(사용자 확정). 매장 탭 버튼은 사용자 지시로 오픈 전부터 전부 연다.
+    // type 파라미터 없이 두면 캐치테이블이 기본 탭(예약)을 보여 준다 — 오픈 전엔 웨이팅이 없어 WAITING 은 빈 화면.
+    '안산점': 'https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan',
     '부산점': 'soon', // 오픈 예정(서면) — 이 값이 스티커 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
   };
+  // 🔴 스티커 매장 선택만 늦게 여는 지점(2026-09-17 사용자 확정 — 매장 탭은 미리 열고, 발도장은 실제 오픈일부터).
+  //    값은 오픈일(YYYY-MM-DD). 보는 사람 기기의 오늘 날짜가 이 날 이상이면 선택 가능해진다.
+  //    오픈일이 지나면 이 줄은 지워도 된다(남겨 둬도 동작은 같다).
+  const STAMP_OPEN_DATE = {
+    '안산점': '2026-10-01',
+  };
+  function stampNotYetOpen(name) {
+    const d = STAMP_OPEN_DATE[name];
+    if (!d) return false;
+    const now = new Date();
+    const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    return today < d;
+  }
 
   /* 🔴 **소스 만들기에서만 감추는 재료**(2026-08-31 사용자님 확정).
      ■ 소스바에 **실제로 있는** 재료라 `SAUCE_BAR` 에는 그대로 둔다 — 그래야 레시피가 쓸 수 있고,
@@ -6194,15 +6210,17 @@
     //    카드가 나왔지만 그 카드를 없앴으므로, 고르면 빈 카드가 된다. 애초에 못 고르게 막는다.
     //    (오픈 예정 매장은 아래에서 '오픈 예정'으로 따로 보여주므로 이 줄에서 거르지 않는다 —
     //     지금 그림 없는 매장은 부산점 하나뿐이고 그게 곧 오픈 예정 매장이다.)
-    if (!STAMP_IMGS[s.name] && STORE_CATCH[s.name] !== 'soon') return;
+    // 오픈 전 = 매장 탭의 'soon' 이거나, STAMP_OPEN_DATE 의 오픈일이 아직 안 온 지점(안산점 2026-10-01).
+    const notYetOpen = STORE_CATCH[s.name] === 'soon' || stampNotYetOpen(s.name);
+    if (!STAMP_IMGS[s.name] && !notYetOpen) return;
     const item = document.createElement('button');
     item.type = 'button';
     item.setAttribute('role', 'option');
     item.className = 'stamp-dd-item';
     item.dataset.value = s.name;
-    // 오픈 예정 매장(STORE_CATCH='soon')은 아직 방문 불가 → 비활성(선택 X, "오픈 예정" 표시).
-    // 매장 탭의 '오픈 예정' 버튼과 같은 신호를 재사용 — 실제 오픈해 URL로 바뀌면 자동으로 선택 가능해짐.
-    if (STORE_CATCH[s.name] === 'soon') {
+    // 오픈 예정 매장(STORE_CATCH='soon' 또는 오픈일 전)은 아직 방문 불가 → 비활성(선택 X, "오픈 예정" 표시).
+    // 'soon' 은 실제 오픈해 URL로 바뀌면, 오픈일 지점은 그 날짜가 되면 자동으로 선택 가능해짐.
+    if (notYetOpen) {
       item.classList.add('soon');
       item.disabled = true;
       item.setAttribute('aria-disabled', 'true');
