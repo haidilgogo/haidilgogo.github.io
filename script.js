@@ -294,19 +294,20 @@
     '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
     // 안산점은 2026-10-01 오픈(캐치테이블 예약 달력이 10/1부터 열림, 2026-09-17 확인). 캐치테이블 등록명은
-    // 「안산고잔점」이지만 우리 표기는 「안산점」 유지(사용자 확정). 매장 탭 버튼은 사용자 지시로 오픈 전부터 전부 연다.
+    // 「안산고잔점」이지만 우리 표기는 「안산점」 유지(사용자 확정). 예약 버튼만 오픈 전부터 열고 지도·전화는 STORE_OPEN_DATE 가 막는다.
     // type 파라미터 없이 두면 캐치테이블이 기본 탭(예약)을 보여 준다 — 오픈 전엔 웨이팅이 없어 WAITING 은 빈 화면.
     '안산점': 'https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan',
     '부산점': 'soon', // 오픈 예정(서면) — 이 값이 스티커 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
   };
-  // 🔴 스티커 매장 선택만 늦게 여는 지점(2026-09-17 사용자 확정 — 매장 탭은 미리 열고, 발도장은 실제 오픈일부터).
-  //    값은 오픈일(YYYY-MM-DD). 보는 사람 기기의 오늘 날짜가 이 날 이상이면 선택 가능해진다.
+  // 🔴 오픈일이 정해진 지점(2026-09-17 사용자 확정) — 캐치테이블 예약 버튼만 미리 열고,
+  //    **지도·전화 버튼과 스티커 매장 선택은 오픈일부터** 자동으로 풀린다(오픈 전엔 지도에 없고 전화도 소용없다).
+  //    값은 오픈일(YYYY-MM-DD). 보는 사람 기기의 오늘 날짜가 이 날 이상이면 열린다.
   //    오픈일이 지나면 이 줄은 지워도 된다(남겨 둬도 동작은 같다).
-  const STAMP_OPEN_DATE = {
+  const STORE_OPEN_DATE = {
     '안산점': '2026-10-01',
   };
-  function stampNotYetOpen(name) {
-    const d = STAMP_OPEN_DATE[name];
+  function storeNotYetOpen(name) {
+    const d = STORE_OPEN_DATE[name];
     if (!d) return false;
     const now = new Date();
     const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
@@ -5561,6 +5562,8 @@
         acts.className = 'store-actions';
         // 예약(캐치테이블 웨이팅) — 맨 앞 강조 버튼. 'soon'이면 비활성 '오픈 예정' 버튼.
         const catchUrl = STORE_CATCH[s.name];
+        // 지도·전화는 'soon' 이거나 STORE_OPEN_DATE 의 오픈일 전이면 막는다(예약 버튼은 catchUrl 로만 판단).
+        const notOpen = catchUrl === 'soon' || storeNotYetOpen(s.name);
         if (catchUrl === 'soon') {
           const book = document.createElement('span');
           book.className = 'store-btn book--soon';
@@ -5575,7 +5578,7 @@
           book.rel = 'noopener';
           acts.appendChild(book);
         }
-        if (s.addr && catchUrl === 'soon') {
+        if (s.addr && notOpen) {
           // 오픈 예정 지점의 지도 — 전화와 같은 이유로 막는다(2026-08-04 사용자 지시).
           // 아직 문을 안 연 자리라 지도에서 찾아도 나오지 않거나 엉뚱한 곳이 잡힌다.
           // 전화(tel--soon)와 같은 크림 바랜 모양이고, 자리는 지켜서 카드 폭이 안 흔들린다.
@@ -5669,7 +5672,7 @@
         }
         // 전화 — 오픈 예정 지점은 아직 걸어도 소용없으므로 번호 유무와 무관하게 비활성으로 자리만 지킨다
         // (버튼 개수가 지점마다 달라 카드 폭이 들쭉날쭉해지는 것도 함께 막힘).
-        if (catchUrl === 'soon') {
+        if (notOpen) {
           const tel = document.createElement('span');
           tel.className = 'store-btn tel tel--soon';
           tel.textContent = '전화';
@@ -6210,8 +6213,8 @@
     //    카드가 나왔지만 그 카드를 없앴으므로, 고르면 빈 카드가 된다. 애초에 못 고르게 막는다.
     //    (오픈 예정 매장은 아래에서 '오픈 예정'으로 따로 보여주므로 이 줄에서 거르지 않는다 —
     //     지금 그림 없는 매장은 부산점 하나뿐이고 그게 곧 오픈 예정 매장이다.)
-    // 오픈 전 = 매장 탭의 'soon' 이거나, STAMP_OPEN_DATE 의 오픈일이 아직 안 온 지점(안산점 2026-10-01).
-    const notYetOpen = STORE_CATCH[s.name] === 'soon' || stampNotYetOpen(s.name);
+    // 오픈 전 = 매장 탭의 'soon' 이거나, STORE_OPEN_DATE 의 오픈일이 아직 안 온 지점(안산점 2026-10-01).
+    const notYetOpen = STORE_CATCH[s.name] === 'soon' || storeNotYetOpen(s.name);
     if (!STAMP_IMGS[s.name] && !notYetOpen) return;
     const item = document.createElement('button');
     item.type = 'button';
