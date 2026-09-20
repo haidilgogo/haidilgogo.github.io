@@ -338,6 +338,8 @@
     })
     .map((x) => x[0]);
 
+  const POPULAR_SAUCE_LIMIT = 10; // 홈·목록·상세 순위 표시를 함께 유지한다.
+
   const RECIPES = [
     { id: 's1', date: '2021-12-26', cat: '소스', emoji: '🥣', img: 'assets/cards/건희소스(오리지널)_2021.jpg?v=3', imgFit: 'cover', imgBg: '#A8CCDC', tint: 'linear-gradient(160deg,#FDECD9,#F8D9BE)', name: '건희소스', ver: '오리지널 · 2021', source: '버블 건희', star: true, person: '건희', desc: '<b>원어스</b>의 <b>건희</b>가 즐겨 먹는 콤보 소스 중 단맛 버전으로, 대한민국에서 가장 유명한 국민 소스이다.',
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '2.5', '스푼'], ['다진 마늘', '0.5', '스푼'], ['다진 파', '0.5', '스푼'], ['참깨', '1', '스푼'], ['땅콩가루', '1', '스푼'], ['마라시즈닝(고춧가루)', '0.5', '스푼'], ['고추기름', '1', '스푼'], ['설탕', '0.3', '스푼'], ['매운소고기소스', '0.5', '스푼']],
@@ -2209,7 +2211,7 @@
 
   // ── 전체보기(브라우즈) 화면 — 전체/소스/히든메뉴/탕 카테고리 탭 (2026-07-24 개편, 2026-07-25 이중 필터로 재구조화) ──
   // 탭은 브라우즈 중 항상 표시(전체 포함)되고, 즐겨찾기·검색·인물과 서로 겹치는 필터로 동작한다(getFiltered 참고).
-  // 소스 카드는 절대 순위 top5(sauceRankMap 기준)면 배지(homeRankBadge) 표시 — 카테고리 탭·즐겨찾기·검색·인물
+  // 소스 카드는 절대 순위 top10(sauceRankMap 기준)면 배지(homeRankBadge) 표시 — 카테고리 탭·즐겨찾기·검색·인물
   // 어느 필터에서 봐도 값이 같다(2026-07-25 버그 수정: 예전엔 화면에 보이는 목록 안 순번을 썼음).
   const BROWSE_TABS = ['전체', '소스', '히든메뉴', '탕'];
   const browseCatTabsEl = document.getElementById('browseCatTabs');
@@ -2495,7 +2497,7 @@
       }
       const rank = (showRankBadges && r.cat === '소스') ? rankMap.get(r.id) : undefined;
       const isMonthly = showRankBadges && r.cat === '소스' && r.id === monthlySauceId;
-      syncBrowseGridCard(el, r, (rank != null && rank < 5) ? rank : null, isMonthly);
+      syncBrowseGridCard(el, r, (rank != null && rank < POPULAR_SAUCE_LIMIT) ? rank : null, isMonthly);
       gridEl.appendChild(el);
     });
     requestAnimationFrame(() => fitBrowseTitles(gridEl));
@@ -2753,7 +2755,7 @@
       storyAnnounceEl.textContent = storyNameEl.textContent + ' 스토리, '
         + (storyIdx + 1) + '/' + storyList.length + ', ' + r.name + (r.ver ? ' ' + r.ver : '');
     }
-    // 키보드용 「레시피 보기」에 지금 칸의 이름을 달아 준다(버튼 글자는 그대로 「레시피 보기」)
+    // 항상 보이는 「레시피 보기」에 지금 칸의 이름을 달아 준다(버튼 글자는 그대로 「레시피 보기」)
     if (storyRecipeKbd) storyRecipeKbd.setAttribute('aria-label', r.name + ' 레시피 보기');
     preloadNextStoryImages();
   }
@@ -2906,8 +2908,7 @@
   });
   // Tab 을 스토리 안에 가둔다 — 안 그러면 안 보이는 뒤 화면 버튼들로 초점이 새어 나간다
   storyViewer.addEventListener('keydown', (e) => trapFocusWithin(storyViewer, e));
-  /* 키보드용 「레시피 보기」 — 손가락용 토글과 **같은 일**을 한다(자동재생 정지 + 상세 열기).
-     ⚠️ 토글은 좌표로 뜨는 것이라 키보드로는 닿을 수 없었다. 그래서 길을 하나 더 낸 것이다. */
+  /* 항상 보이는 「레시피 보기」 — 기존 토글과 같은 상세 화면을 열고 자동재생을 멈춘다. */
   if (storyRecipeKbd) storyRecipeKbd.addEventListener('click', (e) => {
     e.stopPropagation();
     hideRecipeToggle();
@@ -3070,8 +3071,8 @@
     });
   }
 
-  // 인기소스 순위 배지: 1~5위 전부 같은 검정 알약(쿠팡이츠 방식, 2026-07-25 — 금색 알약+왕관은
-  // 되돌림). 1~3위는 알약 안에 메달 아이콘(gold/silver/bronze.svg) + 'N위', 4~5위는 글자만.
+  // 인기소스 순위 배지: 1~10위 전부 같은 검정 알약(쿠팡이츠 방식, 2026-07-25 — 금색 알약+왕관은
+  // 되돌림). 1~3위는 알약 안에 메달 아이콘(gold/silver/bronze.svg) + 'N위', 4~10위는 글자만.
   const RANK_MEDALS = ['gold', 'silver', 'bronze'];
   function homeRankBadge(i) {
     const medal = RANK_MEDALS[i];
@@ -3081,13 +3082,13 @@
     return '<i class="hp-rank">' + medalImg + (i + 1) + '위</i>';
   }
 
-  // ③ 인기 소스: 좋아요순 상위 5개 캐러셀. 순서는 렌더 시점 고정(좋아요 눌러도 즉시 재정렬 안 함 —
+  // ③ 인기 소스: 좋아요순 상위 10개 캐러셀. 순서는 렌더 시점 고정(좋아요 눌러도 즉시 재정렬 안 함 —
   //    카드가 눈앞에서 튀지 않게. 숫자만 refreshLikeCounts로 갱신, 순서는 다음 방문 때 반영).
   function renderHomePopular() {
     // 정렬은 byPopular로 통일(2026-07-25) — 예전엔 동점 타이브레이크가 이름순이라, 좋아요 수가 같을 때
     // 이 레일의 순서와 브라우즈/모달 순위 배지(sauceRankMap, byPopular 기준)가 서로 어긋날 수 있었다.
     const sauces = RECIPES.filter((r) => r.cat === '소스').slice().sort(byPopular);
-    const top = sauces.slice(0, 5);
+    const top = sauces.slice(0, POPULAR_SAUCE_LIMIT);
     popularRailEl.innerHTML = top.map((r, i) =>
       // 이름 앞 별(연예인 표시) 미노출(2026-07-25) — 이 레일은 "인기 소스" 랭킹이 목적이라
       // 별(셀럽) 여부와 섞이면 랭킹 카드에 배지가 두 종류(메달+별) 겹쳐 산만해짐. 브라우즈·모달 별은 유지.
@@ -3398,7 +3399,7 @@
       thumbEl.style.background = r.tint;
       thumbEl.innerHTML = '<span class="modal-thumb-emoji">' + r.emoji + '</span>';
     }
-    // 순위·이달의 소스 배지(2026-07-25) — 소스 카테고리에서 절대 순위(sauceRankMap) top5면 순위 배지
+    // 순위·이달의 소스 배지(2026-07-25) — 소스 카테고리에서 절대 순위(sauceRankMap) top10면 순위 배지
     // (homeRankBadge, 홈 인기소스와 동일 마크업/클래스 재사용), 이번 달 소스(pickMonthlySauce)면 '이달의
     // 소스' 배지. 둘 다 해당하면(예: s19) 좌상단에 가로로 나란히 — 순위 배지 → 이달의 소스 배지 순서.
     /* 🔴 내 소스에는 둘 다 안 붙는다(2026-08-27) — 순위와 「이달의 소스」는 **공개 레시피를
@@ -3407,10 +3408,10 @@
           **왜 안 걸리는지가 코드에 보여야** 나중에 그 두 함수를 고칠 때 실수가 안 난다. */
     const modalRank = (!r.mine && r.cat === '소스') ? sauceRankMap().get(r.id) : undefined;
     const modalIsMonthly = !r.mine && pickMonthlySauce(new Date())?.id === r.id;
-    if ((modalRank != null && modalRank < 5) || modalIsMonthly) {
+    if ((modalRank != null && modalRank < POPULAR_SAUCE_LIMIT) || modalIsMonthly) {
       thumbEl.insertAdjacentHTML('beforeend',
         '<span class="modal-badge-row">'
-        + (modalRank != null && modalRank < 5 ? homeRankBadge(modalRank) : '')
+        + (modalRank != null && modalRank < POPULAR_SAUCE_LIMIT ? homeRankBadge(modalRank) : '')
         + (modalIsMonthly ? MONTHLY_BADGE_HTML : '')
         + '</span>');
     }

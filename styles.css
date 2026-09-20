@@ -4184,42 +4184,45 @@ a[href] {
 }
 .story-viewer.open { display: flex; }
 
-/* 🔴 키보드·화면낭독기 전용 「레시피 보기」(2026-08-09).
-   **평소엔 눈에 안 보이고, 초점이 올 때만 나타난다.** 그래서 손가락·마우스로 쓰는 화면은
-   지금과 **하나도 안 바뀐다** — 사진을 눌러 뜨는 기존 토글도 그대로다.
-   ⚠️ `display:none` 이나 `hidden` 으로 숨기면 **Tab 순서에서도 빠져** 키보드로 못 닿는다.
-      그래서 「화면 밖으로 밀어 두는」 방식(.sr-only 와 같은 원리)을 쓴다. */
+/* D안: 안내와 가로 버튼은 사진 아래 공간을 확보하고 항상 표시한다. */
+.story-recipe-cta {
+  position: relative;
+  z-index: 4;
+  flex: none;
+  width: 88%;
+  width: min(88%, max(100svh - 260px, 240px));
+  align-self: center;
+  padding: 12px 0 max(18px, env(safe-area-inset-bottom));
+  background: transparent; /* 흐린 사진 배경이 버튼 영역까지 이어진다. */
+}
+.story-recipe-cta p {
+  margin: 0 0 8px;
+  color: #fbf5ea;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: keep-all;
+  text-align: center;
+}
 .story-recipe-kbd {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  z-index: 12;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 44px;
   border: 0;
-  background: rgba(0, 0, 0, .62);
-  color: #fff;
+  border-radius: 12px;
+  background: #fbf5ea;
+  color: #302820;
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  border-radius: 999px;
   cursor: pointer;
 }
-/* 초점이 오면 제 모습을 드러낸다 — 어디에 있는지 보여야 누를 수 있다 */
-.story-recipe-kbd:focus {
-  width: auto;
-  height: auto;
-  padding: 10px 18px;
-  overflow: visible;
-  clip: auto;
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
+.story-recipe-kbd svg { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; }
+.story-recipe-kbd:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .story-viewer { --story-dur: 7s; } /* 진행바 자동재생 1칸 시간 */
 .story-phone {
   position: relative; /* 탭 존·CTA의 기준 */
@@ -4464,10 +4467,9 @@ a[href] {
   box-shadow: 0 4px 18px rgba(0, 0, 0, .4);
 }
 .story-cta:active { transform: scale(.96); }
-/* 스토리 위에서 연 레시피 모달은 모바일에서도 상단바 자리까지 꽉 덮어 스토리 헤더가 안 비치게 */
-@media (max-width: 640px) {
-  .modal-overlay.from-story { top: 0; }
-}
+/* 스토리에서 연 상세는 화면 크기와 관계없이 상단까지 덮는다.
+   일반 레시피 상세는 기존처럼 앱 상단바 아래에서 열린다. */
+.modal-overlay.from-story { top: 0; }
 
 /* ── ③ 인기 소스 캐러셀 (클린 카드) ── */
 .hp-rail {
