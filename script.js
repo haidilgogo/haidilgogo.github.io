@@ -2741,6 +2741,7 @@
     const thumb = r.img
       ? '<img class="story-img" src="' + r.img + '" alt="' + r.name + '" draggable="false" style="background:' + thumbBg + '">'
       : '<span class="story-img story-img--emoji" style="background:' + r.tint + '">' + r.emoji + '</span>';
+    storyBody.scrollTop = 0; // 새 사진은 본문 맨 위에서 시작한다
     storyBody.innerHTML = thumb
       + '<div class="story-rname">' + (r.nameHtml || r.name) + '</div>'
       + (r.ver ? '<div class="story-rver">' + r.ver + '</div>' : '')
@@ -2880,6 +2881,11 @@
   }
   document.getElementById('storyNext').addEventListener('click', onZoneTap(storyNext));
   document.getElementById('storyPrev').addEventListener('click', onZoneTap(storyPrev));
+  // 스크롤 가능한 본문에서도 사진 탭과 좌우 넘김은 기존 규칙을 따른다.
+  storyBody.addEventListener('click', (e) => {
+    const rect = storyBody.getBoundingClientRect();
+    onZoneTap(e.clientX < rect.left + rect.width / 2 ? storyPrev : storyNext)(e);
+  });
   // 토글 탭 → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움
   storyRecipeToggle.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -2959,6 +2965,11 @@
     if (stPendingClose) return;
     const dy = e.touches[0].clientY - stDragY;
     const dx = e.touches[0].clientX - stDragX;
+    // 긴 본문을 읽는 스크롤은 '아래로 끌어 닫기'로 처리하지 않는다.
+    if (storyBody.contains(e.target) && storyBody.scrollHeight > storyBody.clientHeight + 1) {
+      if (Math.abs(dy) > 8 || Math.abs(dx) > 8) storyWasHold = true;
+      return;
+    }
     if (!stDragging) {
       if (dy > 8 && dy > Math.abs(dx)) { stDragging = true; storyWasHold = true; } // 세로 아래 드래그 확정 → 탭 무효
       else return;

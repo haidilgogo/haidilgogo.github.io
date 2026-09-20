@@ -4232,7 +4232,7 @@ a[href] {
   background: #000;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: clip; /* 상세에서 초점이 돌아와도 폰 전체가 스크롤되지 않는다. */
   border-radius: 14px 14px 0 0;   /* 상단만 살짝 둥글게(시트 느낌, 2026-07-23) */
 }
 /* 풀블리드 배경: 현재 사진을 흐리게 확대해 폰 컬럼 전체를 채움(새 이미지 없이 몰입감). 텍스트·탭존은 위(z-index 1+) */
@@ -4318,8 +4318,12 @@ a[href] {
   text-align: center;
   min-height: 0;
   position: relative;
-  z-index: 1;
+  z-index: 3;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
+.story-body > * { flex-shrink: 0; }
+.story-body .story-desc { -webkit-line-clamp: unset; overflow: visible; }
 .story-img {
   width: 88%; /* svh 를 모르는 옛 브라우저용 폴백 — 아래 줄이 덮어쓴다 */
   width: min(88%, max(100svh - 260px, 240px)); /* 2026-09-07: 사진·캡션 한 변 = min(판 폭 88%, 화면 높이 − 여유 260, 바닥 240). 폰(393×695)은 346 그대로. 옛 max-width 400 제거 */
