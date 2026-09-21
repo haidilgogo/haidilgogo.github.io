@@ -2670,6 +2670,7 @@
     cancelDragClose();
     document.documentElement.style.overflow = 'hidden';
     storyViewer.classList.add('open');
+    if (refreshStoryEdge) refreshStoryEdge();
     storyViewer.setAttribute('aria-hidden', 'false');
     syncPageBackgroundA11y();   // 뒤 화면(본문·탭바·상단바)을 잠근다
     /* 열면 초점을 X 로 보낸다. `focusDialogClose` 를 쓰는 이유는 「손가락으로 눌렀을 때 파란
@@ -2701,6 +2702,9 @@
     for (let i = storyPersonIdx + dir; i >= 0 && i < storyPersons.length; i += dir) {
       if (loadStoryPerson(storyPersons[i], dir < 0)) {
         storyPersonIdx = i;
+        // renderStorySlide는 위 loadStoryPerson 안에서 이전 셀럽 번호로 실행된다.
+        // 갱신된 번호로 다음 셀럽 사진과 하단 색을 다시 미리 준비한다.
+        preloadNextStoryImages();
         // 넘어간 사람도 '본 것'으로 표시해 레일의 회색 링을 맞춘다(직접 눌렀을 때와 같게).
         if (dir > 0) { seenCelebs.add(storyPersons[i]); renderCelebRail(); }
         return true;
@@ -2708,6 +2712,82 @@
     }
     return false;
   }
+
+  // 받은 이미지와 화면 크기별 색을 재사용하고 다음 사진의 색도 미리 계산한다.
+  const storyEdgeImages = new Map();
+  const storyEdgeColors = new Map();
+  function storyEdgeImage(src) {
+    if (!storyEdgeImages.has(src)) {
+      const image = new Image();
+      image.src = src;
+      storyEdgeImages.set(src, image);
+    }
+    return storyEdgeImages.get(src);
+  }
+  function storyEdgeColor(r, edgeImage, rect) {
+    const key = [r.img || r.tint, Math.round(rect.width), Math.round(rect.height)].join('|');
+    if (storyEdgeColors.has(key)) return storyEdgeColors.get(key);
+    const color = calculateStoryEdgeColor(r, edgeImage, rect);
+    if (storyEdgeColors.size >= 128) storyEdgeColors.clear();
+    storyEdgeColors.set(key, color);
+    return color;
+  }
+  function calculateStoryEdgeColor(r, edgeImage, rect) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 96;
+    canvas.height = Math.max(96, Math.round(96 * rect.height / rect.width));
+    const ctx = canvas.getContext('2d', {willReadFrequently: true});
+    if (!ctx) return '#232323';
+    if (r.img) {
+      const scale = Math.max(canvas.width / edgeImage.naturalWidth, canvas.height / edgeImage.naturalHeight);
+      const w = edgeImage.naturalWidth * scale, h = edgeImage.naturalHeight * scale;
+      ctx.drawImage(edgeImage, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    } else {
+      ctx.fillStyle = r.tint || '#333';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    try {
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const zoom = r.img ? 1.3 : 1;
+      const yCenter = canvas.height * (.5 + .5 / zoom);
+      const sigma = Math.max(1, 39 * canvas.width / rect.width);
+      let sum = [0, 0, 0], total = 0;
+      for (let y = 0; y < canvas.height; y++) {
+        const weight = Math.exp(-.5 * Math.pow((y - yCenter) / sigma, 2));
+        if (weight < .001) continue;
+        for (let x = Math.floor(canvas.width * (.5 - .5 / zoom)); x < canvas.width * (.5 + .5 / zoom); x++) {
+          const i = (y * canvas.width + x) * 4;
+          for (let c = 0; c < 3; c++) sum[c] += pixels[i + c] * weight;
+          total += weight;
+        }
+      }
+      const rgb = sum.map(v => v / total * (r.img ? .5 : .72));
+      const luminance = rgb[0] * .213 + rgb[1] * .715 + rgb[2] * .072;
+      const saturation = r.img ? 1.15 : 1.05;
+      return 'rgb(' + rgb.map(v => Math.round(Math.max(0, Math.min(255, luminance + (v - luminance) * saturation)))).join(',') + ')';
+    } catch (_) { return '#232323'; }
+  }
+  function syncStoryBrowserEdge() {
+    const oldEdge = document.getElementById('storyBrowserEdge');
+    if (!oldEdge) return;
+    const color = modalOverlay.classList.contains('open')
+      ? getComputedStyle(modalOverlay).backgroundColor
+      : document.querySelector('.story-phone').style.getPropertyValue('--story-edge-color') || '#232323';
+    // 고정 요소를 교체해 Safari가 현재 화면 색을 다시 읽게 한다.
+    const newEdge = oldEdge.cloneNode(false);
+    newEdge.style.setProperty('--story-edge-color', color);
+    oldEdge.replaceWith(newEdge);
+  }
+
+  // 창 크기가 바뀌면 background-size: cover의 잘리는 위치도 바뀐다.
+  let refreshStoryEdge = null;
+  let storyEdgeResizeFrame = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(storyEdgeResizeFrame);
+    storyEdgeResizeFrame = requestAnimationFrame(() => {
+      if (storyViewer.classList.contains('open') && refreshStoryEdge) refreshStoryEdge();
+    });
+  });
 
   function renderStorySlide() {
     const r = storyList[storyIdx];
@@ -2723,6 +2803,29 @@
     if (cur) { void cur.offsetWidth; cur.classList.add('current'); } // reflow로 애니메이션 확실히 재시작
     // 풀블리드 배경: 사진 있으면 블러 확대본, 없으면 tint 색으로 채움
     const storyBg = document.getElementById('storyBg');
+    // Safari 하단 색을 현재 확대 배경에서 구한다. 이전 이미지의 늦은 응답은 무시한다.
+    const edgeRequest = Symbol();
+    storyBg._edgeRequest = edgeRequest;
+    const applyEdgeColor = color => {
+      if (storyBg._edgeRequest !== edgeRequest) return;
+      document.querySelector('.story-phone').style.setProperty('--story-edge-color', color);
+      syncStoryBrowserEdge();
+    };
+    const sampleEdge = () => {
+      if (storyBg._edgeRequest !== edgeRequest) return;
+      if (r.img && (!edgeImage.complete || !edgeImage.naturalWidth)) return;
+      const rect = storyBg.getBoundingClientRect();
+      if (!rect.width || !rect.height) return; // 이미지 로딩 중 뷰어를 닫은 경우
+      applyEdgeColor(storyEdgeColor(r, edgeImage, rect));
+    };
+    const edgeImage = r.img ? storyEdgeImage(r.img) : null;
+    refreshStoryEdge = sampleEdge;
+    if (!r.img || (edgeImage.complete && edgeImage.naturalWidth)) sampleEdge();
+    else {
+      edgeImage.addEventListener('load', sampleEdge, {once: true});
+      edgeImage.addEventListener('error', () => applyEdgeColor('#232323'), {once: true});
+    }
+
     if (r.img) {
       storyBg.style.backgroundImage = 'url("' + r.img + '")'; // 따옴표 필수 — 괄호 든 파일명(세훈소스(간장) 등) 깨짐 방지
       storyBg.classList.remove('story-bg--tint');
@@ -2769,9 +2872,14 @@
   function preloadStoryImg(src) {
     if (!src || storyPreloaded.has(src)) return;
     storyPreloaded.add(src);
-    const im = new Image();
-    im.decoding = 'async';
-    im.src = src;
+    const im = storyEdgeImage(src);
+    const warmColor = () => {
+      const recipe = RECIPES.find(item => item.img === src);
+      const rect = document.getElementById('storyBg').getBoundingClientRect();
+      if (recipe && im.naturalWidth && rect.width && rect.height) storyEdgeColor(recipe, im, rect);
+    };
+    if (im.complete && im.naturalWidth) warmColor();
+    else im.addEventListener('load', warmColor, {once: true});
   }
   function preloadNextStoryImages() {
     preloadStoryImg(storyList[storyIdx + 1]?.img);
@@ -3518,6 +3626,7 @@
     // 확대 전환 애니메이션은 제거됨(2026-07-12 사용자 결정) — 즉시 열림
     modalOverlay.inert = false;
     modalOverlay.classList.add('open');
+    syncStoryBrowserEdge();
     modalOverlay.setAttribute('aria-hidden', 'false');
     syncPageBackgroundA11y();
     modalScroll.scrollTop = 0; // 데스크톱 스크롤 컨테이너
@@ -3553,6 +3662,7 @@
       try { history.replaceState(history.state, '', location.pathname); } catch (err) {}
     }
     modalOverlay.classList.remove('open', 'from-story');
+    syncStoryBrowserEdge();
     modalOverlay.setAttribute('aria-hidden', 'true');
     modalOverlay.inert = true;
     modalClosingViaHistory = false;
