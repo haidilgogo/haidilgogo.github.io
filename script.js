@@ -2883,8 +2883,8 @@
   document.getElementById('storyPrev').addEventListener('click', onZoneTap(storyPrev));
   // 스크롤 가능한 본문에서도 사진 탭과 좌우 넘김은 기존 규칙을 따른다.
   storyBody.addEventListener('click', (e) => {
-    const rect = storyBody.getBoundingClientRect();
-    onZoneTap(e.clientX < rect.left + rect.width / 2 ? storyPrev : storyNext)(e);
+    const rect = storyPhoneEl.getBoundingClientRect();
+    onZoneTap(e.clientX < rect.left + rect.width * 0.32 ? storyPrev : storyNext)(e);
   });
   // 토글 탭 → 기존 레시피 상세 모달을 스토리 위(z 200>190)에 겹쳐 띄움
   storyRecipeToggle.addEventListener('click', (e) => {

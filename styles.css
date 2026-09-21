@@ -4222,7 +4222,7 @@ a[href] {
   cursor: pointer;
 }
 .story-recipe-kbd svg { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; }
-.story-recipe-kbd:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.kbd-nav .story-recipe-kbd:focus { outline: 2px solid #fff; outline-offset: 3px; }
 .story-viewer { --story-dur: 7s; } /* 진행바 자동재생 1칸 시간 */
 .story-phone {
   position: relative; /* 탭 존·CTA의 기준 */
