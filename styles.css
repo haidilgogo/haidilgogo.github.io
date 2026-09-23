@@ -4367,7 +4367,6 @@ body:has(.modal-overlay.open) #storyBrowserEdge {
   overscroll-behavior-y: contain;
 }
 .story-body > * { flex-shrink: 0; }
-.story-body .story-desc { -webkit-line-clamp: unset; overflow: visible; }
 .story-img {
   width: 88%; /* svh 를 모르는 옛 브라우저용 폴백 — 아래 줄이 덮어쓴다 */
   width: min(88%, max(100svh - 260px, 240px)); /* 2026-09-07: 사진·캡션 한 변 = min(판 폭 88%, 화면 높이 − 여유 260, 바닥 240). 폰(393×695)은 346 그대로. 옛 max-width 400 제거 */
@@ -4440,10 +4439,8 @@ body:has(.modal-overlay.open) #storyBrowserEdge {
   max-width: none; /* 옛 400 상한 제거(2026-09-07) — 위 식이 상한 역할 */
   padding-left: 0; padding-right: 0;
   text-align: left;              /* 설명만 왼쪽 정렬(제목은 가운데 유지) */
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block; /* 강조 태그 사이의 공백도 일반 문단처럼 표시 */
+  overflow: visible;
 }
 .story-desc b { color: #fff; font-weight: 700; }
 /* 좌/우 탭 존 — 헤더(위)·CTA(아래) 영역은 비워 겹침 방지 */

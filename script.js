@@ -468,6 +468,10 @@
       ings: [['양파', '3', '스푼'], ['다진 파', '2', '스푼'], ['다진 마늘', '2', '스푼'], ['청유훠궈소스', '4', '스푼'], ['굴소스', '0.33', '스푼'], ['완자간장소스', '0.5', '스푼']],
       steps: [],
       tip: '' },
+    { id: 's39', date: '2026-09-11', cat: '소스', emoji: '🥣', img: 'assets/cards/샤오쥔&양양소스.jpg', imgFit: 'cover', tint: 'linear-gradient(160deg,#C6B39A,#A58D73)', name: '샤오쥔&양양소스', source: 'YouTube 하이슬기 Hi Seulgi', star: true, person: '샤오쥔&양양', notes: ['계량'], desc: '<b>레드벨벳</b> <b>슬기</b>의 유튜브 촬영 중 <b>WayV</b>의 <b>샤오쥔</b>과 <b>양양</b>이 공개한 소스로, 천엽 하나를 젓가락으로 집어 소기름 훠궈에 담갔다 빼는 방식으로 익힌 뒤 소스를 얹어 먹는 방법을 소개했다.',
+      ings: [['다진 파', '1', '스푼'], ['태국고추', '1', '스푼'], ['오향우육', '1', '스푼'], ['굴소스', '1', '스푼'], ['고추기름', '7', '스푼'], ['다진 마늘', '2', '스푼'], ['땅콩가루', '2', '스푼'], ['마라시즈닝(고춧가루)', '2', '스푼'], ['참깨', '1', '스푼']],
+      steps: [],
+      tip: '고수를 좋아하면 취향에 따라 추가하기' },
     { id: 'b3', cat: '탕', emoji: '🍲', img: 'assets/cards/스키야키탕.jpg?v=3', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E3CC,#E0C298)', name: '스키야키탕', desc: '맑은 탕에 소스바 재료를 넣어서 셀프로 만드는 스키야키탕이다.',
       order: [['맑은 탕/맹물', '', '']],
       /* 🔴 다섯 번째 칸 = 몇 번 그릇(2026-09-04 사용자님 확정). 소스 그릇 2개를 쓴다.
@@ -2592,6 +2596,10 @@
       .map((p) => p.name);
   }
 
+  function celebDisplayName(name) {
+    return name === '샤오쥔&양양' ? '샤오쥔, 양양' : name;
+  }
+
   function renderCelebRail() {
     // 색은 정렬된 자리 순서대로 배정한다. 셀럽 8명 모두 assets/people/에 사진이 있어 이 색은
     // 사진 뒤에 깔리는 대체 배경일 뿐 화면에 보이지 않는다(사진이 없는 셀럽이 생기면 그때만 드러남).
@@ -2603,7 +2611,7 @@
         + '<span class="celeb-img"><span class="celeb-face" style="background:' + color + '">' + name.charAt(0)
         + '<img src="assets/people/' + name + '.jpg" alt="" draggable="false" onerror="this.remove()">'
         + '</span></span>'
-        + '<span class="celeb-name">' + name + '</span></button>';
+        + '<span class="celeb-name">' + celebDisplayName(name) + '</span></button>';
     }).join('');
     celebRailEl.querySelectorAll('.celeb').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -2646,9 +2654,9 @@
     if (!storyList.length) return false;
     storyIdx = atEnd ? storyList.length - 1 : 0;
     storyAvatarEl.innerHTML = '<img src="assets/people/' + personName + '.jpg" alt="" draggable="false" onerror="this.remove()">';
-    storyNameEl.textContent = personName;
+    storyNameEl.textContent = celebDisplayName(personName);
     // 창 이름도 같이 갈아 끼운다 — 이름만으로는 창인지 모르므로 「스토리」를 붙인다
-    storyViewer.setAttribute('aria-label', personName + ' 스토리');
+    storyViewer.setAttribute('aria-label', celebDisplayName(personName) + ' 스토리');
     // 각 세그먼트에 안쪽 채움 바(.story-seg-fill) — 현재 칸만 CSS 애니메이션으로 차오름
     storyProgress.innerHTML = storyList.map(() => '<span class="story-seg"><i class="story-seg-fill"></i></span>').join('');
     storyViewer.classList.remove('paused');
