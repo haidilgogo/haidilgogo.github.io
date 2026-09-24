@@ -7395,6 +7395,12 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 /* 담은 개수의 숫자만 빨갛게(2026-08-29 사용자님 지시).
    ⚠️ `<b>` 라서 글꼴이 저절로 굵어지는 것을 **되돌린다** — 줄 전체가 400 이므로 숫자만 굵으면 어긋난다. */
 .sauce-count-n { color: var(--brand-red); font-weight: inherit; }
+/* 재료 30개가 다 찼을 때(2026-09-23 사용자님 확정) — 개수 줄은 그대로 두고 **아랫줄에** 한 줄 덧붙인다(script.js `발밑갱신`). */
+.sauce-count.is-full { flex-wrap: wrap; row-gap: 2px; }
+.sauce-limit { flex-basis: 100%; font-size: 12px; color: var(--brand-red); }
+/* 다 찼을 때 담는 단추들 — 흐리게, 손가락 모양 없이. 🔴 hover·active 반응도 끈다(눌리는 것처럼 보이면 안 된다). */
+.si-add:disabled,
+.si-etc-add:disabled { opacity: .35; cursor: default; pointer-events: none; }
 
 /* 안내문 속 담기 버튼 그림 — 목록의 `.si-add` 와 **같은 모양**이라야 「저걸 누르라」는 뜻이 통한다.
    🔴 글자(`+`)를 그대로 담고 있다. 화면낭독기가 「더하기」로 읽어야 문장이 성립하기 때문이다. */
