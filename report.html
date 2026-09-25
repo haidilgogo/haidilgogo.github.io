@@ -95,7 +95,8 @@
 .rp-kind {
   display: flex; align-items: center; width: 100%; text-align: left;
   border: 1.5px solid var(--card-border); background: #fff; border-radius: 12px;
-  min-height: 48px; padding: 0 14px; box-sizing: border-box;
+  /* 왼쪽 여백 12px(2026-09-25 사용자님) — 「목록에서 고르기 / 직접 쓰기」(좁은 폰 때문에 12px)와 동그라미 세로줄을 맞춘다. 예전엔 14px */
+  min-height: 48px; padding: 0 14px 0 12px; box-sizing: border-box;
   font-size: 14px; font-weight: 600; color: var(--text-muted);
   font-family: inherit; -webkit-tap-highlight-color: transparent;
   cursor: pointer; /* 버튼은 기본이 화살표라 손가락 모양을 따로 적어야 한다(2026-09-07 사용자님 지적 — 이 파일에만 빠져 있었다) */
@@ -152,7 +153,8 @@
       이유: **이메일·인스타 바로 아래에 입력 칸이 붙어야** 무엇을 골랐는지 눈으로 이어진다.
       사이에 다른 상자가 끼면 그 연결이 끊긴다. */
 .rp-kinds--pair { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-.rp-kinds--pair .rp-kind { justify-content: center; min-height: 46px; }
+/* 🔴 **왼쪽 정렬**(2026-09-25 사용자님 확정) — 위 세 갈래·「목록에서 고르기 / 직접 쓰기」와 같게. 동그라미가 한 세로줄에 선다. 예전엔 가운데였다. */
+.rp-kinds--pair .rp-kind { justify-content: flex-start; min-height: 46px; }
 .rp-kinds--pair .rp-kind:first-child { grid-column: 1 / -1; }
 /* 2열은 폭이 좁다 — 동그라미와 글자 사이를 줄인다 */
 .rp-kinds--pair .rp-kind::before { margin-right: 8px; }
