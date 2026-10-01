@@ -293,18 +293,19 @@
     '부산역점': 'https://app.catchtable.co.kr/ct/shop/haidilaobusan?type=WAITING&currentSuggestionType=SHOP_NAME',
     '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
-    // 안산점은 2026-10-01 오픈(캐치테이블 예약 달력이 10/1부터 열림, 2026-09-17 확인). 캐치테이블 등록명은
-    // 「안산고잔점」이지만 우리 표기는 「안산점」 유지(사용자 확정). 예약 버튼만 오픈 전부터 열고 지도·전화는 STORE_OPEN_DATE 가 막는다.
-    // type 파라미터 없이 두면 캐치테이블이 기본 탭(예약)을 보여 준다 — 오픈 전엔 웨이팅이 없어 WAITING 은 빈 화면.
-    '안산점': 'https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan',
+    // 🔴 안산점은 **오픈이 미뤄져 다시 잠갔다**(2026-10-01 사용자 지시 「다 잠가주세요」) — 10/1 당일 캐치테이블 예약 달력이
+    //    10/1~10/14 전부 「휴무」로 바뀌었고 새 오픈일은 발표가 없다. 'soon' 이 예약·지도·전화 버튼과 스티커 매장 선택을 모두 막는다.
+    //    오픈이 확인되면 아래 주소로 되돌린다(type 파라미터 없이 — 캐치테이블 기본 탭). 등록명은 「안산고잔점」, 우리 표기는 「안산점」 유지(사용자 확정).
+    //    https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan
+    '안산점': 'soon',
     '부산점': 'soon', // 오픈 예정(서면) — 이 값이 스티커 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
   };
   // 🔴 오픈일이 정해진 지점(2026-09-17 사용자 확정) — 캐치테이블 예약 버튼만 미리 열고,
   //    **지도·전화 버튼과 스티커 매장 선택은 오픈일부터** 자동으로 풀린다(오픈 전엔 지도에 없고 전화도 소용없다).
   //    값은 오픈일(YYYY-MM-DD). 보는 사람 기기의 오늘 날짜가 이 날 이상이면 열린다.
   //    오픈일이 지나면 이 줄은 지워도 된다(남겨 둬도 동작은 같다).
+  //    ⚠️ 안산점의 '2026-10-01' 은 오픈이 미뤄져 뺐다(2026-10-01) — 지금은 위 STORE_CATCH 의 'soon' 이 막는다.
   const STORE_OPEN_DATE = {
-    '안산점': '2026-10-01',
   };
   function storeNotYetOpen(name) {
     const d = STORE_OPEN_DATE[name];
@@ -6347,7 +6348,7 @@
     //    카드가 나왔지만 그 카드를 없앴으므로, 고르면 빈 카드가 된다. 애초에 못 고르게 막는다.
     //    (오픈 예정 매장은 아래에서 '오픈 예정'으로 따로 보여주므로 이 줄에서 거르지 않는다 —
     //     지금 그림 없는 매장은 부산점 하나뿐이고 그게 곧 오픈 예정 매장이다.)
-    // 오픈 전 = 매장 탭의 'soon' 이거나, STORE_OPEN_DATE 의 오픈일이 아직 안 온 지점(안산점 2026-10-01).
+    // 오픈 전 = 매장 탭의 'soon' 이거나, STORE_OPEN_DATE 의 오픈일이 아직 안 온 지점.
     const notYetOpen = STORE_CATCH[s.name] === 'soon' || storeNotYetOpen(s.name);
     if (!STAMP_IMGS[s.name] && !notYetOpen) return;
     const item = document.createElement('button');
