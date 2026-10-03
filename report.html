@@ -113,6 +113,10 @@
   .rp-kind:hover { border-color: var(--card-hover-border); }
 }
 .rp-kind:active { transform: scale(.985); border-color: var(--card-hover-border); }
+/* 🔴 제보 종류 단추는 확인창이 닫힐 때 코드로 초점을 받는다(2026-10-03) — 아이폰 사파리는 손가락으로 누른 뒤
+      코드가 옮긴 초점을 「키보드로 왔다」로 쳐서 파란 테두리를 켠다. 「목록/직접」 단추(.rp-mode-btn)와 같은 짝으로 막는다. */
+.rp-kind:focus { outline: none; }
+.kbd-nav .rp-kind:focus { outline: 2px solid var(--brand-red); outline-offset: 2px; }
 
 /* 🔴 「누르는 상자」와 「적는 칸」이 똑같이 생겼던 것(2026-08-06 사용자 지적).
    앱 입력칸(.stamp-field)의 값을 그대로 빌려 쓴 탓이다 — 흰 배경·1.5px 테두리·모서리 12.
@@ -442,9 +446,9 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
       <!-- 🔴 기본값 없음 — 고르기 전에는 아래를 아예 안 보여준다(2026-08-06 사용자 지시)
            🔴 선택지 문구는 **지금 구글폼 그대로**다(사용자 지시). 줄여 쓰지 말 것. -->
       <div class="rp-kinds" id="rpKinds">
-        <button type="button" class="rp-kind" data-k="recipe">레시피 추가해주세요!</button>
-        <button type="button" class="rp-kind" data-k="bug">잘못된 정보나 오류가 있어요!</button>
-        <button type="button" class="rp-kind" data-k="etc">기타 문의사항이 있습니다.</button>
+        <button type="button" class="rp-kind" data-k="recipe" aria-pressed="false">레시피 추가해주세요!</button>
+        <button type="button" class="rp-kind" data-k="bug" aria-pressed="false">잘못된 정보나 오류가 있어요!</button>
+        <button type="button" class="rp-kind" data-k="etc" aria-pressed="false">기타 문의사항이 있습니다.</button>
       </div>
     </div>
 
@@ -614,9 +618,9 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
            **연락처를 주는 것**이 필수가 아니라 **셋 중 하나를 고르는 것**이 필수다.
            동의를 강요하지 않으므로 개인정보보호법과도 어긋나지 않는다. -->
       <div class="rp-kinds rp-kinds--pair" id="ctKinds">
-        <button type="button" class="rp-kind" data-c="none">답변이 필요 없어요</button>
-        <button type="button" class="rp-kind" data-c="email">이메일</button>
-        <button type="button" class="rp-kind" data-c="insta">인스타그램</button>
+        <button type="button" class="rp-kind" data-c="none" aria-pressed="false">답변이 필요 없어요</button>
+        <button type="button" class="rp-kind" data-c="email" aria-pressed="false">이메일</button>
+        <button type="button" class="rp-kind" data-c="insta" aria-pressed="false">인스타그램</button>
       </div>
 
       <!-- 🔴 칸 바로 위 라벨(2026-08-06 사용자 지시). 칸 안 예시와 역할이 다르다 —
@@ -758,7 +762,9 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   <div class="leave-confirm" role="alertdialog" aria-modal="true"
        aria-labelledby="leaveConfirmTitle" aria-describedby="leaveConfirmDesc">
     <h2 class="leave-confirm-title" id="leaveConfirmTitle">정말 닫을까요?</h2>
-    <p class="leave-confirm-desc" id="leaveConfirmDesc">지금 닫으면 적은 내용이 사라져요.</p>
+    <!-- 🔴 설명은 제보 종류 바꾸기 확인창과 **같은 문장**이다(2026-10-03 사용자님 확정) — 닫기도 담은 줄·동의 체크까지
+         지키게 넓혀서, 「적은 내용」이면 동의만 체크한 이용자가 헷갈린다. 본 앱(index.html)의 같은 이름 창과는 문장을 공유하지 않는다. -->
+    <p class="leave-confirm-desc" id="leaveConfirmDesc">지금까지 입력한 내용이 모두 지워져요.</p>
     <div class="leave-confirm-actions">
       <button class="leave-confirm-btn leave-confirm-btn--stay" id="leaveConfirmStay" type="button">계속 작성</button>
       <button class="leave-confirm-btn leave-confirm-btn--go" id="leaveConfirmGo" type="button">닫기</button>
@@ -766,7 +772,9 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   </div>
 </div>
 
-<!-- ══ 「골라서 넣기 ↔ 글로 쓰기」 바꿀 때 확인창 (2026-09-23 사용자님 확정) ══════════════
+<!-- ══ 바꾸기 확인창 — 「목록에서 고르기 ↔ 직접 쓰기」(2026-09-23)와 **제보 종류 바꾸기**(2026-10-03)가 함께 쓴다 ══
+     🔴 제목·설명은 부를 때마다 JS 가 채우고, 아래 「취소 / 바꾸기」 단추 글자는 **두 용도가 같이 쓴다.**
+        한쪽만 생각해 단추 글자를 고치면 다른 쪽 창의 말도 같이 바뀐다.
      🔴 **묻고 지운다.** 적은 것이 있으면 한 번 묻고, 바꾸면 비운다. 숨겨 보관하지 않는다 —
         내용이 늘 한쪽에만 있어야 보낼 때 섞이거나 빠질 틈이 없다(사용자님이 「오류가 가장 적은 방식」으로 고르심).
      🔴 껍데기·CSS 는 위 「정말 닫을까요?」와 같다. 「취소」가 안전한 쪽이라 열리면 거기에 초점이 간다. -->
@@ -916,7 +924,14 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   }
   var 붙여쓰기 = function (s) { return String(s).replace(/\s+/g, ''); };
   var live = document.getElementById('rpLive');
-  function 알리기(msg) { live.textContent = ''; setTimeout(function () { live.textContent = msg; }, 30); }
+  /* 마지막 알림 하나만 남긴다(2026-10-03) — 담기 직후 연락처를 바꾸는 식으로 빨리 이어질 때
+     앞 문장이 잠깐 끼어 읽히지 않게, 앞 예약은 취소하고 마지막 문장만 넣는다. */
+  var 알림예약 = null;
+  function 알리기(msg) {
+    clearTimeout(알림예약);
+    live.textContent = '';
+    알림예약 = setTimeout(function () { live.textContent = msg; }, 30);
+  }
 
   var pickers = {};
   function makePicker(cfg) {
@@ -1249,6 +1264,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
     p.dirty = function () { return p.rows.length > 0; };
     p.add = function (item) { 고르기(item); };
     p.close = function () { 닫기(); };   // 보내기 시작할 때 열린 목록을 걷는다(아래 전송잠금)
+    p.reset = function () { 비우기(); p.setMode(null); };   // 제보 종류를 바꿀 때 — 담은 줄·찾는 칸·직접 쓴 글·「목록/직접」 선택까지 처음으로
     /* 내 소스에서 넘어온 재료를 줄로 채운다 — 🔴 이름·양을 **따로** 받는다(합친 글을 거꾸로 풀지 않는다).
        소스바 재료면 그림을 붙이고(「매운소고기소스(건더기만)」도 같은 통이라 `base` 로 그림을 붙인다),
        소스바에 없는 이름(내 소스의 「기타」)은 「그대로 적은」 줄로. */
@@ -1327,14 +1343,66 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
     placeholder: '재료 이름으로 찾기', openLabel: '재료 전체 펼치기', groups: 재료묶음
   });
 
-  // 종류 고르기
+  /* 🔴 잃을 것이 남았나 — 제보 종류 바꾸기와 닫기가 **같은 기준**을 쓴다(2026-10-03 사용자님 확정).
+     잃을 것 = 쓴 글 · 찾는 칸 글자 · 담은 줄 · 개인정보 동의 체크(안내를 읽고 판단한 것이라 지킨다).
+     화면에 보이는지와 상관없이 본다. 🔴 **단추만 누른 것은 세지 않는다** — 「목록에서 고르기 / 직접 쓰기」와
+     연락처 방식(답변 불필요·이메일·인스타그램)은 다시 누르면 그만이다(같은 날 확정, 연락처 방식은 나중에 뺐다). */
+  var 입력칸들 = ['rName', 'rOrder', 'rIng', 'rStep', 'rTip', 'rSrc', 'rBody', 'rCt', 'orderCombo', 'ingCombo'];
+  function 남은입력있나() {
+    return 입력칸들.some(function (id) { return document.getElementById(id).value.trim(); })
+      || pickers.order.dirty() || pickers.ing.dirty()
+      || document.getElementById('rpAgree').checked;
+  }
+  /* 🔴 다른 종류로 바뀌면 **연락처·동의까지 전부** 처음으로 돌린다(2026-10-03 사용자님 확정).
+     확인창 없이 바뀔 때도 똑같이 비운다 — 빈 칸의 「직접 쓰기」 선택이나 공백만 든 칸이 다음 갈래로
+     따라오지 않게(2026-10-03 코덱스 계획 검토). ⚠️ `paint()` 안에 넣지 말 것 — 연락처 고르기·첫 표시·
+     내 소스 채움도 `paint()` 를 불러서, 거기 넣으면 이메일만 골라도 글이 지워진다. */
+  function 전부비우기() {
+    ['rName', 'rStep', 'rTip', 'rSrc', 'rBody', 'rCt'].forEach(function (id) {
+      var el = document.getElementById(id);
+      el.value = '';
+      el.dispatchEvent(new Event('input', { bubbles: true }));   // 글자 수 표시·보내기 잠금도 같이 따라오게
+    });
+    pickers.order.reset(); pickers.ing.reset();   // rOrder·rIng·찾는 칸은 여기서 비운다
+    state.ct = null;
+    document.getElementById('rpAgree').checked = false;
+  }
+  function 종류바꾸기(k) {
+    state.kind = k; paint();
+    // 숨은 칸에서 늘리기가 0 으로 계산된 높이를 걷는다 — 3줄 바닥은 CSS 의 min-height 가 지킨다
+    [].forEach.call(document.querySelectorAll('.rp-textarea'), function (el) { el.style.height = ''; });
+  }
+
+  // 종류 고르기 — 🔴 다른 종류로 바꾸면 내용이 지워진다. 남은 입력이 있으면 먼저 묻는다(2026-10-03 사용자님 확정)
   document.getElementById('rpKinds').addEventListener('click', function (e) {
     var b = e.target.closest('.rp-kind'); if (!b) return;
-    state.kind = b.dataset.k; paint();
+    var 새종류 = b.dataset.k;
+    if (새종류 === state.kind) return;                        // 같은 종류를 또 누름 — 아무 일 없음
+    if (state.kind === null) { 종류바꾸기(새종류); return; }   // 처음 고름 — 지울 것이 없다
+    function 바꾸기() { 전부비우기(); 종류바꾸기(새종류); b.focus({ preventScroll: true }); }   // 초점은 누른 단추로(글 칸 아님 — 자판)
+    if (!남은입력있나()) { 바꾸기(); return; }
+    갈래확인('제보 종류를 바꿀까요?', '지금까지 입력한 내용이 모두 지워져요.', b, 바꾸기);
   });
+  /* 🔴 연락처 방식을 바꾸면 **어느 방향이든 주소와 동의를 묻지 않고 비운다**(2026-10-03 사용자님 확정).
+     「연락처 방식을 바꾸면 연락처 부분은 처음부터」 한 규칙이다 — 이메일 주소는 인스타 계정으로 못 쓰고,
+     「답변이 필요 없어요」는 연락처를 안 주겠다는 뜻이라 동의만 숨은 채 남으면 안 된다.
+     ⚠️ 화면에 안내 글은 넣지 않는다(같은 날 확정 — 칸이 비는 게 바로 보인다). 화면 낭독기에만 알린다.
+     ⚠️ `전부비우기()` 를 쓰지 말 것 — 제보 글까지 지워진다. `paint()` 안에도 넣지 말 것(첫 표시·내 소스 채움이 부른다). */
   document.getElementById('ctKinds').addEventListener('click', function (e) {
     var b = e.target.closest('.rp-kind'); if (!b) return;
-    state.ct = b.dataset.c; paint();
+    var 새방식 = b.dataset.c;
+    if (새방식 === state.ct) return;                // 같은 단추를 또 누름 — 아무것도 안 지운다
+    var ct = document.getElementById('rCt'), agree = document.getElementById('rpAgree');
+    var 주소있었나 = ct.value !== '', 동의했었나 = agree.checked;   // 지우기 **전에** 기억한다(알림용)
+    state.ct = 새방식;
+    ct.value = '';
+    agree.checked = false;
+    ct.dispatchEvent(new Event('input', { bubbles: true }));   // 글자 수 표시·보내기 잠금도 따라오게
+    paint();
+    var 말 = 주소있었나 && 동의했었나 ? '연락처 칸을 비우고 개인정보 동의 체크를 해제했어요.'
+      : 주소있었나 ? '연락처 칸을 비웠어요.'
+      : 동의했었나 ? '개인정보 동의 체크를 해제했어요.' : '';
+    if (말) 알리기(말);   // 연락처 값 자체는 읽지 않는다
   });
 
   /* 연락처 값 — 보내기 잠금(checkReady)과 보낼 값 모으기(collect)가 **같은 값**을 봐야 해서 한 곳에 뒀다.
@@ -1346,11 +1414,11 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   /* ══════════════════════════════════════════════════════════════════════
      🔴 보낼 값 모으기 — **화면에 보이는 칸만 담는다**(2026-08-07 사용자 확정)
      ══════════════════════════════════════════════════════════════════════
-     ⚠️ 왜 필요한가: 갈래나 연락처를 바꾸면 칸이 **화면에서만 사라지고 값은 남는다.**
-        그대로 보내면 사람이 「안 주겠다」고 한 것까지 메일에 실린다. 실제로 이렇게 된다 —
-        이메일을 적고 동의까지 한 사람이 마음을 바꿔 「답변이 필요 없어요」를 고르면
-        화면에선 사라지지만 값은 남아 있어, 받는 메일에 그 이메일 주소와 「동의함」이 찍힌다.
-        **안 받겠다고 한 개인정보를 받아 버리는 것**이라 그냥 두면 안 된다.
+     ⚠️ 왜 필요한가: 예전엔 갈래나 연락처를 바꾸면 칸이 **화면에서만 사라지고 값은 남았다.**
+        그대로 보내면 「답변이 필요 없어요」로 바꾼 사람의 이메일과 「동의함」까지 메일에 실렸다 —
+        **안 받겠다고 한 개인정보를 받아 버리는 것**이다.
+        2026-10-03 부터는 제보 종류를 바꾸면 전부, 연락처 방식을 바꾸면 주소·동의를 **바꾸는 순간 비운다.**
+        그래도 이 「보이는 칸만」 규칙은 **겹 안전장치로 남긴다** — 비우기를 빠뜨린 길이 새로 생겨도 새어 나가지 않게.
      🔴 그래서 규칙을 「어느 갈래면 어느 칸」이라고 따로 적지 않는다 — 그렇게 적으면
         나중에 칸이 늘 때 여기를 같이 못 고쳐서 어긋난다. **눈에 보이는지**를 직접 보고 담는다.
         `offsetParent === null` 이면 화면에 없다는 뜻이다(`data-off` 로 숨긴 것이 여기 걸린다).
@@ -1543,7 +1611,7 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   document.getElementById('rpAgree').addEventListener('change', checkReady);
 
   // 닫기 — 🔴 credits.html 과 같은 방식: 같은 사이트에서 왔으면 왔던 자리로, 아니면 홈으로.
-  //        ⚠️ 다만 여기는 폼이라 **적던 글이 있으면 한 번 묻는다**.
+  //        ⚠️ 다만 여기는 폼이라 **잃을 것이 있으면 한 번 묻는다**(2026-10-03 넓힘 — 아래 `남은입력있나`).
   function 나가기() {
     var same = false;
     try { same = new URL(document.referrer).origin === location.origin; } catch (e) {}
@@ -1576,9 +1644,9 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
     if (e.key === 'Escape' && lcOverlay.classList.contains('open')) { e.preventDefault(); 확인창닫기(true); }
   });
   document.getElementById('rpClose').addEventListener('click', function () {
-    var dirty = ['rName','rBody','rCt'].some(function (id) { return document.getElementById(id).value.trim(); })
-      || pickers.order.dirty() || pickers.ing.dirty();   // 고른 줄이 있어도 묻는다(2026-09-23)
-    if (dirty) { 확인창열기(); return; }
+    /* 🔴 제보 종류 바꾸기와 같은 기준(`남은입력있나`) — 글·찾는 칸 글자·담은 줄·동의 체크가 있으면 묻는다(2026-10-03 사용자님 확정).
+       예전엔 이름·내용·연락처·담은 줄만 봐서, 만드는 법·팁·출처·직접 쓴 주문/재료만 적으면 묻지 않고 닫혔다. */
+    if (남은입력있나()) { 확인창열기(); return; }
     나가기();
   });
   /* 🔴 보낸 뒤의 닫기는 **묻지 않는다** — 이미 보냈으니 사라질 글이 없다 */
@@ -1700,10 +1768,14 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
   function paint() {
     // 레시피 갈래용 조작 — ③「선택」 꼬리표는 확정되어 걷어냈다(2026-08-07)
     [].forEach.call(document.getElementById('rpKinds').children, function (b) {
-      b.classList.toggle('on', b.dataset.k === state.kind);
+      var 골랐나 = b.dataset.k === state.kind;   // 🔴 화면 표시(.on)와 화면 낭독기 표시(aria-pressed)는 **같은 값**으로(2026-10-03)
+      b.classList.toggle('on', 골랐나);
+      b.setAttribute('aria-pressed', String(골랐나));
     });
     [].forEach.call(document.getElementById('ctKinds').children, function (b) {
-      b.classList.toggle('on', b.dataset.c === state.ct);
+      var 골랐나 = b.dataset.c === state.ct;
+      b.classList.toggle('on', 골랐나);
+      b.setAttribute('aria-pressed', String(골랐나));
     });
 
     // 🔴 고르기 전에는 아래를 통째로 안 보여준다
