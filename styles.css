@@ -633,6 +633,7 @@ a[href] {
   color: #fff;
   font-size: 11px;
   line-height: 1;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;  /* <button>은 페이지 글꼴을 안 이어받는다(2026-10-15) */
   cursor: pointer;
   padding: 0;
 }
@@ -748,6 +749,9 @@ a[href] {
   border-radius: 10px;           /* 29CM식 낮은 라운드 */
   overflow: hidden;
   cursor: pointer;
+  /* 배너는 <button>이라 페이지 글꼴을 이어받지 않는다 — 안 적으면 머리글·제목·문구가 브라우저의
+     버튼 기본 글꼴(맥 크롬 Arial, 아이폰 시스템 글꼴)로 나온다(2026-10-15 발견, 사용자님 「프리텐다드로」). */
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
   /* 그림자 없음(플랫) — 그림자가 간격으로 번져 배경과 다른 띠로 보이던 문제 해결(2026-07-21) */
   -webkit-tap-highlight-color: transparent;
 }
@@ -815,12 +819,22 @@ a[href] {
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .25));
   transform: translateY(-14px);   /* 캡션과 겹치지 않게 살짝 위로 */
 }
-.mf-hero--column .mf-badge-em { color: #fff; }  /* '기획' 라벨은 흰색 */
+/* (옛 「기획」 라벨을 흰색으로 하던 .mf-hero--column .mf-badge-em 규칙은 지웠다 — 그 라벨은 이미 없고,
+   2026-10-15 추천조합 배너의 「추천 조합」 머리글도 이달의 소스처럼 뒤 낱말이 빨개야 해서.) */
 /* 칼럼 배너 제목의 줄 간격(제목 크기는 .mf-name 공통 30px) */
 .mf-hero--column .mf-name { line-height: 1.2; }
 /* 가이드 배너만 작게 — 제목이 두 줄(어서와~ / 하이디라오는 처음이지?)이라 30px이면
    좁은 폰(320px)에서 둘째 줄이 한 번 더 감겨 세 줄이 된다(2026-07-28 측정). */
 .mf-hero--guide .mf-name { font-size: 26px; }
+/* 추천조합 제목 줄 간격은 이달의 소스 배너와 같은 1.1 — 칼럼 배너 공통 1.2를 쓰면 제목 칸이 3px 커져서
+   그 위 「추천 조합」 머리글이 「이달의 소스」 머리글보다 3px 높아진다(2026-10-15 측정). */
+.mf-hero--title-sm .mf-name { line-height: 1.1; }
+/* 아주 좁은 폰(345px 이하)에서는 모든 배너 제목을 26px·줄 간격 1.1로 통일한다(2026-10-15 사용자님 요청).
+   추천조합 제목 「치즈 분모자 × 영지소스」는 Pretendard로 30px 262px · 26px 227px이고 캡션 폭 = 화면 − 72px
+   (320폭 248 · 375폭 303)이라, 30px이 한 줄에 들어가려면 화면 334px 이상이어야 한다. 그래서 좁은 폰에선
+   26px로 줄이는데, 추천조합만 줄이면 넘길 때 머리글·제목 위치가 4~5px씩 흔들려서 다른 배너도 같이 맞춘다.
+   346px 이상은 그대로 — 30px(가이드만 26px), 칼럼 배너 줄 간격 1.2. */
+@media (max-width: 345px) { .mf-hero .mf-name { font-size: 26px; line-height: 1.1; } }
 /* 준비중 배너 — 클릭 안 되니 기본 커서 */
 .mf-hero--soon { cursor: default; }
 
@@ -832,7 +846,8 @@ a[href] {
 }
 .mf-name {
   /* 배너 제목 공통 30px(2026-07-28, 이달의 소스 34 → 30으로 낮춰 통일).
-     배너를 넘길 때 제목 크기가 계단처럼 바뀌지 않게 — 예외는 두 줄인 가이드(26px)뿐. */
+     배너를 넘길 때 제목 크기가 계단처럼 바뀌지 않게 — 예외는 두 줄인 가이드(26px)뿐.
+     345px 이하 폰에서는 전부 26px(위 .mf-hero .mf-name 규칙, 2026-10-15). */
   font-size: 30px;
   font-weight: 800;
   color: #fff;
@@ -5543,6 +5558,14 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   background: linear-gradient(to top, rgba(0,0,0,.6) 0%, rgba(0,0,0,.18) 32%, rgba(0,0,0,0) 60%);
   pointer-events: none;
 }
+/* 제목 위 작은 머리글 — 홈 배너 .mf-kicker 와 같은 13px 흰 글씨, 강조 낱말은 .mf-badge-em 빨강(2026-10-15). */
+.column-kicker {
+  position: relative; z-index: 1;
+  margin: 0 0 5px;
+  font-size: 13px; font-weight: 700; line-height: 1.5;
+  letter-spacing: -.02em; word-spacing: -1px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
+}
 .column-title {
   position: relative; z-index: 1;
   margin: 0;
@@ -5737,6 +5760,12 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   content: '🌿'; position: absolute; left: 0; top: 0; font-size: 11px;
 }
 .column-body li b { font-weight: 700; }
+/* 추천조합 「먹는 방법」(2026-10-15) — 제목은 아래 목록 절 제목(.column-sauces-title)과 같은 15px,
+   목록은 본문 li 의 🌿 머리표 대신 번호. 줄이 넘어가도 둘째 줄이 번호 뒤에 맞춰지게 번호를 왼쪽에 띄운다. */
+.column-body h3.col-howto-title { margin: 28px 0 10px; font-size: 15px; }
+.column-body ol.col-howto { margin: 0; padding: 0; list-style: none; counter-reset: howto; }
+.column-body ol.col-howto li { counter-increment: howto; padding-left: 20px; }
+.column-body ol.col-howto li::before { content: counter(howto) '.'; font-size: 14px; font-weight: 700; color: var(--text-dark); }
 /* 하단: 관련 소스 목록 */
 .column-sauces { padding: 8px 22px 32px; }
 .column-sauces-title {
@@ -5755,6 +5784,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   background: var(--bg-soft, #f7f4f1);
   border: 1px solid #ececec; border-radius: 12px;
   cursor: pointer; text-align: left;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;  /* <button>은 페이지 글꼴을 안 이어받는다(2026-10-15) */
   -webkit-tap-highlight-color: transparent;
 }
 .col-sauce:active { background: #efeae6; }
@@ -6289,7 +6319,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
    🔴 카드용 그림(IMG)을 쓴다 — 목록 카드가 이미 받아 둔 파일이라 새로 받지 않는다.
    전골도 카드용을 쓴다(냄비 칸의 `-타일`이 아니다) — 그건 담는 순간 따로 받는 파일이다. */
 .mn-sheet-item img { flex:none; width:24px; height:24px; object-fit:contain; }
-.mn-sheet-x { margin-left:auto; background:none; border:0; color:var(--text-muted); font-size:15px; cursor:pointer; }
+.mn-sheet-x { margin-left:auto; background:none; border:0; color:var(--text-muted); font-size:15px; font-family:'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif; cursor:pointer; }  /* 글꼴: <button>은 안 이어받는다(2026-10-15) */
 /* 고지 — 목록 맨 아래. 마지막 줄의 밑줄과 붙지 않게 위 여백을 준다.
    푸터 안내문(.footer-note)과 같은 크기·색을 쓴다 — 같은 성격의 말이라 따로 정하지 않는다. */
 .mn-sheet-note { margin:14px 0 0; font-size:12px; line-height:1.55; color:var(--text-muted); }
@@ -6453,6 +6483,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   color: #7A5A4F;
   font-size: 14px;
   font-weight: 700;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;  /* <button>은 페이지 글꼴을 안 이어받는다(2026-10-15) */
   cursor: pointer;
   /* 손끝 반응 — 앱의 다른 단추(`.si-add`)와 **같은 문법**이다.
      🔴 `transform` 은 0.08s 로 짧게 — 길면 연달아 누를 때 굼떠 보인다. */
@@ -6671,6 +6702,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   color: #7A5A4F;
   font-size: 15px;
   font-weight: 700;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;  /* <button>은 페이지 글꼴을 안 이어받는다(2026-10-15) */
   cursor: pointer;
   /* 손끝 반응 — 맛 칩(`.taste-btn`)과 **같은 문법**이다. 둘 다 「골라서 켜는 단추」라 같아야 한다. */
   transition: border-color .15s, color .15s, background .15s, transform .08s ease;
@@ -7004,6 +7036,7 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   border-radius: 12px;
   font-size: 15px;
   font-weight: 700;
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;  /* <button>은 페이지 글꼴을 안 이어받는다(2026-10-15) */
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background .12s, transform .08s;

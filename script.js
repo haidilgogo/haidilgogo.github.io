@@ -428,7 +428,7 @@
       ings: [['땅콩참깨소스', '1', '스푼'], ['스위트칠리소스', '1', '스푼'], ['다진 파', '1', '스푼'], ['다진 마늘', '1', '스푼'], ['고추기름', '0.5', '스푼'], ['매운소고기소스', '0.5', '스푼'], ['굴소스', '0.5', '스푼'], ['태국고추', '0.5', '스푼'], ['땅콩가루', '0.5', '스푼'], ['참깨', '0.5', '스푼']],
       steps: [],
       tip: '' },
-    { id: 's28', date: '2026-03-19', cat: '소스', emoji: '🥣', img: 'assets/cards/범이소스.jpg', heroDesc: '건희 나와 범이 간다', heroImg: 'assets/monthly-sauce/s28.jpg?v=1', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E0D2,#DDB394)', name: '범이소스', source: 'YouTube 때때때 TTT', star: true, person: '곽범', desc: '<b>연차없이 어떡행</b> 촬영 중 <b>곽범</b>이 상하이에 있는 하이디라오 와이탄점에 방문해서 <u>건희 나와 범이 간다</u>며 공개한 소스이다.',
+    { id: 's28', date: '2026-03-19', cat: '소스', emoji: '🥣', img: 'assets/cards/범이소스.jpg', heroDesc: '건희 나와 범이 간다', heroImg: 'assets/monthly-sauce/s28.jpg?v=2', imgFit: 'cover', tint: 'linear-gradient(160deg,#F3E0D2,#DDB394)', name: '범이소스', source: 'YouTube 때때때 TTT', star: true, person: '곽범', desc: '<b>연차없이 어떡행</b> 촬영 중 <b>곽범</b>이 상하이에 있는 하이디라오 와이탄점에 방문해서 <u>건희 나와 범이 간다</u>며 공개한 소스이다.',
       ings: [['굴소스', '1', '바퀴'], ['매운소고기소스', '2', '스푼'], ['다진 마늘', '1', '스푼'], ['다진 파', '1', '스푼'], ['고수', '1', '스푼'], ['참깨', '0.5', '스푼'], ['고추기름', '3', '스푼']],
       steps: [],
       tip: '' },
@@ -1611,7 +1611,7 @@
   // '이달의 소스' 배지 마크업 — 모달(.modal-badge-row)·브라우즈 그리드 카드(.hc-badge-slot) 공용(2026-07-25).
   const MONTHLY_BADGE_HTML = '<span class="monthly-badge">이달의 소스</span>';
 
-  // ── 기획 칼럼(배너 2번 고정) ─────────────────────────────────
+  // ── 기획 칼럼(배너 4번 — 순서는 pickMonthlyFeatures) ─────────────
   // 레시피가 아닌 '읽을거리' 배너. 클릭 시 칼럼 패널이 열리고 하단에 관련 소스 자동 목록.
   // 배너 사진은 임시(초록 그라데이션+🌿) — 실제 사진 생기면 bannerImg에 경로만 넣으면 그걸 씀.
   // 하단 소스 목록은 ingFilter 재료가 ings에 든 레시피를 자동 수집(수동 관리 불필요).
@@ -1699,7 +1699,7 @@
     '<svg class="ttl-arw" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
       '<path d="M6 18 L18 6 M11 6 H18 V13"/></svg>';
 
-  // ── 훠궈·하이디라오 잡학 아티클(배너 3번 고정) ───────────────────
+  // ── 훠궈·하이디라오 잡학 아티클(배너 마지막 — 순서는 pickMonthlyFeatures) ──
   // 제목은 2026-07-28에 '알쓸신잡' → '안물안궁' → '물어본 사람~ 궁금한 사람~'으로 확정.
   // id·이미지 파일명(hotpot-trivia)은 화면에 안 나오므로 그대로 둔다.
   const HOTPOT_TRIVIA_COLUMN = {
@@ -1804,8 +1804,8 @@
     ],
   };
 
-  // ── 가이드 배너(항상 마지막 고정) ────────────────────────────
-  // 홈 아래쪽 '하이디라오가 처음인 당신에게' 가이드를 놓치는 사람이 많아, 히어로 마지막 칸에도
+  // ── 가이드 배너(이달의 소스 바로 뒤 — 순서는 pickMonthlyFeatures) ──────
+  // 홈 아래쪽 '하이디라오가 처음인 당신에게' 가이드를 놓치는 사람이 많아, 히어로 배너에도
   // 한 번 더 노출. 홈 배너와 히어로 배너 모두 이 아티클을 연다(내용 공유).
   // 아티클은 고수·알쓸신잡과 같은 칼럼 패널(openColumn)을 그대로 쓴다 — 배너 스타일만
   // isGuide로 구분(.mf-hero--guide). 본문은 STEP 1(확정)과 STEP 2(2026-07-29 초안)까지 들어 있다 —
@@ -2060,20 +2060,69 @@
       '<button class="col-cta" type="button" data-go="menu">메뉴 보러 가기</button>',
   };
 
+  // ── 추천조합 배너(맨 앞, 2026-11) ─────────────────────────────
+  // CMO님 안건 → 2026-10-15 회의·사용자 결정(docs/review/회의록-추천조합배너-2026-10-15.md).
+  // 영지소스 2025 + 치즈 분모자. 누르면 고수·가이드와 같은 칼럼 패널이 열린다 — 새 부품 없이
+  // 그림·제목 → 도입(본문) → 「추천 메뉴」 치즈 분모자 → 「추천 레시피」 영지소스 순서(아래 menusFirst).
+  // 제목 아래 한 줄 문구는 사용자님이 정한 「이거 꼭 먹어주세요 제발」(2026-10-15, 처음엔 문구 없이 가기로 했다가 바꿈).
+  // 제목은 다른 배너와 같은 30px, 아주 좁은 폰(345px 이하)에서만 26px로 줄여 한 줄을 지킨다(titleSmall).
+  // 그림은 홈 배너와 칼럼 맨 위가 같은 한 장 — 원본은 data/article/combo-2026-11/(코덱스 D2 — D의 젓가락 표면 정리본, 사용자 확정).
+  // 🔴 12월 이후 계속할지는 정하지 않았다 — 내리려면 COMBO_ON 을 false 로.
+  const COMBO_ON = true;
+  const COMBO_COLUMN = {
+    id: 'col-combo-2026-11',
+    isColumn: true,
+    title: '치즈 분모자 × 영지소스',
+    // 제목 위 작은 머리글 — 이달의 소스처럼 뒤 낱말만 빨강(2026-10-15 사용자 결정, 「추천」 강조안 대신)
+    kickerHtml: '추천 <span class="mf-badge-em">조합</span>',
+    heroDesc: '이거 꼭 먹어주세요 제발',
+    titleSmall: true,
+    bannerImg: 'assets/columns/combo-2026-11.jpg?v=2',
+    bannerBg: 'linear-gradient(150deg,#B8742E 0%,#D9A055 55%,#EFD08C 100%)',
+    emoji: '🥢',
+    lightClose: true,               // 그림 위쪽이 어두운 매장 배경이라 상단 X를 흰색으로
+    // 「추천 메뉴」(치즈 분모자) → 「추천 레시피」(영지소스) 순서 — 치즈 분모자가 먼저 보이게(2026-10-15 사용자).
+    menusFirst: true,
+    menusTitle: '추천 메뉴',        // 메뉴 절 제목(없으면 index.html 의 「고수가 들어간 메뉴」)
+    menus: ['치즈 분모자'],
+    saucesTitle: '추천 레시피',     // 소스 절 제목(없으면 index.html 의 「고수가 들어간 소스」)
+    sauceIds: ['s5'],               // s5 = 영지소스(2025). 재료로 모으지 않고 이것 하나만.
+    // 본문 = 도입 두 문장(연한 글씨 .col-lead, 2026-10-15 사용자 확정 — CMO님 「내용이 빈약하다」).
+    // 고수·안물안궁처럼 「질문 한 문장 + 설명 한 문장」 → 대각선 그림 → 먹는 방법 세 줄.
+    body:
+      '<p class="col-lead">하이디라오 신메뉴인 치즈 분모자, 어디에 찍어 드시나요?</p>' +
+      '<p class="col-lead">고소하고 달콤하다가 끝에 매콤하게 올라오는 영지소스에 찍으면, 쫀득한 분모자 속 치즈와 잘 어울려요.</p>' +
+      // 대각선으로 나눈 두 그림(2026-10-15 사용자 확정) — 왼쪽 위 = 메뉴 탭 치즈 분모자 그림(그림자를 더함),
+      // 오른쪽 아래 = 이달의 소스 영지소스 그림(코덱스 그림자 v3). 둘 다 그림자까지 대각선을 넘지 않게 배치.
+      // 바탕 = 왼쪽 위 연한 초록 #E9F0E4 · 오른쪽 아래 살구색 #F5DFCB(위쪽을 화면 바탕과 같은 아이보리로 두면 네모가 안 보였다).
+      // 보관 원본 data/article/combo-2026-11/02_export/추천조합-대각선-분모자-영지소스-2026-10-15.png
+      '<figure class="col-figure col-figure--no-caption">' +
+        '<img src="assets/columns/combo-2026-11/pair.webp?v=2" width="880" height="880" loading="lazy" decoding="async" alt="접시에 담긴 치즈 분모자와 그릇에 담긴 영지소스를 대각선으로 나눠 놓은 그림">' +
+      '</figure>' +
+      // 먹는 방법 세 줄(2026-10-15 사용자 확정 — 1번 「태블릿으로」·2번 「만드는 방법은」·3번 「치즈 분모자를」은 사용자님이 고침).
+      // 제목은 아래 「추천 메뉴」·「추천 레시피」와 같은 15px, 목록은 🌿 대신 번호(styles.css .col-howto).
+      '<h3 class="col-howto-title">먹는 방법</h3>' +
+      '<ol class="col-howto">' +
+        '<li>태블릿으로 치즈 분모자를 주문해요.</li>' +
+        '<li>소스바에서 영지소스를 만들어요. 만드는 방법은 아래 「추천 레시피」에 있어요.</li>' +
+        '<li>치즈 분모자를 탕에 넣어 익힌 뒤, 영지소스에 찍어 드세요.</li>' +
+      '</ol>',
+  };
+
   function pickMonthlyFeatures() {
     const pool = RECIPES.filter((r) => r.img); // 히어로는 큰 이미지 필요
     if (!pool.length) return [];
     const now = new Date();
     const out = [];
-    // 1) 첫 배너 = 이 달의 소스(고정/자동). out[0]이 항상 '이 달의 소스'.
+    // 순서 = 추천조합 → 이달의 소스 → 가이드 → 고수 → 안물안궁(2026-10-15 사용자 결정).
+    // 가이드를 이달의 소스 바로 뒤에 두는 것은 2026-08-23 확정을 이제야 맞춘 것이다.
+    if (COMBO_ON) out.push(COMBO_COLUMN);
+    // 이 달의 소스(고정/자동). 레시피로 된 배너는 이것 하나뿐이다 — 「이달의 소스」 머리글이 여기에만 붙는다.
     const monthlySauce = pickMonthlySauce(now);
     if (monthlySauce) out.push(monthlySauce);
-    // 2) 두 번째 배너 = 기획 칼럼(고정).
-    out.push(GOSU_COLUMN);
-    // 3) 세 번째 배너 = 훠궈·하이디라오 알쓸신잡.
-    out.push(HOTPOT_TRIVIA_COLUMN);
-    // 4) 마지막 배너 = 가이드 배너(항상 끝에 고정).
     out.push(GUIDE_BANNER);
+    out.push(GOSU_COLUMN);
+    out.push(HOTPOT_TRIVIA_COLUMN);
     return out;
   }
 
@@ -2083,25 +2132,30 @@
     monthlyList = pickMonthlyFeatures();
     if (!monthlyList.length) { monthlyFeatureEl.hidden = true; return; }
     const total = monthlyList.length;
-    mfScroll.innerHTML = monthlyList.map((r, i) => {
+    mfScroll.innerHTML = monthlyList.map((r) => {
       const tagline = r.heroDesc || r.desc;
-      const desc = tagline ? '<div class="mf-desc">' + tagline + '</div>' : '';
+      // 문구 없는 배너(추천조합)도 문구 한 줄 자리는 비워 둔다 — 캡션이 아래 기준이라 안 비우면 제목이
+      // 한 줄만큼 내려가서, 옆으로 넘길 때 배너마다 제목 높이가 바뀐다(2026-10-15 사용자 지적).
+      const desc = tagline ? '<div class="mf-desc">' + tagline + '</div>' : '<div class="mf-desc" aria-hidden="true">&nbsp;</div>';
       // 특수 배너(기획 칼럼 / 가이드 / 준비중): 이미지 대신 임시 배경(bannerImg 있으면 그 사진) + 큰 이모지
       if (r.isColumn || r.isGuide || r.isSoon) {
         const bg = r.bannerImg
           ? 'background-image:url(' + r.bannerImg + ');background-size:cover;background-position:center;'
           : 'background:' + r.bannerBg + ';';
         const aria = r.isColumn ? ' 칼럼 열기' : r.isGuide ? ' 가이드 열기' : '';
-        const kind = r.isGuide ? ' mf-hero--guide' : r.isSoon ? ' mf-hero--soon' : '';
+        const kind = (r.isGuide ? ' mf-hero--guide' : r.isSoon ? ' mf-hero--soon' : '')
+          + (r.titleSmall ? ' mf-hero--title-sm' : '');
         return '<button class="mf-hero mf-hero--column' + kind + '" type="button" aria-label="' + r.title + aria + '">'
           + '<div class="mf-colbg" style="' + bg + '">' + (r.bannerImg ? '' : '<span class="mf-colemoji">' + (r.emoji || '') + '</span>') + '</div>'
-          + '<div class="mf-caption"><div class="mf-name">' + (r.titleHtml || r.title) + '</div>' + desc + '</div>'
+          + '<div class="mf-caption">' + (r.kickerHtml ? '<div class="mf-kicker">' + r.kickerHtml + '</div>' : '')
+          + '<div class="mf-name">' + (r.titleHtml || r.title) + '</div>' + desc + '</div>'
           + '</button>';
       }
       // 히어로 전용 이미지(heroImg) 있으면 그걸, 없으면 카드 썸네일(img)로 폴백(2026-07-21)
       const heroImg = r.heroImg || r.img;
-      // 첫 배너(i===0)에만 제목 위 '이달의 소스' kicker — '소스'만 빨강(.mf-badge-em)
-      const kicker = i === 0 ? '<div class="mf-kicker">이달의 <span class="mf-badge-em">소스</span></div>' : '';
+      // 레시피 배너(= 이달의 소스)에만 제목 위 '이달의 소스' kicker — '소스'만 빨강(.mf-badge-em).
+      // 예전엔 「첫 배너(i===0)」로 골랐는데, 2026-10-15 추천조합이 맨 앞에 오면서 자리 대신 종류로 고른다.
+      const kicker = '<div class="mf-kicker">이달의 <span class="mf-badge-em">소스</span></div>';
       return '<button class="mf-hero" type="button" aria-label="' + r.name + ' 자세히 보기">'
         + '<img src="' + heroImg + '" alt="' + r.name + '" draggable="false">'
         + '<div class="mf-caption">' + kicker + '<div class="mf-name">' + (r.nameHtml || r.name) + '</div>' + desc + '</div>'
@@ -5114,25 +5168,48 @@
     const titleEl = document.getElementById('columnTitle');
     if (col.titleHtml) titleEl.innerHTML = col.titleHtml;
     else titleEl.textContent = col.title;
+    // 홈 배너의 작은 머리글을 칼럼 맨 위에도 그대로(2026-10-15 — 추천조합을 누르면 「추천 조합」이 사라져 보였다).
+    const kickerEl = document.getElementById('columnKicker');
+    kickerEl.innerHTML = col.kickerHtml || '';
+    kickerEl.hidden = !col.kickerHtml;
     document.getElementById('columnSub').textContent = col.heroDesc || '';
-    document.getElementById('columnBody').innerHTML = col.body || '';
+    const bodyEl = document.getElementById('columnBody');
+    bodyEl.innerHTML = col.body || '';
+    // 본문이 없는 글(추천조합)은 본문 칸의 위아래 여백까지 숨긴다 — 그림 바로 아래 목록 절이 오게.
+    bodyEl.hidden = !col.body;
     // 본문의 출처 번호는 URL/history를 바꾸지 않고 하단 해당 출처로 이동.
     [...document.querySelectorAll('#columnBody .col-note-ref')].forEach((el) => {
       el.addEventListener('click', () => {
         document.getElementById('columnNote' + el.dataset.note)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     });
-    // 하단: 관련 소스 자동 목록(각 항목 클릭 → 칼럼 닫고 해당 레시피 열기)
-    const sauces = getColumnSauces(col);
-    const saucesSection = document.querySelector('.column-sauces');
+    // 하단: 관련 소스 목록(각 항목 클릭 → 칼럼 닫고 해당 레시피 열기). 보통은 재료(ingFilter)로 자동 수집,
+    // sauceIds 를 적은 글(추천조합)은 그 소스만 적은 순서대로. 절 제목도 글마다(saucesTitle, 없으면 index.html 원래 제목).
+    const sauces = col.sauceIds
+      ? col.sauceIds.map((id) => RECIPES.find((r) => r.id === id)).filter(Boolean)
+      : getColumnSauces(col);
+    // ⚠️ 메뉴 절도 같은 .column-sauces 라 querySelector('.column-sauces') 로 고르면 안 된다 — 메뉴 절을 위로
+    //    옮긴 글(menusFirst)을 연 뒤엔 그쪽이 먼저 걸린다. 소스 목록이 든 절을 직접 찾는다.
+    const saucesSection = document.getElementById('columnSauceList').closest('.column-sauces');
+    const saucesTitleEl = saucesSection.querySelector('.column-sauces-title');
+    if (!saucesTitleEl.dataset.def) saucesTitleEl.dataset.def = saucesTitleEl.textContent;
+    saucesTitleEl.textContent = col.saucesTitle || saucesTitleEl.dataset.def;
     saucesSection.hidden = !sauces.length;
     const listEl = document.getElementById('columnSauceList');
     listEl.innerHTML = sauces.map(buildColumnSauce).join('');
     // 하단: 관련 메뉴(손으로 적은 목록). 적어 둔 칼럼에만 뜬다 — 없으면 절째로 숨는다.
     const menusSection = document.getElementById('columnMenus');
+    // 절 제목은 글마다 다르다(추천조합 = 「추천 메뉴」). 안 적은 글은 index.html 의 원래 제목을 쓴다.
+    const menusTitleEl = menusSection.querySelector('.column-sauces-title');
+    if (!menusTitleEl.dataset.def) menusTitleEl.dataset.def = menusTitleEl.textContent;
+    menusTitleEl.textContent = col.menusTitle || menusTitleEl.dataset.def;
     const menus = (col.menus || []).map(buildColumnMenu).filter(Boolean);
     menusSection.hidden = !menus.length;
     document.getElementById('columnMenuList').innerHTML = menus.join('');
+    // 절 순서: 보통은 소스 → 메뉴. menusFirst 인 글(추천조합 — 치즈 분모자가 먼저 보이게, 2026-10-15)은 메뉴 → 소스.
+    // 열 때마다 제자리를 다시 정해서, 다른 글을 열면 원래 순서로 돌아온다.
+    if (col.menusFirst) saucesSection.before(menusSection);
+    else saucesSection.after(menusSection);
     // 본문 중간에 직접 고른 소스를 놓는 자리. 본문 HTML에
     // <div class="column-sauce-list" data-sauce-ids="s1,s2"></div> 를 넣으면 그 자리에 채워진다.
     // 아래 자동 목록(.column-sauces)은 재료로 모으고 위치가 맨 끝 고정이라, 가이드처럼
