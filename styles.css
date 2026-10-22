@@ -58,6 +58,15 @@
   src: url('assets/fonts/Paperlogy-5Medium.subset.119.woff2') format('woff2');
   unicode-range: U+ACE0, U+D558;
 }
+/* 스티커 띠의 매장 이름용 주아체(배민 주아, SIL OFL 1.1) — 2026-10-22. 매장 이름 15곳의 글자 30자만 잘라 넣은 9KB 조각.
+   🔴 매장 이름에 새 글자가 들어오면 조각을 다시 만들어야 한다(docs/HANDOVER 10-22 절 「주아체 조각」). 없는 글자는 Pretendard 로 떨어진다. */
+@font-face {
+  font-family: 'HG Sticker';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('assets/fonts/BMJua-Regular.subset.stores.woff2') format('woff2');
+}
 
 /* 자주 쓰는 색 이름표(변수). 색을 바꾸려면 여기 한 곳만 고치면 전체에 반영됨 */
 :root {
@@ -7553,3 +7562,41 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
 .sauce-back[hidden] { display: none; }
 @media (hover:hover) { .sauce-back:hover { background: rgba(43, 18, 13, .05); } }
 .sauce-back:active { background: rgba(43, 18, 13, .08); transform: scale(.97); }
+
+/* ── 스티커 띠의 매장 이름(앱이 그림, 2026-10-22) ─────────────────────────
+   그림(600×1034 webp)의 빨간 띠는 세로 85.8%~98.3%, 가로 3%~97% 자리(make_stickers.py 가 글씨를 지우고 띠만 남김).
+   이름은 그 띠 한가운데에 주아체 크림색(#FBF5EA)으로 — 예전에 그림에 구워져 있던 글씨와 같은 자리·같은 크기
+   (구운 글씨 높이 = 띠 높이의 0.69, 2026-10-22 실측). 카드 폭에 비례해야 타일(44px)·슬롯(158px)·상세(크게)
+   어디서나 같은 비율이 되므로 컨테이너 단위(cqw)를 쓴다. 글자가 5자 이상이면(대구동성로점) 조금 줄인다. */
+.stamp-tile, .stamp-slot-card, .stamp-view-card { container-type: inline-size; }
+.stamp-view-card { position: relative; display: block; }
+.stamp-name {
+  position: absolute;
+  left: 3%; width: 94%;
+  top: 85.8%; height: 12.5%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'HG Sticker', 'Pretendard Variable', Pretendard, sans-serif;
+  /* 기본값 = 컨테이너 단위(cqw)를 모르는 옛 브라우저(iOS 15 이하)용 고정 크기. 세 자리의 카드 폭(타일 44·슬롯 158·상세 185)에
+     18%를 곱한 값이다(코덱스 검토 2026-10-22 권고 4). 아래 @supports 에서 cqw 로 덮어쓴다. */
+  font-size: 7.9px;
+  line-height: 1;
+  color: #FBF5EA;
+  white-space: nowrap;
+  letter-spacing: 0;
+  /* 주아체 한글은 글줄 상자보다 조금 아래에 찍혀서, 상자를 띠 가운데 두면 글자가 2~3% 내려가 보인다(2026-10-22 사용자님 지적·실측).
+     띠 높이의 2% 만큼 올려 글자의 먹 부분이 띠 가운데 오게 한다(실측: 0% → 중심 0.52, 3% → 0.49, 2% → 0.50 부근. 예전 구운 글씨는 0.51). */
+  transform: translateY(-2%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.stamp-name--long { font-size: 7.3px; }
+.stamp-slot-card .stamp-name { font-size: 28.4px; }
+.stamp-slot-card .stamp-name--long { font-size: 26.1px; }
+.stamp-view-card .stamp-name { font-size: 33.3px; }
+.stamp-view-card .stamp-name--long { font-size: 30.5px; }
+@supports (font-size: 1cqw) {
+  /* 2026-10-22 실측: 구운 글씨와 같은 크기(띠 높이의 0.70). 19면 5% 컸다. 카드 폭에 비례하므로 어느 크기에서나 같은 비율 */
+  .stamp-name, .stamp-slot-card .stamp-name, .stamp-view-card .stamp-name { font-size: 18cqw; }
+  .stamp-name--long, .stamp-slot-card .stamp-name--long, .stamp-view-card .stamp-name--long { font-size: 16.5cqw; }
+}

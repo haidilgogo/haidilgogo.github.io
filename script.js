@@ -205,6 +205,8 @@
   // region = 지역 그룹(화면 표시 순서). addr = 전체 주소(시/도 포함, 사용자가 준 그대로).
   // 화면 지점명엔 '하이디라오 '가 앞에 붙음(renderStores). 지도 링크도 '하이디라오 {name}'으로 네이버 검색,
   // 전화는 tel: 링크. (soon:true = 오픈 예정 표시 — 지금은 뺐지만 확정 시 필드만 붙이면 렌더가 처리)
+  // 🔴 매장 이름 15곳은 2026-10-22 사용자님 확정 목록이 기준(명동·서초·홍대·건대·영등포·대학로·부산역·코엑스·가산·제주·
+  //    대구동성로·부천역·부산서면·청량리·안산). 이름을 바꾸면 STAMP_RENAME(옛 이름→새 이름)에 한 줄 보태야 모은 스티커가 따라온다.
   const STORES = [
     { region: '서울', name: '명동점',    addr: '서울 중구 명동3길 36, 마이티빌딩 1/2층',          hours: '10:00 – 03:00', tel: '02-3789-3888' },
     { region: '서울', name: '서초점',    addr: '서울 서초구 서초대로77길 54, 서초W타워 2층',       hours: '10:00 – 07:00', tel: '02-533-8260' },
@@ -216,15 +218,21 @@
     { region: '서울', name: '대학로점',  addr: '서울 종로구 대학로 146, 혜화동씨티밸리 3층',        hours: '10:00 – 05:00', tel: '02-743-6868' },
     { region: '서울', name: '코엑스점',  addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 – 05:00', tel: '02-562-1005' },
     { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 – 05:00', tel: '02-2136-9939' },
+    // 🔴 청량리점 — 신규 매장(2026-10 예정 기사, 사용자님 확정 목록 2026-10-22). 주소·전화·오픈일 미정이라 soon:true 로
+    //    「오픈 예정」 배지 + 「자세한 정보가 곧 준비될 예정이에요」만 보인다. STORE_CATCH 도 'soon'. 정보가 나오면 채우고 soon 을 뺀다.
+    { region: '서울', name: '청량리점',  soon: true },
     // 부천점 영업시간 03:00→05:00(2026-09-09 사용자 확정). 네이버·캐치테이블·8월 방문 후기가 05:00, 카카오만 03:00.
-    { region: '경기', name: '부천점',    addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 05:00', tel: '032-666-0118' },
-    { region: '경기', name: '안산점',    addr: '경기 안산시 단원구 당곡로 20, 2001아울렛 4층',    hours: '10:00 – 05:00', tel: '031-481-8886' },
+    { region: '경기', name: '부천역점',  addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 05:00', tel: '032-666-0118' },
+    // 🔴 안산점 — 오픈 미확정(2026-10-22 사용자님). 청량리점과 똑같이 「오픈 예정」만 보인다(사용자님 결정 2026-10-22: 캐치테이블이 있어도
+    //    아직 안 열었으니). 오픈하면 아래 값을 되살린다: addr '경기 안산시 단원구 당곡로 20, 2001아울렛 4층' · hours '10:00 – 05:00' · tel '031-481-8886'.
+    { region: '경기', name: '안산점',    soon: true },
     { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
     // 오픈 예정(2026-07-24 추가) — STORE_CATCH만 'soon'을 둔다(제목 옆 배지는 사용자가 뺐음). 안산점도 이 방식이었다가 2026-09-17 열었다.
     // 그 값 하나로 매장 탭 '오픈 예정' 버튼 + 스티커 매장 선택 비활성이 동시에 걸린다.
     // 🔴 주소는 도로명까지만 확정 — 건물명은 오픈 확정 후 사용자가 알려주면 채운다. 영업시간·전화도 그때.
-    { region: '부산', name: '부산점',    addr: '부산 부산진구 중앙대로 654',                     hours: '미정' },
-    { region: '대구', name: '대구점',    addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
+    // 🔴 부산서면점 — 오픈 전(캐치테이블만 생김 2026-10-22). 안산·청량리와 같이 「오픈 예정」만. 오픈하면 되살린다: addr '부산 부산진구 중앙대로 654'(도로명까지) · tel '051-818-1003'.
+    { region: '부산', name: '부산서면점', soon: true },
+    { region: '대구', name: '대구동성로점', addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
     { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
 
@@ -260,9 +268,9 @@
     '대학로점': '731469845',
     '코엑스점': '576159166',
     '가산점': '670610672',
-    '부천점': '481359274',
+    '부천역점': '481359274',
     '부산역점': '957408853',
-    '대구점': '1203829931',
+    '대구동성로점': '1203829931',
     '제주점': '1143177072',
   };
   const STORE_NAVER_ID = {
@@ -274,9 +282,9 @@
     '대학로점': '1583520034',
     '코엑스점': '1950007630',
     '가산점': '1364098721',
-    '부천점': '2027810824',
+    '부천역점': '2027810824',
     '부산역점': '1327035832',
-    '대구점': '2065069021',
+    '대구동성로점': '2065069021',
     '제주점': '2024934566',
   };
   // 지점별 캐치테이블 예약·웨이팅 링크(있는 지점만 '예약' 버튼 표시). 키 = STORES의 name.
@@ -289,16 +297,23 @@
     '대학로점': 'https://app.catchtable.co.kr/ct/shop/haidilao_hyehwa?type=WAITING&currentSuggestionType=SHOP_NAME',
     '코엑스점': 'https://app.catchtable.co.kr/ct/shop/hidirao_coex?type=WAITING&currentSuggestionType=SHOP_NAME',
     '가산점': 'https://app.catchtable.co.kr/ct/shop/hidiraohd?type=DINING&currentSuggestionType=SHOP_NAME',
-    '부천점': 'https://app.catchtable.co.kr/ct/shop/haidilao_bucheon?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '부천역점': 'https://app.catchtable.co.kr/ct/shop/haidilao_bucheon?type=WAITING&currentSuggestionType=SHOP_NAME',
     '부산역점': 'https://app.catchtable.co.kr/ct/shop/haidilaobusan?type=WAITING&currentSuggestionType=SHOP_NAME',
-    '대구점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
+    '대구동성로점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
     // 🔴 안산점은 **오픈이 미뤄졌다**(2026-10-01 확인 — 당일 캐치테이블 예약 달력이 10/1~10/14 전부 「휴무」, 새 오픈일 발표 없음).
     //    예약 버튼은 열어 둔다(2026-10-01 사용자 결정 — 누르면 캐치테이블의 휴무 달력이 보여 방문자가 직접 상황을 안다).
     //    지도·전화·스티커는 아래 STORE_OPEN_DATE 의 '미정' 이 막는다. 등록명은 「안산고잔점」, 우리 표기는 「안산점」 유지(사용자 확정).
     //    type 파라미터 없이 두면 캐치테이블이 기본 탭(예약)을 보여 준다 — 오픈 전엔 웨이팅이 없어 WAITING 은 빈 화면.
-    '안산점': 'https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan',
-    '부산점': 'soon', // 오픈 예정(서면) — 이 값이 스티커 매장 선택의 비활성 판정도 겸한다. 열리면 실제 URL로 교체.
+    // 2026-10-22 사용자님 결정: 오픈 전엔 예약 버튼도 열지 않는다(청량리와 같은 「오픈 예정」). 오픈하면 'soon' 을 아래 URL 로.
+    //   안산점: https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan (등록명 안산고잔점)
+    //   부산서면점: https://app.catchtable.co.kr/ct/shop/haidilao_seomyeon (등록명 부산서면점)
+    '안산점': 'soon',
+    // 🔴 부산점(서면)은 **오픈 전**이지만 캐치테이블 페이지가 생겼다(2026-10-22 사용자님 발견, 등록명 「하이디라오 부산서면점」,
+    //    전화 051-818-1003, 영업시간 미등록, 공식 사전주문 매장 목록에도 아직 없음). 안산점과 같은 처리(사용자님 결정 2026-10-22):
+    //    예약 버튼만 열고 지도·전화·스티커는 STORE_OPEN_DATE '미정' 이 막는다. type 파라미터 없이 둔다(오픈 전 WAITING 은 빈 화면).
+    '부산서면점': 'soon',
+    '청량리점': 'soon', // 신규(2026-10-22 목록). 캐치테이블 생기면 URL 로, 그때까지 예약 버튼 자리는 「오픈 예정」
   };
   // 🔴 오픈일이 정해진 지점(2026-09-17 사용자 확정) — 캐치테이블 예약 버튼만 미리 열고,
   //    **지도·전화 버튼과 스티커 매장 선택은 오픈일부터** 자동으로 풀린다(오픈 전엔 지도에 없고 전화도 소용없다).
@@ -308,6 +323,7 @@
   //    ⚠️ 안산점은 '2026-10-01' 이었으나 오픈이 미뤄져 '미정' 으로 바꿨다(2026-10-01). 새 오픈일이 나오면 그 날짜로 바꾼다.
   const STORE_OPEN_DATE = {
     '안산점': '미정',
+    '부산서면점': '미정',   // 서면. 캐치테이블만 생김(2026-10-22). 오픈일 나오면 날짜로.
   };
   function storeNotYetOpen(name) {
     const d = STORE_OPEN_DATE[name];
@@ -1631,7 +1647,7 @@
           메뉴 데이터에는 재료가 없어서 모을 근거가 없다. 이름은 `MENU_DATA` 의 것과 글자까지 같아야 한다.
        🔴 **여기가 원본이다.** 별도 주소 페이지(cilantro.html)는 복사본이고, 여기가 바뀌면
           거기도 반드시 같이 바꾼다(사용자가 정한 규칙). */
-    menus: ['고수 듬뿍 훠궈', '고수'],
+    menus: ['고수'],   // 고수 듬뿍 훠궈는 2026-10-22 가림(제주도점 공식에서 사라짐) — cilantro.html 에서도 같이 뺐다
     body:
       // 도입부는 '훅 한 문장 + 설명 한 문단'으로 끊는다(2026-07-29). 안물안궁 도입부와 같은 꼴.
       '<p class="col-lead">고수를 한입 먹자마자 “어? 비누 맛인데?” 싶었다면 기분 탓만은 아니에요.</p>' +
@@ -3353,7 +3369,8 @@
         (`청유마라훠궈` 와 `우유마라훠궈` 는 다른 항목이다. 헷갈리기 쉬우니 고칠 때 확인할 것.)
      🔴 카드 생김새는 옛 「탕」 그리드 그대로다(`.hc-card` + 그림 + 이름). 사용자 지시 —
         「이미지만 따오고 아래에 전골 이름 표시」. 그래서 레시피 카드의 하트·출처는 안 붙인다. */
-  const HOME_BROTHS = ['토마토탕훠궈', '청유마라훠궈', '후추탕훠궈', '고수 듬뿍 훠궈'];
+  // 2026-10-22 넷째 칸 고수 듬뿍 훠궈 → 버섯탕훠궈(사용자님 결정 — 고수 듬뿍 훠궈가 제주도점 공식 메뉴에서 빠져 가림 예정).
+  const HOME_BROTHS = ['토마토탕훠궈', '청유마라훠궈', '후추탕훠궈', '버섯탕훠궈'];
   function renderHomeJeongol() {
     if (!jeongolGridEl) return;
     const D = window.MENU_DATA;
@@ -5947,6 +5964,21 @@
   // 🔴 **이 목록에 없는 매장은 기록 드롭다운에 안 나온다**(2026-07-30). 예전엔 골라도 🐾
   //    자리표시 카드로 나왔지만 그 카드를 없앴다 — 새 매장을 STORES에 넣고 스티커를 안 만들면
   //    그 매장은 조용히 선택 목록에서 빠지므로, 스티커부터 만들 것(.claude/make_stickers.py).
+  // 🔴 2026-10-22 — 스티커 그림의 띠에서 구운 이름을 지웠다(make_stickers.py 가 띠를 빨강으로 덮음). 이름은 아래 buildStampCard 가
+  //    .stamp-name(주아체 웹폰트)으로 얹는다. 그래서 매장 이름이 바뀌어도 그림은 그대로 쓰고 열쇠만 바꾼다.
+  //    그림 내용이 바뀌었으니 캐시 번호 STAMP_V 를 올렸다(파일 이름이 같아 안 올리면 폰에 글씨 구운 옛 그림이 남는다).
+  const STAMP_V = 2;
+  // 옛 이름 → 새 이름(2026-10-22 사용자님 확정). 저장된 스티커 기록·동기화로 받은 기록의 이름을 불러올 때 바꾼다.
+  const STAMP_RENAME = { '대구점': '대구동성로점', '부천점': '부천역점', '부산점': '부산서면점' };
+  function 스티커이름정리(records) {
+    let changed = false;
+    (records || []).forEach((r) => { if (r && STAMP_RENAME[r.name]) { r.name = STAMP_RENAME[r.name]; changed = true; } });
+    return changed;
+  }
+  // 🔴 스티커 그림 주소는 반드시 이 함수로 만든다 — 카드(buildStampCard)·고를 때 미리 받기·붙이기 직전 확인 셋이 **같은 주소**여야
+  //    캐시가 맞아 「탁 붙는」 연출이 산다. 2026-10-22 밤 카드만 ?v=2 를 붙이고 미리 받기는 옛 주소를 써서 붙이는 순간에야 새로
+  //    내려받았고, 아이폰에서 「붙는 느낌이 없다」로 드러났다(사용자님).
+  function stampImgSrc(name) { return STAMP_IMGS[name] ? STAMP_IMGS[name] + '?v=' + STAMP_V : ''; }
   const STAMP_IMGS = {
     '명동점': 'assets/stickers/명동점.webp',
     '서초점': 'assets/stickers/서초점.webp',
@@ -5956,9 +5988,9 @@
     '대학로점': 'assets/stickers/대학로점.webp',
     '코엑스점': 'assets/stickers/코엑스점.webp',
     '가산점': 'assets/stickers/가산점.webp',
-    '부천점': 'assets/stickers/부천점.webp',
+    '부천역점': 'assets/stickers/부천역점.webp',
     '부산역점': 'assets/stickers/부산역점.webp',
-    '대구점': 'assets/stickers/대구점.webp',
+    '대구동성로점': 'assets/stickers/대구동성로점.webp',
     '제주점': 'assets/stickers/제주점.webp',
     '안산점': 'assets/stickers/안산점.webp',
   };
@@ -5976,13 +6008,14 @@
     const savedStamps = JSON.parse(localStorage.getItem(STAMPS_KEY));
     if (savedStamps && Array.isArray(savedStamps.records)) {
       stampData = savedStamps;
+      if (스티커이름정리(stampData.records)) saveStamps(); // 옛 이름(대구점 등)으로 저장된 기록을 새 이름으로
     } else if (savedStamps && savedStamps.stamps) {
       // v1 → v2 자동 이전: 기존 사용자의 기록을 그대로 배열로 옮김(유실 0)
       stampData = {
         version: 2,
         records: Object.keys(savedStamps.stamps).map((name) => {
           const r = savedStamps.stamps[name];
-          return { id: newStampId(), name: name, date: r.date, memo: r.memo || '', with: r.with, addedAt: r.addedAt || 0 };
+          return { id: newStampId(), name: STAMP_RENAME[name] || name, date: r.date, memo: r.memo || '', with: r.with, addedAt: r.addedAt || 0 };
         }),
       };
       saveStamps();
@@ -5997,12 +6030,14 @@
   //    빈 카드가 뜨는 것보다 낫다고 판단한 것이다. 새 스티커는 .claude/make_stickers.py로만 만들 것.
   function buildStampCard(name, opts) {
     const card = document.createElement('div');
-    // 스티커 이미지엔 지점명이 이미 구워져 있음 → 앱 밴드 오버레이 안 붙임.
+    // 스티커 그림의 띠는 비어 있고(2026-10-22부터) 이름은 아래 .stamp-name 으로 얹는다.
     // loading: 기록 그리드 카드는 lazy(화면 밖은 스크롤 시 로드). 수정 슬롯·찍기(pop)는
     // 반드시 즉시 보여야 하는 초점 이미지라 eager — lazy면 시트 슬라이드 중 로드가 미뤄져
     // 스티커가 한 박자 늦게 떴음(opts.eager로 지정).
     const loading = opts && opts.eager ? 'eager' : 'lazy';
-    card.innerHTML = '<img src="' + STAMP_IMGS[name] + '" alt="' + name + ' 스티커" loading="' + loading + '">';
+    // 🔴 이름은 앱이 그린다(2026-10-22). 글자 수가 많으면(5자 이상) 조금 작게 — 띠 폭 안에 들어가게.
+    card.innerHTML = '<img src="' + stampImgSrc(name) + '" alt="' + name + ' 스티커" loading="' + loading + '">'
+      + '<span class="stamp-name' + (name.length >= 5 ? ' stamp-name--long' : '') + '" aria-hidden="true">' + name + '</span>';
     return card;
   }
 
@@ -6248,7 +6283,7 @@
       stampSlotHint.textContent = '스티커 붙이는 곳'; // 지점 선택해도 지점명 안 붙이고 고정 문구 유지
       stampSubmitEl.disabled = false;
     }
-    if (STAMP_IMGS[name]) { const pre = new Image(); pre.src = STAMP_IMGS[name]; } // 미리 로드 → 팝/교체 때 흰 카드 안 뜸
+    if (STAMP_IMGS[name]) { const pre = new Image(); pre.src = stampImgSrc(name); } // 미리 로드(카드와 같은 주소) → 팝/교체 때 흰 카드 안 뜸
   }
 
   // editId 있으면 = 그 기록 수정 모드(매장·날짜·메모·동행 수정 + 삭제), 없으면 새로 찍기
@@ -6661,7 +6696,7 @@
       }, 1250); // 팝 0.55s + 붙은 스티커 감상 시간
     };
     // 이미지가 캐시됐으면(대개 이 경우) 즉시, 아직이면 로드 완료 후 pop. 실패·지연 시엔 안전장치로 진행.
-    const stampImgUrl = STAMP_IMGS[stampSelected];
+    const stampImgUrl = stampImgSrc(stampSelected); // 카드와 같은 주소(?v= 포함)여야 캐시가 맞는다
     if (stampImgUrl) {
       const pre = new Image();
       let started = false;
@@ -6944,6 +6979,7 @@
       const saved = readStoredObject(STAMPS_KEY);
       if (Array.isArray(saved.records) || localStorage.getItem(STAMPS_KEY) === null) {
         stampData = Array.isArray(saved.records) ? saved : { version: 2, records: [] };
+        스티커이름정리(stampData.records); // 다른 기기가 옛 이름으로 올린 기록도 새 이름으로
         stampCardCache.clear();
         renderStamps();
         // 열린 상세도 맞춘다 — 예전엔 **지워졌을 때 닫기만** 하고 내용이 바뀐 경우는 그대로 둬서
@@ -7471,6 +7507,10 @@
     //    그대로 넘기면 옛 즐겨찾기가 그 순간 사라진다(1차 교차검증에서 겪은 그 버그).
     a = a || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
     b = b || { stamps: { records: [], deleted: [] }, favorites: [], liked: [], favMarks: {}, likedMarks: {} };
+    // 🔴 합치기 전에 양쪽 모두 옛 매장 이름을 새 이름으로(2026-10-22, 코덱스 검토 1번). 서버 사본이 옛 이름이면 그대로 들어오고,
+    //    같은 id·같은 시각일 때 문자열 비교로 옛 이름이 이기는 경우까지 있었다. 이름을 먼저 맞추면 합치기가 이름 때문에 갈릴 일이 없다.
+    스티커이름정리(a.stamps && a.stamps.records);
+    스티커이름정리(b.stamps && b.stamps.records);
     const stampsM = 기록합치기(
       (a.stamps && a.stamps.records), (b.stamps && b.stamps.records),
       (a.stamps && a.stamps.deleted), (b.stamps && b.stamps.deleted)
@@ -7513,6 +7553,7 @@
     if (!p) return;
     const prevRecs = stampData.records || [];
     stampData.records = (p.stamps && p.stamps.records) || [];
+    스티커이름정리(stampData.records); // 서버에서 온 기록의 옛 매장 이름 → 새 이름(2026-10-22). 여기서 saveStamps()는 부르지 않는다(되울림)
     stampData.deleted = (p.stamps && p.stamps.deleted) || [];
     // 🔴 카드 캐시에서 **내용이 바뀐 id만** 지운다(3차 교차검증 3번 + 4차 3번). 목록 카드는
     //    id로 재사용하는데, 다른 기기에서 수정된 내용이 들어와도 캐시가 옛 카드를 그대로

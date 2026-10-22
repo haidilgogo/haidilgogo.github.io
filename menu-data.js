@@ -1082,6 +1082,15 @@ window.MENU_DATA = {
      "up": "채소·버섯",
      "sub": "잎채류",
      "o": 0.05
+    },
+    {
+     "n": "동과",
+     "img": true,
+     "part": true,
+     "jeju": false,
+     "up": "채소·버섯",
+     "sub": "근경류",
+     "o": 0.042
     }
    ]
   },
@@ -1224,15 +1233,6 @@ window.MENU_DATA = {
      "o": 0.95
     },
     {
-     "n": "매운 떡볶이",
-     "img": true,
-     "part": true,
-     "jeju": true,
-     "up": "사이드·디저트",
-     "sub": "사이드메뉴",
-     "o": 0.25
-    },
-    {
      "n": "아이스크림",
      "img": true,
      "part": true,
@@ -1240,15 +1240,6 @@ window.MENU_DATA = {
      "up": "사이드·디저트",
      "sub": "디저트",
      "o": 0.9
-    },
-    {
-     "n": "제주한라봉셔벗",
-     "img": true,
-     "part": true,
-     "jeju": true,
-     "up": "사이드·디저트",
-     "sub": "디저트",
-     "o": 0.7
     },
     {
      "n": "우유 치즈 꽃빵",
@@ -1333,12 +1324,6 @@ window.MENU_DATA = {
    "n": "맑은 탕(맹물)",
    "img": true,
    "jeju": false,
-   "tile": true
-  },
-  {
-   "n": "고수 듬뿍 훠궈",
-   "img": true,
-   "jeju": true,
    "tile": true
   }
  ],
