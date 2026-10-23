@@ -7644,7 +7644,10 @@ html.duo-folded .tabbar {
 }
 html.duo-folded .tabbar-btn { min-width: 0; width: 46px; padding: 7px 0 5px; border-radius: 20px; }
 html.duo-folded .tabbar-label { max-width: 46px; font-size: 10px; }
-html.duo-folded .tabbar-indicator { border-radius: 20px; }
+html.duo-folded .tabbar-indicator { border-radius: 20px; }   /* 멈춘 분홍 칸 = 버튼 모서리와 같게(확정 시안) */
+/* 🔴 움직이는 유리구슬은 가로 탭바처럼 원이다(2026-10-24 사용자님 지시). 위 20px 줄이 .tabbar-indicator--glass 의 50% 를 덮어
+   듀오에서만 둥근 사각형으로 미끄러졌다 — 이 줄을 지우거나 위 줄보다 앞으로 옮기면 다시 그렇게 된다(선택자 무게가 같아 뒤에 쓴 쪽이 이긴다). */
+html.duo-folded .tabbar-indicator--glass { border-radius: 50%; }
 
 /* 창(덮개 화면): 어두운 막·창 바탕은 화면 전체를 덮고(폰에서 창이 탭바를 덮는 것과 같다),
    창 안 내용과 닫기(X)는 띠 앞에서 끝나게 오른쪽 안쪽 여백에 띠를 더한다. 값 = 각 창의 원래 여백 + 띠.
