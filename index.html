@@ -77,7 +77,60 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <!-- 스티커 띠 이름용 주아체 조각(9KB)을 미리 받는다 — 스티커 탭에서 처음 글자가 뜰 때 다른 글꼴로 보였다 바뀌는 한 박자를 없앤다(2026-10-22) -->
 <link rel="preload" href="assets/fonts/BMJua-Regular.subset.stores.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=941">
+<link rel="stylesheet" href="styles.css?v=942">
+<!-- 아이폰 듀오 — 접은 채 홈 화면 앱으로 열었을 때만 `html.duo-folded` 를 붙인다(2026-10-24, styles.css 맨 끝 「아이폰 듀오」 절과 짝).
+     바깥 화면(466×678pt) 오른쪽에 카메라·시계 띠가 있는데, 그 띠까지 화면으로 쓰려면 viewport-fit=cover 가 필요하다.
+     🔴 viewport-fit=cover 를 viewport 태그에 그냥 넣지 말 것 — 사파리에서 상단바가 다이나믹 아일랜드 밑으로 올라간 회귀가 있었다.
+        그래서 홈 화면 앱(navigator.standalone) + 듀오 바깥 화면일 때만 여기서 붙인다.
+     판정: 접은 바깥 화면 + 세로로 들었을 때만 먼저 붙여 첫 화면부터 맞게 그리고, 다 뜬 뒤 실제 오른쪽 안전 여백을 재서 없으면 뗀다.
+     펼치거나 접거나 돌리면(resize) 다시 잰다. 가로로 눕히면 띠가 오른쪽이 아니라서 아예 붙이지 않는다.
+     🔴 한 번 「띠 없음」으로 판정된 자세는 기억해서 다시 cover 를 붙이지 않는다 — 안 그러면 cover↔원래 를 오가며
+        그때마다 resize 가 나서 끝없이 되풀이될 수 있다(2026-10-24 독립 검토에서 지적). -->
+<script>
+(function () {
+  if (!navigator.standalone) return;
+  var html = document.documentElement;
+  var meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) return;
+  var BASE = meta.getAttribute('content');
+  var COVER = BASE + ', viewport-fit=cover';
+  var probe = null;
+  var rejected = '';   // 「띠 없음」으로 판정된 자세(화면 크기+방향). 같은 자세에선 다시 시도하지 않는다
+  function pose() { return screen.width + 'x' + screen.height + (innerHeight >= innerWidth ? 'p' : 'l'); }
+  // 접은 바깥 화면(466×678pt)을 세로로 들었을 때만. 화면 크기는 돌려도 같은 값일 수 있어 창의 가로세로로 방향을 본다
+  function folded() {
+    var a = screen.width, b = screen.height;
+    return Math.min(a, b) === 466 && Math.max(a, b) === 678 && innerHeight >= innerWidth;
+  }
+  function insetRight() {
+    if (!probe) {
+      probe = document.createElement('div');
+      probe.setAttribute('aria-hidden', 'true');
+      probe.style.cssText = 'position:fixed;top:0;right:0;width:0;height:0;visibility:hidden;pointer-events:none;padding-right:env(safe-area-inset-right,0px)';
+      (document.body || html).appendChild(probe);
+    }
+    return parseFloat(getComputedStyle(probe).paddingRight) || 0;
+  }
+  function off() {
+    html.classList.remove('duo-folded');
+    if (meta.getAttribute('content') !== BASE) meta.setAttribute('content', BASE);
+  }
+  // 오른쪽 띠가 실제로 있을 때만(접고 세로로 든 상태 86pt). 가로로 눕히면 띠가 다른 쪽으로 가서 0 이 된다
+  function check() {
+    if (folded() && insetRight() >= 60) { rejected = ''; html.classList.add('duo-folded'); }
+    else { if (folded()) rejected = pose(); off(); }
+  }
+  function evaluate() {
+    if (!folded()) { rejected = ''; off(); return; }   // 펴거나 눕히면 거절 기록을 지운다 — 다시 접어 세우면 새로 잰다(코덱스 검토)
+    if (rejected === pose()) return;
+    if (meta.getAttribute('content') !== COVER) meta.setAttribute('content', COVER);
+    requestAnimationFrame(function () { requestAnimationFrame(check); }); // 태그를 바꾼 뒤 여백이 반영될 때까지 두 프레임 기다린다
+  }
+  if (folded()) { meta.setAttribute('content', COVER); html.classList.add('duo-folded'); }
+  window.addEventListener('load', function () { requestAnimationFrame(check); });
+  window.addEventListener('resize', evaluate);
+})();
+</script>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-round-v7-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v6.png">
@@ -108,6 +161,15 @@
     opacity: 1; transition: opacity .4s ease;
   }
   .splash-hide { opacity: 0; pointer-events: none; }
+  /* 아이폰 듀오(접은 홈 화면 앱, html.duo-folded)에서만: 스플래시가 떠 있는 동안 뒤 화면(본문·탭바)을 숨긴다(2026-10-24).
+     켜는 첫 순간 아이폰이 스플래시를 화면보다 좁고 짧게 그려서 그 틈으로 뒤의 카드 줄·탭 버튼이 0.1초 비쳤다
+     (가상 듀오 30fps 녹화로 확인 — 아래로 늘려 덮는 방법은 안 먹었다).
+     스플래시가 걷히기 시작하면(.splash-hide) 바로 다시 보이므로 걷히는 모습은 그대로다. visibility 라 자리·크기 계산은 그대로다.
+     🔴 모든 기기로 넓히지 말 것 — 독립 검토에서 두 가지가 나왔다: ① 크롬의 LCP(첫 큰 그림이 뜨는 시점) 측정이
+        스플래시가 걷힐 때까지 밀린다(보이는 화면은 같지만 속도 점수·방문 통계 수치가 나빠진다)
+        ② sessionStorage 가 막힌 브라우저에선 스플래시 스크립트가 멈춰 화면이 영영 숨었다(화면 낭독기까지) — 아래 스크립트를 try/catch 로 감싸 막았다.
+        듀오 밖에서는 이 깜빡임을 확인하지 못했다. */
+  html.duo-folded body:has(#splash:not(.splash-hide)) :is(.page, .tabbar) { visibility: hidden; }
   /* 로고+제목을 한 덩어리로 함께 등장시켜 시간차 방지 */
   .splash-inner {
     display: flex; flex-direction: column; align-items: center; gap: 0; opacity: 0;
@@ -162,8 +224,13 @@
   var s = document.getElementById('splash');
   if (!s) return;
   // 이미 이번 세션에 봤으면(새로고침·로고클릭 등) 즉시 제거 — 깜빡임 없음
-  if (sessionStorage.getItem('hg_splash')) { s.parentNode.removeChild(s); return; }
-  sessionStorage.setItem('hg_splash', '1');
+  // 🔴 저장소가 막힌 브라우저(사이트 데이터 차단 등)에선 sessionStorage 가 예외를 낸다. 감싸지 않으면 아래 종료 절차·3초 타이머가
+  //    등록되기 전에 멈춰 스플래시가 영영 남는다(2026-10-24 코덱스 검토 — 듀오에선 뒤 화면 숨김 규칙까지 안 풀린다).
+  //    실패하면 「처음 본 것」으로 치고 그대로 띄운 뒤 평소처럼 닫는다.
+  var seen = false;
+  try { seen = !!sessionStorage.getItem('hg_splash'); } catch (e) {}
+  if (seen) { s.parentNode.removeChild(s); return; }
+  try { sessionStorage.setItem('hg_splash', '1'); } catch (e) {}
   var inner = s.querySelector('.splash-inner');
   var logo = s.querySelector('.splash-logo');
   var MIN = 1100, start = 0, done = false, ready = false, loaded = false;
@@ -1585,7 +1652,7 @@
 
 <!-- 메뉴 데이터 — `node .claude/make_menu_data.mjs`가 메뉴.md 에서 자동 생성한다. 손으로 고치지 말 것 -->
 <script src="menu-data.js?v=15"></script>
-<script src="script.js?v=997"></script>
+<script src="script.js?v=998"></script>
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7c0ac8f66544156bca23d2c7f84c961"}'></script><!-- End Cloudflare Web Analytics -->
 <div id="storyBrowserEdge" aria-hidden="true"></div>

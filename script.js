@@ -5563,12 +5563,16 @@
   let dragPointerId = null;
   let dragMoved = false; // 6px 이상 움직였을 때만 드래그로 판정(그냥 탭은 click이 처리)
   let dragStartX = 0;
+  let dragStartY = 0;
   let suppressClick = false;
-  function nearestTabBtn(clientX) {
+  // 🔴 탭바가 세로로 설 때가 있다 — 아이폰 듀오를 접은 홈 화면 앱(styles.css 「아이폰 듀오」 절, 2026-10-24).
+  //    그때는 손가락의 위아래를 읽고 원도 위아래로 움직인다. 판정은 CSS 의 flex-direction 하나로 한다(듀오 판정과 묶지 않는다).
+  const tabbarVertical = () => getComputedStyle(tabbarEl).flexDirection === 'column';
+  function nearestTabBtn(clientPos, vertical) {
     let best = null, bestD = Infinity;
     tabbarEl.querySelectorAll('.tabbar-btn').forEach((b) => {
       const r = b.getBoundingClientRect();
-      const d = Math.abs(clientX - (r.left + r.width / 2));
+      const d = vertical ? Math.abs(clientPos - (r.top + r.height / 2)) : Math.abs(clientPos - (r.left + r.width / 2));
       if (d < bestD) { bestD = d; best = b; }
     });
     return best;
@@ -5591,13 +5595,15 @@
     dragPointerId = e.pointerId;
     dragMoved = false;
     dragStartX = e.clientX;
+    dragStartY = e.clientY;
     // ⚠️ 여기서 캡처하면 안 됨 — pointer capture가 걸리면 click 이벤트가 버튼 대신 바로 재타게팅되어
     // 탭 클릭 전환이 죽는다(실제 버그였음). 캡처는 드래그로 판정된 순간(pointermove 6px)에만.
   });
   tabbarEl.addEventListener('pointermove', (e) => {
     if (e.pointerId !== dragPointerId) return;
+    const vertical = tabbarVertical();
     if (!dragMoved) {
-      if (Math.abs(e.clientX - dragStartX) < 6) return; // 아직 클릭 범위
+      if (vertical ? Math.abs(e.clientY - dragStartY) < 6 : Math.abs(e.clientX - dragStartX) < 6) return; // 아직 클릭 범위
       dragMoved = true;
       // 드래그로 확정된 지금만 캡처(pointerdown에서 걸면 click이 죽음) — 손가락이 바 밖으로 나가도 추적 유지
       try { tabbarEl.setPointerCapture(e.pointerId); } catch (_) { /* 일부 브라우저 방어 */ }
@@ -5613,12 +5619,18 @@
     }
     const barRect = tabbarEl.getBoundingClientRect();
     const active = tabbarEl.querySelector('.tabbar-btn.active');
-    const y = active ? bubblePosFor(active).y : 0;
-    let x = e.clientX - barRect.left - BUBBLE / 2;
-    x = Math.max(-6, Math.min(x, barRect.width - BUBBLE + 6)); // 양끝 살짝만 넘게 제한
+    const home = active ? bubblePosFor(active) : { x: 0, y: 0 };
+    let x = home.x, y = home.y;
+    if (vertical) {
+      y = e.clientY - barRect.top - BUBBLE / 2;
+      y = Math.max(-6, Math.min(y, barRect.height - BUBBLE + 6)); // 양끝 살짝만 넘게 제한
+    } else {
+      x = e.clientX - barRect.left - BUBBLE / 2;
+      x = Math.max(-6, Math.min(x, barRect.width - BUBBLE + 6)); // 양끝 살짝만 넘게 제한
+    }
     tabbarIndicator.style.transform = 'translate(' + x + 'px,' + y + 'px)';
     // 버블(클램프된 실제 위치) 중심 밑에 있는 탭만 빨강으로 물듦
-    setDragCandidate(nearestTabBtn(barRect.left + x + BUBBLE / 2));
+    setDragCandidate(vertical ? nearestTabBtn(barRect.top + y + BUBBLE / 2, true) : nearestTabBtn(barRect.left + x + BUBBLE / 2, false));
   });
   function endTabbarDrag(e) {
     if (e.pointerId !== dragPointerId) return;
@@ -5630,7 +5642,8 @@
     tabbarIndicator.style.transition = '';
     suppressClick = true;
     setTimeout(() => { suppressClick = false; }, 0); // 이 제스처의 잔여 click만 무시
-    const target = nearestTabBtn(e.clientX);
+    const vertical = tabbarVertical();
+    const target = vertical ? nearestTabBtn(e.clientY, true) : nearestTabBtn(e.clientX, false);
     const activeBtn = tabbarEl.querySelector('.tabbar-btn.active');
     if (!target || target === activeBtn) {
       slideIndicator(activeBtn); // 같은 탭이면 제자리 복귀 슬라이드
@@ -5680,6 +5693,23 @@
     requestAnimationFrame(() => { tabbarIndicator.style.transition = ''; });
   }
   window.addEventListener('resize', placeIndicator);
+  // 듀오를 접고 펴서 탭바가 가로↔세로로 바뀌면(html 의 duo-folded 가 붙고 떨어짐) 원을 새 자리에 바로 붙인다.
+  // index.html 의 판정은 resize 뒤 두 프레임 기다렸다 바꾸므로 위 resize 만으로는 옛 자리에 남는다.
+  // ⚠️ html 의 class 는 kbd-nav·is-locked 도 자주 바뀌므로, duo-folded 가 실제로 붙고 떨어질 때만 반응한다.
+  let tabbarWasDuo = document.documentElement.classList.contains('duo-folded');
+  new MutationObserver(() => {
+    const now = document.documentElement.classList.contains('duo-folded');
+    if (now === tabbarWasDuo) return;
+    tabbarWasDuo = now;
+    // 🔴 버튼 폭·여백은 transition(.24s)으로 바뀐다 — 그대로 재면 중간 폭(예: 62→46 사이)이 원에 박혀
+    //    돌렸다 세우면 분홍 원이 바 밖으로 삐져나왔다(2026-10-24 가상 듀오, 기록으로 확인).
+    //    바꾸는 순간만 트랜지션을 끄고 최종 크기로 재고, 다음 프레임에 되돌린다(setCompact 의 --freeze 와 같은 방식).
+    // 🔴 placeIndicator 가 아니라 snapIndicator 다 — 탭 이동 슬라이드 도중에 돌리면 placeIndicator 는 indicatorBusy 로 그냥 빠지고
+    //    슬라이드가 옛 방향 좌표로 끝까지 가서 원이 0.6초쯤 바 밖에 떴다(2026-10-24 코덱스 검토). snap 은 진행 중 이동을 끊고 바로 붙인다.
+    tabbarEl.classList.add('tabbar--freeze');
+    snapIndicator();
+    requestAnimationFrame(() => tabbarEl.classList.remove('tabbar--freeze'));
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
   // ── 매장(지점) 렌더 ──
   let activeRegion = '전국'; // 매장 지역 필터 기본값(=전체 지점). 탭 라벨·개수 표기 모두 '전국'

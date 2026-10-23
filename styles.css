@@ -7600,3 +7600,63 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
   .stamp-name, .stamp-slot-card .stamp-name, .stamp-view-card .stamp-name { font-size: 18cqw; }
   .stamp-name--long, .stamp-slot-card .stamp-name--long, .stamp-view-card .stamp-name--long { font-size: 16.5cqw; }
 }
+
+/* ============================================================
+   아이폰 듀오 — 접은 채 홈 화면 앱으로 열었을 때만(2026-10-23·24 사용자님 확정)
+   ============================================================
+   켜는 곳: index.html <head> 의 짧은 스크립트가 `html.duo-folded` 를 붙인다
+   (홈 화면 앱 + 바깥 화면 466×678pt + 오른쪽 안전 여백이 실제로 있을 때만. 사파리·펼친 화면·다른 기기는 안 붙는다).
+   바깥 화면 오른쪽에 카메라·시계가 들어간 띠(86pt)가 있고, 애플 앱은 그 띠에 버튼을 세로로 세운다.
+   🔴 정한 배치(A안): 본문·사진·창은 띠 앞(466 − 86 = 380pt)에서 끝나고 띠 밑으로 아무것도 보내지 않는다.
+      띠 색은 페이지 바탕 그대로(따로 칠하지 않는다).
+   🔴 정한 탭바(좁힌 바): 띠 안 세로 유리 바, 폭 52pt, 가운데를 시계·카메라 줄(418pt)에 맞춘다.
+      띠 정가운데(423pt)가 아니다 — 카메라 부품이 띠 가운데보다 약 5pt 왼쪽이고, 애플 HIG 도
+      「옆 조작부는 카메라와 세로로 한 줄」이라고 한다. 애플 설정·사파리의 띠 버튼도 가운데 417.8pt(가상 듀오 실측).
+      여백을 양쪽 똑같이 맞추는 안은 시계 줄과 6pt 어긋나서 고르지 않았다.
+   ⚠️ 418pt·5pt 는 가상 기기(Xcode 27.1)에서 잰 값이다. 실물 듀오에서 다시 잴 것.
+   시안·측정 기록: docs/HANDOVER.md 2026-10-23~24 절. */
+html.duo-folded { --duo-r: env(safe-area-inset-right, 86px); }
+
+/* 본문: 오른쪽 여백 = 띠. 아래 여백은 탭바가 옆으로 갔으니 홈 인디케이터만 피한다 */
+html.duo-folded .topbar-inner { padding-right: var(--duo-r); }
+html.duo-folded .main { padding-right: var(--duo-r); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); }
+/* 배너·가로 줄은 보통 화면 끝까지(음수 여백 −20) 가는데, 여기선 그 20 이 띠 밑으로 들어가므로 0 으로 */
+html.duo-folded .mf-carousel,
+html.duo-folded .hp-rail,
+html.duo-folded .celeb-rail { margin-right: 0; }
+
+/* 탭바: 띠 안 세로 유리 바(재질은 위 .tabbar 그대로). right = 띠 가운데 기준 (86 − 52) / 2 = 17 에 5 를 더해 시계 줄에 맞춘다 */
+html.duo-folded .tabbar {
+  left: auto; right: calc((var(--duo-r) - 52px) / 2 + 5px);
+  top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  transform: none;
+  width: 52px; max-width: none;
+  flex-direction: column; gap: 4px;
+  padding: 5px 2px;   /* 52 − 테두리 2 − 여백 4 = 46 = 버튼 폭. 3 이면 2px 넘쳐 버튼이 1px 오른쪽으로 쏠린다(독립 검토) */
+  border-radius: 26px;
+}
+html.duo-folded .tabbar-btn { min-width: 0; width: 46px; padding: 7px 0 5px; border-radius: 20px; }
+html.duo-folded .tabbar-label { max-width: 46px; font-size: 10px; }
+html.duo-folded .tabbar-indicator { border-radius: 20px; }
+
+/* 창(덮개 화면): 어두운 막·창 바탕은 화면 전체를 덮고(폰에서 창이 탭바를 덮는 것과 같다),
+   창 안 내용과 닫기(X)는 띠 앞에서 끝나게 오른쪽 안쪽 여백에 띠를 더한다. 값 = 각 창의 원래 여백 + 띠.
+   🔴 이게 없으면 닫기(X)가 시계 밑에 숨어 창을 못 닫는다 — 스티커 기록하기는 X 자리를 누르면 제어 센터가 열렸다(2026-10-23). */
+html.duo-folded .modal-overlay,
+html.duo-folded .story-viewer,
+html.duo-folded .column-overlay        { padding-right: var(--duo-r); }   /* column 은 폰 폭에서 원래 0(24 는 641px 이상 전용) */
+html.duo-folded .stamp-sheet-overlay,
+html.duo-folded .stamp-view-overlay    { padding-right: calc(8px + var(--duo-r)); }
+html.duo-folded .gacha-overlay,
+html.duo-folded .guide-overlay,
+html.duo-folded .share-overlay,
+html.duo-folded .crop-overlay          { padding-right: calc(20px + var(--duo-r)); }
+html.duo-folded .leave-confirm-overlay { padding-right: calc(24px + var(--duo-r)); }
+/* 잠깐 뜨는 알림은 보이는 폭(띠 앞)의 가운데에 */
+html.duo-folded .share-toast { left: calc((100% - var(--duo-r)) / 2); }
+
+/* 스플래시: 켜는 첫 순간 아이폰이 띠를 뺀 좁은 폭(380)으로 먼저 그렸다가 466 으로 펴서 로고가 190 → 233pt 로 튀었다.
+   로고 묶음을 왼쪽 끝부터 본문 폭 380 상자에 놓아 좁게 그리든 넓게 그리든 중심이 190 에 머물게 한다.
+   (뒤 화면이 비치던 것은 index.html 스플래시 <style> 의 듀오 규칙이 맡는다) */
+html.duo-folded .splash { justify-content: flex-start; }
+html.duo-folded .splash-inner { width: 380px; }
