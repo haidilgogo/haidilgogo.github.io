@@ -4989,7 +4989,14 @@ body:has(.modal-overlay.open) #storyBrowserEdge {
 /* ── ⑤⑥ 탕·히든메뉴 2열 그리드 (클린 카드) ── */
 .home-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* 🔴 minmax(0, 1fr) 이 핵심이다(2026-10-24).
+     확인한 것: 사파리에서 화면 폭이 한 번 넓어졌다 좁아진 뒤 홈 전골 카드 칸이 줄지 않고 화면 밖으로 넘쳤다
+       (아이폰 듀오 가상 기기 = 홈 화면에 나갔다 오기만 해도, 아이폰 17 Pro 사파리 = 가로로 돌렸다 세우면. 크롬은 재현 안 됨).
+       그냥 1fr 은 최소 폭이 「내용 폭(auto)」이라 내용이 커지면 칸도 밀려 커진다 — 0 을 최소로 박아 그 길을 막는다. 고친 뒤 둘 다 반반 유지.
+     추정(미확인): 정사각 썸네일(aspect-ratio)의 크기를 사파리가 다시 재는 과정의 오류로 보인다.
+       WebKit 버그 322714(그리드 + aspect-ratio 에서 창을 줄여도 칸이 안 줄어듦)와 증상이 비슷하지만 이 앱의 정확한 내부 원인은 확인하지 않았다(코덱스 검토).
+     .stamps 의 같은 주석도 참고. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 12px;
   margin-top: 17px;   /* 헤더와 간격 — 탕 리스트 간격(헤더2px+행padding15px=17px)과 동일하게(2026-07-23) */
 }
