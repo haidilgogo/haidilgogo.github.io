@@ -77,58 +77,128 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <!-- 스티커 띠 이름용 주아체 조각(9KB)을 미리 받는다 — 스티커 탭에서 처음 글자가 뜰 때 다른 글꼴로 보였다 바뀌는 한 박자를 없앤다(2026-10-22) -->
 <link rel="preload" href="assets/fonts/BMJua-Regular.subset.stores.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=944">
+<link rel="stylesheet" href="styles.css?v=945">
 <!-- 아이폰 듀오 — 접은 채 홈 화면 앱으로 열었을 때만 `html.duo-folded` 를 붙인다(2026-10-24, styles.css 맨 끝 「아이폰 듀오」 절과 짝).
      바깥 화면(466×678pt) 오른쪽에 카메라·시계 띠가 있는데, 그 띠까지 화면으로 쓰려면 viewport-fit=cover 가 필요하다.
      🔴 viewport-fit=cover 를 viewport 태그에 그냥 넣지 말 것 — 사파리에서 상단바가 다이나믹 아일랜드 밑으로 올라간 회귀가 있었다.
         그래서 홈 화면 앱(navigator.standalone) + 듀오 바깥 화면일 때만 여기서 붙인다.
-     판정: 접은 바깥 화면 + 세로로 들었을 때만 먼저 붙여 첫 화면부터 맞게 그리고, 다 뜬 뒤 실제 오른쪽 안전 여백을 재서 없으면 뗀다.
-     펼치거나 접거나 돌리면(resize) 다시 잰다. 가로로 눕히면 띠가 오른쪽이 아니라서 아예 붙이지 않는다.
-     🔴 한 번 「띠 없음」으로 판정된 자세는 기억해서 다시 cover 를 붙이지 않는다 — 안 그러면 cover↔원래 를 오가며
-        그때마다 resize 가 나서 끝없이 되풀이될 수 있다(2026-10-24 독립 검토에서 지적). -->
+     🔴 판정은 「지금 창」으로 한다 — screen 크기는 기기 구분에만 쓴다(2026-10-24 가상 듀오 기록).
+        ① 펼친 안쪽 화면(951×669 / 669×951)에서도 screen 은 466×678 그대로라, screen 만으로는 바깥·안쪽 화면을 못 가린다.
+        ② 창 크기가 바뀌어도 resize 가 안 올 때가 있다(펼칠 때 466×669 → 951×669, 가로 ↔ 반대 가로 180도 회전).
+           그래서 방향 바뀜·화면 영역 바뀜 신호도 듣고, 신호 뒤 1.5초 동안 창 크기·방향을 0.1초마다 다시 본다.
+        조건 = 정방향 세로(portrait-primary) + 창 높이가 바깥 화면 높이(678) + 창 폭 470 이하(cover 466 / 원래 382)
+             + cover 를 붙인 뒤 오른쪽 안전 여백 60 이상·왼쪽 20 미만. 하나라도 아니면 떼고 viewport 를 되돌린다.
+     🔴 「띠 없음」으로 판정된 자세는 기억해서 다시 cover 를 붙이지 않는다 — cover↔원래 를 오가며 끝없이 되풀이되는 것을 막는다.
+        자세가 바뀌면(돌리기·펼치기) 기억을 지운다. -->
 <script>
 (function () {
   if (!navigator.standalone) return;
+  var sw = screen.width, sh = screen.height;
+  if (Math.min(sw, sh) !== 466 || Math.max(sw, sh) !== 678) return;   // 아이폰 듀오가 아니면 아무것도 안 한다
   var html = document.documentElement;
   var meta = document.querySelector('meta[name="viewport"]');
   if (!meta) return;
   var BASE = meta.getAttribute('content');
   var COVER = BASE + ', viewport-fit=cover';
   var probe = null;
-  var rejected = '';   // 「띠 없음」으로 판정된 자세(화면 크기+방향). 같은 자세에선 다시 시도하지 않는다
-  function pose() { return screen.width + 'x' + screen.height + (innerHeight >= innerWidth ? 'p' : 'l'); }
-  // 접은 바깥 화면(466×678pt)을 세로로 들었을 때만. 화면 크기는 돌려도 같은 값일 수 있어 창의 가로세로로 방향을 본다
-  function folded() {
-    var a = screen.width, b = screen.height;
-    return Math.min(a, b) === 466 && Math.max(a, b) === 678 && innerHeight >= innerWidth;
+  var rejected = '';   // 「띠 없음」으로 판정된 자세. 같은 자세에선 다시 시도하지 않는다
+  var gen = 0;         // 늦게 도착한 옛 판정이 새 판정을 덮지 않게 하는 번호
+  var lastSig = '', settleTimer = 0, settleUntil = 0;
+  function orient() {
+    if (screen.orientation && screen.orientation.type) return screen.orientation.type;
+    return window.orientation === 0 ? 'portrait-primary' : 'other';
   }
-  function insetRight() {
+  function sig() { return innerWidth + 'x' + innerHeight + '|' + orient(); }
+  // 접은 바깥 화면을 정방향 세로로 들고, 창이 그 화면 높이를 꽉 채울 때만.
+  // 🔴 막 켜지는 동안(booting)은 창 높이가 657 로 먼저 잡혔다가 678 이 된다(가상 듀오 기록) — 그동안만 640 이상이면 인정한다.
+  //    펼칠 때 잠깐 보이는 466×669 를 듀오로 잘못 보지 않으려고, 켜진 뒤에는 678 딱 맞을 때만 인정한다.
+  var booting = true;
+  function candidate(loose) {
+    var H = Math.max(sw, sh);
+    var hOk = loose ? (innerHeight >= 640 && innerHeight <= H) : innerHeight === H;
+    return orient() === 'portrait-primary' && hOk && innerWidth <= 470;
+  }
+  function insets() {
     if (!probe) {
       probe = document.createElement('div');
       probe.setAttribute('aria-hidden', 'true');
-      probe.style.cssText = 'position:fixed;top:0;right:0;width:0;height:0;visibility:hidden;pointer-events:none;padding-right:env(safe-area-inset-right,0px)';
+      probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)';
       (document.body || html).appendChild(probe);
     }
-    return parseFloat(getComputedStyle(probe).paddingRight) || 0;
+    if (document.body && probe.parentNode !== document.body) document.body.appendChild(probe);
+    var cs = getComputedStyle(probe);
+    return { l: parseFloat(cs.paddingLeft) || 0, r: parseFloat(cs.paddingRight) || 0 };
+  }
+  // 🔴 viewport 태그를 바꾸면 그 자체로 창 크기가 바뀌어 다시 판정이 돈다. 혹시 cover↔원래 가 오가며 멈추지 않으면
+  //    (5초에 8번 넘게 바꾸면) 원래 태그로 두고 같은 방향에서는 더 바꾸지 않는다 — 방향이 바뀌면 풀린다(독립 검토 권고)
+  var writes = [], frozen = '';
+  function setMeta(v) {
+    if (meta.getAttribute('content') === v) return;
+    if (frozen) return;
+    var now = Date.now();
+    writes = writes.filter(function (t) { return now - t < 5000; });
+    if (writes.length >= 8) { frozen = orient(); html.classList.remove('duo-folded'); meta.setAttribute('content', BASE); return; }
+    writes.push(now);
+    meta.setAttribute('content', v);
   }
   function off() {
     html.classList.remove('duo-folded');
-    if (meta.getAttribute('content') !== BASE) meta.setAttribute('content', BASE);
+    setMeta(BASE);
   }
-  // 오른쪽 띠가 실제로 있을 때만(접고 세로로 든 상태 86pt). 가로로 눕히면 띠가 다른 쪽으로 가서 0 이 된다
-  function check() {
-    if (folded() && insetRight() >= 60) { rejected = ''; html.classList.add('duo-folded'); }
-    else { if (folded()) rejected = pose(); off(); }
+  // cover 를 붙인 뒤 여백이 늦게 들어올 수 있어(첫 판정에서 0 이 나온 적 있음) 0.15초 간격으로 세 번까지 다시 본다
+  function check(key, g, tries) {
+    if (g !== gen) return;
+    // cover 가 실제로 붙어 있지 않으면(멈춤 장치가 거절했으면) 듀오 배치를 붙이지 않는다 — 원래 viewport + 듀오 배치가 섞이는 것을 막는다(코덱스 1-2)
+    if (frozen || meta.getAttribute('content') !== COVER) { html.classList.remove('duo-folded'); return; }
+    if (!candidate(booting)) { if (!booting) off(); return; }
+    var i = insets();
+    if (i.r >= 60 && i.l < 20) {
+      rejected = '';
+      if (candidate(false)) booting = false;   // 창 높이가 678 이 된 뒤에만 「막 켜지는 중」을 끝낸다
+      html.classList.add('duo-folded');
+      return;
+    }
+    if (tries < 3) { setTimeout(function () { check(key, g, tries + 1); }, 150); return; }
+    if (!booting) rejected = key;   // 막 켜지는 동안은 「띠 없음」을 기억하지 않는다 — 여백이 늦게 들어와도 다음 판정에서 다시 본다
+    off();
   }
   function evaluate() {
-    if (!folded()) { rejected = ''; off(); return; }   // 펴거나 눕히면 거절 기록을 지운다 — 다시 접어 세우면 새로 잰다(코덱스 검토)
-    if (rejected === pose()) return;
-    if (meta.getAttribute('content') !== COVER) meta.setAttribute('content', COVER);
-    requestAnimationFrame(function () { requestAnimationFrame(check); }); // 태그를 바꾼 뒤 여백이 반영될 때까지 두 프레임 기다린다
+    lastSig = sig();
+    var g = ++gen;
+    // 방향이 실제로 바뀌면 멈춤을 풀고 바꾼 횟수 기록도 비운다 — 안 비우면 5초 안에 세로로 돌아왔을 때 옛 기록 때문에 곧바로 다시 멈춘다(코덱스 1-1)
+    if (frozen) { if (frozen === orient()) { html.classList.remove('duo-folded'); return; } frozen = ''; writes = []; }
+    if (!candidate(booting)) { rejected = ''; off(); return; }
+    var key = orient() + '|' + Math.max(sw, sh);
+    if (rejected === key) { off(); return; }
+    setMeta(COVER);
+    // 태그를 바꾼 뒤 여백이 반영될 때까지 두 프레임 기다린다. 그사이 새 판정이 시작됐으면 이 판정은 버린다
+    requestAnimationFrame(function () { requestAnimationFrame(function () { check(key, g, 0); }); });
   }
-  if (folded()) { meta.setAttribute('content', COVER); html.classList.add('duo-folded'); }
-  window.addEventListener('load', function () { requestAnimationFrame(check); });
-  window.addEventListener('resize', evaluate);
+  // 신호가 오면 바로 판정하고, 1.5초 동안 창 크기·방향이 신호 없이 바뀌는지 0.1초마다 본다
+  function kick() {
+    evaluate();
+    settleUntil = Date.now() + 1500;
+    if (settleTimer) return;
+    settleTimer = setInterval(function () {
+      if (sig() !== lastSig) evaluate();
+      if (Date.now() > settleUntil) { clearInterval(settleTimer); settleTimer = 0; }
+    }, 100);
+  }
+  if (candidate(true)) { setMeta(COVER); html.classList.add('duo-folded'); }
+  kick();
+  // 켜진 뒤 3초가 지나면 「막 켜지는 중」 너그러움을 끝낸다(그 뒤로는 창 높이 678 딱 맞을 때만)
+  window.addEventListener('load', function () { kick(); setTimeout(function () { booting = false; kick(); }, 3000); });
+  window.addEventListener('resize', kick);
+  window.addEventListener('orientationchange', kick);
+  window.addEventListener('pageshow', function () { rejected = ''; kick(); });
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', kick);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', kick);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { rejected = ''; kick(); } });
+  // styles.css 듀오 절의 @media 조건과 같은 조건이 바뀌면 다시 본다 — 다른 신호 없이 창만 바뀌는 경우 대비(코덱스 선택 권고)
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(orientation: portrait) and (max-width: 470px)');
+    if (mq.addEventListener) mq.addEventListener('change', kick); else if (mq.addListener) mq.addListener(kick);
+  }
 })();
 </script>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-round-v7-32.png">

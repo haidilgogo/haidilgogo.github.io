@@ -7622,6 +7622,10 @@ button.hc-card:not(.hc-card--static):active { transform: scale(.97); }
       여백을 양쪽 똑같이 맞추는 안은 시계 줄과 6pt 어긋나서 고르지 않았다.
    ⚠️ 418pt·5pt 는 가상 기기(Xcode 27.1)에서 잰 값이다. 실물 듀오에서 다시 잴 것.
    시안·측정 기록: docs/HANDOVER.md 2026-10-23~24 절. */
+/* 🔴 아래 듀오 규칙은 전부 「세로 + 폭 470 이하」 안에서만 쓴다(2026-10-24). 펼친 안쪽 화면(폭 669·951)이나 가로에서
+   html.duo-folded 가 잠깐 남아 있어도 세로 바·오른쪽 여백이 그려지지 않게 하는 안전장치다(판정 스크립트가 곧 떼지만 그 사이를 막는다).
+   ⚠️ CSS 의 orientation 은 기기 방향이 아니라 창의 가로·세로 크기 비교라, 펼치는 중간 466×669 는 통과한다 — 그건 index.html 판정(창 높이 678)이 거른다. */
+@media (orientation: portrait) and (max-width: 470px) {
 html.duo-folded { --duo-r: env(safe-area-inset-right, 86px); }
 
 /* 본문: 오른쪽 여백 = 띠. 아래 여백은 탭바가 옆으로 갔으니 홈 인디케이터만 피한다 */
@@ -7670,3 +7674,4 @@ html.duo-folded .share-toast { left: calc((100% - var(--duo-r)) / 2); }
    (뒤 화면이 비치던 것은 index.html 스플래시 <style> 의 듀오 규칙이 맡는다) */
 html.duo-folded .splash { justify-content: flex-start; }
 html.duo-folded .splash-inner { width: 380px; }
+} /* @media 듀오 안전장치 끝 */
