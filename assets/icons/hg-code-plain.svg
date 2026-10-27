@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- HG-*** — 내 코드 아이콘, **테두리 없는 판**(2026-08-05 사용자 요청).
+<!-- HG-*** — 내 코드 아이콘, 테두리 없는 판.
      테두리 있는 판은 같은 폴더의 hg-code.svg 다. 둘의 차이는 두 가지뿐이다:
-       ① 둥근 사각 테두리(옛 path1)를 지웠다
-       ② viewBox 를 남은 그림에 맞게 좁혔다 — 0 250 1300 800(비율 1.63) → 100 558 1105 183(비율 6.03)
-     🔴 비율이 크게 달라지므로 **CSS 의 aspect-ratio 와 width 도 같이 고쳐야 한다**(.home-code-ic).
-        안 고치면 글자가 납작해지거나 둘레에 빈 자리가 생긴다.
-     원본·유래는 hg-code.svg 주석 참고(사용자가 Solar Icons 「Password」를 고쳐 만듦, 글자는 도형 변환). -->
+       ① 둥근 사각 테두리가 없다
+       ② viewBox 가 테두리 없는 그림에 맞게 좁다 — hg-code.svg 는 0 250 1300 800(비율 1.63), 이 판은 100 558 1105 183(비율 6.03)
+     🔴 두 판은 비율이 크게 다르므로 CSS 의 aspect-ratio 와 width 도 판에 맞춰야 한다(.home-code-ic).
+        안 맞추면 글자가 납작해지거나 둘레에 빈 자리가 생긴다.
+     원본·유래는 hg-code.svg 주석 참고(Solar Icons 「Password」를 고쳐 만든 것, 글자는 도형 변환). -->
 <svg viewBox="100 558 1105 183" xmlns="http://www.w3.org/2000/svg">
     <path id="path2" fill="none" stroke="currentColor" stroke-width="50" stroke-linecap="round" d="M 922.753357 583.333313 L 922.753357 716.666626 M 865.006714 616.666626 L 980.476685 683.333313 M 980.469971 616.666626 L 865 683.333313"/>
     <path id="path3" fill="none" stroke="currentColor" stroke-width="50" stroke-linecap="round" d="M 722.75531 583.333313 L 722.75531 716.666626 M 665.00769 616.666626 L 780.478027 683.333313 M 780.469971 616.666626 L 665 683.333313"/>
