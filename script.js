@@ -187,24 +187,25 @@
     { region: '서울', name: '건대점',    addr: '서울 광진구 능동로 110, 스타시티 영존 A동 1/2층',   hours: '10:00 – 05:00', tel: '02-456-5683' },
     // 영등포점은 타임스퀘어 쪽(영중로 28 5층)이다. 주소·전화는 카카오맵 기준.
     // 매장이 이전했어도 네이버·카카오 장소 번호는 그대로라 STORE_*_ID 는 손대지 않는다.
-    { region: '서울', name: '영등포점',  addr: '서울 영등포구 영중로 28, 5층',                   hours: '10:00 – 03:00', tel: '02-2633-0119' },
+    { region: '서울', name: '영등포점',  addr: '서울 영등포구 영중로 28, 5층',                   hours: '10:00 – 05:00', tel: '02-2633-0119' },
     { region: '서울', name: '대학로점',  addr: '서울 종로구 대학로 146, 혜화동씨티밸리 3층',        hours: '10:00 – 05:00', tel: '02-743-6868' },
     { region: '서울', name: '코엑스점',  addr: '서울 강남구 테헤란로87길 58, 컨벤션별관 지하 2층',   hours: '10:00 – 05:00', tel: '02-562-1005' },
     { region: '서울', name: '가산점',    addr: '서울 금천구 디지털로10길 9, 현대아울렛 가산점 6층',  hours: '10:00 – 05:00', tel: '02-2136-9939' },
     // 🔴 청량리점 — 신규 매장. 주소·전화·오픈일 미정이라 soon:true 로
-    //    「오픈 예정」 배지 + 「자세한 정보가 곧 준비될 예정이에요」만 보인다. STORE_CATCH 도 'soon'. 정보가 나오면 채우고 soon 을 뺀다.
+    //    「오픈 예정」 배지 + 「자세한 정보가 곧 준비될 예정이에요」만 보인다. STORE_CATCH 도 'soon'.
+    //    정보가 나오면 값을 채우고 soon:true 와 STORE_CATCH 의 'soon' 을 함께 정리한다(공개 날짜가 정해졌으면 STORE_OPEN_DATE 에 날짜).
     { region: '서울', name: '청량리점',  soon: true },
     // 부천점 영업시간은 05:00 — 네이버·캐치테이블·방문 후기가 05:00, 카카오만 03:00.
     { region: '경기', name: '부천역점',  addr: '경기 부천시 원미구 부천로 11, 2층',              hours: '10:00 – 05:00', tel: '032-666-0118' },
     // 🔴 안산점 — 오픈 전. 청량리점과 똑같이 「오픈 예정」만 보인다(캐치테이블이 있어도 아직 안 열었다).
     //    오픈하면 아래 값을 넣는다: addr '경기 안산시 단원구 당곡로 20, 2001아울렛 4층' · hours '10:00 – 05:00' · tel '031-481-8886'.
+    //    그때 soon:true 를 빼고, STORE_CATCH 를 링크로, STORE_OPEN_DATE 의 '미정' 은 지우거나 공개 날짜로 바꾼다(셋 중 하나라도 남으면 계속 「오픈 예정」).
     { region: '경기', name: '안산점',    soon: true },
     { region: '부산', name: '부산역점',  addr: '부산 동구 중앙대로 175',                        hours: '10:00 – 03:00', tel: '051-466-8880' },
-    // 오픈 예정 — STORES 에 soon:true, STORE_CATCH 에 'soon' 을 둔다.
-    // soon:true 에 addr 가 없으면 매장 탭엔 「오픈 예정」 배지와 안내 문구만 보이고(버튼 줄 없음), STORE_CATCH 의 'soon' 이 스티커 매장 선택을 막는다.
-    // 🔴 주소는 도로명까지만 적는다 — 건물명·영업시간·전화는 오픈 뒤 정보가 나오면 채운다.
-    // 🔴 부산서면점 — 오픈 전. 안산·청량리와 같이 「오픈 예정」만. 오픈하면 넣는다: addr '부산 부산진구 중앙대로 654'(도로명까지) · tel '051-818-1003'.
-    { region: '부산', name: '부산서면점', soon: true },
+    // 오픈 예정 — 두 가지 방법이 있다(매장 탭·스티커 매장 선택 모두 「오픈 예정」으로 보인다. 아래 storeIsSoon).
+    //   · 정보가 아직 없으면 soon:true 와 STORE_CATCH 의 'soon'.
+    //   · 정보는 있고 공개할 날만 정해졌으면 값을 다 채우고 STORE_OPEN_DATE 에 그 날짜를 적는다. 그날 한국 시간 0시에 열린다.
+    { region: '부산', name: '부산서면점', addr: '부산 부산진구 중앙대로 654, 서면푸르지오시티 시그니처 2층', hours: '10:00 – 05:00', tel: '051-818-1003' },
     { region: '대구', name: '대구동성로점', addr: '대구 중구 동성로1길 15, 유니온스퀘어 2층',         hours: '10:00 – 05:00', tel: '053-428-7771' },
     { region: '제주', name: '제주점',    addr: '제주 제주시 연동4길 2, 제주볼튼호텔 5층',          hours: '10:00 – 03:00', tel: '064-747-8886' },
   ];
@@ -214,16 +215,15 @@
   //            HTML 안 items 배열의 id 가 번호다(name 은 「하이디라오 …」).
   //    ⚠️ 새 지점이 생기면 여기 한 줄 추가할 것. 없으면 핀 없이 검색 결과로 뜬다(동작은 한다).
   //    ⚠️ 코엑스점은 네이버 등록명이 「하이디라오 COEX점」이라 이름이 다르다 — 번호로 걸어 문제없다.
-  //    ⚠️ 오픈 예정 부산점은 네이버에 아직 없어 번호가 없다. 주소 없는 오픈 예정 매장은 지도 버튼이 아예 안 나와 필요 없다.
-  //       (부산점은 이름으로 검색하면 엉뚱하게 부산역점이 잡히기까지 한다.)
-  //    ⚠️ 안산점은 네이버·카카오 미등록이라 번호가 없다. 오픈 예정(주소 없음)인 동안은 지도 버튼이 안 나온다.
+  //    ⚠️ 오픈 예정 매장은 지도 버튼이 아예 안 나온다. 번호는 등록되는 대로 미리 넣어 둬도 된다.
+  //    ⚠️ 안산점은 네이버·카카오 미등록이라 번호가 없다. 오픈 예정인 동안은 지도 버튼이 안 나온다.
   //       등록되면 번호를 뽑아 여기와 STORE_KAKAO_ID 에 한 줄씩 넣을 것.
   // 🔴 지점별 카카오 장소번호. 네이버와 **번호 체계가 다르다** — 서로 못 바꿔 쓴다.
   //    뽑는 법: m.map.kakao.com/actions/searchView?q=하이디라오+<지점> 의 HTML 안
   //            search_item 항목의 data-id 가 번호다.
   //    ⚠️ 카카오 등록명이 STORES 의 name 과 다른 곳이 있다(번호로 걸어서 화면엔 영향 없다):
   //       홍대점→홍대지점 · 코엑스점→COEX점 · 제주점→제주도점
-  //    ⚠️ 오픈 예정 부산점은 번호가 없다(지도 버튼이 안 나온다). 안산점도 아직 미등록(위 네이버 주석 참고).
+  //    ⚠️ 안산점은 아직 미등록(위 네이버 주석 참고).
   const STORE_KAKAO_ID = {
     '명동점': '1820258951',
     '서초점': '1372079546',
@@ -237,6 +237,7 @@
     '부산역점': '957408853',
     '대구동성로점': '1203829931',
     '제주점': '1143177072',
+    '부산서면점': '1852425096',
   };
   const STORE_NAVER_ID = {
     '명동점': '1501495669',
@@ -251,6 +252,7 @@
     '부산역점': '1327035832',
     '대구동성로점': '2065069021',
     '제주점': '2024934566',
+    '부산서면점': '2093161550',
   };
   // 지점별 캐치테이블 예약·웨이팅 링크(있는 지점만 '예약' 버튼 표시). 키 = STORES의 name.
   const STORE_CATCH = {
@@ -266,34 +268,50 @@
     '부산역점': 'https://app.catchtable.co.kr/ct/shop/haidilaobusan?type=WAITING&currentSuggestionType=SHOP_NAME',
     '대구동성로점': 'https://app.catchtable.co.kr/ct/shop/haidilao_daegu?type=WAITING&currentSuggestionType=SHOP_NAME',
     '제주점': 'https://app.catchtable.co.kr/ct/shop/haidilao_jeju?type=WAITING&currentSuggestionType=SHOP_NAME',
-    // 🔴 안산점·부산서면점은 오픈 전이라 예약 버튼도 열지 않는다(청량리와 같은 「오픈 예정」). 지도·전화·스티커는 아래 STORE_OPEN_DATE 의 '미정' 이 막는다.
+    // 🔴 안산점은 오픈 전이라 예약 버튼도 열지 않는다(청량리와 같은 「오픈 예정」).
     //    캐치테이블 등록명은 「안산고잔점」이지만 표기는 「안산점」이다.
     //    type 파라미터 없이 두면 캐치테이블이 기본 탭(예약)을 보여 준다 — 오픈 전엔 웨이팅이 없어 WAITING 은 빈 화면.
     //    오픈하면 'soon' 을 아래 URL 로 바꾼다.
     //   안산점: https://app.catchtable.co.kr/ct/shop/haidilao_ansan_gojan (등록명 안산고잔점)
-    //   부산서면점: https://app.catchtable.co.kr/ct/shop/haidilao_seomyeon (등록명 부산서면점)
     '안산점': 'soon',
-    // 🔴 부산서면점은 **오픈 전**이지만 캐치테이블 페이지가 있다(등록명 「하이디라오 부산서면점」, 영업시간 미등록).
-    //    안산점과 같은 처리 — 지도·전화·스티커는 STORE_OPEN_DATE '미정' 이 막는다. type 파라미터 없이 둔다(오픈 전 WAITING 은 빈 화면).
-    '부산서면점': 'soon',
+    // 부산서면점 — 등록명 「하이디라오 부산서면점」. type 파라미터 없이 둔다(기본 탭).
+    //    STORE_OPEN_DATE 의 날짜 전에는 매장 카드에 버튼이 안 나와서 이 링크도 안 보인다.
+    '부산서면점': 'https://app.catchtable.co.kr/ct/shop/haidilao_seomyeon',
     '청량리점': 'soon', // 신규. 캐치테이블 생기면 URL 로. 그때까지 'soon' 이 스티커 매장 선택을 「오픈 예정」으로 막는다
   };
-  // 🔴 오픈일이 정해진 지점 — 캐치테이블 예약 버튼만 미리 열고,
-  //    **지도·전화 버튼과 스티커 매장 선택은 오픈일부터** 자동으로 풀린다(오픈 전엔 지도에 없고 전화도 소용없다).
-  //    값은 오픈일(YYYY-MM-DD). 보는 사람 기기의 오늘 날짜가 이 날 이상이면 열린다.
-  //    오픈일이 지나면 이 줄은 지워도 된다(남겨 둬도 동작은 같다).
-  //    날짜를 모르면 '미정' — 날짜를 적을 때까지 계속 잠긴다. 오픈일이 나오면 그 날짜로 바꾼다.
+  // 🔴 공개 날짜가 정해진 지점 — 그 전에는 매장 탭·스티커 매장 선택 모두 「오픈 예정」으로 보이고
+  //    (주소·영업시간·버튼을 감춘다), **그날 한국 시간 0시**부터 자동으로 열린다.
+  //    값은 날짜(YYYY-MM-DD). 보는 사람 기기의 시간대와 상관없이 한국 시간으로 잰다.
+  //    열어 둔 화면도 그 시각에 바뀐다(아래 「공개 시각 전환」).
+  //    날짜가 지나면 이 줄은 지워도 된다(남겨 둬도 동작은 같다).
+  //    날짜를 모르면 '미정' — 날짜를 적을 때까지 계속 잠긴다. 날짜 모양이 틀려도 잠긴 채로 둔다.
   const STORE_OPEN_DATE = {
     '안산점': '미정',
-    '부산서면점': '미정',   // 서면. 캐치테이블 페이지만 있다. 오픈일 나오면 날짜로.
+    '부산서면점': '2026-11-01',
   };
-  function storeNotYetOpen(name) {
+  // 공개 시각(밀리초). 없으면 0, '미정'이거나 모양이 틀리면 Infinity.
+  function storeOpenTime(name) {
     const d = STORE_OPEN_DATE[name];
-    if (!d) return false;
-    if (d === '미정') return true;
-    const now = new Date();
-    const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-    return today < d;
+    if (!d) return 0;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d);
+    if (!m) return Infinity;
+    const y = +m[1], mo = +m[2] - 1, day = +m[3];
+    const utc = Date.UTC(y, mo, day);
+    const back = new Date(utc);
+    if (back.getUTCFullYear() !== y || back.getUTCMonth() !== mo || back.getUTCDate() !== day) return Infinity;   // 없는 날
+    return utc - 9 * 60 * 60 * 1000;   // 한국 시간 그날 0시
+  }
+  // 아래 세 함수의 now 는 판정 시각(밀리초)이다. 안 주면 지금. 한 번의 판정 안에서는 같은 값을 넘긴다.
+  // 「오픈 예정」 상태를 매장 순서대로 적은 열쇠 — 화면을 그릴 때의 값과 지금 값이 다르면 다시 그린다.
+  function storeSoonKey(now) {
+    return STORES.map((s) => (storeIsSoon(s, now) ? 1 : 0)).join('');
+  }
+  function storeNotYetOpen(name, now) {
+    return (now === undefined ? Date.now() : now) < storeOpenTime(name);
+  }
+  // 「오픈 예정」으로 보일 매장 — 정보가 없거나(soon), 예약이 'soon' 이거나, 공개 날짜 전.
+  function storeIsSoon(s, now) {
+    return !!s.soon || STORE_CATCH[s.name] === 'soon' || storeNotYetOpen(s.name, now);
   }
 
   /* 🔴 **소스 만들기에서만 감추는 재료**.
@@ -5483,9 +5501,12 @@
     });
     updateStoreUnderline();
   }
+  let storesDrawnKey = '';   // 매장 카드가 마지막으로 맞춰진 storeSoonKey()
   function renderStores() {
     const wrap = document.getElementById('stores');
     if (!wrap) return;
+    const at = Date.now();
+    storesDrawnKey = storeSoonKey(at);
     wrap.innerHTML = '';
     const showAll = activeRegion === '전국';
     const list = STORES.filter((s) => showAll || s.region === activeRegion);
@@ -5504,185 +5525,182 @@
         h.textContent = s.region;
         wrap.appendChild(h);
       }
-      const card = document.createElement('div');
-      card.className = 'store' + (s.soon ? ' store--soon' : '');
-
-      const top = document.createElement('div');
-      top.className = 'store-top';
-      const nm = document.createElement('span');
-      nm.className = 'store-name';
-      nm.textContent = '하이디라오 ' + s.name;
-      top.appendChild(nm);
-      if (s.soon) {
-        const badge = document.createElement('span');
-        badge.className = 'store-badge';
-        badge.textContent = '오픈 예정';
-        top.appendChild(badge);
-      }
-      card.appendChild(top);
-
-      if (s.addr) {
-        const addr = s.addr.replace(/,\s*/g, ' '); // 주소에서 쉼표 제거(표시·복사 공통)
-        const a = document.createElement('div');
-        a.className = 'store-info store-info--addr';
-        a.innerHTML = '<span class="store-i store-i--pin"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.686-6-10a6 6 0 0 1 12 0c0 4.314-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><span class="store-addr">' + addr + '</span>';
-        // 주소 복사 버튼 — 주소 줄 오른쪽 끝
-        const copy = document.createElement('button');
-        copy.type = 'button';
-        copy.className = 'store-copy';
-        copy.setAttribute('aria-label', '주소 복사');
-        copy.innerHTML =
-          '<svg class="ic-copy" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>' +
-          '<svg class="ic-check" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
-        copy.addEventListener('click', (e) => { e.stopPropagation(); copyAddr(copy, addr); });
-        a.appendChild(copy); // 주소 블록 옆(형제) — 짧으면 글자 바로 뒤, 2줄이면 오른쪽 위(혼자 안 떨어짐)
-        card.appendChild(a);
-      }
-      if (s.hours) {
-        const h = document.createElement('div');
-        h.className = 'store-info';
-        h.innerHTML = '<span class="store-i"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></span><span>' + s.hours + '</span>';
-        card.appendChild(h);
-      }
-      if (s.soon && !s.addr) {
-        const p = document.createElement('div');
-        p.className = 'store-info store-info--muted';
-        p.textContent = '자세한 정보가 곧 준비될 예정이에요.';
-        card.appendChild(p);
-      }
-
-      // 버튼: 오픈 예정이 아니고 주소/전화가 있을 때만
-      if (!s.soon || s.addr) {
-        const acts = document.createElement('div');
-        acts.className = 'store-actions';
-        // 예약(캐치테이블 웨이팅) — 맨 앞 강조 버튼. 'soon'이면 비활성 '오픈 예정' 버튼.
-        const catchUrl = STORE_CATCH[s.name];
-        // 지도·전화는 'soon' 이거나 STORE_OPEN_DATE 의 오픈일 전이면 막는다(예약 버튼은 catchUrl 로만 판단).
-        const notOpen = catchUrl === 'soon' || storeNotYetOpen(s.name);
-        if (catchUrl === 'soon') {
-          const book = document.createElement('span');
-          book.className = 'store-btn book--soon';
-          book.textContent = '오픈 예정';
-          acts.appendChild(book);
-        } else if (catchUrl) {
-          const book = document.createElement('a');
-          book.className = 'store-btn book';
-          book.textContent = '캐치테이블';
-          book.href = catchUrl;
-          book.target = '_blank';
-          book.rel = 'noopener';
-          acts.appendChild(book);
-        }
-        if (s.addr && notOpen) {
-          // 오픈 예정 지점의 지도 — 전화와 같은 이유로 막는다.
-          // 아직 문을 안 연 자리라 지도에서 찾아도 나오지 않거나 엉뚱한 곳이 잡힌다.
-          // 전화(tel--soon)와 같은 크림 바랜 모양이고, 자리는 지켜서 카드 폭이 안 흔들린다.
-          const map = document.createElement('span');
-          map.className = 'store-btn tel--soon';
-          map.textContent = '지도';
-          acts.appendChild(map);
-        } else if (s.addr) {
-          // '지도' 버튼 → 아래(위)로 펼쳐지는 드롭다운(네이버 지도/카카오맵)
-          const dd = document.createElement('div');
-          dd.className = 'map-dd';
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'store-btn map';
-          btn.textContent = '지도';
-          const menu = document.createElement('div');
-          menu.className = 'map-dd-menu';
-          const q = encodeURIComponent('하이디라오 ' + s.name);
-          // 🔴 네이버는 공백을 %20 이 아니라 + 로 받는다(실기기 확인).
-          //    %20 으로 보내면 「명동점」이 통째로 잘려 나가고 「하이디라오」만 검색돼서
-          //    명동점·대학로점·홍대점이 다 나오거나, 지도만 뜨고 아무 데도 안 찍힌다.
-          const qPlus = q.replace(/%20/g, '+');
-          [
-            // 🔴 map.naver.com/p/search/ 를 쓰면 안 된다 — 폰에서 열면 네이버가 앱 실행 페이지
-            //    (app.map.naver.com, appSchemeName=nmap&appmarket=N)로 넘겨서, 네이버지도 앱이
-            //    없으면 「앱 설치」 화면만 뜨고 지도를 못 본다(실기기에서 확인).
-            //    m.map.naver.com/search + mapMode=0 은 앱으로 안 튀고 웹 지도에 핀을 찍는다.
-            //    🔴 핀은 pinId + pinType=site + menu=location 이 찍는다.
-            //    🔴🔴 그런데 그것만으로는 안 된다 — **rel 에 noreferrer 가 있어야 한다**(아래 a.rel 참고).
-            //       네이버·카카오가 「어디서 왔는지」를 읽고 바깥에서 들어온 링크에는 핀을 안 내준다.
-            //       주소를 직접 열면 핀이 나오고 사이트에서 누르면 안 나오는 차이가 이것이다.
-            //       ⚠️ 서버가 보내는 주소만 봐서는 안 보인다(curl 로는 referrer 있든 없든 같은 곳으로 간다).
-            //          페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
-            //    ⚠️ 아래 주소들은 안 된다. 쓰지 말 것:
-            //       · map.naver.com/p/search/…        폰에서 앱 설치 화면으로 튄다(appmarket=N 이라 아무 일도 안 남)
-            //       · …/search?query=…&mapMode=0#map/<번호>  이미 열린 화면 안에서만 통한다.
-            //                                        새 탭으로 열면 「알 수 없는 오류가 발생했습니다」
-            //       · m.map.naver.com/entry/place/<번호>     오류
-            //       · m.place.naver.com/restaurant/<번호>/home  열리긴 하나 지도가 아니라 매장정보 페이지
-            //       · map.naver.com/p/entry/place/<번호>     앱으로 튄다
-            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다 — 매장 하나만 잡히므로 쓸 만하다.
-            { label: '네이버지도', img: 'assets/icons/navermap.png?v=1',
-              href: STORE_NAVER_ID[s.name]
-                ? 'https://m.map.naver.com/map.naver?pinId=' + STORE_NAVER_ID[s.name] + '&pinType=site&menu=location'
-                : 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
-            // 🔴 카카오는 해시(#!/<번호>/map/place)가 핀을 찍는다. 네이버와 마찬가지로
-            //    rel 의 noreferrer 가 있어야 한다 — 없으면 해시가 무시되고 검색 결과만 나온다.
-            //    ⚠️ 카카오는 핀 지도 위에 「카카오맵 앱에서 더 편리하게」 안내창이 뜬다(네이버는 안 뜬다).
-            //       🔴 못 끈다. 같은 탭으로 열어도 뜬다(실기기 확인) — 여는 방식과 무관하게
-            //          카카오 페이지가 스스로 띄우는 것이라 우리 쪽에서 손댈 수 없다.
-            //          받아 온 HTML 에도 끄는 값이 없다(배너 관련 낱말 자체가 안 나온다).
-            //          지도는 안내창 뒤에 이미 핀까지 찍혀 있어서, 닫으면 바로 보인다.
-            //    ⚠️ 옛 map.kakao.com/?q=… 는 쓰면 안 된다 — 폰에서 applink.map.kakao.com 으로 앱에 튄다.
-            //    ⚠️ place.map.kakao.com/<번호> 는 열리지만 지도가 아니라 매장정보 페이지다.
-            //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다.
-            { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1',
-              href: 'https://m.map.kakao.com/actions/searchView?q=' + qPlus +
-                    (STORE_KAKAO_ID[s.name] ? '#!/' + STORE_KAKAO_ID[s.name] + '/map/place' : '') },
-          ].forEach((o) => {
-            const a = document.createElement('a');
-            a.className = 'map-dd-item';
-            a.href = o.href;
-            a.target = '_blank';
-            // 🔴🔴 noreferrer 를 빼면 지도에 핀이 안 찍힌다(실기기 확인).
-            //    네이버·카카오가 「어디서 왔는지」(document.referrer)를 읽고, 바깥 사이트에서 들어온
-            //    링크에는 핀 대신 기본 지도나 검색 결과를 준다. noreferrer 가 그 값을 지워서
-            //    주소창에 직접 친 것과 같아진다. 주소를 아무리 정확히 만들어도 이것 없이는 소용없다.
-            //    ⚠️ 이건 서버 응답으로는 안 보인다 — curl 로는 referrer 유무에 상관없이 같은 곳으로 간다.
-            //       페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
-            a.rel = 'noopener noreferrer';
-            a.innerHTML = '<img class="map-dd-ic" src="' + o.img + '" alt="" draggable="false">' + o.label;
-            a.addEventListener('click', closeAllMapDd);
-            menu.appendChild(a);
-          });
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // 바깥클릭 닫기 리스너가 곧바로 닫지 않게
-            const open = dd.classList.contains('open');
-            closeAllMapDd();
-            if (!open) {
-              dd.classList.add('open');
-              // 기본은 아래로 펼침. 단, 버튼 아래 공간이 부족하면(하단 탭바 영역 ~100px 감안) 위로 뒤집음.
-              const rect = btn.getBoundingClientRect();
-              const spaceBelow = window.innerHeight - rect.bottom - 100;
-              dd.classList.toggle('map-dd--up', spaceBelow < menu.offsetHeight);
-            }
-          });
-          dd.appendChild(btn);
-          dd.appendChild(menu);
-          acts.appendChild(dd);
-        }
-        // 전화 — 오픈 예정 지점은 아직 걸어도 소용없으므로 번호 유무와 무관하게 비활성으로 자리만 지킨다
-        // (버튼 개수가 지점마다 달라 카드 폭이 들쭉날쭉해지는 것도 함께 막힘).
-        if (notOpen) {
-          const tel = document.createElement('span');
-          tel.className = 'store-btn tel tel--soon';
-          tel.textContent = '전화';
-          acts.appendChild(tel);
-        } else if (s.tel) {
-          const tel = document.createElement('a');
-          tel.className = 'store-btn tel';
-          tel.textContent = '전화';
-          tel.href = 'tel:' + s.tel.replace(/[^0-9]/g, '');
-          acts.appendChild(tel);
-        }
-        if (acts.children.length) card.appendChild(acts);
-      }
-
-      wrap.appendChild(card);
+      wrap.appendChild(buildStoreCard(s, storeIsSoon(s, at)));
     });
+  }
+  // 매장 카드 하나. soon 이면 배지와 안내 문구만, 아니면 정보와 버튼을 그린다.
+  function buildStoreCard(s, soon) {
+    const card = document.createElement('div');
+    card.className = 'store' + (soon ? ' store--soon' : '');
+    card.dataset.store = s.name;
+
+    const top = document.createElement('div');
+    top.className = 'store-top';
+    const nm = document.createElement('span');
+    nm.className = 'store-name';
+    nm.textContent = '하이디라오 ' + s.name;
+    top.appendChild(nm);
+    if (soon) {
+      const badge = document.createElement('span');
+      badge.className = 'store-badge';
+      badge.textContent = '오픈 예정';
+      top.appendChild(badge);
+    }
+    card.appendChild(top);
+
+    if (s.addr && !soon) {
+      const addr = s.addr.replace(/,\s*/g, ' '); // 주소에서 쉼표 제거(표시·복사 공통)
+      const a = document.createElement('div');
+      a.className = 'store-info store-info--addr';
+      a.innerHTML = '<span class="store-i store-i--pin"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.686-6-10a6 6 0 0 1 12 0c0 4.314-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><span class="store-addr">' + addr + '</span>';
+      // 주소 복사 버튼 — 주소 줄 오른쪽 끝
+      const copy = document.createElement('button');
+      copy.type = 'button';
+      copy.className = 'store-copy';
+      copy.setAttribute('aria-label', '주소 복사');
+      copy.innerHTML =
+        '<svg class="ic-copy" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>' +
+        '<svg class="ic-check" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+      copy.addEventListener('click', (e) => { e.stopPropagation(); copyAddr(copy, addr); });
+      a.appendChild(copy); // 주소 블록 옆(형제) — 짧으면 글자 바로 뒤, 2줄이면 오른쪽 위(혼자 안 떨어짐)
+      card.appendChild(a);
+    }
+    if (s.hours && !soon) {
+      const h = document.createElement('div');
+      h.className = 'store-info';
+      h.innerHTML = '<span class="store-i"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></span><span>' + s.hours + '</span>';
+      card.appendChild(h);
+    }
+    if (soon) {
+      const p = document.createElement('div');
+      p.className = 'store-info store-info--muted';
+      p.textContent = '자세한 정보가 곧 준비될 예정이에요.';
+      card.appendChild(p);
+    }
+
+    // 버튼: 오픈 예정이 아닐 때만
+    if (!soon) {
+      const acts = document.createElement('div');
+      acts.className = 'store-actions';
+      // 예약(캐치테이블 웨이팅) — 맨 앞 강조 버튼.
+      const catchUrl = STORE_CATCH[s.name];
+      if (catchUrl) {
+        const book = document.createElement('a');
+        book.className = 'store-btn book';
+        book.textContent = '캐치테이블';
+        book.href = catchUrl;
+        book.target = '_blank';
+        book.rel = 'noopener';
+        acts.appendChild(book);
+      }
+      if (s.addr) {
+        // '지도' 버튼 → 아래(위)로 펼쳐지는 드롭다운(네이버 지도/카카오맵)
+        const dd = document.createElement('div');
+        dd.className = 'map-dd';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'store-btn map';
+        btn.textContent = '지도';
+        const menu = document.createElement('div');
+        menu.className = 'map-dd-menu';
+        const q = encodeURIComponent('하이디라오 ' + s.name);
+        // 🔴 네이버는 공백을 %20 이 아니라 + 로 받는다(실기기 확인).
+        //    %20 으로 보내면 「명동점」이 통째로 잘려 나가고 「하이디라오」만 검색돼서
+        //    명동점·대학로점·홍대점이 다 나오거나, 지도만 뜨고 아무 데도 안 찍힌다.
+        const qPlus = q.replace(/%20/g, '+');
+        [
+          // 🔴 map.naver.com/p/search/ 를 쓰면 안 된다 — 폰에서 열면 네이버가 앱 실행 페이지
+          //    (app.map.naver.com, appSchemeName=nmap&appmarket=N)로 넘겨서, 네이버지도 앱이
+          //    없으면 「앱 설치」 화면만 뜨고 지도를 못 본다(실기기에서 확인).
+          //    m.map.naver.com/search + mapMode=0 은 앱으로 안 튀고 웹 지도에 핀을 찍는다.
+          //    🔴 핀은 pinId + pinType=site + menu=location 이 찍는다.
+          //    🔴🔴 그런데 그것만으로는 안 된다 — **rel 에 noreferrer 가 있어야 한다**(아래 a.rel 참고).
+          //       네이버·카카오가 「어디서 왔는지」를 읽고 바깥에서 들어온 링크에는 핀을 안 내준다.
+          //       주소를 직접 열면 핀이 나오고 사이트에서 누르면 안 나오는 차이가 이것이다.
+          //       ⚠️ 서버가 보내는 주소만 봐서는 안 보인다(curl 로는 referrer 있든 없든 같은 곳으로 간다).
+          //          페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
+          //    ⚠️ 아래 주소들은 안 된다. 쓰지 말 것:
+          //       · map.naver.com/p/search/…        폰에서 앱 설치 화면으로 튄다(appmarket=N 이라 아무 일도 안 남)
+          //       · …/search?query=…&mapMode=0#map/<번호>  이미 열린 화면 안에서만 통한다.
+          //                                        새 탭으로 열면 「알 수 없는 오류가 발생했습니다」
+          //       · m.map.naver.com/entry/place/<번호>     오류
+          //       · m.place.naver.com/restaurant/<번호>/home  열리긴 하나 지도가 아니라 매장정보 페이지
+          //       · map.naver.com/p/entry/place/<번호>     앱으로 튄다
+          //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다 — 매장 하나만 잡히므로 쓸 만하다.
+          { label: '네이버지도', img: 'assets/icons/navermap.png?v=1',
+            href: STORE_NAVER_ID[s.name]
+              ? 'https://m.map.naver.com/map.naver?pinId=' + STORE_NAVER_ID[s.name] + '&pinType=site&menu=location'
+              : 'https://m.map.naver.com/search?query=' + qPlus + '&mapMode=0' },
+          // 🔴 카카오는 해시(#!/<번호>/map/place)가 핀을 찍는다. 네이버와 마찬가지로
+          //    rel 의 noreferrer 가 있어야 한다 — 없으면 해시가 무시되고 검색 결과만 나온다.
+          //    ⚠️ 카카오는 핀 지도 위에 「카카오맵 앱에서 더 편리하게」 안내창이 뜬다(네이버는 안 뜬다).
+          //       🔴 못 끈다. 같은 탭으로 열어도 뜬다(실기기 확인) — 여는 방식과 무관하게
+          //          카카오 페이지가 스스로 띄우는 것이라 우리 쪽에서 손댈 수 없다.
+          //          받아 온 HTML 에도 끄는 값이 없다(배너 관련 낱말 자체가 안 나온다).
+          //          지도는 안내창 뒤에 이미 핀까지 찍혀 있어서, 닫으면 바로 보인다.
+          //    ⚠️ 옛 map.kakao.com/?q=… 는 쓰면 안 된다 — 폰에서 applink.map.kakao.com 으로 앱에 튄다.
+          //    ⚠️ place.map.kakao.com/<번호> 는 열리지만 지도가 아니라 매장정보 페이지다.
+          //    번호가 없는 지점은 핀 없이 검색 결과로 뜬다.
+          { label: '카카오맵',   img: 'assets/icons/kakaomap.png?v=1',
+            href: 'https://m.map.kakao.com/actions/searchView?q=' + qPlus +
+                  (STORE_KAKAO_ID[s.name] ? '#!/' + STORE_KAKAO_ID[s.name] + '/map/place' : '') },
+        ].forEach((o) => {
+          const a = document.createElement('a');
+          a.className = 'map-dd-item';
+          a.href = o.href;
+          a.target = '_blank';
+          // 🔴🔴 noreferrer 를 빼면 지도에 핀이 안 찍힌다(실기기 확인).
+          //    네이버·카카오가 「어디서 왔는지」(document.referrer)를 읽고, 바깥 사이트에서 들어온
+          //    링크에는 핀 대신 기본 지도나 검색 결과를 준다. noreferrer 가 그 값을 지워서
+          //    주소창에 직접 친 것과 같아진다. 주소를 아무리 정확히 만들어도 이것 없이는 소용없다.
+          //    ⚠️ 이건 서버 응답으로는 안 보인다 — curl 로는 referrer 유무에 상관없이 같은 곳으로 간다.
+          //       페이지 안 스크립트가 읽는 값이라 실기기에서 여는 방식을 바꿔 가며 재야 잡힌다.
+          a.rel = 'noopener noreferrer';
+          a.innerHTML = '<img class="map-dd-ic" src="' + o.img + '" alt="" draggable="false">' + o.label;
+          a.addEventListener('click', closeAllMapDd);
+          menu.appendChild(a);
+        });
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); // 바깥클릭 닫기 리스너가 곧바로 닫지 않게
+          const open = dd.classList.contains('open');
+          closeAllMapDd();
+          if (!open) {
+            dd.classList.add('open');
+            // 기본은 아래로 펼침. 단, 버튼 아래 공간이 부족하면(하단 탭바 영역 ~100px 감안) 위로 뒤집음.
+            const rect = btn.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom - 100;
+            dd.classList.toggle('map-dd--up', spaceBelow < menu.offsetHeight);
+          }
+        });
+        dd.appendChild(btn);
+        dd.appendChild(menu);
+        acts.appendChild(dd);
+      }
+      // 전화
+      if (s.tel) {
+        const tel = document.createElement('a');
+        tel.className = 'store-btn tel';
+        tel.textContent = '전화';
+        tel.href = 'tel:' + s.tel.replace(/[^0-9]/g, '');
+        acts.appendChild(tel);
+      }
+      if (acts.children.length) card.appendChild(acts);
+    }
+
+    return card;
+  }
+  // 공개 시각이 지나 「오픈 예정」이 바뀐 매장 카드만 새로 만들어 바꿔 끼운다.
+  // 다른 카드는 그대로 두므로 펼쳐 둔 지도 메뉴와 키보드 초점이 유지된다(지역 필터·개수도 그대로).
+  function refreshStoreCards(now) {
+    const wrap = document.getElementById('stores');
+    if (!wrap) return;
+    wrap.querySelectorAll('.store[data-store]').forEach((card) => {
+      const s = STORES.find((x) => x.name === card.dataset.store);
+      if (!s) return;
+      const soon = storeIsSoon(s, now);
+      if (card.classList.contains('store--soon') !== soon) card.replaceWith(buildStoreCard(s, soon));
+    });
+    storesDrawnKey = storeSoonKey(now);
   }
 
   // ── 지도 드롭다운(네이버/카카오) 닫기 ──
@@ -5752,6 +5770,8 @@
     '대구동성로점': 'assets/stickers/대구동성로점.webp',
     '제주점': 'assets/stickers/제주점.webp',
     '안산점': 'assets/stickers/안산점.webp',
+    '청량리점': 'assets/stickers/청량리점.webp',
+    '부산서면점': 'assets/stickers/부산서면점.webp',
   };
   // v2: 매장당 1개(stamps 객체, v1) 대신 기록 목록(records 배열)으로 저장한다.
   // 같은 매장을 여러 번 방문해도 각각 기록된다. 기록 = { id, name, date, memo, with?, addedAt }
@@ -6210,22 +6230,30 @@
     if (stampWithDdEl.classList.contains('open') && !stampWithDdEl.contains(e.target)) closeStampWithDd();
   });
 
-  // 매장 드롭다운 메뉴 — 같은 매장 여러 번 기록 가능이라 ✓ 잠금 없음(전부 선택 가능), 항목 고정이라 한 번만 생성
+  // 매장 드롭다운 메뉴 — 같은 매장 여러 번 기록 가능이라 ✓ 잠금 없음(전부 선택 가능).
+  // 처음에 한 번 만들고, 공개 시각이 지나 「오픈 예정」이 풀리면 다시 만든다(아래 「공개 시각 전환」).
+  let stampItemsDrawnKey = '';   // buildStampStoreItems 가 마지막으로 만들 때의 storeSoonKey()
+  function buildStampStoreItems(now) {
+  const at = now === undefined ? Date.now() : now;
+  stampItemsDrawnKey = storeSoonKey(at);
+  // 다시 만들 때 키보드 초점이 목록 안에 있었으면 같은 매장 항목으로 돌려준다(기록 창의 초점 가두기가 풀리지 않게).
+  const focusedValue = stampDdMenu.contains(document.activeElement) && document.activeElement.dataset ? document.activeElement.dataset.value : null;
+  stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.remove());
   STORES.forEach((s) => {
     // 🔴 스티커 그림이 없는 매장은 목록에 넣지 않는다. 고르면 빈 카드가 되므로
     //    애초에 못 고르게 막는다.
-    //    (오픈 예정 매장은 아래에서 '오픈 예정'으로 따로 보여주므로 이 줄에서 거르지 않는다 —
-    //     지금 그림 없는 매장은 청량리점·부산서면점 둘이고 둘 다 오픈 예정 매장이다.)
-    // 오픈 전 = 매장 탭의 'soon' 이거나, STORE_OPEN_DATE 의 오픈일이 아직 안 온 지점.
-    const notYetOpen = STORE_CATCH[s.name] === 'soon' || storeNotYetOpen(s.name);
+    //    (오픈 예정 매장은 아래에서 '오픈 예정'으로 따로 보여주므로 이 줄에서 거르지 않는다.
+    //     그림이 있어도 오픈 전이면 고를 수 없다.)
+    // 오픈 전 = 매장 탭에서 「오픈 예정」으로 보이는 지점과 같다.
+    const notYetOpen = storeIsSoon(s, at);
     if (!STAMP_IMGS[s.name] && !notYetOpen) return;
     const item = document.createElement('button');
     item.type = 'button';
     item.setAttribute('role', 'option');
     item.className = 'stamp-dd-item';
     item.dataset.value = s.name;
-    // 오픈 예정 매장(STORE_CATCH='soon' 또는 오픈일 전)은 아직 방문 불가 → 비활성(선택 X, "오픈 예정" 표시).
-    // 'soon' 은 실제 오픈해 URL로 바뀌면, 오픈일 지점은 그 날짜가 되면 자동으로 선택 가능해짐.
+    // 오픈 예정 매장은 아직 방문 불가 → 비활성(선택 X, "오픈 예정" 표시).
+    // 'soon' 은 실제 오픈해 URL로 바뀌면, 공개 날짜 지점은 그 시각이 되면 자동으로 선택 가능해짐.
     if (notYetOpen) {
       item.classList.add('soon');
       item.disabled = true;
@@ -6240,6 +6268,14 @@
     }
     stampDdMenu.appendChild(item);
   });
+  // 고른 매장 표시(active)를 다시 만든 목록에도 이어 준다.
+  if (stampSelected) stampDdMenu.querySelectorAll('.stamp-dd-item').forEach((i) => i.classList.toggle('active', i.dataset.value === stampSelected));
+  if (focusedValue) {
+    const again = [...stampDdMenu.querySelectorAll('.stamp-dd-item')].find((i) => i.dataset.value === focusedValue && !i.disabled);
+    (again || stampDdBtn).focus();
+  }
+  }
+  buildStampStoreItems();
   /* ══ 확인창 ══════════════════════════════════════════════════════════════════
      🔴 브라우저 기본 `confirm()` 을 안 쓴다 — 기기마다 모양이 다르고 문구를 못 정한다.
      흐름: 닫으려 함 → 안 바뀌었으면 바로 닫음 / 바뀌었으면 이 창을 띄우고 **원래 동작을 붙들어 둔다.**
@@ -6807,6 +6843,37 @@
   renderList();
   renderStoreTabs();
   renderStores();
+
+  // ── 공개 시각 전환 ──
+  // STORE_OPEN_DATE 의 날짜가 오면 매장 탭과 스티커 매장 고르기를 다시 그린다(새로고침 없이).
+  // 다음 공개 시각에 맞춰 타이머를 걸고, 화면으로 돌아오거나 창이 초점을 받을 때도 다시 본다 —
+  // 기기가 잠들어 있던 동안 타이머가 멈췄을 수 있어서다. 타이머는 길어도 6시간마다 한 번 깨어 다시 잰다.
+  // 매장 탭과 스티커 매장 고르기는 각자 맞춰진 상태를 기억해 두고, 지금 상태와 다른 쪽만 고친다
+  // (처음 그리는 도중에 공개 시각이 지나가도 다음 확인 때 맞춰진다).
+  // 판정 시각 at 을 한 번 잡아 판정과 다음 예약에 같이 쓴다 — at 뒤의 공개 시각은 반드시 예약되고,
+  // 예약하는 사이에 그 시각이 이미 지났으면 곧바로(늦어도 0.3초 안에) 다시 본다.
+  let storeOpenTimer = 0;
+  function checkStoreOpen() {
+    const at = Date.now();
+    const key = storeSoonKey(at);
+    if (key !== storesDrawnKey) refreshStoreCards(at);
+    if (key !== stampItemsDrawnKey) buildStampStoreItems(at);
+    scheduleStoreOpenCheck(at);
+  }
+  function scheduleStoreOpenCheck(at) {
+    clearTimeout(storeOpenTimer);
+    let next = Infinity;
+    Object.keys(STORE_OPEN_DATE).forEach((name) => {
+      const t = storeOpenTime(name);
+      if (t > at && t < next) next = t;
+    });
+    if (next === Infinity) return;
+    storeOpenTimer = setTimeout(checkStoreOpen, Math.max(0, Math.min(next - Date.now() + 300, 6 * 60 * 60 * 1000)));
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkStoreOpen(); });
+  window.addEventListener('pageshow', checkStoreOpen);
+  window.addEventListener('focus', checkStoreOpen);
+  checkStoreOpen();
   renderStamps();
   window.addEventListener('resize', updateStoreUnderline);
   window.addEventListener('resize', () => {
