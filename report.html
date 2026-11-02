@@ -937,24 +937,26 @@ body:not(.has-pick) #submitWrap { margin-top: auto; }
 
     /* 목록 그리기 — 글자를 치면 맞는 것만, 비었으면 전체.
        🔴 띄어쓰기는 무시하고 찾는다(「다진마늘」로 쳐도 「다진 마늘」이 나온다).
-       🔴 목록에 없는 글자를 치면 맨 끝에 「그대로 적기」가 붙는다(거름망처럼 메뉴가 아닌 것). */
+       🔴 대문자·소문자도 가리지 않는다(「a++」로 쳐도 「한우목심A++」가 나온다) — 비교할 때만 소문자로 바꾸고,
+          보이는 이름·담는 이름·친 글자는 그대로 둔다.
+       🔴 목록에 없는 글자를 치면 맨 끝에 「「○○」 담기」가 붙는다(거름망처럼 메뉴가 아닌 것). */
     /* `전체` = ▼ 로 연 것 — 칸에 글자가 남아 있어도 **전체 목록**을 보인다. */
     function 목록그리기(전체보기) {
       전체열림 = !!전체보기;
-      var q = 전체보기 ? '' : input.value.trim(), qn = 붙여쓰기(q);
+      var q = 전체보기 ? '' : input.value.trim(), qn = 붙여쓰기(q).toLowerCase(), ql = q.toLowerCase();
       var html = '', n = 0, 똑같은것 = false;
       후보 = [];
       묶음.forEach(function (g) {
-        var 맞는것 = g.items.filter(function (it) { return !qn || 붙여쓰기(it.n).indexOf(qn) >= 0; });
+        var 맞는것 = g.items.filter(function (it) { return !qn || 붙여쓰기(it.n).toLowerCase().indexOf(qn) >= 0; });
         if (!맞는것.length) return;
         var body = 맞는것.map(function (it) {
-          if (붙여쓰기(it.n) === qn) 똑같은것 = true;
+          if (붙여쓰기(it.n).toLowerCase() === qn) 똑같은것 = true;
           var 이미 = 담겼나(it.n);
           var id = cfg.key + 'Opt' + (n++);
           if (!이미) 후보.push({ id: id, item: it });
           var 글 = esc(it.n);
           if (q) {
-            var i = it.n.indexOf(q);
+            var i = it.n.toLowerCase().indexOf(ql);
             if (i >= 0) 글 = esc(it.n.slice(0, i)) + '<b>' + esc(it.n.slice(i, i + q.length)) + '</b>' + esc(it.n.slice(i + q.length));
           }
           return '<div class="stamp-dd-item' + (이미 ? ' done' : '') + '" role="option" id="' + id + '"'
